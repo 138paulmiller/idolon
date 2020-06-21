@@ -1,0 +1,54 @@
+#include "pch.h"
+#include "editor.h"
+#include "graphics.h"
+#include "engine.h"
+#include "assets.h"
+
+
+namespace Editor
+{
+	using namespace Graphics;
+	//name of sheet to edit
+	int RunSheetView(const std::string& name)
+	{
+		int mx, my;
+		int w, h;
+		Engine::GetSize(w, h);
+		Rect src =  { 0,0,w,h }, dest = { 0,0,w,h };
+		Sheet* sheet = Assets::Load<Sheet>(name);
+		if (!sheet)
+		{
+			//add a create new sheet button
+			sheet = new Sheet(name, w, h);
+
+		}
+ 		//Color * pixels = Sim::GetPixels();
+		float timer = 0;
+		while (Engine::Run())
+		{
+			timer += Engine::GetTimeDeltaMs()/1000.0;
+			//every 1 seconds
+			if (timer > 1) 
+			{
+				printf("FPS:%.2f\n", Engine::GetFPS());
+				timer = 0;
+			}
+			if (Engine::GetMouseButtonState(MOUSEBUTTON_LEFT) != BUTTON_UP)
+			{
+				Engine::GetMousePosition(mx, my);
+				Color color;
+				color.r = 255;
+				color.g = 255;
+				color.b = 255;
+				color.a = 255;
+				sheet->pixels[my * w + mx] = color;
+				sheet->update();
+			}
+			sheet->use();
+			Engine::Draw(src, dest);
+		}
+		//Assets::Save(sheet, name);
+		//Assets::Unload(name);
+		return 1;
+	}
+}
