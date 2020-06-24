@@ -3,14 +3,22 @@
 #include "graphics.h"
 #include "engine.h"
 #include "assets.h"
-
+#include <iostream>
 
 namespace Editor
 {
 	using namespace Graphics;
+
+	void Startup()
+	{}
+
+	void Shutdown()
+	{}
+
 	//name of sheet to edit
 	int RunSheetView(const std::string& name)
 	{
+		Engine::SetEcho(true);
 		int mx, my;
 		int w, h;
 		Engine::GetSize(w, h);
@@ -20,7 +28,6 @@ namespace Editor
 		{
 			//add a create new sheet button
 			sheet = new Sheet(name, w, h);
-
 		}
  		//Color * pixels = Sim::GetPixels();
 		float timer = 0;
@@ -47,8 +54,10 @@ namespace Editor
 			sheet->use();
 			Engine::Draw(src, dest);
 		}
-		//Assets::Save(sheet, name);
-		//Assets::Unload(name);
+		Assets::Save(sheet, name);
+		Assets::Unload(name);
+		Engine::SetEcho(false);
+
 		return 1;
 	}
 }

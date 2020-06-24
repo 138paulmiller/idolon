@@ -24,6 +24,8 @@ public:
 
 namespace Assets
 {
+	void Startup(const std::string & assetdir);
+	void Shutdown();
 
 	//update the cache. Do not call each frame.
 	//void Prune();
@@ -32,11 +34,13 @@ namespace Assets
 	void SaveImpl(const Asset* asset, const std::type_info& type, const std::string& name);
 
 	void Unload(const std::string& name);
+
 	template <typename Type>
 	Type * Load(const std::string& name) 
 	{
 		return dynamic_cast<Type*>(LoadImpl(typeid(Type), name));
 	}
+	
 	template <typename Type>
 	void Save(Type * asset, const std::string& name) 
 	{

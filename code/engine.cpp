@@ -3,6 +3,9 @@
 #include "pool.h"
 #include "engine.h"
 
+
+#include <SDL2/SDL.h>
+
 #define WINDOW_TITLE "Ult Boy"
 #define WINDOW_X SDL_WINDOWPOS_UNDEFINED
 #define WINDOW_Y SDL_WINDOWPOS_UNDEFINED
@@ -12,6 +15,9 @@
 
 namespace
 {
+    static bool s_echo;
+    static EchoCallback s_echocb;
+    //when this key is hit, input handling enters "echo" mode. forwards all key input
     static SDL_Window* s_window;
     static SDL_Renderer* s_renderer;
     static SDL_Color s_clearColor = { 55, 55, 55, 255 };
@@ -132,6 +138,7 @@ namespace Engine
 
     void Startup(int w, int h, float scale)
     {
+        s_echo = false;
         s_windowScale = scale;
         s_ue.s_isRunning = SDL_Init(SDL_INIT_EVERYTHING) == 0;
         s_windowW = w / s_windowScale;
@@ -162,7 +169,15 @@ namespace Engine
         SDL_DestroyWindow(s_window);
         SDL_Quit();
     }
-
+    void SetEcho(bool on)
+    {
+        s_echo = on;
+    }
+    //only use in edit/debug mode
+    void SetEchoHandler(EchoCallback cb)
+    {
+        s_echocb = cb;
+    }
     void PollEvents()
     {
         SDL_Event event;
@@ -177,24 +192,25 @@ namespace Engine
             switch (event.type)
             {
             case SDL_KEYUP:
-
-                if (event.key.keysym.sym < 255)
-                {
-                    ButtonState & state = s_ue.keymap[event.key.keysym.sym];
-                    state = BUTTON_UP;
-                }
+            {
+                char sym = event.key.keysym.sym; 
+                s_ue.keymap[sym] = BUTTON_UP;
+            }
                 break;
             case SDL_KEYDOWN:
-                if (event.key.keysym.sym < 255)
-                {
-                    ButtonState & state = s_ue.keymap[event.key.keysym.sym];
+            {
+                char sym = event.key.keysym.sym;
+                    if( s_echo )
+                    {
+                        s_echocb(Key(sym));
+                    }
+                    ButtonState & state = s_ue.keymap[sym];
                     if (state == BUTTON_DOWN || state == BUTTON_HOLD)
                     {
                         if(Engine::GetTimeDeltaMs() > 10)
                             state = BUTTON_HOLD;
                         else
                             state = BUTTON_UP;
-
                     }
                     else
                         state = BUTTON_DOWN;
@@ -270,9 +286,9 @@ namespace Engine
 
     // ----------- Getters . Should Inline these with externs! ---------------------------
     
-    ButtonState GetKeyState(SDL_KeyCode code)
+    ButtonState GetKeyState(Key key)
     {
-        return s_ue.keymap[code];
+        return s_ue.keymap[(int)key];
     }
 
     ButtonState GetMouseButtonState(MouseButton button)

@@ -4,9 +4,6 @@
 #define FPS_CAP 60
 #define FPS_SAMPLE_COUNT 100
 
-
-
-//
 enum ButtonState 
 {
     BUTTON_UP = 0,
@@ -23,13 +20,17 @@ enum MouseButton
     MOUSEBUTTON_X1 ,
     MOUSEBUTTON_X2 ,
 };
+typedef void(*EchoCallback)(Key key);
 
 namespace Engine
 {
     void Startup(int w, int h, float = 1/5.0);
     bool Run();
     void Shutdown();
-    //API 
+    void SetEcho(bool on);
+    //only use in edit/debug mode
+    void SetEchoHandle(EchoCallback cb);
+
     // Texture 
     int CreateTexture(int width, int height);
     void DestroyTexture(int textureId);
@@ -51,7 +52,7 @@ namespace Engine
 
     float GetFPS();
 
-    ButtonState GetKeyState(SDL_KeyCode code);
+    ButtonState GetKeyState(Key key);
     ButtonState GetMouseButtonState(MouseButton button);
     void GetMousePosition(int& x, int& y);
     void GetMouseWheel(int& x, int& y, int& dx, int& dy);
