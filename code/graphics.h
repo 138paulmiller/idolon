@@ -1,5 +1,5 @@
 #pragma once
-#include "pch.h"
+#include "core.h"
 #include "assets.h"
 /*
     Basis 2D Render system. 
@@ -70,7 +70,7 @@ namespace Graphics
 
     private:
         //if sheetcache->name != name, then unload old sheet. and load sheet
-        class Sheet * sheetcache;
+        Sheet * sheetcache;
         //current animation
         int iframe;
 

@@ -1,6 +1,6 @@
 #pragma once
-#include "pch.h"
 #include <typeinfo>
+#include <string>
 
 // Impl
 namespace Graphics {

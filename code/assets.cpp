@@ -1,4 +1,3 @@
-#include "pch.h"
 #include "assets.h"
 #include "graphics.h"
 //#include "scripts.h"

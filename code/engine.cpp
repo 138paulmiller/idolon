@@ -1,9 +1,7 @@
-#include "pch.h"
+#include "core.h"
 
 #include "pool.h"
 #include "engine.h"
-
-
 #include <SDL2/SDL.h>
 
 #define WINDOW_TITLE "Ult Boy"

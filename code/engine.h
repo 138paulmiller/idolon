@@ -1,5 +1,5 @@
 #pragma once
-#include "pch.h"
+#include "core.h"
 
 #define FPS_CAP 60
 #define FPS_SAMPLE_COUNT 100

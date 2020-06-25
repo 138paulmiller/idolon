@@ -15,46 +15,43 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="../main.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="..\code\assets.cpp">
+      <Filter>../Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../pch.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="..\code\main.cpp">
+      <Filter>../Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../engine.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="..\code\engine.cpp">
+      <Filter>../Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../pool.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="..\code\pool.cpp">
+      <Filter>../Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../graphics.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="..\code\graphics.cpp">
+      <Filter>../Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../assets.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="../editor.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="..\code\editor.cpp">
+      <Filter>../Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="../pch.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\code\assets.h">
+      <Filter>../Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../engine.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\code\engine.h">
+      <Filter>../Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../pool.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\code\pool.h">
+      <Filter>../Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../graphics.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\code\graphics.h">
+      <Filter>../Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../assets.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\code\editor.h">
+      <Filter>../Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../editor.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\code\core.h">
+      <Filter>../Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

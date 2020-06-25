@@ -1,5 +1,5 @@
 #pragma once
-#include "pch.h"
+#include <string>
 
 //Create terminal system. Echos key input to a buffer. has line offset nd render the text to the screen
 

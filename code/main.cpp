@@ -1,8 +1,9 @@
-#include "pch.h"
+#include "core.h"
 #include "assets.h"
 #include "graphics.h"
 #include "engine.h"
 #include "editor.h"
+#include <functional>
 
 
 #define GRID_W 200

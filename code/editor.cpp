@@ -1,5 +1,3 @@
-#include "pch.h"
-#include "editor.h"
 #include "graphics.h"
 #include "engine.h"
 #include "assets.h"
