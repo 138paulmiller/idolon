@@ -16,6 +16,7 @@ namespace Editor
 	//name of sheet to edit
 	int RunSheetView(const std::string& name)
 	{
+		//Create an overlay to see potential changes. Committing this changes replaces current ui texture.
 		Engine::SetEcho(true);
 		int mx, my;
 		int w, h;
@@ -47,10 +48,12 @@ namespace Editor
 				color.b = 255;
 				color.a = 255;
 				sheet->pixels[my * w + mx] = color;
-				sheet->update();
+				if(mx > 0) mx--;
+				if(my > 0) my--;
+				
+				sheet->update({mx, my, 2, 2 });
 			}
-			sheet->use();
-			Engine::Draw(src, dest);
+			Engine::DrawTexture(sheet->texture, src, dest);
 		}
 		Assets::Save(sheet, name);
 		Assets::Unload(name);

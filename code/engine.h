@@ -38,10 +38,8 @@ namespace Engine
     Color * LockTexture(int textureId, const Rect & region);
     void UnlockTexture(int textureId);
     
-    //use texture for drawing
-    void UseTexture(int textureId);
-    void Draw(const Rect & src, const Rect & dest);
-    
+    void DrawTexture(int textureId, const Rect & src, const Rect & dest);
+    //void DrawRect(const Rect & dest, bool filled)
     
     //Getters/setters
     void Resize(int w, int h);
@@ -57,5 +55,8 @@ namespace Engine
     void GetMousePosition(int& x, int& y);
     void GetMouseWheel(int& x, int& y, int& dx, int& dy);
 
+    //Tools 
 
+    //Load and image and save as an asset
+    Color * LoadTexture(const std::string path, int &w, int &h);
 }

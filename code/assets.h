@@ -3,7 +3,8 @@
 #include <string>
 
 // Impl
-namespace Graphics {
+namespace Graphics 
+{
 	class Sheet;
 	class Sprite;
 }

@@ -11,20 +11,18 @@ namespace Graphics
 {
     class Sheet : public Asset
     {
+        friend class Sprite;
     public:
         
         Sheet(const std::string& name, int w, int h);
         ~Sheet();
         
         //call sparingly 
-        void update(); 
-        void use();
+        void update(const Rect & rect = { 0, 0, 0, 0 } ); 
 
         Color * const pixels;
         const int w, h;
-
-    private:
-        int texture;
+        const int texture;
     };
     //
     //class Image
@@ -64,8 +62,8 @@ namespace Graphics
         std::string animation;        
         //position/size
         Rect rect;
-
-        void update();
+        //reload cached sheet from disk.
+        void reload();
         void draw();
 
     private:
@@ -77,4 +75,6 @@ namespace Graphics
         float timer;
     };
 
+    //Create a Map. Contains a 2d array or 1d indices that map to a 2d tilesheet.
+    //reload function memcopies tiles into render texture.
 }

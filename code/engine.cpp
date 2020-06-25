@@ -3,6 +3,7 @@
 #include "pool.h"
 #include "engine.h"
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 
 #define WINDOW_TITLE "Ult Boy"
 #define WINDOW_X SDL_WINDOWPOS_UNDEFINED
@@ -40,7 +41,6 @@ namespace
 
 
     static std::vector<SDL_Texture* > s_textures;
-    static int currenttexture = 0;
     //TODO threaded input
     static std::mutex s_uemutex;
 
@@ -97,7 +97,8 @@ namespace Engine
 
     Color * LockTexture(int textureId, const Rect & region)
     {
-        ASSERT(textureId >= 0 && textureId < s_textures.size() && s_textures[textureId], "Engine: Texture does not exist");
+        ASSERT(textureId >= 0 && textureId < s_textures.size() && s_textures[textureId], 
+            "Engine: Texture does not exist");
         SDL_Texture* texture = s_textures[textureId];
 
         uint32_t format;
@@ -113,20 +114,18 @@ namespace Engine
     }   
     void UnlockTexture(int textureId)
     {
-        ASSERT(textureId >= 0 && textureId < s_textures.size() && s_textures[textureId], "Engine: Texture does not exist");
+        ASSERT(textureId >= 0 && textureId < s_textures.size() && s_textures[textureId], 
+            "Engine: Texture does not exist");
         SDL_Texture* texture = s_textures[textureId];
         SDL_UnlockTexture(texture);
     }
 
-    void UseTexture(int textureId)
-    {
-        currenttexture = textureId;
-    }
     
-    void Draw( const Rect & src, const Rect & dest)
+    void DrawTexture(int textureId, const Rect & src, const Rect & dest)
     {
-        ASSERT(currenttexture >= 0 && currenttexture < s_textures.size() && s_textures[currenttexture], "Engine: Texture does not exist");
-        SDL_Texture* texture = s_textures[currenttexture];
+        ASSERT(textureId >= 0 && textureId < s_textures.size() && s_textures[textureId], 
+            "Engine: Texture does not exist");
+        SDL_Texture* texture = s_textures[textureId];
         const SDL_Rect & srcrect = { src.x, src.y, src.w, src.h };
         const SDL_Rect& destrect = { dest.x, dest.y,dest.w,dest.h};
         SDL_SetRenderTarget(s_renderer, s_buffer);
@@ -191,13 +190,17 @@ namespace Engine
             {
             case SDL_KEYUP:
             {
-                char sym = event.key.keysym.sym; 
-                s_ue.keymap[sym] = BUTTON_UP;
+                unsigned char sym = event.key.keysym.sym;
+                if(sym < 255) 
+                    s_ue.keymap[sym] = BUTTON_UP;
             }
                 break;
             case SDL_KEYDOWN:
             {
-                char sym = event.key.keysym.sym;
+                unsigned char sym = event.key.keysym.sym;
+                if(sym < 255)
+                {
+
                     if( s_echo )
                     {
                         s_echocb(Key(sym));
@@ -213,7 +216,8 @@ namespace Engine
                     else
                         state = BUTTON_DOWN;
                 }
-                break;
+            }
+            break;
             case SDL_MOUSEWHEEL:
                 s_ue.wheeldx = s_ue.wheelx - event.wheel.x;
                 s_ue.wheeldy = s_ue.wheely - event.wheel.y;
@@ -326,5 +330,25 @@ namespace Engine
     float GetFPS()
     {
         return s_fps;
+    }
+
+
+    Color * LoadTexture(const std::string path, int &w, int &h)
+    {
+        SDL_Surface *surface = IMG_Load(path.c_str());
+        w = surface->w;
+        h = surface->h;
+        Color * pixels = new Color[w*h];
+        int bpp = surface->format->BytesPerPixel;
+        const SDL_PixelFormat * format = surface->format;
+        for(int y = 0; y < h; y++)
+            for(int x = 0; x < w; x++)
+            {
+                Color color;
+                unsigned int pixel = (unsigned int)((char*)surface->pixels)[y * bpp * w + x * bpp]; 
+                SDL_GetRGBA(pixel, format, &color.r, &color.g, &color.b, &color.a);
+                pixels[y + w + x ] = color;
+
+            }
     }
 }

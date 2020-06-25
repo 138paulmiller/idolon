@@ -12,6 +12,9 @@
 #define SIM_RATEMS 10
 
 
+//action to load 
+
+
 void renderCheck0(int w, int h, float scale)
 {
 	float timer = 10;
@@ -44,8 +47,7 @@ void renderCheck0(int w, int h, float scale)
 			pixel.a = 255;
 		}
 		Engine::UnlockTexture(texture);
-		Engine::UseTexture(texture);
-		Engine::Draw({ 0,0,w,h}, { 0,0,w,h});
+		Engine::DrawTexture(texture, { 0,0,w,h}, { 0,0,w,h});
 		Engine::DestroyTexture(texture);
 	}
 }
