@@ -21,23 +21,24 @@ namespace Editor
 		int mx, my;
 		int w, h;
 		Engine::GetSize(w, h);
-		Rect src =  { 0,0,w,h }, dest = { 0,0,w,h };
+		Rect dest = { 0,0,w,h };
 		Sheet* sheet = Assets::Load<Sheet>(name);
 		if (!sheet)
 		{
 			//add a create new sheet button
 			sheet = new Sheet(name, w, h);
 		}
+		Rect src = { 0,0,sheet->w,sheet->h };
  		//Color * pixels = Sim::GetPixels();
 		float timer = 0;
 		while (Engine::Run())
 		{
-			timer += Engine::GetTimeDeltaMs()/1000.0;
+			timer += Engine::GetTimeDeltaMs()/1000.0f;
 			//every 1 seconds
-			if (timer > 1) 
+			if (timer > 1.f) 
 			{
 				printf("FPS:%.2f\n", Engine::GetFPS());
-				timer = 0;
+				timer = 0.f;
 			}
 			if (Engine::GetMouseButtonState(MOUSEBUTTON_LEFT) != BUTTON_UP)
 			{
@@ -47,11 +48,8 @@ namespace Editor
 				color.g = 255;
 				color.b = 255;
 				color.a = 255;
-				sheet->pixels[my * w + mx] = color;
-				if(mx > 0) mx--;
-				if(my > 0) my--;
-				
-				sheet->update({mx, my, 2, 2 });
+				sheet->pixels[my * sheet->w + mx] = color;
+				sheet->update({mx, my, 1, 1 });
 			}
 			Engine::DrawTexture(sheet->texture, src, dest);
 		}

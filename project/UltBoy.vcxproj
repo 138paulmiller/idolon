@@ -74,7 +74,7 @@
     <OutDir>$(SolutionDir)\Build\$(Platform)\$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IntDir>$(SolutionDir)\Temp\$(Platform)\$(Configuration)\</IntDir>
+    <IntDir>$(SolutionDir)\build\temp\$(Platform)\$(Configuration)\</IntDir>
     <OutDir>$(SolutionDir)\Build\$(Platform)\$(Configuration)\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -102,7 +102,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
-      <AdditionalLibraryDirectories>$(SolutionDir)\code\external\SDL2\x64</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)\code\external\SDL2\x64;$(SolutionDir)\code\external\SDL2\image</AdditionalLibraryDirectories>
       <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2test.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -149,6 +149,7 @@
     <ClCompile Include="..\code\pool.cpp" />
     <ClCompile Include="..\code\graphics.cpp" />
     <ClCompile Include="..\code\editor.cpp" />
+    <ClCompile Include="..\code\ui.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\code\assets.h" />
@@ -157,6 +158,7 @@
     <ClInclude Include="..\code\pool.h" />
     <ClInclude Include="..\code\graphics.h" />
     <ClInclude Include="..\code\editor.h" />
+    <ClInclude Include="..\code\ui.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

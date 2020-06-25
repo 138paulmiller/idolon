@@ -4,7 +4,6 @@
 
 namespace UI
 {
-
 	//handle input
 	void Update();
 	void Draw();

@@ -3,7 +3,8 @@
 #include "pool.h"
 #include "engine.h"
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
 
 #define WINDOW_TITLE "Ult Boy"
 #define WINDOW_X SDL_WINDOWPOS_UNDEFINED
@@ -45,7 +46,8 @@ namespace
     static std::mutex s_uemutex;
 
     static uint32_t s_fpsStartTime, s_nextFrameTime, s_frameStartTime, s_startTime, s_frame = 0;
-    static float s_fps = 0, s_deltaMs;
+    static float s_fps = 0;
+    static uint32_t s_deltaMs;
 
 }
 
@@ -53,93 +55,13 @@ namespace
 namespace Engine
 {
 
-  
-    void Resize(int w, int h)
-    {
-        SDL_SetWindowSize(s_window, w /s_windowScale, h /s_windowScale);
-        SDL_GetWindowSize(s_window, &s_windowW, &s_windowH);
-        if (s_buffer)
-        {
-            SDL_DestroyTexture(s_buffer);
-        }
-        s_buffer = SDL_CreateTexture(s_renderer,
-            SDL_PIXELFORMAT_BGRA8888,
-            SDL_TEXTUREACCESS_TARGET, 
-            w, h);
-        
-    }
-    
-    int CreateTexture(int width, int height)
-    {
-        //find next slot
-        int i;
-        for (i = 0; i < s_textures.size(); i++)
-        {
-            if (s_textures[i] == 0)
-                break;
-        }
-        if (i >= s_textures.size()) {
-            s_textures.push_back(0);
-        }
-        s_textures[i] = SDL_CreateTexture(s_renderer,
-            SDL_PIXELFORMAT_BGRA8888,
-            SDL_TEXTUREACCESS_STREAMING, 
-            width, height);
-        return i;
-    }
-    void DestroyTexture(int textureId)
-    {  
-        ASSERT(textureId >= 0 && textureId < s_textures.size() && s_textures[textureId], "Engine: Texture does not exist");
-        SDL_Texture* texture = s_textures[textureId];
-        SDL_DestroyTexture(texture);
-        s_textures[textureId] = 0;
-    }
-
-    Color * LockTexture(int textureId, const Rect & region)
-    {
-        ASSERT(textureId >= 0 && textureId < s_textures.size() && s_textures[textureId], 
-            "Engine: Texture does not exist");
-        SDL_Texture* texture = s_textures[textureId];
-
-        uint32_t format;
-        int access, buffw, buffh;
-        SDL_QueryTexture(texture, &format, &access, &buffw, &buffh);
-        ASSERT(region.x+region.w <= buffw && region.y+region.h <= buffh && region.x >= 0 && region.y >= 0 && region.w >= 0 && region.h >= 0, "Blit: Invalid rect");
-        const SDL_Rect & rect = { region.x,region.y,region.w,region.h };
-        //internal 
-        int pitch;
-        Color* texpixels = 0;
-        SDL_LockTexture(texture, &rect, (void**)&texpixels, &pitch);
-        return texpixels;
-    }   
-    void UnlockTexture(int textureId)
-    {
-        ASSERT(textureId >= 0 && textureId < s_textures.size() && s_textures[textureId], 
-            "Engine: Texture does not exist");
-        SDL_Texture* texture = s_textures[textureId];
-        SDL_UnlockTexture(texture);
-    }
-
-    
-    void DrawTexture(int textureId, const Rect & src, const Rect & dest)
-    {
-        ASSERT(textureId >= 0 && textureId < s_textures.size() && s_textures[textureId], 
-            "Engine: Texture does not exist");
-        SDL_Texture* texture = s_textures[textureId];
-        const SDL_Rect & srcrect = { src.x, src.y, src.w, src.h };
-        const SDL_Rect& destrect = { dest.x, dest.y,dest.w,dest.h};
-        SDL_SetRenderTarget(s_renderer, s_buffer);
-	    SDL_RenderClear(s_renderer);
-        SDL_RenderCopy( s_renderer, texture, &srcrect, &destrect );
-    }
-
     void Startup(int w, int h, float scale)
     {
         s_echo = false;
         s_windowScale = scale;
         s_ue.s_isRunning = SDL_Init(SDL_INIT_EVERYTHING) == 0;
-        s_windowW = w / s_windowScale;
-        s_windowH = h / s_windowScale;
+        s_windowW = (int)( w / s_windowScale);
+        s_windowH = (int)( h / s_windowScale);
         
         s_window = SDL_CreateWindow(WINDOW_TITLE, WINDOW_X, WINDOW_Y, s_windowW, s_windowH, WINDOW_FLAGS);
         s_renderer = SDL_CreateRenderer(s_window, -1, RENDERER_FLAGS);
@@ -225,8 +147,8 @@ namespace Engine
                 s_ue.wheely = event.wheel.y;
                 break;
             case SDL_MOUSEMOTION:
-                s_ue.mousex = event.motion.x * s_windowScale;
-                s_ue.mousey = event.motion.y * s_windowScale;
+                s_ue.mousex = (int)(event.motion.x * s_windowScale);
+                s_ue.mousey = (int)(event.motion.y * s_windowScale);
                 break;
 
             case SDL_MOUSEBUTTONDOWN:
@@ -262,13 +184,13 @@ namespace Engine
 
     void UpdateTime()
     {
-        int waitMS = ((1.f / FPS_CAP * 1000.f) -  (GetTime() - s_frameStartTime));
+        int waitMS = (int)((1.f / FPS_CAP * 1000.f) -  (GetTime() - s_frameStartTime));
         waitMS = waitMS > 0 ? waitMS : 0;
         SDL_Delay(waitMS);
         if (++s_frame > FPS_SAMPLE_COUNT)
         {
             const uint32_t time = GetTime();
-            s_fps = FPS_SAMPLE_COUNT/(( time - s_fpsStartTime) / 1000.0);
+            s_fps = (FPS_SAMPLE_COUNT/(( time - s_fpsStartTime) / 1000.0f));
             s_fpsStartTime = time;
             s_frame = 0;
         }       
@@ -284,6 +206,122 @@ namespace Engine
         Render(); 
         UpdateTime();
         return true;
+    }  
+    void Resize(int w, int h)
+    {
+        int sw = (int)(w / s_windowScale);
+        int sh = (int)(h / s_windowScale);
+        SDL_SetWindowSize(s_window, sw, sh);
+        SDL_GetWindowSize(s_window, &s_windowW, &s_windowH);
+        if (s_buffer)
+        {
+            SDL_DestroyTexture(s_buffer);
+        }
+        s_buffer = SDL_CreateTexture(s_renderer,
+            SDL_PIXELFORMAT_BGRA8888,
+            SDL_TEXTUREACCESS_TARGET, 
+            w, h);
+        
+    }
+    
+    int CreateTexture(int width, int height)
+    {
+        //find next slot
+        int i;
+        for (i = 0; i < s_textures.size(); i++)
+        {
+            if (s_textures[i] == 0)
+                break;
+        }
+        if (i >= s_textures.size()) {
+            s_textures.push_back(0);
+        }
+        s_textures[i] = SDL_CreateTexture(s_renderer,
+            SDL_PIXELFORMAT_BGRA8888,
+            SDL_TEXTUREACCESS_STREAMING, 
+            width, height);
+        return i;
+    }
+    void DestroyTexture(int textureId)
+    {  
+        ASSERT(textureId >= 0 && textureId < s_textures.size() && s_textures[textureId], "Engine: Texture does not exist");
+        SDL_Texture* texture = s_textures[textureId];
+        SDL_DestroyTexture(texture);
+        s_textures[textureId] = 0;
+    }
+
+    Color * LockTexture(int textureId, const Rect & region)
+    {
+        ASSERT(textureId >= 0 && textureId < s_textures.size() && s_textures[textureId], 
+            "Engine: Texture does not exist");
+        SDL_Texture* texture = s_textures[textureId];
+
+        uint32_t format;
+        int access, buffw, buffh;
+        SDL_QueryTexture(texture, &format, &access, &buffw, &buffh);
+        ASSERT(region.x+region.w <= buffw && region.y+region.h <= buffh && region.x >= 0 && region.y >= 0 && region.w >= 0 && region.h >= 0, "LockTexture: Invalid rect");
+        const SDL_Rect & rect = { region.x,region.y,region.w,region.h };
+        //internal 
+        int pitch;
+        Color* texpixels = 0;
+        SDL_LockTexture(texture, &rect, (void**)&texpixels, &pitch);
+        return texpixels;
+    }   
+    void UnlockTexture(int textureId)
+    {
+        ASSERT(textureId >= 0 && textureId < s_textures.size() && s_textures[textureId], 
+            "Engine: Texture does not exist");
+        SDL_Texture* texture = s_textures[textureId];
+        SDL_UnlockTexture(texture);
+    }
+    Color * LoadTexture(const std::string path, int &w, int &h)
+    {
+        int bpp = 4; //force 4 bpp
+        unsigned char *data = stbi_load(path.c_str(), &w, &h, &bpp, bpp);
+        Color * pixels = new Color[w*h];
+        for (int y = 0; y < h; y++)
+        {
+            for (int x = 0; x < w; x++)
+            {
+                Color* c = &pixels[y * w + x];
+                c->r = data[y * w * 4 + x + 0];
+                c->g = data[y * w * 4 + x + 1];
+                c->b = data[y * w * 4 + x + 2];
+                c->a = data[y * w * 4 + x + 3];
+            }
+        }
+        stbi_image_free(data);
+        return pixels;
+    }
+    
+    void DrawTexture(int textureId, const Rect & src, const Rect & dest)
+    {
+        ASSERT(textureId >= 0 && textureId < s_textures.size() && s_textures[textureId], 
+            "Engine: Texture does not exist");
+        SDL_Texture* texture = s_textures[textureId];
+        const SDL_Rect & srcrect = { src.x, src.y, src.w, src.h };
+        const SDL_Rect& destrect = { dest.x, dest.y,dest.w,dest.h};
+        SDL_SetRenderTarget(s_renderer, s_buffer);
+	    SDL_RenderClear(s_renderer);
+        SDL_RenderCopy( s_renderer, texture, &srcrect, &destrect );
+    }
+
+    void DrawLine(const Color& color, int x1, int y1, int x2, int y2)
+    {
+        SDL_SetRenderTarget(s_renderer, s_buffer);
+        SDL_SetRenderDrawColor(s_renderer, color.r, color.g, color.b, color.a);
+        SDL_RenderDrawLine(s_renderer, x1, y1, x2, y2);
+    }
+
+    void DrawRect(const Color& color, const Rect & rect, bool filled)
+    {
+        SDL_SetRenderTarget(s_renderer, s_buffer);
+        SDL_SetRenderDrawColor(s_renderer, color.r, color.g, color.b, color.a);
+        SDL_Rect sdlrect = { rect.x, rect.y,rect.w,rect.h };
+        if (filled)
+            SDL_RenderFillRect(s_renderer,&sdlrect);
+        else
+            SDL_RenderDrawRect(s_renderer,&sdlrect);
     }
 
     // ----------- Getters . Should Inline these with externs! ---------------------------
@@ -314,8 +352,8 @@ namespace Engine
     
     void GetSize(int & w, int & h)
     {
-        w = s_windowW * s_windowScale;
-        h = s_windowH * s_windowScale;
+        w = (int)(s_windowW * s_windowScale);
+        h = (int)(s_windowH * s_windowScale);
     }
 
     uint32_t GetTime()
@@ -332,23 +370,4 @@ namespace Engine
         return s_fps;
     }
 
-
-    Color * LoadTexture(const std::string path, int &w, int &h)
-    {
-        SDL_Surface *surface = IMG_Load(path.c_str());
-        w = surface->w;
-        h = surface->h;
-        Color * pixels = new Color[w*h];
-        int bpp = surface->format->BytesPerPixel;
-        const SDL_PixelFormat * format = surface->format;
-        for(int y = 0; y < h; y++)
-            for(int x = 0; x < w; x++)
-            {
-                Color color;
-                unsigned int pixel = (unsigned int)((char*)surface->pixels)[y * bpp * w + x * bpp]; 
-                SDL_GetRGBA(pixel, format, &color.r, &color.g, &color.b, &color.a);
-                pixels[y + w + x ] = color;
-
-            }
-    }
 }

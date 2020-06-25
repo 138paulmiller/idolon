@@ -57,9 +57,8 @@ namespace Graphics
         Sprite(const std::string & name);
 
         std::string sheet;
+        std::string animation; //current animation        
         std::map<std::string, std::vector<Frame>> animframes;
-
-        std::string animation;        
         //position/size
         Rect rect;
         //reload cached sheet from disk.
@@ -74,7 +73,20 @@ namespace Graphics
 
         float timer;
     };
-
+    
+	class TextBox
+	{
+	public:
+		TextBox(const std::string & text);
+        int scrolly; //
+        std::string text;
+        std::string font;
+        Rect rect;
+        
+    private:
+        //font sheet to use
+        Sheet * fontsheetcache;
+	};
     //Create a Map. Contains a 2d array or 1d indices that map to a 2d tilesheet.
     //reload function memcopies tiles into render texture.
 }

@@ -135,7 +135,7 @@ namespace Assets
 				return;
 			}
 		}	
-		printf("Assets: Failed to unload unload (%s)\n", name.c_str());
+		printf("Assets: Failed to unload (%s)\n", name.c_str());
 	}
 
 	Asset* LoadImpl(const std::type_info& type, const std::string& name)
