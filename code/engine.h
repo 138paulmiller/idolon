@@ -38,6 +38,7 @@ namespace Engine
     Color * LockTexture(int textureId, const Rect & region);
     void UnlockTexture(int textureId);
     
+    void Blit(int srcTexture, int destTexture, const Rect & src, const Rect & dest);
     void DrawTexture(int textureId, const Rect & src, const Rect & dest);
     void DrawLine(const Color& color, int x1, int y1, int x2, int y2);
     void DrawRect(const Color& color, const Rect& rect, bool filled);

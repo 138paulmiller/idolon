@@ -100,6 +100,17 @@ std::string GetFilename(std::string path)
     return path;
 }
 
+Graphics::Font * CreateFontAsset(const std::string & filepath, int cw, int ch, char start)
+{
+	int w, h;
+	Color * pixels = Engine::LoadTexture(filepath, w, h);
+	std::string name = GetFilename(filepath);
+	Graphics::Font * font = new Graphics::Font(name, w, h, cw, ch, start);
+	memcpy(font->pixels, pixels, w * h * sizeof(Color));
+	font->update();
+	return font;
+}
+
 Graphics::Sheet * ConvertImageToAsset(const std::string & filepath)
 {
 	int w, h;
@@ -113,20 +124,37 @@ Graphics::Sheet * ConvertImageToAsset(const std::string & filepath)
 
 ////create usage messages
 //[min,max] 
+#define ARG_NONEMPTY(args) assert(args.size() > 0  );
 #define ARG_RANGE(args, min, max) assert(args.size() >= min && args.size() <= max );
+#define ARG_COUNT(args, i) assert(args.size() == i );
 int main(int argc, char** argv)
 { 
 	std::string root = "./";
 	std::vector<const Graphics::Sheet * > convertedSheets;
+	std::vector<const Graphics::Font * > convertedFonts;
 	CommandTable cli = {
 		{ 	"-game", 
-			[&](Args args){ ARG_RANGE(args, 0, 1) root = args[0]; } 
+			[&](Args args){ ARG_COUNT(args, 1) root = args[0]; } 
 		},
 		{ 	"-convert", 
 			[&](Args args)
 			{ 
-				ARG_RANGE(args, 0, 1) 
-				convertedSheets.push_back(ConvertImageToAsset(args[0])); 
+				ARG_NONEMPTY(args)
+				if(args[0].compare("image") == 0)
+				{
+					//must be two args
+					ARG_COUNT(args, 2) 
+					convertedSheets.push_back(ConvertImageToAsset(args[1])); 
+				}
+				else if(args[0].compare("font") == 0)
+				{
+					ARG_COUNT(args, 5) // 
+					const std::string &  img = args[1];
+					int cw = std::stoi(args[2]);
+					int ch = std::stoi(args[3]);
+					int start = std::stoi(args[4]);
+					convertedFonts.push_back(CreateFontAsset(img, cw, ch, start)); 
+				}
 			} 
 		}  
 	};
@@ -135,11 +163,16 @@ int main(int argc, char** argv)
 
 	Execute(argc, argv, cli);
 	Assets::Startup(root);
-	//Save converted assets
+	//Save converted assets to disk
 	for ( int i =0; i < convertedSheets.size(); i++)
 	{
 		const Graphics::Sheet* sheet = convertedSheets[i];
 		Assets::Save(sheet, sheet->name);
+	}
+	for ( int i =0; i < convertedFonts.size(); i++)
+	{
+		const Graphics::Font* font = convertedFonts[i];
+		Assets::Save(font, font->name);
 	}
 	
 	printf("Config:\n\tAsset Dir : %s\n", root.c_str());

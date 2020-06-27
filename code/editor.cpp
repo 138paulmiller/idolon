@@ -28,8 +28,20 @@ namespace Editor
 			//add a create new sheet button
 			sheet = new Sheet(name, w, h);
 		}
+
+		Graphics::Text text(128, 70, " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~");
+        text.crop = false;
+        text.font = "default";
+        text.reload();
+
+		Graphics::Text text2(35, 70, "Hello\nWorld");
+        text2.y = 100;
+        text2.crop = false;
+        text2.font = "default";
+        text2.reload();
+
+
 		Rect src = { 0,0,sheet->w,sheet->h };
- 		//Color * pixels = Sim::GetPixels();
 		float timer = 0;
 		while (Engine::Run())
 		{
@@ -51,7 +63,10 @@ namespace Editor
 				sheet->pixels[my * sheet->w + mx] = color;
 				sheet->update({mx, my, 1, 1 });
 			}
-			Engine::DrawTexture(sheet->texture, src, dest);
+		//		Engine::DrawTexture(sheet->texture, src, dest);
+	        text.draw();
+	        text2.draw();
+
 		}
 		Assets::Save(sheet, name);
 		Assets::Unload(name);

@@ -277,22 +277,38 @@ namespace Engine
     Color * LoadTexture(const std::string path, int &w, int &h)
     {
         int bpp = 4; //force 4 bpp
-        unsigned char *data = stbi_load(path.c_str(), &w, &h, &bpp, bpp);
+        unsigned char *data = stbi_load(path.c_str(), &w, &h, &bpp, 0);
         Color * pixels = new Color[w*h];
         for (int y = 0; y < h; y++)
         {
             for (int x = 0; x < w; x++)
             {
-                Color* c = &pixels[y * w + x];
-                c->r = data[y * w * 4 + x + 0];
-                c->g = data[y * w * 4 + x + 1];
-                c->b = data[y * w * 4 + x + 2];
-                c->a = data[y * w * 4 + x + 3];
+                int i = y * w + x;
+                Color* c = &pixels[i];
+                unsigned char* pixel = data + i * bpp;
+                c->r = pixel[0];
+                c->g = pixel[1];
+                c->b = pixel[2];
+                c->a = bpp == 4 ? pixel[3] : 255;
             }
         }
         stbi_image_free(data);
         return pixels;
     }
+    void Blit(int srcTextureId, int destTextureId, const Rect & src, const Rect & dest)
+    {
+        ASSERT(srcTextureId >= 0 && srcTextureId < s_textures.size() && s_textures[srcTextureId], 
+            "Engine: Texture does not exist");
+        ASSERT(destTextureId >= 0 && destTextureId < s_textures.size() && s_textures[destTextureId], 
+            "Engine: Texture does not exist");
+        SDL_Texture* srcTexture = s_textures[srcTextureId];
+        SDL_Texture* destTexture = s_textures[destTextureId];
+        const SDL_Rect & srcrect = { src.x, src.y, src.w, src.h };
+        const SDL_Rect& destrect = { dest.x, dest.y,dest.w,dest.h};
+        SDL_SetRenderTarget(s_renderer, destTexture );
+        SDL_RenderCopy( s_renderer, srcTexture, &srcrect, &destrect );        
+    }
+
     
     void DrawTexture(int textureId, const Rect & src, const Rect & dest)
     {
@@ -302,7 +318,7 @@ namespace Engine
         const SDL_Rect & srcrect = { src.x, src.y, src.w, src.h };
         const SDL_Rect& destrect = { dest.x, dest.y,dest.w,dest.h};
         SDL_SetRenderTarget(s_renderer, s_buffer);
-	    SDL_RenderClear(s_renderer);
+	    //SDL_RenderClear(s_renderer);
         SDL_RenderCopy( s_renderer, texture, &srcrect, &destrect );
     }
 

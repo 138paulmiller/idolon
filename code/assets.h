@@ -7,6 +7,7 @@ namespace Graphics
 {
 	class Sheet;
 	class Sprite;
+	class Font;
 }
 /*
 	All assets must define a constructor with const std::string & name as a param and as a const, public, attrib. 

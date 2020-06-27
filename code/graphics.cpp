@@ -3,6 +3,8 @@
 #include "assets.h"
 #include "engine.h"
 
+#include <sstream>
+
 namespace Graphics
 {
     
@@ -44,15 +46,16 @@ namespace Graphics
         Engine::UnlockTexture(texture);
 
     }
-    Sprite::Sprite(const std::string& name)
-        :Asset(name), sheetcache(0), iframe(0), timer(0), animation("default")
+    
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+
+    Sprite::Sprite(int w, int h, const std::string& name)
+        :Asset(name), sheetcache(0), iframe(0), timer(0), animation("default"), rect({0,0,w,h})
     {
-        rect = { 0,0,0,0 };
     }
     void Sprite::reload()
     {
-        if (!sheetcache)
-            sheetcache = Assets::Load<Sheet>(name);
+        sheetcache = Assets::Load<Sheet>(sheet);
     }
 
     void Sprite::draw()
@@ -60,15 +63,93 @@ namespace Graphics
         timer += Engine::GetTimeDeltaMs();
         const std::vector<Frame>& frames = animframes[animation];
         
-        Frame frame = frames[iframe];
-        if (timer > frame.duration)
+        if (timer > frames[iframe].duration)
         {
             timer = 0;
             iframe++;
             iframe %= frames.size();
-            frame = frames[iframe];
         }
-        Engine::DrawTexture(sheetcache->texture, frame.region, rect);
+        Engine::DrawTexture(sheetcache->texture, frames[iframe].region, rect);
+    }
+    
+    ///////////////////////////////////////////////////////////////////////////////
+
+    Font::Font(const std::string& name, int w, int h, int charW, int charH, char start)
+         :charW(charW), charH(charH), 
+         Sheet(name, w, h), 
+         start(start)
+    { }    
+    void Font::draw(const std::string & text, const Rect & dest, bool crop)
+    {
+
+        const int srcW = w / charW;  
+        const int destW = dest.w / charW;     
+        const int destH = dest.h / charH;     
+        int scrolly = 0;
+        int j = 0;
+
+        for(int i = 0; i < text.size(); i++)
+        {
+            int s =  text[i];
+            j = i;
+            if(s == '\n')
+            {
+                i++;
+                if(i== text.size()) break;
+                scrolly++;
+                s =  text[i];
+            }
+            
+            const int c =  s - start;
+            const int sx = (c % srcW)  , sy = (c / srcW) ;
+            int dx = (j % destW) , dy = (j / destW) + scrolly;
+            
+            Rect src = { 
+                sx * charW, sy * charH, 
+                charW, charH 
+            } ;
+            Rect pos = { 
+                dest.x + dx * charW, 
+                dest.y + dy * charH, 
+                charW, charH 
+            };   
+            if(crop && dy == destH) //last one, partial render if cropped
+            {
+                src.h = (src.y + charH) - (dest.y + dest.h);
+                pos.h = (pos.y + charH) - (dest.y + dest.h); 
+            }
+            else if(dy > destH) 
+                break;
+
+            Engine::DrawTexture(texture, src, pos);
+
+        }
     }
 
+
+    ///////////////////////////////////////////////////////////////////////////////
+    
+    Text::Text(int w, int h, const std::string & text)
+        :text(text),
+        font("default"),
+        x(0), y(0), w(w), h(h),
+        scrolly(0) , crop(0)
+    {
+        texture = Engine::CreateTexture(w, h);
+    }
+    Text::~Text()
+    {
+        Engine::DestroyTexture(texture);
+    }
+
+    void Text::draw()
+    {
+        if(!fontcache) return;
+        fontcache->draw(text, {x,y,w,h}, crop);
+    }
+
+    void Text::reload()
+    {
+        fontcache = Assets::Load<Font>(font);
+    }
 }

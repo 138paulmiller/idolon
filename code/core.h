@@ -1,6 +1,7 @@
 #pragma once
 
 
+#include <cmath>
 #include <cassert>
 #include <cstring>
 #include <stdio.h> 
@@ -38,7 +39,8 @@ struct Color
 
 struct Rect
 {
-    int x, y, w, h;
+    int x, y;
+    int w, h;
 };
 
 //note : order matches sdl2

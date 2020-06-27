@@ -54,7 +54,7 @@ namespace Graphics
     class Sprite  : public Asset
     {
     public:
-        Sprite(const std::string & name);
+        Sprite(int w, int h, const std::string & name);
 
         std::string sheet;
         std::string animation; //current animation        
@@ -73,19 +73,36 @@ namespace Graphics
 
         float timer;
     };
+
+    class Font : public Sheet
+    {
+    public:
+        Font(const std::string& name, int w, int h, int charW, int charH, char start);
+        //src is textbox in character units
+        void draw(const std::string & text, const Rect & dest, bool crop);
+        const int charW,charH;
+        const char start;
+    };
     
-	class TextBox
+	class Text
 	{
 	public:
-		TextBox(const std::string & text);
+		Text(int tw, int th, const std::string & text);
+        ~Text();
+
+        bool crop; //
         int scrolly; //
         std::string text;
         std::string font;
-        Rect rect;
+        int x,y;
+        const int w,h;
         
+        void reload();
+        void draw();
     private:
+        int texture; 
         //font sheet to use
-        Sheet * fontsheetcache;
+        Font * fontcache;
 	};
     //Create a Map. Contains a 2d array or 1d indices that map to a 2d tilesheet.
     //reload function memcopies tiles into render texture.
