@@ -37,7 +37,7 @@ namespace
         int wheelx, wheely;
         int wheeldx, wheeldy;
         ButtonState mousebuttons[5] = { BUTTON_UP } ;
-        ButtonState keymap[255] = { BUTTON_UP } ;
+        ButtonState keymap[512] = { BUTTON_UP } ;
     } s_ue;
 
 
@@ -113,31 +113,27 @@ namespace Engine
             case SDL_KEYUP:
             {
                 unsigned char sym = event.key.keysym.sym;
-                if(sym < 255) 
-                    s_ue.keymap[sym] = BUTTON_UP;
+                s_ue.keymap[sym] = BUTTON_UP;
             }
                 break;
             case SDL_KEYDOWN:
             {
                 unsigned char sym = event.key.keysym.sym;
-                if(sym < 255)
+            
+                if( s_echo && s_echocb)
                 {
-
-                    if( s_echo )
-                    {
-                        s_echocb(Key(sym));
-                    }
-                    ButtonState & state = s_ue.keymap[sym];
-                    if (state == BUTTON_DOWN || state == BUTTON_HOLD)
-                    {
-                        if(Engine::GetTimeDeltaMs() > 10)
-                            state = BUTTON_HOLD;
-                        else
-                            state = BUTTON_UP;
-                    }
-                    else
-                        state = BUTTON_DOWN;
+                    s_echocb(Key(sym));
                 }
+                ButtonState & state = s_ue.keymap[sym];
+                if (state == BUTTON_DOWN || state == BUTTON_HOLD)
+                {
+                    if(Engine::GetTimeDeltaMs() > 10)
+                        state = BUTTON_HOLD;
+                    else
+                        state = BUTTON_UP;
+                }
+                else
+                    state = BUTTON_DOWN;
             }
             break;
             case SDL_MOUSEWHEEL:

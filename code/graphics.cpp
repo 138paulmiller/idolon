@@ -79,30 +79,34 @@ namespace Graphics
          Sheet(name, w, h), 
          start(start)
     { }    
-    void Font::draw(const std::string & text, const Rect & dest, bool crop)
+    void Font::blit(const std::string & text, const Rect & dest)
     {
 
         const int srcW = w / charW;  
         const int destW = dest.w / charW;     
         const int destH = dest.h / charH;     
         int scrolly = 0;
-        int j = 0;
-
+        int dx = 0, dy = 0;
         for(int i = 0; i < text.size(); i++)
         {
             int s =  text[i];
-            j = i;
             if(s == '\n')
             {
                 i++;
                 if(i== text.size()) break;
                 scrolly++;
                 s =  text[i];
+                dx = 0;
+                dy++;
             }
             
+            if(dx == destW)
+            {
+                dx = 0;
+                dy++;
+            }
             const int c =  s - start;
-            const int sx = (c % srcW)  , sy = (c / srcW) ;
-            int dx = (j % destW) , dy = (j / destW) + scrolly;
+            const int sx = (c % srcW), sy = (c / srcW) ;
             
             Rect src = { 
                 sx * charW, sy * charH, 
@@ -113,43 +117,51 @@ namespace Graphics
                 dest.y + dy * charH, 
                 charW, charH 
             };   
-            if(crop && dy == destH) //last one, partial render if cropped
-            {
-                src.h = (src.y + charH) - (dest.y + dest.h);
-                pos.h = (pos.y + charH) - (dest.y + dest.h); 
-            }
-            else if(dy > destH) 
+            //if(crop && dy == destH) //last one, partial render if cropped
+            //{
+            //    src.h = (src.y + charH) - (dest.y + dest.h);
+            //    pos.h = (pos.y + charH) - (dest.y + dest.h); 
+            //}
+            //else 
+            if(dy > destH) 
                 break;
-
-            Engine::DrawTexture(texture, src, pos);
-
+            //should render to texture
+            //Engine::Blit(destTexture, texture,  src, pos);
+            Engine::DrawTexture(texture,  src, pos);
+            dx++;
+            
         }
     }
 
 
     ///////////////////////////////////////////////////////////////////////////////
     
-    Text::Text(int w, int h, const std::string & text)
+    TextBox::TextBox(int w, int h, const std::string & text)
         :text(text),
         font("default"),
         x(0), y(0), w(w), h(h),
-        scrolly(0) , crop(0)
+        scrolly(0)
     {
         texture = Engine::CreateTexture(w, h);
     }
-    Text::~Text()
+    TextBox::~TextBox()
     {
         Engine::DestroyTexture(texture);
     }
 
-    void Text::draw()
+    void TextBox::draw()
     {
         if(!fontcache) return;
-        fontcache->draw(text, {x,y,w,h}, crop);
+        //Engine::DrawTexture(texture, {0,0,w,h}, {x,y,w,h});
+        fontcache->blit(text, {x,y,w,h});
+
     }
 
-    void Text::reload()
+    void TextBox::reload()
     {
         fontcache = Assets::Load<Font>(font);
+        if(!fontcache) return;
+        //fontcache->blit(texture, text, {x,y,w,h});
+
     }
 }

@@ -29,15 +29,13 @@ namespace Editor
 			sheet = new Sheet(name, w, h);
 		}
 
-		Graphics::Text text(128, 70, " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~");
-        text.crop = false;
+		Graphics::TextBox text(128, 70, " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~");
         text.font = "default";
         text.reload();
 
-		Graphics::Text text2(35, 70, "Hello\nWorld");
-        text2.y = 100;
-        text2.crop = false;
+		Graphics::TextBox text2(55, 70, "Hello\nWorld\n!!!!!!!!");
         text2.font = "default";
+        text2.y = 100;
         text2.reload();
 
 

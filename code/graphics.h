@@ -79,18 +79,17 @@ namespace Graphics
     public:
         Font(const std::string& name, int w, int h, int charW, int charH, char start);
         //src is textbox in character units
-        void draw(const std::string & text, const Rect & dest, bool crop);
+        void blit(const std::string & text, const Rect & dest);
         const int charW,charH;
         const char start;
     };
     
-	class Text
+	class TextBox
 	{
 	public:
-		Text(int tw, int th, const std::string & text);
-        ~Text();
+		TextBox(int tw, int th, const std::string & text);
+        ~TextBox();
 
-        bool crop; //
         int scrolly; //
         std::string text;
         std::string font;
