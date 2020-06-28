@@ -32,7 +32,7 @@ namespace Engine
     void SetEchoHandle(EchoCallback cb);
 
     // Texture 
-    int CreateTexture(int width, int height);
+    int CreateTexture(int width, int height, bool target = false);
     void DestroyTexture(int textureId);
     //update the pixels of texure
     Color * LockTexture(int textureId, const Rect & region);

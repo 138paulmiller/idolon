@@ -32,7 +32,6 @@ namespace Editor
 		Graphics::TextBox text(128, 70, " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~");
         text.font = "default";
         text.reload();
-
 		Graphics::TextBox text2(55, 70, "Hello\nWorld\n!!!!!!!!");
         text2.font = "default";
         text2.y = 100;
@@ -61,9 +60,10 @@ namespace Editor
 				sheet->pixels[my * sheet->w + mx] = color;
 				sheet->update({mx, my, 1, 1 });
 			}
-		//		Engine::DrawTexture(sheet->texture, src, dest);
-	        text.draw();
+			text.draw();
 	        text2.draw();
+	        const Color &line = {255, 255, 0, 0 };
+	        Engine::DrawLine(line, 1, 1, w,  h);
 
 		}
 		Assets::Save(sheet, name);

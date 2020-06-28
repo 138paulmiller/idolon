@@ -23,7 +23,7 @@ namespace
     static SDL_Color s_clearColor = { 55, 55, 55, 255 };
     //create layers. blit to layer. priority
     //Create internal texture system. All textures are managed by the engine system
-    static SDL_Texture* s_buffer;
+    static int s_target; //used to upsample to display to acheive pixelated effect
     static int s_windowW, s_windowH;
     static float s_windowScale;
     
@@ -65,10 +65,7 @@ namespace Engine
         
         s_window = SDL_CreateWindow(WINDOW_TITLE, WINDOW_X, WINDOW_Y, s_windowW, s_windowH, WINDOW_FLAGS);
         s_renderer = SDL_CreateRenderer(s_window, -1, RENDERER_FLAGS);
-        s_buffer = SDL_CreateTexture(s_renderer,
-            SDL_PIXELFORMAT_BGRA8888,
-            SDL_TEXTUREACCESS_TARGET, 
-            w, h);
+        s_target = CreateTexture( w, h, true);
 
         s_ue.s_isRunning == s_ue.s_isRunning && s_window && s_renderer;
         s_frame = 0;
@@ -84,7 +81,6 @@ namespace Engine
         {
             if (s_textures[i])SDL_DestroyTexture(s_textures[i]);
         }
-        SDL_DestroyTexture(s_buffer);
         SDL_DestroyWindow(s_window);
         SDL_Quit();
     }
@@ -165,16 +161,10 @@ namespace Engine
 
     void Render()
     {
-        //clear screen
         SDL_SetRenderTarget(s_renderer, 0);
-        SDL_SetRenderDrawColor(s_renderer, s_clearColor.r, s_clearColor.g, s_clearColor.b, s_clearColor.a);
         SDL_RenderClear(s_renderer);
-        //deqeue commands until timer is up
-        //render all ui objects
-        
         SDL_Rect drect = { 0,0, s_windowW,s_windowH };
-
-        SDL_RenderCopy( s_renderer, s_buffer, NULL, &drect );
+        SDL_RenderCopy( s_renderer, s_textures[s_target], NULL, &drect );
         SDL_RenderPresent(s_renderer);
     }
 
@@ -209,18 +199,15 @@ namespace Engine
         int sh = (int)(h / s_windowScale);
         SDL_SetWindowSize(s_window, sw, sh);
         SDL_GetWindowSize(s_window, &s_windowW, &s_windowH);
-        if (s_buffer)
+        if (s_target)
         {
-            SDL_DestroyTexture(s_buffer);
+            DestroyTexture(s_target);
         }
-        s_buffer = SDL_CreateTexture(s_renderer,
-            SDL_PIXELFORMAT_BGRA8888,
-            SDL_TEXTUREACCESS_TARGET, 
-            w, h);
+        s_target = CreateTexture(w, h, true);
         
     }
     
-    int CreateTexture(int width, int height)
+    int CreateTexture(int width, int height, bool target)
     {
         //find next slot
         int i;
@@ -234,7 +221,7 @@ namespace Engine
         }
         s_textures[i] = SDL_CreateTexture(s_renderer,
             SDL_PIXELFORMAT_BGRA8888,
-            SDL_TEXTUREACCESS_STREAMING, 
+            target ? SDL_TEXTUREACCESS_TARGET : SDL_TEXTUREACCESS_STREAMING, 
             width, height);
         return i;
     }
@@ -293,41 +280,30 @@ namespace Engine
     }
     void Blit(int srcTextureId, int destTextureId, const Rect & src, const Rect & dest)
     {
-        ASSERT(srcTextureId >= 0 && srcTextureId < s_textures.size() && s_textures[srcTextureId], 
-            "Engine: Texture does not exist");
-        ASSERT(destTextureId >= 0 && destTextureId < s_textures.size() && s_textures[destTextureId], 
-            "Engine: Texture does not exist");
-        SDL_Texture* srcTexture = s_textures[srcTextureId];
-        SDL_Texture* destTexture = s_textures[destTextureId];
+        ASSERT(srcTextureId >= 0 && srcTextureId < s_textures.size() && s_textures[srcTextureId], "Engine: Texture does not exist");
+        ASSERT(destTextureId >= 0 && destTextureId < s_textures.size() && s_textures[destTextureId], "Engine: Texture does not exist");
         const SDL_Rect & srcrect = { src.x, src.y, src.w, src.h };
         const SDL_Rect& destrect = { dest.x, dest.y,dest.w,dest.h};
-        SDL_SetRenderTarget(s_renderer, destTexture );
-        SDL_RenderCopy( s_renderer, srcTexture, &srcrect, &destrect );        
+        SDL_SetRenderTarget(s_renderer, s_textures[destTextureId] );
+        SDL_RenderCopy( s_renderer, s_textures[srcTextureId], &srcrect, &destrect );        
     }
 
     
     void DrawTexture(int textureId, const Rect & src, const Rect & dest)
     {
-        ASSERT(textureId >= 0 && textureId < s_textures.size() && s_textures[textureId], 
-            "Engine: Texture does not exist");
-        SDL_Texture* texture = s_textures[textureId];
-        const SDL_Rect & srcrect = { src.x, src.y, src.w, src.h };
-        const SDL_Rect& destrect = { dest.x, dest.y,dest.w,dest.h};
-        SDL_SetRenderTarget(s_renderer, s_buffer);
-	    //SDL_RenderClear(s_renderer);
-        SDL_RenderCopy( s_renderer, texture, &srcrect, &destrect );
+        Blit(textureId, s_target, src,  dest);
     }
 
     void DrawLine(const Color& color, int x1, int y1, int x2, int y2)
     {
-        SDL_SetRenderTarget(s_renderer, s_buffer);
+        SDL_SetRenderTarget(s_renderer, s_textures[s_target]);
         SDL_SetRenderDrawColor(s_renderer, color.r, color.g, color.b, color.a);
         SDL_RenderDrawLine(s_renderer, x1, y1, x2, y2);
     }
 
     void DrawRect(const Color& color, const Rect & rect, bool filled)
     {
-        SDL_SetRenderTarget(s_renderer, s_buffer);
+        SDL_SetRenderTarget(s_renderer, s_textures[s_target]);
         SDL_SetRenderDrawColor(s_renderer, color.r, color.g, color.b, color.a);
         SDL_Rect sdlrect = { rect.x, rect.y,rect.w,rect.h };
         if (filled)

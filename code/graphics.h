@@ -79,7 +79,7 @@ namespace Graphics
     public:
         Font(const std::string& name, int w, int h, int charW, int charH, char start);
         //src is textbox in character units
-        void blit(const std::string & text, const Rect & dest);
+        void blit(int destTexture, const std::string & text, const Rect & dest);
         const int charW,charH;
         const char start;
     };

@@ -79,7 +79,7 @@ namespace Graphics
          Sheet(name, w, h), 
          start(start)
     { }    
-    void Font::blit(const std::string & text, const Rect & dest)
+    void Font::blit(int destTexture, const std::string & text, const Rect & dest)
     {
 
         const int srcW = w / charW;  
@@ -121,13 +121,12 @@ namespace Graphics
             //{
             //    src.h = (src.y + charH) - (dest.y + dest.h);
             //    pos.h = (pos.y + charH) - (dest.y + dest.h); 
-            //}
-            //else 
+            //}else 
             if(dy > destH) 
                 break;
             //should render to texture
-            //Engine::Blit(destTexture, texture,  src, pos);
-            Engine::DrawTexture(texture,  src, pos);
+            Engine::Blit(texture, destTexture, src, pos);
+            //Engine::DrawTexture(texture,  src, pos);
             dx++;
             
         }
@@ -142,7 +141,7 @@ namespace Graphics
         x(0), y(0), w(w), h(h),
         scrolly(0)
     {
-        texture = Engine::CreateTexture(w, h);
+        texture = Engine::CreateTexture(w, h, true);
     }
     TextBox::~TextBox()
     {
@@ -151,17 +150,13 @@ namespace Graphics
 
     void TextBox::draw()
     {
-        if(!fontcache) return;
-        //Engine::DrawTexture(texture, {0,0,w,h}, {x,y,w,h});
-        fontcache->blit(text, {x,y,w,h});
-
+        Engine::DrawTexture(texture, {0,0,w,h}, {x,y,w,h});
     }
 
     void TextBox::reload()
     {
         fontcache = Assets::Load<Font>(font);
         if(!fontcache) return;
-        //fontcache->blit(texture, text, {x,y,w,h});
-
+        fontcache->blit(texture, text, {0,0,w,h});
     }
 }
