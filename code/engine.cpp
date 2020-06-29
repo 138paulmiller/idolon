@@ -20,7 +20,7 @@ namespace
     //when this key is hit, input handling enters "echo" mode. forwards all key input
     static SDL_Window* s_window;
     static SDL_Renderer* s_renderer;
-    static SDL_Color s_clearColor = { 55, 55, 55, 255 };
+    static Color s_clearColor = { 255, 0, 0, 0 };
     //create layers. blit to layer. priority
     //Create internal texture system. All textures are managed by the engine system
     static int s_target; //used to upsample to display to acheive pixelated effect
@@ -162,6 +162,7 @@ namespace Engine
     void Render()
     {
         SDL_SetRenderTarget(s_renderer, 0);
+        SDL_SetRenderDrawColor(s_renderer, s_clearColor.r, s_clearColor.g, s_clearColor.b, s_clearColor.a);
         SDL_RenderClear(s_renderer);
         SDL_Rect drect = { 0,0, s_windowW,s_windowH };
         SDL_RenderCopy( s_renderer, s_textures[s_target], NULL, &drect );
@@ -223,6 +224,7 @@ namespace Engine
             SDL_PIXELFORMAT_BGRA8888,
             target ? SDL_TEXTUREACCESS_TARGET : SDL_TEXTUREACCESS_STREAMING, 
             width, height);
+        SDL_SetTextureBlendMode( s_textures[i], SDL_BLENDMODE_BLEND );
         return i;
     }
     void DestroyTexture(int textureId)
@@ -280,14 +282,21 @@ namespace Engine
     }
     void Blit(int srcTextureId, int destTextureId, const Rect & src, const Rect & dest)
     {
-        ASSERT(srcTextureId >= 0 && srcTextureId < s_textures.size() && s_textures[srcTextureId], "Engine: Texture does not exist");
-        ASSERT(destTextureId >= 0 && destTextureId < s_textures.size() && s_textures[destTextureId], "Engine: Texture does not exist");
+        ASSERT(srcTextureId >= 0 && srcTextureId < s_textures.size() && s_textures[srcTextureId], "Engine::Blit: Texture does not exist");
+        ASSERT(destTextureId >= 0 && destTextureId < s_textures.size() && s_textures[destTextureId], "Engine::Blit: Texture does not exist");
         const SDL_Rect & srcrect = { src.x, src.y, src.w, src.h };
         const SDL_Rect& destrect = { dest.x, dest.y,dest.w,dest.h};
         SDL_SetRenderTarget(s_renderer, s_textures[destTextureId] );
         SDL_RenderCopy( s_renderer, s_textures[srcTextureId], &srcrect, &destrect );        
     }
-
+    void MultiplyTexture(int textureId, const Color & color)
+    {
+        ASSERT(textureId >= 0 && textureId < s_textures.size() && s_textures[textureId], "Engine::MultiplyTexture: Texture does not exist");
+        SDL_Texture * texture = s_textures[textureId];
+        SDL_SetTextureColorMod(texture, color.r, color.g, color.b);
+        SDL_SetTextureAlphaMod(texture, color.a);
+        
+    }
     
     void DrawTexture(int textureId, const Rect & src, const Rect & dest)
     {

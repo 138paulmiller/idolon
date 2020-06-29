@@ -6,14 +6,6 @@
 #include <functional>
 
 
-#define GRID_W 200
-#define GRID_H 150
-#define WINDOW_SCALE 1.0/5
-#define SIM_RATEMS 10
-
-
-//action to load 
-
 
 void renderCheck0(int w, int h, float scale)
 {
@@ -122,6 +114,10 @@ Graphics::Sheet * ConvertImageToAsset(const std::string & filepath)
 	return sheet;
 }
 
+#define SCREEN_W 182
+#define SCREEN_H 144
+#define WINDOW_SCALE 1.0/5
+
 ////create usage messages
 //[min,max] 
 #define ARG_NONEMPTY(args) assert(args.size() > 0  );
@@ -159,7 +155,7 @@ int main(int argc, char** argv)
 		}  
 	};
 	
-	Engine::Startup(GRID_W, GRID_H, WINDOW_SCALE);
+	Engine::Startup(SCREEN_W, SCREEN_H, WINDOW_SCALE);
 
 	Execute(argc, argv, cli);
 	Assets::Startup(root);

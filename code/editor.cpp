@@ -21,24 +21,24 @@ namespace Editor
 		int mx, my;
 		int w, h;
 		Engine::GetSize(w, h);
-		Rect dest = { 0,0,w,h };
-		Sheet* sheet = Assets::Load<Sheet>(name);
-		if (!sheet)
-		{
-			//add a create new sheet button
-			sheet = new Sheet(name, w, h);
-		}
 
-		Graphics::TextBox text(128, 70, " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~");
+
+		Graphics::TextBox text(18, 5, " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~");
         text.font = "default";
+        text.x = 10;
+        text.y = 1;        
         text.reload();
-		Graphics::TextBox text2(55, 70, "Hello\nWorld\n!!!!!!!!");
+
+
+		Graphics::TextBox text2(7, 4, "Hello\nWorld\n!!!!!!!!");
         text2.font = "default";
         text2.y = 100;
+        text2.textColor = {255, 255, 0, 0};
+        text2.filled = true;
+        text2.fillColor = {255, 0, 255, 0};
         text2.reload();
 
 
-		Rect src = { 0,0,sheet->w,sheet->h };
 		float timer = 0;
 		while (Engine::Run())
 		{
@@ -52,13 +52,6 @@ namespace Editor
 			if (Engine::GetMouseButtonState(MOUSEBUTTON_LEFT) != BUTTON_UP)
 			{
 				Engine::GetMousePosition(mx, my);
-				Color color;
-				color.r = 255;
-				color.g = 255;
-				color.b = 255;
-				color.a = 255;
-				sheet->pixels[my * sheet->w + mx] = color;
-				sheet->update({mx, my, 1, 1 });
 			}
 			text.draw();
 	        text2.draw();
@@ -66,7 +59,6 @@ namespace Editor
 	        Engine::DrawLine(line, 1, 1, w,  h);
 
 		}
-		Assets::Save(sheet, name);
 		Assets::Unload(name);
 		Engine::SetEcho(false);
 

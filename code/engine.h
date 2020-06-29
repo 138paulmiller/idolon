@@ -34,20 +34,21 @@ namespace Engine
     // Texture 
     int CreateTexture(int width, int height, bool target = false);
     void DestroyTexture(int textureId);
-    //update the pixels of texure
+    //Gget handle to pixels in memory
     Color * LockTexture(int textureId, const Rect & region);
     void UnlockTexture(int textureId);
-    
+    //multiply color of texture on each texture draw 
+    void MultiplyTexture(int textureId, const Color& color);
+
+    //Copy data from one texture to another    
     void Blit(int srcTexture, int destTexture, const Rect & src, const Rect & dest);
     void DrawTexture(int textureId, const Rect & src, const Rect & dest);
     void DrawLine(const Color& color, int x1, int y1, int x2, int y2);
     void DrawRect(const Color& color, const Rect& rect, bool filled);
-
-    //void DrawRect(const Rect & dest, bool filled)
     
     //Getters/setters
     void Resize(int w, int h);
-    //size of draw region. windows may be larger
+    //size of draw region in "units". Not window size
     void GetSize(int& w, int& h);
     uint32_t GetTime();
     uint32_t GetTimeDeltaMs();
@@ -56,6 +57,7 @@ namespace Engine
 
     ButtonState GetKeyState(Key key);
     ButtonState GetMouseButtonState(MouseButton button);
+    //Mouse position in window space
     void GetMousePosition(int& x, int& y);
     void GetMouseWheel(int& x, int& y, int& dx, int& dy);
 

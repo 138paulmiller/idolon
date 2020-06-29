@@ -87,14 +87,19 @@ namespace Graphics
 	class TextBox
 	{
 	public:
+        // w and height are number of chars
 		TextBox(int tw, int th, const std::string & text);
         ~TextBox();
-
-        int scrolly; //
+        Color textColor;
+        //Fill should be texture!
+        bool filled; //
+        Color fillColor;
         std::string text;
         std::string font;
+        int scrolly; //
         int x,y;
-        const int w,h;
+        int w,h;
+        int tw,th;
         
         void reload();
         void draw();

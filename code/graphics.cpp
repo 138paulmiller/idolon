@@ -75,10 +75,12 @@ namespace Graphics
     ///////////////////////////////////////////////////////////////////////////////
 
     Font::Font(const std::string& name, int w, int h, int charW, int charH, char start)
-         :charW(charW), charH(charH), 
-         Sheet(name, w, h), 
+         :Sheet(name, w, h), 
+         charW(charW), charH(charH), 
          start(start)
-    { }    
+    { 
+    }    
+
     void Font::blit(int destTexture, const std::string & text, const Rect & dest)
     {
 
@@ -99,15 +101,13 @@ namespace Graphics
                 dx = 0;
                 dy++;
             }
-            
             if(dx == destW)
             {
                 dx = 0;
                 dy++;
             }
             const int c =  s - start;
-            const int sx = (c % srcW), sy = (c / srcW) ;
-            
+            const int sx = (c % srcW), sy = (c / srcW) ;            
             Rect src = { 
                 sx * charW, sy * charH, 
                 charW, charH 
@@ -117,16 +117,9 @@ namespace Graphics
                 dest.y + dy * charH, 
                 charW, charH 
             };   
-            //if(crop && dy == destH) //last one, partial render if cropped
-            //{
-            //    src.h = (src.y + charH) - (dest.y + dest.h);
-            //    pos.h = (pos.y + charH) - (dest.y + dest.h); 
-            //}else 
             if(dy > destH) 
                 break;
-            //should render to texture
             Engine::Blit(texture, destTexture, src, pos);
-            //Engine::DrawTexture(texture,  src, pos);
             dx++;
             
         }
@@ -138,10 +131,14 @@ namespace Graphics
     TextBox::TextBox(int w, int h, const std::string & text)
         :text(text),
         font("default"),
-        x(0), y(0), w(w), h(h),
-        scrolly(0)
+        texture (0),
+        x(0), y(0), 
+        w(0), h(0),
+        tw(w), th(h),
+        scrolly(0),filled(false),
+        textColor({255,255,255,255}),
+        fillColor({255,0,0,0})
     {
-        texture = Engine::CreateTexture(w, h, true);
     }
     TextBox::~TextBox()
     {
@@ -150,6 +147,8 @@ namespace Graphics
 
     void TextBox::draw()
     {
+        if(!fontcache) return;
+        if(filled) Engine::DrawRect(fillColor, {x,y,w,h}, true);
         Engine::DrawTexture(texture, {0,0,w,h}, {x,y,w,h});
     }
 
@@ -157,6 +156,14 @@ namespace Graphics
     {
         fontcache = Assets::Load<Font>(font);
         if(!fontcache) return;
+        //only do if texture w/h changes
+        if(texture) Engine::DestroyTexture(texture);
+        w = tw * fontcache->charW;
+        h = th * fontcache->charH;
+         
+        texture = Engine::CreateTexture(w, h, true);
         fontcache->blit(texture, text, {0,0,w,h});
+        Engine::MultiplyTexture(texture, textColor);
+
     }
 }
