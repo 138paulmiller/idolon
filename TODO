@@ -1,0 +1,48 @@
+- Create Dialog system. Used for RPG style games
+	- Dialog(text)
+		- start : render text to bottom of screen
+		- next : render next lines of next 		
+		- stop : close text box
+
+- Finish and test Sprites
+
+- Create Game making API
+	- Simple draw primitives. 
+	- sprite creation, map loading
+	- background scroll
+	- input events (polling)
+	- collision events
+	
+
+- Background rendering (for parallax)
+	- Not tilemap, just large texture. Can scroll
+
+- Tilemap rendering 
+	- Create Tilesheet class
+	- Create Tile class
+	- Create Tilemap class that renders array of tile indices
+
+- Collision system
+	- Create collision shapes. (lines, boxes, circles)
+	- Dispatch collisions for sprite on (sprite, tile (if collideable), collision_shape)  
+
+- UI System
+	- Buttons
+	- Text (highlight on select)
+	- Menu system 
+
+- Editor
+
+	- Create texture editor, scale up by 4x, create a cursor that "highlights box (create box the is +2 wider/taller " 
+	- Background editor 
+	- Sprite editor (add animations, edit image)
+	- Tilesheet editor 
+	- TileMap editor (tile brushes)
+
+- controller input 
+	-  keyboard to controller mapping config file
+
+- create console 
+	- CLI to "system"
+	- build game files
+	- game file executer 
