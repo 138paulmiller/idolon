@@ -7,6 +7,6 @@ namespace Editor
 {
 	void Startup();
 	void Shutdown();
-	//name of sheet to edit
+	//TODO Create universal toolbar that runs when editor is running
 	int RunSheetView(const std::string & name);
 }

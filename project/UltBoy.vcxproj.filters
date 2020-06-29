@@ -36,6 +36,9 @@
     <ClCompile Include="..\code\ui.cpp">
       <Filter>../Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\code\shell.cpp">
+      <Filter>../Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\code\assets.h">
@@ -57,6 +60,9 @@
       <Filter>../Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\code\ui.h">
+      <Filter>../Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\shell.h">
       <Filter>../Header Files</Filter>
     </ClInclude>
   </ItemGroup>

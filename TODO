@@ -42,7 +42,11 @@
 - controller input 
 	-  keyboard to controller mapping config file
 
-- create console 
-	- CLI to "system"
-	- build game files
-	- game file executer 
+- Create shell
+	- show shell input text for "dev debugging" 
+	- handle Shift key to get capitilized characters. 
+	
+- Create toolbar Overlay that persists on editor and Shell
+	- tool bar swaps between editors/shell
+	- uses buttons and hotkeys
+	- When game runs it is hidden. Can be displayed when "start" button is triggered 

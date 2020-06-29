@@ -12,11 +12,13 @@
 #define WINDOW_FLAGS SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN
 #define RENDERER_FLAGS SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED
 
+#define CHECK_TEXTURE(texId) ASSERT(texId >= 0 && texId < s_textures.size() && s_textures[texId], "Engine::Blit: Texture does not exist");
+
 
 namespace
 {
     static bool s_echo;
-    static EchoCallback s_echocb;
+    static std::function<void(Key, bool)> s_echocb;
     //when this key is hit, input handling enters "echo" mode. forwards all key input
     static SDL_Window* s_window;
     static SDL_Renderer* s_renderer;
@@ -84,12 +86,14 @@ namespace Engine
         SDL_DestroyWindow(s_window);
         SDL_Quit();
     }
-    void SetEcho(bool on)
+    void SetKeyEcho(bool on)
     {
         s_echo = on;
+        if (!on)
+            s_echocb = 0;
     }
     //only use in edit/debug mode
-    void SetEchoHandler(EchoCallback cb)
+    void SetKeyHandler(std::function<void(Key, bool)> cb)
     {
         s_echocb = cb;
     }
@@ -108,17 +112,22 @@ namespace Engine
             {
             case SDL_KEYUP:
             {
-                unsigned char sym = event.key.keysym.sym;
+                Key sym = GetKey(event.key.keysym.sym);
+                if (sym == KEY_UNKNOWN) break;
+                if( s_echo && s_echocb)
+                {
+                    s_echocb(Key(sym), false);
+                }
                 s_ue.keymap[sym] = BUTTON_UP;
             }
                 break;
             case SDL_KEYDOWN:
             {
-                unsigned char sym = event.key.keysym.sym;
-            
+                Key sym = GetKey(event.key.keysym.sym);
+                if (sym == KEY_UNKNOWN) break;
                 if( s_echo && s_echocb)
                 {
-                    s_echocb(Key(sym));
+                    s_echocb(Key(sym), true);
                 }
                 ButtonState & state = s_ue.keymap[sym];
                 if (state == BUTTON_DOWN || state == BUTTON_HOLD)
@@ -186,12 +195,24 @@ namespace Engine
 
     bool Run()
     {
+        static float timer = 0;
+
         s_frameStartTime  = GetTime();
         PollEvents();
         if (!s_ue.s_isRunning) 
             return false;
         Render(); 
         UpdateTime();
+        
+        timer += Engine::GetTimeDeltaMs()/1000.0f;
+		//every 1 seconds
+		if (timer > 1.f) 
+		{
+			printf("FPS:%.2f\n", Engine::GetFPS());
+			timer = 0.f;
+		}
+
+
         return true;
     }  
     void Resize(int w, int h)
@@ -229,7 +250,7 @@ namespace Engine
     }
     void DestroyTexture(int textureId)
     {  
-        ASSERT(textureId >= 0 && textureId < s_textures.size() && s_textures[textureId], "Engine: Texture does not exist");
+        CHECK_TEXTURE(textureId )
         SDL_Texture* texture = s_textures[textureId];
         SDL_DestroyTexture(texture);
         s_textures[textureId] = 0;
@@ -237,8 +258,8 @@ namespace Engine
 
     Color * LockTexture(int textureId, const Rect & region)
     {
-        ASSERT(textureId >= 0 && textureId < s_textures.size() && s_textures[textureId], 
-            "Engine: Texture does not exist");
+        CHECK_TEXTURE(textureId )
+
         SDL_Texture* texture = s_textures[textureId];
 
         uint32_t format;
@@ -254,8 +275,8 @@ namespace Engine
     }   
     void UnlockTexture(int textureId)
     {
-        ASSERT(textureId >= 0 && textureId < s_textures.size() && s_textures[textureId], 
-            "Engine: Texture does not exist");
+        CHECK_TEXTURE(textureId )
+
         SDL_Texture* texture = s_textures[textureId];
         SDL_UnlockTexture(texture);
     }
@@ -280,10 +301,18 @@ namespace Engine
         stbi_image_free(data);
         return pixels;
     }
+    void ClearTexture(int textureId, const Color& color)
+    {
+        CHECK_TEXTURE(textureId);
+        SDL_SetRenderTarget(s_renderer, s_textures[textureId] );
+        SDL_SetRenderDrawColor(s_renderer, color.r, color.g, color.b, color.a);
+        SDL_RenderClear(s_renderer);
+    }
+
     void Blit(int srcTextureId, int destTextureId, const Rect & src, const Rect & dest)
     {
-        ASSERT(srcTextureId >= 0 && srcTextureId < s_textures.size() && s_textures[srcTextureId], "Engine::Blit: Texture does not exist");
-        ASSERT(destTextureId >= 0 && destTextureId < s_textures.size() && s_textures[destTextureId], "Engine::Blit: Texture does not exist");
+        CHECK_TEXTURE(srcTextureId )
+        CHECK_TEXTURE(destTextureId )
         const SDL_Rect & srcrect = { src.x, src.y, src.w, src.h };
         const SDL_Rect& destrect = { dest.x, dest.y,dest.w,dest.h};
         SDL_SetRenderTarget(s_renderer, s_textures[destTextureId] );
@@ -291,7 +320,8 @@ namespace Engine
     }
     void MultiplyTexture(int textureId, const Color & color)
     {
-        ASSERT(textureId >= 0 && textureId < s_textures.size() && s_textures[textureId], "Engine::MultiplyTexture: Texture does not exist");
+        
+        CHECK_TEXTURE(textureId )
         SDL_Texture * texture = s_textures[textureId];
         SDL_SetTextureColorMod(texture, color.r, color.g, color.b);
         SDL_SetTextureAlphaMod(texture, color.a);

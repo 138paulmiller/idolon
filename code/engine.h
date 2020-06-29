@@ -20,16 +20,15 @@ enum MouseButton
     MOUSEBUTTON_X1 ,
     MOUSEBUTTON_X2 ,
 };
-typedef void(*EchoCallback)(Key key);
 
 namespace Engine
 {
     void Startup(int w, int h, float = 1/5.0);
     bool Run();
     void Shutdown();
-    void SetEcho(bool on);
+    void SetKeyEcho(bool on);
     //only use in edit/debug mode
-    void SetEchoHandle(EchoCallback cb);
+    void SetKeyHandler(std::function<void(Key, bool)> cb);
 
     // Texture 
     int CreateTexture(int width, int height, bool target = false);
@@ -39,6 +38,8 @@ namespace Engine
     void UnlockTexture(int textureId);
     //multiply color of texture on each texture draw 
     void MultiplyTexture(int textureId, const Color& color);
+    void ClearTexture(int textureId, const Color& color);
+
 
     //Copy data from one texture to another    
     void Blit(int srcTexture, int destTexture, const Rect & src, const Rect & dest);

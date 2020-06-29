@@ -2,47 +2,17 @@
 #include "assets.h"
 #include "graphics.h"
 #include "engine.h"
+#include "shell.h"
 #include "editor.h"
 #include <functional>
 
+//Default settings
+#define FONT_W 7
+#define FONT_H 9
+#define SCREEN_W 182
+#define SCREEN_H 144
+#define WINDOW_SCALE 1.0/5
 
-
-void renderCheck0(int w, int h, float scale)
-{
-	float timer = 10;
-	int texture = 0;
-
-	while (Engine::Run())
-	{
-		timer -= Engine::GetTimeDeltaMs()/1000.0;
-		//every 1 seconds
-		if (timer <= 0) 
-		{
-			printf("FPS:%.2f\n", Engine::GetFPS());
-			timer = 10;
-		}
-
-		//perf test. create destory
-		int texture = Engine::CreateTexture(w, h);
-		const int len = w * h;
-		Color* pixels = Engine::LockTexture(texture, { 0,0,w,h });
-
-		for(int y = 0; y < h; y++)
-		for (int x = 0; x < w; x++)
-		{
-			const int i = y * w + x;
-
-			Color& pixel = pixels[i];
-			pixel.r = ((float)x) / w * 255;
-			pixel.g = ((float)y) / h*255;
-			pixel.b = 0;
-			pixel.a = 255;
-		}
-		Engine::UnlockTexture(texture);
-		Engine::DrawTexture(texture, { 0,0,w,h}, { 0,0,w,h});
-		Engine::DestroyTexture(texture);
-	}
-}
 
 using Args = std::vector<std::string > ;
 using Command = std::function<void(Args)>;
@@ -78,7 +48,6 @@ void Execute(int argc, char** argv, const CommandTable & commands )
 	}
 }
 
-
 std::string GetFilename(std::string path)
 {
     size_t sep = path.find_last_of("\\/");
@@ -103,7 +72,7 @@ Graphics::Font * CreateFontAsset(const std::string & filepath, int cw, int ch, c
 	return font;
 }
 
-Graphics::Sheet * ConvertImageToAsset(const std::string & filepath)
+Graphics::Sheet * CreateSheetAsset(const std::string & filepath)
 {
 	int w, h;
 	Color * pixels = Engine::LoadTexture(filepath, w, h);
@@ -114,33 +83,57 @@ Graphics::Sheet * ConvertImageToAsset(const std::string & filepath)
 	return sheet;
 }
 
-#define SCREEN_W 182
-#define SCREEN_H 144
-#define WINDOW_SCALE 1.0/5
+struct CreationRequests
+{
+	std::vector<const Graphics::Sheet* > sheets;
+	std::vector<const Graphics::Font* > fonts;
+};
 
-////create usage messages
-//[min,max] 
+void CreateAssets(const CreationRequests & requests)
+{
+	//Save converted assets to disk
+	for ( int i =0; i < requests.sheets.size(); i++)
+	{
+		const Graphics::Sheet* sheet = requests.sheets[i];
+		Assets::Save(sheet, sheet->name);
+	}
+	for ( int i =0; i < requests.fonts.size(); i++)
+	{
+		const Graphics::Font* font = requests.fonts[i];
+		Assets::Save(font, font->name);
+	}
+}
+
+
+
 #define ARG_NONEMPTY(args) assert(args.size() > 0  );
 #define ARG_RANGE(args, min, max) assert(args.size() >= min && args.size() <= max );
 #define ARG_COUNT(args, i) assert(args.size() == i );
+
+
 int main(int argc, char** argv)
 { 
 	std::string root = "./";
-	std::vector<const Graphics::Sheet * > convertedSheets;
-	std::vector<const Graphics::Font * > convertedFonts;
-	CommandTable cli = {
-		{ 	"-game", 
-			[&](Args args){ ARG_COUNT(args, 1) root = args[0]; } 
+	CreationRequests requests;
+	
+	CommandTable argcommands = 
+	{
+		{ 	"-assets", 
+			[&](Args args)
+			{ 
+				ARG_COUNT(args, 1) 
+				root = args[0]; 
+			} 
 		},
-		{ 	"-convert", 
+		{ 	"-create", 
 			[&](Args args)
 			{ 
 				ARG_NONEMPTY(args)
-				if(args[0].compare("image") == 0)
+				if(args[0].compare("sheet") == 0)
 				{
 					//must be two args
 					ARG_COUNT(args, 2) 
-					convertedSheets.push_back(ConvertImageToAsset(args[1])); 
+					requests.sheets.push_back(CreateSheetAsset(args[1])); 
 				}
 				else if(args[0].compare("font") == 0)
 				{
@@ -149,33 +142,24 @@ int main(int argc, char** argv)
 					int cw = std::stoi(args[2]);
 					int ch = std::stoi(args[3]);
 					int start = std::stoi(args[4]);
-					convertedFonts.push_back(CreateFontAsset(img, cw, ch, start)); 
+					requests.fonts.push_back(CreateFontAsset(img, cw, ch, start)); 
 				}
 			} 
 		}  
 	};
 	
 	Engine::Startup(SCREEN_W, SCREEN_H, WINDOW_SCALE);
-
-	Execute(argc, argv, cli);
+	
+	Execute(argc, argv, argcommands);
+	
 	Assets::Startup(root);
-	//Save converted assets to disk
-	for ( int i =0; i < convertedSheets.size(); i++)
-	{
-		const Graphics::Sheet* sheet = convertedSheets[i];
-		Assets::Save(sheet, sheet->name);
-	}
-	for ( int i =0; i < convertedFonts.size(); i++)
-	{
-		const Graphics::Font* font = convertedFonts[i];
-		Assets::Save(font, font->name);
-	}
+	CreateAssets(requests);
+	Shell::Startup();
 	
-	printf("Config:\n\tAsset Dir : %s\n", root.c_str());
-	
-	Editor::RunSheetView("example");
-	Assets::Shutdown();
+	Shell::Run();
 
+	Shell::Shutdown();
+	Assets::Shutdown();
 	Engine::Shutdown();
 
 	return 0;

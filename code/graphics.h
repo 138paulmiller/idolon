@@ -24,24 +24,6 @@ namespace Graphics
         const int w, h;
         const int texture;
     };
-    //
-    //class Image
-    //{
-    //public:
-    //    Image(const std::string & name);
-
-    //    const std::string name;
-    //    //nonowning ref to another asset
-    //    std::string sheet;
-
-    //    Rect rect;
-    //    void draw();
-
-    //private:
-    //    //if sheetcache->name != name, then unload old sheet. and load sheet
-    //    class Sheet * sheetcache;
-    //};
-
     //animation frame
     struct Frame
     {
@@ -100,7 +82,8 @@ namespace Graphics
         int x,y;
         int w,h;
         int tw,th;
-        
+        bool visible;
+        void refresh();
         void reload();
         void draw();
     private:
