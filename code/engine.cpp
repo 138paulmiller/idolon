@@ -62,6 +62,8 @@ namespace Engine
         s_echo = false;
         s_windowScale = scale;
         s_ue.s_isRunning = SDL_Init(SDL_INIT_EVERYTHING) == 0;
+        
+        
         s_windowW = (int)( w / s_windowScale);
         s_windowH = (int)( h / s_windowScale);
         
@@ -97,6 +99,7 @@ namespace Engine
     {
         s_echocb = cb;
     }
+    Key GetKeyFromKeyCode(SDL_Keycode code, bool cap);
     void PollEvents()
     {
         SDL_Event event;
@@ -112,7 +115,7 @@ namespace Engine
             {
             case SDL_KEYUP:
             {
-                Key sym = GetKey(event.key.keysym.sym);
+                Key sym = GetKeyFromKeyCode(event.key.keysym.sym, event.key.keysym.mod & KMOD_SHIFT);
                 if (sym == KEY_UNKNOWN) break;
                 if( s_echo && s_echocb)
                 {
@@ -123,7 +126,7 @@ namespace Engine
                 break;
             case SDL_KEYDOWN:
             {
-                Key sym = GetKey(event.key.keysym.sym);
+                Key sym = GetKeyFromKeyCode(event.key.keysym.sym, event.key.keysym.mod & KMOD_SHIFT);
                 if (sym == KEY_UNKNOWN) break;
                 if( s_echo && s_echocb)
                 {
@@ -397,4 +400,67 @@ namespace Engine
         return s_fps;
     }
 
+    Key GetKeyFromKeyCode(SDL_Keycode code, bool cap )
+    {
+        switch (code)
+        {
+        case SDLK_RETURN    : return KEY_RETURN;
+	    case SDLK_ESCAPE    : return KEY_ESCAPE;
+	    case SDLK_BACKSPACE : return KEY_BACKSPACE;
+	    case SDLK_TAB    : return KEY_TAB;
+	    case SDLK_SPACE  : return KEY_SPACE;
+        case SDLK_QUOTE  : return cap ? KEY_QUOTEDBL  : KEY_QUOTE;
+        case SDLK_COMMA  : return cap ? KEY_LESS      : KEY_COMMA;
+	    case SDLK_MINUS  : return cap ? KEY_UNDERSCORE: KEY_MINUS;
+	    case SDLK_PERIOD : return cap ? KEY_GREATER   : KEY_PERIOD;
+        case SDLK_SLASH  : return cap ? KEY_QUESTION  : KEY_SLASH;
+	    case SDLK_0 : return cap ? KEY_RIGHTPAREN : KEY_0;
+	    case SDLK_1 : return cap ? KEY_EXCLAIM   : KEY_1;
+	    case SDLK_2 : return cap ? KEY_AT        : KEY_2;
+	    case SDLK_3 : return cap ? KEY_HASH      : KEY_3;
+	    case SDLK_4 : return cap ? KEY_DOLLAR    : KEY_4;
+	    case SDLK_5 : return cap ? KEY_PERCENT   : KEY_5;
+	    case SDLK_6 : return cap ? KEY_CARET     : KEY_6;
+	    case SDLK_7 : return cap ? KEY_AMPERSAND : KEY_7;
+	    case SDLK_8 : return cap ? KEY_ASTERISK  : KEY_8;
+	    case SDLK_9 : return cap ? KEY_LEFTPAREN : KEY_9;
+        case SDLK_SEMICOLON    : return cap ? KEY_COLON     : KEY_SEMICOLON;
+        case SDLK_EQUALS       : return cap ? KEY_PLUS      : KEY_EQUALS;
+	    case SDLK_LEFTBRACKET  : return cap ? KEY_LEFTBRACE : KEY_LEFTBRACKET;
+        case SDLK_RIGHTBRACKET : return cap ? KEY_RIGHTBRACE: KEY_RIGHTBRACKET;
+        case SDLK_BACKSLASH    : return cap ? KEY_BAR       : KEY_BACKSLASH;
+        case SDLK_BACKQUOTE    : return cap ? KEY_TILDA     : KEY_BACKQUOTE;
+	    case SDLK_a : return cap ? KEY_A : KEY_a;
+	    case SDLK_b : return cap ? KEY_B : KEY_b;
+	    case SDLK_c : return cap ? KEY_C : KEY_c;
+	    case SDLK_d : return cap ? KEY_D : KEY_d;
+	    case SDLK_e : return cap ? KEY_E : KEY_e;
+	    case SDLK_f : return cap ? KEY_F : KEY_f;
+	    case SDLK_g : return cap ? KEY_G : KEY_g;
+	    case SDLK_h : return cap ? KEY_H : KEY_h;
+	    case SDLK_i : return cap ? KEY_I : KEY_i;
+	    case SDLK_j : return cap ? KEY_J : KEY_j;
+	    case SDLK_k : return cap ? KEY_K : KEY_k;
+	    case SDLK_l : return cap ? KEY_L : KEY_l;
+	    case SDLK_m : return cap ? KEY_M : KEY_m;
+	    case SDLK_n : return cap ? KEY_N : KEY_n;
+	    case SDLK_o : return cap ? KEY_O : KEY_o;
+	    case SDLK_p : return cap ? KEY_P : KEY_p;
+	    case SDLK_q : return cap ? KEY_Q : KEY_q;
+	    case SDLK_r : return cap ? KEY_R : KEY_r;
+	    case SDLK_s : return cap ? KEY_S : KEY_s;
+	    case SDLK_t : return cap ? KEY_T : KEY_t;
+	    case SDLK_u : return cap ? KEY_U : KEY_u;
+	    case SDLK_v : return cap ? KEY_V : KEY_v;
+	    case SDLK_w : return cap ? KEY_W : KEY_w;
+	    case SDLK_x : return cap ? KEY_X : KEY_x;
+	    case SDLK_y : return cap ? KEY_Y : KEY_y;
+	    case SDLK_z : return cap ? KEY_Z : KEY_z;
+        case SDLK_UP    : return KEY_UP;
+        case SDLK_DOWN  : return KEY_DOWN;
+        case SDLK_LEFT  : return KEY_LEFT;
+        case SDLK_RIGHT : return KEY_RIGHT;
+        default: return KEY_UNKNOWN;
+        }
+    }
 }

@@ -81,16 +81,14 @@ namespace Shell
 						break;
 					case KEY_BACKSPACE:
 						//do not remove >
-						if (cursorPos > 1)
+						if (s_input->text.size() > 1)
 						{
-							cursorPos--;
 							if (cursorPos >= s_input->text.size())
-							{
 								s_input->text.pop_back();
-							}
 							else
 								s_input->text.erase(cursorPos, 1);
-
+							if(cursorPos > 1)
+								cursorPos--;
 						}
 						break;
 					case KEY_RETURN:
@@ -113,13 +111,8 @@ namespace Shell
 						cursorPos = 1;
 						break;
 					default:
-						//if text can fit in line!
-						if (cursorPos < lineW)
+						if (cursorPos < lineW-1)
 						{
-
-							//toupper
-							if (key >= 'a' && key <= 'z')
-								key = (Key)(key - ('a' - 'A'));
 							if (cursorPos == s_input->text.size()) 
 								s_input->text += key;
 							else

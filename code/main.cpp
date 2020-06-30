@@ -9,9 +9,9 @@
 //Default settings
 #define FONT_W 7
 #define FONT_H 9
-#define SCREEN_W 182
-#define SCREEN_H 144
-#define WINDOW_SCALE 1.0/5
+#define SCREEN_W 320
+#define SCREEN_H 270
+#define WINDOW_SCALE 1.0/2
 
 
 using Args = std::vector<std::string > ;
@@ -155,7 +155,7 @@ int main(int argc, char** argv)
 	Assets::Startup(root);
 	CreateAssets(requests);
 	Shell::Startup();
-	
+	//create context switcher
 	Shell::Run();
 
 	Shell::Shutdown();

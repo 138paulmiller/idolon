@@ -88,6 +88,32 @@ enum Key
 	KEY_GREATER = '>',
 	KEY_QUESTION = '?',
 	KEY_AT = '@',
+	KEY_A = 'A',
+	KEY_B = 'B',
+	KEY_C = 'C',
+	KEY_D = 'D',
+	KEY_E = 'E',
+	KEY_F = 'F',
+	KEY_G = 'G',
+	KEY_H = 'H',
+	KEY_I = 'I',
+	KEY_J = 'J',
+	KEY_K = 'K',
+	KEY_L = 'L',
+	KEY_M = 'M',
+	KEY_N = 'N',
+	KEY_O = 'O',
+	KEY_P = 'P',
+	KEY_Q = 'Q',
+	KEY_R = 'R',
+	KEY_S = 'S',
+	KEY_T = 'T',
+	KEY_U = 'U',
+	KEY_V = 'V',
+	KEY_W = 'W',
+	KEY_X = 'X',
+	KEY_Y = 'Y',
+	KEY_Z = 'Z',
 	KEY_LEFTBRACKET = '[',
 	KEY_BACKSLASH = '\\',
 	KEY_RIGHTBRACKET = ']',
@@ -120,92 +146,16 @@ enum Key
 	KEY_x = 'x',
 	KEY_y = 'y',
 	KEY_z = 'z',
-	KEY_UP = 'R',
-	KEY_DOWN = 'Q',
-	KEY_LEFT = 'P',
-	KEY_RIGHT = 'O'
+	KEY_LEFTBRACE = '{',
+	KEY_BAR = '|',
+	KEY_RIGHTBRACE = '}',
+	KEY_TILDA = '~',
+	//non-symbol related
+	KEY_SHIFT = KEY_TILDA + 1,
+	KEY_UP,
+	KEY_DOWN,
+	KEY_LEFT,
+	KEY_RIGHT
 };
 
 
-inline Key GetKey(char c)
-{
-	switch (c)
-	{
-	case KEY_RETURN:
-	case KEY_ESCAPE:
-	case KEY_BACKSPACE:
-	case KEY_TAB :
-	case KEY_SPACE:
-	case KEY_EXCLAIM:
-	case KEY_QUOTEDBL:
-	case KEY_HASH:
-	case KEY_PERCENT:
-	case KEY_DOLLAR:
-	case KEY_AMPERSAND:
-	case KEY_QUOTE:
-	case KEY_LEFTPAREN:
-	case KEY_RIGHTPAREN:
-	case KEY_ASTERISK:
-	case KEY_PLUS:
-	case KEY_COMMA:
-	case KEY_MINUS:
-	case KEY_PERIOD:
-	case KEY_SLASH:
-	case KEY_0:
-	case KEY_1:
-	case KEY_2:
-	case KEY_3:
-	case KEY_4:
-	case KEY_5:
-	case KEY_6:
-	case KEY_7:
-	case KEY_8:
-	case KEY_9:
-	case KEY_COLON:
-	case KEY_SEMICOLON:
-	case KEY_LESS:
-	case KEY_EQUALS:
-	case KEY_GREATER:
-	case KEY_QUESTION:
-	case KEY_AT:
-	case KEY_LEFTBRACKET:
-	case KEY_BACKSLASH:
-	case KEY_RIGHTBRACKET:
-	case KEY_CARET:
-	case KEY_UNDERSCORE:
-	case KEY_BACKQUOTE:
-	case KEY_a:
-	case KEY_b:
-	case KEY_c:
-	case KEY_d:
-	case KEY_e:
-	case KEY_f:
-	case KEY_g:
-	case KEY_h:
-	case KEY_i:
-	case KEY_j:
-	case KEY_k:
-	case KEY_l:
-	case KEY_m:
-	case KEY_n:
-	case KEY_o:
-	case KEY_p:
-	case KEY_q:
-	case KEY_r:
-	case KEY_s:
-	case KEY_t:
-	case KEY_u:
-	case KEY_v:
-	case KEY_w:
-	case KEY_x:
-	case KEY_y:
-	case KEY_z:
-	case KEY_UP:
-	case KEY_DOWN:
-	case KEY_LEFT:
-	case KEY_RIGHT:
-		return Key(c);
-	default:
-		return KEY_UNKNOWN;
-	}
-}
