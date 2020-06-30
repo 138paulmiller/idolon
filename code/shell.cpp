@@ -5,7 +5,6 @@
 
 namespace
 {
-	int s_lineMax = 35; //only save 35 lines 
 	std::string s_fontName = "default";
 	Graphics::Font* s_font;
 	int s_charW, s_charH;
@@ -19,14 +18,13 @@ namespace Shell
 {
 	void Startup()
 	{
-		s_lines.clear();
 		Engine::GetSize(s_w, s_h);
+		s_lines.clear();
 
 		s_font = Assets::Load<Graphics::Font>(s_fontName );
 		s_charW = s_font->charW;
 		s_charH = s_font->charH;
 
-		
 		s_cursor = new Graphics::TextBox(1, 1, " ");
 		s_cursor->font = s_fontName ;
 		s_cursor->filled = true;
@@ -50,7 +48,13 @@ namespace Shell
 	{
 		s_lines.clear();
 	}
-	
+
+	void ExecuteCommand(const std::string & command)
+	{
+		printf("\n%s", command.c_str());
+		//push resutl to lines and update buffer as well
+	}	
+
 	void Run()
 	{
 		int lineW = s_w / s_charW;
@@ -66,23 +70,6 @@ namespace Shell
 					char sym = key;
 					switch (key)
 					{
-					case KEY_BACKSPACE:
-						//do not remove >
-						if (cursorPos > 0)
-						{
-							if (cursorPos > 1 && cursorPos == s_input->text.size())
-							{
-								cursorPos--;
-								s_input->text.pop_back();
-							}
-							else
-								s_input->text.erase(cursorPos, 1);
-						}
-						break;
-					
-					case KEY_UP:
-					case KEY_DOWN:
-						break;
 					case KEY_LEFT:
 						if(cursorPos > 1) 
 							cursorPos--;					
@@ -91,23 +78,32 @@ namespace Shell
 						if(cursorPos < s_input->text.size()) 
 							cursorPos++;					
 						break;
-
-					
+					case KEY_UP:
+					case KEY_DOWN:
+						break;
+					case KEY_BACKSPACE:
+						//do not remove >
+						if (cursorPos > 0)
+						{
+							if (cursorPos > 1 && cursorPos >= s_input->text.size())
+							{
+								cursorPos--;
+								s_input->text.pop_back();
+							}
+							else
+								s_input->text.erase(cursorPos, 1);
+						}
+						break;
 					case KEY_RETURN:
 						s_input->y += s_charH;
-						if (s_input->y > s_h-s_charH)
+						if (s_input->y >= s_h -s_charH)
 						{
 							s_input->y = s_h-s_charH;
-							//pop first line
 							s_lines.pop_front();
 						}
-						if (s_lines.size() > s_lineMax)
-						{
-							s_lines.pop_front();
-						}
+						
 						s_lines.push_back(s_input->text);
-						//remove ">"
-						//lines.push_back(ExecuteCommand(line.text)); //push resutl to buffer as well
+						ExecuteCommand(s_input->text.substr(1)); 
 						s_buffer->text = "";
 						for (std::string& line : s_lines)
 						{

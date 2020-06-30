@@ -7,19 +7,22 @@
 #include <stdio.h> 
 #include <stdlib.h>
 
-#include <functional>
 #include <map>
-#include <unordered_map>
+#include <list>
 #include <queue>
 #include <vector>
 #include <mutex>
 #include <thread>
+#include <functional>
+#include <unordered_map>
 #include <condition_variable>
 
 
-#define UltBoy_DEBUG 1
+//Add Vector / Math classes
 
-#if UltBoy_DEBUG 
+#define ULT_DEBUG 1
+
+#if ULT_DEBUG 
 #define ASSERT(cond,...) \
 {	\
 	if (!(cond)) { printf((__VA_ARGS__)); } \
