@@ -64,10 +64,8 @@ namespace Shell
 		Engine::SetKeyHandler(
 			[&](Key key, bool isDown) 
 			{
-				printf("%c\n", key);
 				if (isDown)
 				{
-					char sym = key;
 					switch (key)
 					{
 					case KEY_LEFT:
@@ -83,20 +81,21 @@ namespace Shell
 						break;
 					case KEY_BACKSPACE:
 						//do not remove >
-						if (cursorPos > 0)
+						if (cursorPos > 1)
 						{
-							if (cursorPos > 1 && cursorPos >= s_input->text.size())
+							cursorPos--;
+							if (cursorPos >= s_input->text.size())
 							{
-								cursorPos--;
 								s_input->text.pop_back();
 							}
 							else
 								s_input->text.erase(cursorPos, 1);
+
 						}
 						break;
 					case KEY_RETURN:
 						s_input->y += s_charH;
-						if (s_input->y >= s_h -s_charH)
+						if (s_input->y >= s_h)
 						{
 							s_input->y = s_h-s_charH;
 							s_lines.pop_front();
@@ -117,20 +116,15 @@ namespace Shell
 						//if text can fit in line!
 						if (cursorPos < lineW)
 						{
-							//toupper
-							if (sym >= 'a' && sym <= 'z')
-								sym = sym - ('a' - 'A');
-							if (cursorPos == s_input->text.size()) {
-								cursorPos++;
-								s_input->text += sym;
-							}
-							else
-							{
 
-								//place one char at cursor pos
-								s_input->text.insert(cursorPos, 1, sym);
-								cursorPos++;
-							}
+							//toupper
+							if (key >= 'a' && key <= 'z')
+								key = (Key)(key - ('a' - 'A'));
+							if (cursorPos == s_input->text.size()) 
+								s_input->text += key;
+							else
+								s_input->text.insert(cursorPos, 1, key);
+							cursorPos++;
 						}
 					}
 					s_input->refresh();
