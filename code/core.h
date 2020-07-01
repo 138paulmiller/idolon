@@ -1,5 +1,10 @@
 #pragma once
 
+#ifdef __unix__         
+#define OS_LINUX
+#elif defined(_WIN32) || defined(_WIN64)  
+#define OS_WINDOWS
+#endif
 
 #include <cmath>
 #include <cassert>

@@ -11,6 +11,7 @@
 #define WINDOW_Y SDL_WINDOWPOS_UNDEFINED
 #define WINDOW_FLAGS SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN
 #define RENDERER_FLAGS SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED
+#define FPS_STAT_RATE  5.f 
 
 #define CHECK_TEXTURE(texId) ASSERT(texId >= 0 && texId < s_textures.size() && s_textures[texId], "Engine::Blit: Texture does not exist");
 
@@ -209,7 +210,7 @@ namespace Engine
         
         timer += Engine::GetTimeDeltaMs()/1000.0f;
 		//every 1 seconds
-		if (timer > 1.f) 
+		if (timer > FPS_STAT_RATE) 
 		{
 			printf("FPS:%.2f\n", Engine::GetFPS());
 			timer = 0.f;

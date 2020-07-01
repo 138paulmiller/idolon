@@ -145,6 +145,7 @@
   <ItemGroup>
     <ClCompile Include="..\code\assets.cpp" />
     <ClCompile Include="..\code\commands.cpp" />
+    <ClCompile Include="..\code\fs.cpp" />
     <ClCompile Include="..\code\main.cpp" />
     <ClCompile Include="..\code\engine.cpp" />
     <ClCompile Include="..\code\pool.cpp" />
@@ -158,6 +159,7 @@
     <ClInclude Include="..\code\commands.h" />
     <ClInclude Include="..\code\core.h" />
     <ClInclude Include="..\code\engine.h" />
+    <ClInclude Include="..\code\fs.h" />
     <ClInclude Include="..\code\pool.h" />
     <ClInclude Include="..\code\graphics.h" />
     <ClInclude Include="..\code\editor.h" />

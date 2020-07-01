@@ -42,6 +42,9 @@
     <ClCompile Include="..\code\commands.cpp">
       <Filter>../Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\code\fs.cpp">
+      <Filter>../Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\code\assets.h">
@@ -69,6 +72,9 @@
       <Filter>../Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\code\commands.h">
+      <Filter>../Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\fs.h">
       <Filter>../Header Files</Filter>
     </ClInclude>
   </ItemGroup>
