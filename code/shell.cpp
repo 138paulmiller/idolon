@@ -2,6 +2,7 @@
 #include "engine.h"
 #include "graphics.h"
 #include "assets.h"
+#include <sstream>
 
 namespace
 {
@@ -12,12 +13,14 @@ namespace
 	const int cursorFlickRate = 3;
 	Graphics::TextBox * s_cursor, * s_input, * s_buffer;
 	std::list<std::string> 	s_lines;
+	CommandTable s_commands;
 }
 
 namespace Shell
 {
-	void Startup()
+	void Startup(const CommandTable & commands)
 	{
+		s_commands = commands;
 		Engine::GetSize(s_w, s_h);
 		s_lines.clear();
 
@@ -48,12 +51,33 @@ namespace Shell
 	{
 		s_lines.clear();
 	}
-
-	void ExecuteCommand(const std::string & command)
+	
+	//Can only be called in command
+	void Log(const std::string & msg)
 	{
-		printf("\n%s", command.c_str());
-		//push resutl to lines and update buffer as well
-	}	
+		//split into lines
+		std::string line;
+		std::istringstream iss;
+		iss.str(msg);
+		s_buffer->text = ""; //reset buffer. will be rebuilt
+		while (std::getline(iss, line))
+		{
+			s_lines.push_back(msg);
+			//move input down, if cannot go down further pop lines off buffer
+			s_input->y += s_charH;
+			if (s_input->y >= s_h)
+			{
+				s_input->y = s_h - s_charH;
+				s_lines.pop_front();
+			}
+		}
+		for (std::string& line : s_lines)
+		{
+			s_buffer->text += line + '\n';
+		}
+
+		s_buffer->refresh();
+	}
 
 	void Run()
 	{
@@ -92,23 +116,12 @@ namespace Shell
 						}
 						break;
 					case KEY_RETURN:
-						s_input->y += s_charH;
-						if (s_input->y >= s_h)
-						{
-							s_input->y = s_h-s_charH;
-							s_lines.pop_front();
-						}
-						
-						s_lines.push_back(s_input->text);
-						ExecuteCommand(s_input->text.substr(1)); 
-						s_buffer->text = "";
-						for (std::string& line : s_lines)
-						{
-							s_buffer->text += line + '\n';
-						}
+
+						Log(s_input->text);
+						if (s_input->text.size() > 1)
+							Execute(s_input->text.substr(1), s_commands); 
+						cursorPos = 1; //reset
 						s_input->text = ">";
-						s_buffer->refresh();
-						cursorPos = 1;
 						break;
 					default:
 						if (cursorPos < lineW-1)

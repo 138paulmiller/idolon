@@ -144,6 +144,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\code\assets.cpp" />
+    <ClCompile Include="..\code\commands.cpp" />
     <ClCompile Include="..\code\main.cpp" />
     <ClCompile Include="..\code\engine.cpp" />
     <ClCompile Include="..\code\pool.cpp" />
@@ -154,6 +155,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\code\assets.h" />
+    <ClInclude Include="..\code\commands.h" />
     <ClInclude Include="..\code\core.h" />
     <ClInclude Include="..\code\engine.h" />
     <ClInclude Include="..\code\pool.h" />

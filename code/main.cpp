@@ -4,7 +4,6 @@
 #include "engine.h"
 #include "shell.h"
 #include "editor.h"
-#include <functional>
 
 //Default settings
 #define FONT_W 7
@@ -14,39 +13,7 @@
 #define WINDOW_SCALE 1.0/2
 
 
-using Args = std::vector<std::string > ;
-using Command = std::function<void(Args)>;
-using CommandTable = std::map<std::string, Command>;  
-void Execute(int argc, char** argv, const CommandTable & commands ) 
-{
-	Args args; 
-	//ignore first arg
-	int i = 1;
-	while( i < argc)
-	{
-		CommandTable::const_iterator it = commands.find(argv[i]);
-		if(it == commands.end())
-		{
-			printf("Execute: Invalid Command (%s)\n", argv[i]);
-			return;
-		}
-		//parse until non cmd is found
-		const Command & command  = it->second; 
-		i++;
-		while(i < argc)
-		{
-			const char *arg=  argv[i];
-			it = commands.find(arg);
-			if (it == commands.end()) //if does not exist
-				args.push_back(arg);
-			else
-				break;
-			i++;
-		}
-		command(args);
-		args.clear();
-	}
-}
+
 
 std::string GetFilename(std::string path)
 {
@@ -110,12 +77,27 @@ void CreateAssets(const CreationRequests & requests)
 #define ARG_RANGE(args, min, max) assert(args.size() >= min && args.size() <= max );
 #define ARG_COUNT(args, i) assert(args.size() == i );
 
+void Startup()
+{
+}
+
+void Shutdown()
+{
+	Shell::Shutdown();
+	Assets::Shutdown();
+	Engine::Shutdown();
+	exit(1);
+}
 
 int main(int argc, char** argv)
 { 
+	//ignore first arg (program path)
+	argv++;
+	argc--;
 	std::string root = "./";
 	CreationRequests requests;
-	
+	// todo remove args commands
+
 	CommandTable argcommands = 
 	{
 		{ 	"-assets", 
@@ -147,20 +129,25 @@ int main(int argc, char** argv)
 			} 
 		}  
 	};
-	
+	CommandTable shellcommands = 
+	{
+		{ 	"quit", 
+			[&](Args args)
+			{ 
+				Shutdown();
+			} 
+		},
+	};
 	Engine::Startup(SCREEN_W, SCREEN_H, WINDOW_SCALE);
 	
 	Execute(argc, argv, argcommands);
 	
 	Assets::Startup(root);
 	CreateAssets(requests);
-	Shell::Startup();
-	//create context switcher
+	Shell::Startup(shellcommands);
+	
 	Shell::Run();
 
-	Shell::Shutdown();
-	Assets::Shutdown();
-	Engine::Shutdown();
-
+	Shutdown();
 	return 0;
 }
