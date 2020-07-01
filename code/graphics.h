@@ -37,15 +37,15 @@ namespace Graphics
     {
     public:
         Sprite(int w, int h, const std::string & name);
+        //reload cached sheet from disk.
+        void reload();
+        void draw();
 
         std::string sheet;
         std::string animation; //current animation        
         std::map<std::string, std::vector<Frame>> animframes;
         //position/size
         Rect rect;
-        //reload cached sheet from disk.
-        void reload();
-        void draw();
 
     private:
         //if sheetcache->name != name, then unload old sheet. and load sheet
@@ -62,16 +62,22 @@ namespace Graphics
         Font(const std::string& name, int w, int h, int charW, int charH, char start);
         //src is textbox in character units
         void blit(int destTexture, const std::string & text, const Rect & dest);
+
         const int charW,charH;
         const char start;
     };
-    
+    //TODO Create a texture that is sizeof(boxtexture)/fontw
+    // this contains the colors. then perform additive blending
 	class TextBox
 	{
 	public:
         // w and height are number of chars
 		TextBox(int tw, int th, const std::string & text);
         ~TextBox();
+        void refresh();
+        void reload();
+        void draw();
+        
         Color textColor;
         //Fill should be texture!
         bool filled; //
@@ -83,9 +89,7 @@ namespace Graphics
         int w,h;
         int tw,th;
         bool visible;
-        void refresh();
-        void reload();
-        void draw();
+
     private:
         int texture; 
         //font sheet to use

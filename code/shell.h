@@ -4,8 +4,10 @@
 
 namespace Shell
 {
-	void Startup(const CommandTable & commands);
+	void Startup();
 	void Shutdown();
 	void Run();
 	void Log(const std::string & msg);
+	void SetFont(const std::string & font);
+	void AddCommands(const CommandTable & commands);
 }

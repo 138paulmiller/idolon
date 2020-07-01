@@ -20,15 +20,20 @@ public:
 	Asset(const std::string & name) ;
 	virtual ~Asset() = default;
 	const std::string name;
+	std::string filepath;
 	int refcounter = 0;
+
 };
 
 
 namespace Assets
 {
-	void Startup(const std::string & assetdir);
+	void Startup(const std::string & dirpath);
 	void Shutdown();
-
+	//Run for the given game 
+	void AddPath(const std::string & dirpath);
+	//clear all but default path
+	void ClearPaths();
 	//update the cache. Do not call each frame.
 	//void Prune();
 	
@@ -47,6 +52,14 @@ namespace Assets
 	void Save(Type * asset, const std::string& name) 
 	{
 		return SaveImpl(asset, typeid(Type), name);
+	}
+
+	std::string GetAssetTypeExtImpl(const std::type_info& type);
+
+	template <typename Type>
+	std::string GetAssetTypeExt() 
+	{
+		return GetAssetTypeExtImpl(typeid(Type));
 	}
 
 }

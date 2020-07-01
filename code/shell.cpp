@@ -18,9 +18,8 @@ namespace
 
 namespace Shell
 {
-	void Startup(const CommandTable & commands)
+	void Startup()
 	{
-		s_commands = commands;
 		Engine::GetSize(s_w, s_h);
 		s_lines.clear();
 
@@ -50,8 +49,24 @@ namespace Shell
 	void Shutdown()
 	{
 		s_lines.clear();
+		delete s_input;
+		delete s_cursor;
+		delete s_buffer;
+		
 	}
 	
+	void AddCommands(const CommandTable & commands)
+	{
+		s_commands.insert(commands.begin(), commands.end());
+	}
+
+	void SetFont(const std::string & font)
+	{
+		s_fontName = font;	
+		Shutdown();
+		Startup();
+	}
+
 	//Can only be called in command
 	void Log(const std::string & msg)
 	{

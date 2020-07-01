@@ -12,7 +12,7 @@ namespace
 	using Table = std::unordered_map<std::string, Type>;
 	Table<Asset*> s_assets;	
 
-	std::string s_assetdir; 
+	std::vector<std::string> s_assetdirs; 
 
 }
 
@@ -22,7 +22,7 @@ Asset::Asset(const std::string& name) :name(name)
 
 namespace Assets
 {
-	std::string GetAssetTypeExt(const std::type_info& type)
+	std::string GetAssetTypeExtImpl(const std::type_info& type)
 	{
 
 		if(type ==  typeid(Graphics::Sprite))
@@ -31,23 +31,53 @@ namespace Assets
 			return ".sheet";
 		if(type ==  typeid(Graphics::Font))
 			return ".font";
+		return "";
 	}
 
-
-	std::string MakeAssetPath(const std::type_info& type, const std::string & name)
+	bool FileExists(const std::string & filepath)
 	{
-		return s_assetdir + std::string("/") + name + GetAssetTypeExt(type);
+	    std::ifstream infile(filepath);
+	    return infile.good();
 	}
 
-	void Startup(const std::string & assetdir)
+	std::string FindAssetPath(const std::type_info& type, const std::string & name)
 	{
-		s_assetdir = assetdir;
+		std::string path ;
+		for(const std::string & dirpath : s_assetdirs)
+		{
 
+			path = dirpath + std::string("/") + name + GetAssetTypeExtImpl(type);
+			if(FileExists(path))
+			{
+				return path;
+			}
+		}
+		return "";
+	}
+
+	void Startup(const std::string & dirpath)
+	{
+		s_assetdirs.push_back(dirpath);
 	}
 
 	void Shutdown()
-	{}
+	{
+		for(auto & pair : s_assets)
+		{
+			delete pair.second;
+		}
+	}
 
+	void AddPath(const std::string & dirpath)
+	{
+		s_assetdirs.push_back(dirpath);
+	}
+	void ClearPaths()
+	{
+		std::string path = s_assetdirs[0];
+		s_assetdirs.clear();
+		s_assetdirs.push_back(path);   
+	}
 	
 	Graphics::Sheet* LoadSheet(const std::string & name, const std::string & path)
 	{
@@ -147,9 +177,9 @@ namespace Assets
 			if(font)
 				delete font;
 				font = 0;
-			printf("Asset:Failed to load %s\n", path.c_str());
+			printf("Assets: Failed to load %s\n", path.c_str());
 		}
-		printf("Asset:Loaded %s\n", path.c_str());
+		printf("Assets: Loaded %s\n", path.c_str());
 		return font;
 	}
 
@@ -203,7 +233,13 @@ namespace Assets
 
 	Asset* LoadImpl(const std::type_info& type, const std::string& name)
 	{	
-		const std::string & path = MakeAssetPath(type, name);
+		std::string path =  FindAssetPath(type, name);
+		
+		if(path.size() == 0)
+		{
+			printf("Assets: %s Does not exist\n", name.c_str());
+			return 0;
+		}
 
 		Table<Asset*>::iterator it = s_assets.find(name);		
 		if (it != s_assets.end()) 									
@@ -216,31 +252,48 @@ namespace Assets
 		}			
 		//asset to filename 
 		printf("Assets: Loading %s\n", path.c_str());
-
+		Asset * asset =0 ;
+	
 		if(type ==  typeid(Graphics::Sprite))
-			return s_assets[name] = LoadSprite(name, path );
-		if(type ==  typeid(Graphics::Sheet))
-			return s_assets[name] = LoadSheet(name, path );
-		if(type ==  typeid(Graphics::Font))
-			return s_assets[name] = LoadFont(name, path );
-		return 0;
+			asset= LoadSprite(name, path );
+
+		else if(type ==  typeid(Graphics::Sheet))
+			asset = LoadSheet(name, path );
+	
+		else if(type ==  typeid(Graphics::Font))
+			asset = LoadFont(name, path );
+	
+		asset->filepath = path;
+		s_assets[name] = asset;
+	
+		return asset;
 	}
 
 	void SaveImpl(const Asset* asset, const std::type_info& type, const std::string& name)
 	{
 		//asset to filename 
-		const std::string & path = MakeAssetPath(type, name);
+		std::string path = FindAssetPath(type, name);
+		if(path.size() == 0)
+		{
+			path = asset->filepath;
+			if(path.size() == 0)
+			{
+				printf("Assets: Failed to Save %s. No filepath\n", name.c_str());
+				return;
+			}
+		}
+		
 		printf("Assets: Saving %s\n",path.c_str());
 
 		if(type ==  typeid(Graphics::Sprite))
 			SaveSprite(dynamic_cast<const Graphics::Sprite*>(asset),  path );
+		
 		else if(type ==  typeid(Graphics::Sheet))
 			SaveSheet(dynamic_cast<const Graphics::Sheet*>(asset), path );	
+		
 		else if(type ==  typeid(Graphics::Font))
 			SaveFont(dynamic_cast<const Graphics::Font*>(asset), path );	
+	
 	}
-
-
-
 
 }
