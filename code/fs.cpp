@@ -4,15 +4,23 @@
 
 #include <windows.h>
 #include <direct.h>
+
 #define getcwd _getcwd
 #define mkdir _mkdir
+#define chmod()
 
-#elif OS_LINUX
+#elif defined(OS_LINUX)
 
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <dirent.h>
 #include <unistd.h>
+#include <stdio.h>
+#include <glob.h>
+
+#define mkdir(path) mkdir(path, 0777)
+
+#define MAX_PATH 260
 
 #endif
 
@@ -48,16 +56,24 @@ namespace FS
 					//do not allow to navigate beyond root
 					if (path == FS::Root() && filename == "..")
 						continue;
-					files.push_back(data.cFileName);
+					files.push_back(filename);
 				}
 			} while (FindNextFileA(hFind, &data));
             FindClose(hFind);
         }
-#elif OS_LINUX
+#elif defined(OS_LINUX)
 		DIR* dir = opendir(path.c_str());
 		dirent * entry;
-		while ((entry = readdir(dir))) {
-			files.push_back(entry->d_name);
+		while ((entry = readdir(dir))) 
+		{
+			std::string filename = entry->d_name;
+			if (filename != "."  )
+			{
+				//do not allow to navigate beyond root
+				if (path == FS::Root() && filename == "..")
+					continue;
+				files.push_back(filename);
+			}
 		}
 		closedir(dir);
 #endif
@@ -77,8 +93,8 @@ namespace FS
 #ifdef OS_WINDOWS
 		GetFullPathNameA(filename.c_str(), MAX_PATH, buff, nullptr);
 	
-#elif OS_LINUX
-		asset(0);
+#elif defined(OS_LINUX)
+		realpath(filename.c_str(), buff);
 #endif	
 		std::string fullpath = buff;
 		ReplaceAll(fullpath, "\\", "/");
@@ -87,16 +103,16 @@ namespace FS
 
 	std::string Root()
 	{
-		const char* mountPoint =
 #ifdef OS_WINDOWS
-			"C:/Program Files/UltBoy"
-#elif OS_LINUX
-			"/usr/share"
+		const char* mountPoint = "C:/Program Files/UltBoy/root";
+#elif defined(OS_LINUX)
+		char mountPoint[MAX_PATH];
+	    glob_t globbuf;
+	 	glob("~", GLOB_TILDE, NULL, &globbuf);
+        snprintf(mountPoint, sizeof(mountPoint), "%s/ultboy/root", globbuf.gl_pathv[0]);
 #endif	
-		;
-		mkdir(mountPoint);
+		int status = mkdir(mountPoint);
 		return mountPoint;
-
 	}
 
 	bool IsDir(const std::string& path)
@@ -105,9 +121,9 @@ namespace FS
 		DWORD attrib = GetFileAttributesA(path.c_str());
 		//if not file and is dir
 		return (attrib != INVALID_FILE_ATTRIBUTES && (attrib & FILE_ATTRIBUTE_DIRECTORY));
-#elif OS_LINUX
+#elif defined(OS_LINUX)
 		struct stat info;
-		return (stat(path, &info) && (info.st_mode & S_IFDIR));
+		return (stat(path.c_str(), &info) == 0 && (info.st_mode & S_IFDIR));
 #endif
 	}
 

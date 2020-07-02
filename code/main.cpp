@@ -5,6 +5,7 @@
 #include "shell.h"
 #include "editor.h"
 #include "fs.h"
+#include "err.h"
 
 //Default settings
 //TODO make font 8x8
@@ -251,6 +252,9 @@ const CommandTable & shellcommands =
 
 int main(int argc, char** argv)
 { 
+
+	stacktrace();
+
 	//default config
 	g_context.sysPath = FS::ExePath() + "/system";
 	g_context.sysAssetPath = g_context.sysPath + "/assets";
