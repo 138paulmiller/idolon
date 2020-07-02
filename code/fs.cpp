@@ -87,13 +87,16 @@ namespace FS
 
 	std::string Root()
 	{
+		const char* mountPoint =
 #ifdef OS_WINDOWS
-		const char * mountPoint= "C:/Program Files/UltBoy";
+			"C:/Program Files/UltBoy"
+#elif OS_LINUX
+			"/usr/share"
+#endif	
+		;
 		mkdir(mountPoint);
 		return mountPoint;
-#elif OS_LINUX
-		asset(0);
-#endif	
+
 	}
 
 	bool IsDir(const std::string& path)
@@ -115,5 +118,41 @@ namespace FS
 		if ( path.compare(0, root.size(), root.c_str(), root.size()) != 0 )
 				return false;
 		return mkdir(path.c_str()) != -1;	
+	}
+
+
+	std::string Append(const std::string& path1, const std::string& path2)
+	{
+		return FS::FullPath(path1 + "/" + path2);
+	}
+
+	std::string BaseName(std::string path)
+	{
+		size_t sep = path.find_last_of("\\/");
+		if (sep != std::string::npos)
+			path = path.substr(sep + 1, path.size() - sep - 1);
+		size_t dot = path.find_last_of(".");
+		if (dot != std::string::npos)
+		{
+			return path.substr(0, dot);
+		}
+		return path;
+	}
+	std::string FileExt(const std::string& path)
+	{
+		size_t dot = path.find_last_of(".");
+		if (dot != std::string::npos)
+		{
+			return path.substr(dot+1);
+		}
+		return "";
+	}
+
+	std::string DirName(const std::string & path)
+	{
+		size_t sep = path.find_last_of("\\/");
+		if (sep != std::string::npos)
+			return path.substr(0, sep);
+		return "";
 	}
 }

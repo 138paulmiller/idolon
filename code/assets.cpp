@@ -45,7 +45,6 @@ namespace Assets
 		std::string path ;
 		for(const std::string & dirpath : s_assetdirs)
 		{
-
 			path = dirpath + std::string("/") + name + GetAssetTypeExtImpl(type);
 			if(FileExists(path))
 			{
@@ -74,6 +73,7 @@ namespace Assets
 	}
 	void ClearPaths()
 	{
+		//default path
 		std::string path = s_assetdirs[0];
 		s_assetdirs.clear();
 		s_assetdirs.push_back(path);   
@@ -263,26 +263,12 @@ namespace Assets
 		else if(type ==  typeid(Graphics::Font))
 			asset = LoadFont(name, path );
 	
-		asset->filepath = path;
 		s_assets[name] = asset;
 	
 		return asset;
 	}
-
-	void SaveImpl(const Asset* asset, const std::type_info& type, const std::string& name)
+	void SaveAsImpl(const Asset* asset, const std::type_info& type, const std::string& path)
 	{
-		//asset to filename 
-		std::string path = FindAssetPath(type, name);
-		if(path.size() == 0)
-		{
-			path = asset->filepath;
-			if(path.size() == 0)
-			{
-				printf("Assets: Failed to Save %s. No filepath\n", name.c_str());
-				return;
-			}
-		}
-		
 		printf("Assets: Saving %s\n",path.c_str());
 
 		if(type ==  typeid(Graphics::Sprite))
@@ -292,8 +278,18 @@ namespace Assets
 			SaveSheet(dynamic_cast<const Graphics::Sheet*>(asset), path );	
 		
 		else if(type ==  typeid(Graphics::Font))
-			SaveFont(dynamic_cast<const Graphics::Font*>(asset), path );	
-	
+			SaveFont(dynamic_cast<const Graphics::Font*>(asset), path );		
+	}
+	void SaveImpl(const Asset* asset, const std::type_info& type, const std::string& name)
+	{
+		//asset to filename 
+		const std::string & path = FindAssetPath(type, name);
+		if(path.size() == 0)
+		{
+			printf("Assets: Failed to Save %s. Could not find asset path \n",name.c_str());
+			return;
+		}
+		SaveAsImpl(asset, type, path);
 	}
 
 }

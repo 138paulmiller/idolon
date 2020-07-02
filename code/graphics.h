@@ -71,7 +71,7 @@ namespace Graphics
 	class TextBox
 	{
 	public:
-        // w and height are number of chars
+        // tw and th are number of chars
 		TextBox(int tw, int th, const std::string & text);
         ~TextBox();
         void refresh();

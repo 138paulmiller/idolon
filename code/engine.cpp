@@ -249,7 +249,7 @@ namespace Engine
             SDL_PIXELFORMAT_BGRA8888,
             target ? SDL_TEXTUREACCESS_TARGET : SDL_TEXTUREACCESS_STREAMING, 
             width, height);
-        SDL_SetTextureBlendMode( s_textures[i], SDL_BLENDMODE_BLEND );
+        SetTextureBlendMode(i, BLEND_MIX);
         return i;
     }
     void DestroyTexture(int textureId)
@@ -258,6 +258,32 @@ namespace Engine
         SDL_Texture* texture = s_textures[textureId];
         SDL_DestroyTexture(texture);
         s_textures[textureId] = 0;
+    }
+    void ClearScreen(const Color& color)
+    {
+    
+        ClearTexture(s_target, color);
+    }
+   
+    void SetTextureBlendMode(int textureId, BlendMode mode)
+    {
+        SDL_BlendMode sdlmode;
+        switch (mode)
+        {
+        case BLEND_ADD: sdlmode = SDL_BLENDMODE_ADD;
+            break;
+        case BLEND_MULTIPLY: sdlmode = SDL_BLENDMODE_MUL;
+            break;
+        case BLEND_MIX: sdlmode = SDL_BLENDMODE_BLEND;
+            break;
+        }
+        SDL_SetTextureBlendMode(  s_textures[textureId], sdlmode );
+    
+    }
+
+    void SetDrawBlendMode(BlendMode mode)
+    {
+        SetTextureBlendMode(  s_target, mode );
     }
 
     Color * LockTexture(int textureId, const Rect & region)

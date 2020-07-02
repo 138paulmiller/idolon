@@ -7,6 +7,7 @@ namespace Editor
 {
 	void Startup();
 	void Shutdown();
-	//TODO Create universal toolbar that runs when editor is running
-	int RunSheetView(const std::string & name);
+	//TODO Create universal toolbar that runs when editor is running. Used to navigate the various editor pages. return back to terminal
+	int EditSheet(const std::string & name);
+	int EditFont(const std::string & name);
 }

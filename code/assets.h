@@ -39,6 +39,7 @@ namespace Assets
 	
 	Asset* LoadImpl(const std::type_info& type, const std::string& name);
 	void SaveImpl(const Asset* asset, const std::type_info& type, const std::string& name);
+	void SaveAsImpl(const Asset* asset, const std::type_info& type, const std::string& path);
 
 	void Unload(const std::string& name);
 
@@ -52,6 +53,12 @@ namespace Assets
 	void Save(Type * asset, const std::string& name) 
 	{
 		return SaveImpl(asset, typeid(Type), name);
+	}
+		
+	template <typename Type>
+	void SaveAs(Type * asset, const std::string& path ) 
+	{
+		return SaveAsImpl(asset, typeid(Type), path);
 	}
 
 	std::string GetAssetTypeExtImpl(const std::type_info& type);

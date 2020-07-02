@@ -66,7 +66,11 @@ namespace Shell
 		Shutdown();
 		Startup();
 	}
-
+	void OverrideInput(const std::string& msg)
+	{
+		//should wrap ? 
+		s_buffer->text = msg; 
+	}
 	//Can only be called in command
 	void Log(const std::string & msg)
 	{
@@ -86,6 +90,7 @@ namespace Shell
 				s_lines.pop_front();
 			}
 		}
+
 		for (std::string& line : s_lines)
 		{
 			s_buffer->text += line + '\n';
@@ -107,6 +112,9 @@ namespace Shell
 				{
 					switch (key)
 					{
+					case KEY_TAB:
+						//auto fill ? execute the "auto-complete" command and delegate main to list options by overriding input
+						break;
 					case KEY_LEFT:
 						if(cursorPos > 1) 
 							cursorPos--;					
@@ -152,7 +160,6 @@ namespace Shell
 				}
 			}
 		);
-
 		float timer = 0;
 		while (Engine::Run())
 		{

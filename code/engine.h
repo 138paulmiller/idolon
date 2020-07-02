@@ -21,6 +21,16 @@ enum MouseButton
     MOUSEBUTTON_X2 ,
 };
 
+//Mouse button
+enum BlendMode
+{
+    BLEND_NONE= 0, //color = newcolor
+    BLEND_ADD,
+    BLEND_MULTIPLY,
+    BLEND_MIX
+};
+
+
 namespace Engine
 {
     void Startup(int w, int h, float = 1/5.0);
@@ -39,6 +49,7 @@ namespace Engine
     //multiply color of texture on each texture draw 
     void MultiplyTexture(int textureId, const Color& color);
     void ClearTexture(int textureId, const Color& color);
+    void SetTextureBlendMode(int textureId, BlendMode mode);
 
 
     //Copy data from one texture to another    
@@ -46,7 +57,9 @@ namespace Engine
     void DrawTexture(int textureId, const Rect & src, const Rect & dest);
     void DrawLine(const Color& color, int x1, int y1, int x2, int y2);
     void DrawRect(const Color& color, const Rect& rect, bool filled);
-    
+    void ClearScreen(const Color& color = { 255, 0, 0, 0 } );
+    void SetDrawBlendMode(BlendMode mode);
+
     //Getters/setters
     void Resize(int w, int h);
     //size of draw region in "units". Not window size
