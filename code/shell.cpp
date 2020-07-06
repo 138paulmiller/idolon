@@ -4,180 +4,202 @@
 #include "assets.h"
 #include <sstream>
 
-namespace
+Shell::Shell() 
 {
-	std::string s_fontName = "default";
-	Graphics::Font* s_font;
-	int s_charW, s_charH;
-	int s_w, s_h;
-	const int cursorFlickRate = 3;
-	Graphics::TextBox * s_cursor, * s_input, * s_buffer;
-	std::list<std::string> 	s_lines;
-	CommandTable s_commands;
+
 }
 
-namespace Shell
+
+Shell::~Shell() 
 {
-	void Startup()
+}
+
+void Shell::onEnter()
+{
+	Engine::GetSize(m_w, m_h);
+
+	m_font = Assets::Load<Graphics::Font>(m_fontName );
+	m_charW = m_font->charW;
+	m_charH = m_font->charH;
+
+	m_cursor = new Graphics::TextBox(1, 1, " ");
+	m_cursor->font = m_fontName ;
+	m_cursor->filled = true;
+	m_cursor->fillColor = { 255, 255, 255, 255 } ;
+	m_cursor->reload();
+
+	m_input = new Graphics::TextBox(m_w/m_charW, 1, ">");
+	m_input->font = m_fontName ;    
+	m_input->reload();
+
+	//used to render lines
+	m_buffer = new Graphics::TextBox(m_w/m_charW, (m_h-1)/m_charH, "");
+	m_buffer->font = m_fontName ;
+	m_buffer->x = 0;
+	m_buffer->y = 0;        
+	m_buffer->reload();
+
+	m_lineW = m_w / m_charW;
+	m_cursorPos = 1; //offset by > 
+	m_stashedInput = "";
+	m_timer = 0;
+
+
+	//Maintain buffer input
+/*	std::string linesText;
+	for(const std::string & line : m_lines)
 	{
-		Engine::GetSize(s_w, s_h);
-		s_lines.clear();
+		linesText += line + "\n";
+	}
+	if(linesText.size())
+		log(linesText);
+*/
+	m_lines.clear();
+	Engine::ClearScreen();
+}
 
-		s_font = Assets::Load<Graphics::Font>(s_fontName );
-		s_charW = s_font->charW;
-		s_charH = s_font->charH;
-
-		s_cursor = new Graphics::TextBox(1, 1, " ");
-		s_cursor->font = s_fontName ;
-		s_cursor->filled = true;
-		s_cursor->fillColor = { 255, 255, 255, 255 } ;
-		s_cursor->reload();
+void Shell::onExit()
+{
+	if(m_input)
+	{
+		delete m_input;
+		m_input  = 0;	
+	}  
+	if(m_cursor)
+	{
+		delete m_cursor;
+		m_cursor = 0;
+	} 
+	if(m_buffer) 
+	{
+		delete m_buffer;
+		m_buffer = 0;
+	}	
 	
-		s_input = new Graphics::TextBox(s_w/s_charW, 1, ">");
-		s_input->font = s_fontName ;    
-		s_input->reload();
+	printf("Exited Shell\n");
 
-		//used to render lines
-		s_buffer = new Graphics::TextBox(s_w/s_charW, (s_h-1)/s_charH, "");
-		s_buffer->font = s_fontName ;
-		s_buffer->x = 0;
-		s_buffer->y = 0;        
-		s_buffer->reload();
+}
 
-	}
-	
-	void Shutdown()
-	{
-		s_lines.clear();
-		delete s_input;
-		delete s_cursor;
-		delete s_buffer;
-		
-	}
-	
-	void AddCommands(const CommandTable & commands)
-	{
-		s_commands.insert(commands.begin(), commands.end());
-	}
+void Shell::onKey(Key key, bool isDown)
+{
 
-	void SetFont(const std::string & font)
+	if (isDown)
 	{
-		s_fontName = font;	
-		Shutdown();
-		Startup();
-	}
-	void OverrideInput(const std::string& msg)
-	{
-		//should wrap ? 
-		s_buffer->text = msg; 
-	}
-	//Can only be called in command
-	void Log(const std::string & msg)
-	{
-		//split into lines
-		std::string line;
-		std::istringstream iss;
-		iss.str(msg);
-		s_buffer->text = ""; //reset buffer. will be rebuilt
-		while (std::getline(iss, line))
+		switch (key)
 		{
-			s_lines.push_back(msg);
-			//move input down, if cannot go down further pop lines off buffer
-			s_input->y += s_charH;
-			if (s_input->y >= s_h)
+		case KEY_TAB:
+			//auto fill ? execute the "auto-complete" command and delegate main to list options by overriding input
+			break;
+		case KEY_LEFT:
+			if(m_cursorPos > 1) 
+				m_cursorPos--;					
+			break;
+		case KEY_RIGHT:
+			if(m_cursorPos < m_input->text.size()) 
+				m_cursorPos++;					
+			break;
+		case KEY_UP:
+		case KEY_DOWN:
+			break;
+		case KEY_BACKSPACE:
+			//do not remove >
+			if (m_input->text.size() > 1)
 			{
-				s_input->y = s_h - s_charH;
-				s_lines.pop_front();
+				if (m_cursorPos >= m_input->text.size())
+					m_input->text.pop_back();
+				else
+					m_input->text.erase(m_cursorPos, 1);
+				if(m_cursorPos > 1)
+					m_cursorPos--;
+			}
+			break;
+		case KEY_RETURN:
+
+			log(m_input->text);
+			if (m_input->text.size() > 1)
+				m_command = m_input->text.substr(1);
+			m_cursorPos = 1; //reset
+			m_input->text = ">";
+			break;
+		default:
+			if (m_cursorPos < m_lineW-1)
+			{
+				if (m_cursorPos == m_input->text.size()) 
+					m_input->text += key;
+				else
+					m_input->text.insert(m_cursorPos, 1, key);
+				m_cursorPos++;
 			}
 		}
-
-		for (std::string& line : s_lines)
-		{
-			s_buffer->text += line + '\n';
-		}
-
-		s_buffer->refresh();
+		m_input->refresh();
 	}
+}
 
-	void Run()
+void Shell::onTick()
+{
+	m_timer += Engine::GetTimeDeltaMs()/1000.0f;
+	if (m_timer > 1.0/cursorFlickRate) 
 	{
-		int lineW = s_w / s_charW;
-		int cursorPos = 1; //offset by > 
-		std::string stashedInput = "";
-		Engine::SetKeyEcho(true);
-		Engine::SetKeyHandler(
-			[&](Key key, bool isDown) 
-			{
-				if (isDown)
-				{
-					switch (key)
-					{
-					case KEY_TAB:
-						//auto fill ? execute the "auto-complete" command and delegate main to list options by overriding input
-						break;
-					case KEY_LEFT:
-						if(cursorPos > 1) 
-							cursorPos--;					
-						break;
-					case KEY_RIGHT:
-						if(cursorPos < s_input->text.size()) 
-							cursorPos++;					
-						break;
-					case KEY_UP:
-					case KEY_DOWN:
-						break;
-					case KEY_BACKSPACE:
-						//do not remove >
-						if (s_input->text.size() > 1)
-						{
-							if (cursorPos >= s_input->text.size())
-								s_input->text.pop_back();
-							else
-								s_input->text.erase(cursorPos, 1);
-							if(cursorPos > 1)
-								cursorPos--;
-						}
-						break;
-					case KEY_RETURN:
-
-						Log(s_input->text);
-						if (s_input->text.size() > 1)
-							Execute(s_input->text.substr(1), s_commands); 
-						cursorPos = 1; //reset
-						s_input->text = ">";
-						break;
-					default:
-						if (cursorPos < lineW-1)
-						{
-							if (cursorPos == s_input->text.size()) 
-								s_input->text += key;
-							else
-								s_input->text.insert(cursorPos, 1, key);
-							cursorPos++;
-						}
-					}
-					s_input->refresh();
-				}
-			}
-		);
-		float timer = 0;
-		while (Engine::Run())
-		{
-			timer += Engine::GetTimeDeltaMs()/1000.0f;
-			if (timer > 1.0/cursorFlickRate) 
-			{
-				s_cursor->visible = !s_cursor->visible;
-				timer = 0;
-			}
-		
-			s_cursor->x = cursorPos * s_charW;	
-			s_cursor->y = s_input->y;	
-
-			s_buffer->draw();
-			s_input->draw();
-			s_cursor->draw();
-
-		}
-		Engine::SetKeyEcho(false);
+		m_cursor->visible = !m_cursor->visible;
+		m_timer = 0;
 	}
+
+	m_cursor->x = m_cursorPos * m_charW;	
+	m_cursor->y = m_input->y;	
+
+	m_buffer->draw();
+	m_input->draw();
+	m_cursor->draw();
+
+	//process command at the end of the frame
+	if(m_command.size())
+	{
+		Execute(m_command, m_commands);
+		m_command = "";
+	}
+
+}
+
+void Shell::addCommands(const CommandTable & commands)
+{
+	m_commands.insert(commands.begin(), commands.end());
+}
+
+void Shell::setFont(const std::string & font)
+{
+	m_fontName = font;	
+	onExit();
+	onEnter();
+}
+void Shell::overrideInput(const std::string& msg)
+{
+	//should wrap ? 
+	m_buffer->text = msg; 
+}
+//Can only be called in command
+void Shell::log(const std::string & msg)
+{
+	//split into lines
+	std::string line;
+	std::istringstream iss;
+	iss.str(msg);
+	m_buffer->text = ""; //reset buffer. will be rebuilt
+	while (std::getline(iss, line))
+	{
+		m_lines.push_back(msg);
+		//move input down, if cannot go down further pop lines off buffer
+		m_input->y += m_charH;
+		if (m_input->y >= m_h)
+		{
+			m_input->y = m_h - m_charH;
+			m_lines.pop_front();
+		}
+	}
+
+	for (const std::string& line : m_lines)
+	{
+		m_buffer->text += line + '\n';
+	}
+
+	m_buffer->refresh();
 }

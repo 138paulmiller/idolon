@@ -3,7 +3,7 @@
 #include "graphics.h"
 #include "engine.h"
 #include "shell.h"
-#include "editor.h"
+#include "editsheet.h"
 #include "fs.h"
 #include "err.h"
 
@@ -23,27 +23,71 @@
 #define WINDOW_SCALE 1.0/2
 
 
+enum ViewType
+{
+	VIEW_SHELL = 0,
+	VIEW_EDIT_SHEET,
+	VIEW_COUNT,
+};
+
 struct Context
 {
 	std::string sysPath;
 	std::string sysAssetPath;
 	//current working dir
 	std::string workPath;
+	ViewType prevView;
+	ViewType view;
+	UI * ui ;
 };
 //system context
 Context g_context;
+UI * g_ui[VIEW_COUNT];
+
+template <typename Type>
+Type * GetView(int index)
+{
+	return dynamic_cast<Type*>(g_ui[index]);
+}
+
+void SwitchView(ViewType view)
+{
+	if(g_context.ui)
+		g_context.ui->onExit();
+	
+	g_context.prevView = g_context.view;
+	g_context.ui = g_ui[view];
+	g_context.view = view; 
+	
+	g_context.ui->onEnter();
+}
 
 void Startup(const Context & context)
 {
+	//default config
+	g_context.sysPath = FS::ExePath() + "/system";
+	g_context.sysAssetPath = g_context.sysPath + "/assets";
+	g_context.workPath = FS::Root();
+	g_context.ui = 0;
+
+
 	Engine::Startup(SCREEN_W, SCREEN_H, WINDOW_SCALE);
 	//add system assets path
 	Assets::Startup(context.sysAssetPath);
-	Shell::Startup();
+	
+	g_ui[VIEW_SHELL]      = new Shell();
+	g_ui[VIEW_EDIT_SHEET] = new EditSheet();
+
+	SwitchView(VIEW_SHELL);
 }
 
 void Shutdown()
 {
-	Shell::Shutdown();
+	if(	g_context.ui)
+		g_context.ui->onExit();
+	for(int i=0; i < VIEW_COUNT; i++)
+		delete g_ui[i];
+
 	Assets::Shutdown();
 	Engine::Shutdown();
 	printf("Goodbye :)");
@@ -52,10 +96,12 @@ void Shutdown()
 
 void PrintHelp()
 {
-	Shell::Log("Commands");
-	Shell::Log("help - print this message");
-	Shell::Log("exit - power down system");
-	Shell::Log("font <name> - set shell font");
+
+	Shell * shell = GetView<Shell>(VIEW_SHELL); //references the
+	shell->log("Commands");
+	shell->log("help - print this message");
+	shell->log("exit - power down system");
+	shell->log("font <name> - set shell font");
 }
 
 //TODO - handle error more elegantly. Throw exception with msg ? Log mesage to shell ? with usage. 
@@ -143,11 +189,14 @@ void EditAsset(const Args& args)
 	const std::string& name = FS::BaseName(args[0]);
 	if(ext == "sheet")
 	{
-		Editor::EditSheet(name);
+		EditSheet * editsheet = GetView<EditSheet>(VIEW_EDIT_SHEET); //references the
+		editsheet->setSheet(name);
+		SwitchView(VIEW_EDIT_SHEET);
+		printf("Ending Edit Asset\n");
 	}
 	else if(ext == "font")
 	{
-		Editor::EditFont(name);
+	//	SwitchView(g_context, VIEW_FONT_EDITOR);
 	}
 }
 
@@ -181,8 +230,10 @@ const CommandTable & shellcommands =
 		"font", 
 		[](Args args)
 		{ 
-			ARG_COUNT(args, 1) // 	
-			Shell::SetFont(args[0]);
+			ARG_COUNT(args, 1) //
+
+			Shell * shell = GetView<Shell>(VIEW_SHELL); //references the
+			shell->setFont(args[0]);
 		} 
 	},
 	{
@@ -201,12 +252,13 @@ const CommandTable & shellcommands =
 		"ls", 
 		[](Args args)
 		{ 
+			Shell * shell = GetView<Shell>(VIEW_SHELL); //references the
 			std::string path = g_context.workPath;
 			std::vector<std::string> files;
 			path += (args.size() == 1) ? "/"+args[0] : "";
 			FS::List(path, files);
 			for (const std::string& file : files)
-				Shell::Log(file);
+				shell->log(file);
 		} 
 	},
 	{
@@ -214,6 +266,8 @@ const CommandTable & shellcommands =
 		[](Args args)
 		{ 
 			ARG_COUNT(args, 1) // 	
+			Shell * shell = GetView<Shell>(VIEW_SHELL); //references the
+
 			const std::string & root = FS::Root();
 			const std::string & path = FS::Append(g_context.workPath, args[0]);
 			//do not naviage beyond root. compare substring to see if new dir is subdir of root
@@ -223,24 +277,27 @@ const CommandTable & shellcommands =
 			if (FS::IsDir(path))
 				g_context.workPath = path;
 			else
-				Shell::Log("Directory does not exist");
+				shell->log("Directory does not exist");
 		} 
 	},
 	{
 		"cwd", 
 		[](Args args)
 		{ 
-			Shell::Log(g_context.workPath);
+			Shell * shell = GetView<Shell>(VIEW_SHELL); //references the
+			shell->log(g_context.workPath);
 		} 
 	},
 	{
 		"mkdir", 
 		[](Args args)
 		{ 
+			Shell * shell = GetView<Shell>(VIEW_SHELL); //references the
+
 			ARG_COUNT(args, 1) // 	
 			const std::string & path = FS::Append(g_context.workPath, args[0]);
 			if (!FS::MkDir(path))
-				Shell::Log("Could not create directory");
+				shell->log("Could not create directory");
 		} 
 	},
 	//if running game, add all sub-directories as search dir for assets
@@ -255,18 +312,35 @@ int main(int argc, char** argv)
 
 	stacktrace();
 
-	//default config
-	g_context.sysPath = FS::ExePath() + "/system";
-	g_context.sysAssetPath = g_context.sysPath + "/assets";
-	g_context.workPath = FS::Root();
-
-	//prefix all cmdline args with -
-	//do this to build the config file. 
-	//Execute(argc, argv, shellcommands);
-
 	Startup(g_context);
-	Shell::AddCommands(shellcommands);
-	Shell::Run();
+	Shell * shell = GetView<Shell>(VIEW_SHELL); //references the
+
+	shell->addCommands(shellcommands);
+
+	//TODO - capture all input here, forward it to the shell 
+	// "trampoline" contexts. 
+	//Create base "class View  for shell and editors. the view will return contexts. 
+	//also, each context will register its commands 
+	//Editor views, Shell will return a code that indicates the action to take. 
+	//ie switch to another context, exit, or run game.  
+	
+	Engine::SetKeyEcho(true);
+	Engine::SetKeyHandler(
+		[&](Key key, bool isDown) 
+		{
+			if(isDown && key == KEY_ESCAPE)
+				SwitchView(g_context.prevView);	
+			else 
+				g_context.ui->onKey(key, isDown);
+		}
+	);
+	float timer = 0;
+	while (Engine::Run())
+	{
+		g_context.ui->onTick();
+	}
+	Engine::SetKeyEcho(false);
+
 	Shutdown();
 	return 0;
 }

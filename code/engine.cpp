@@ -18,19 +18,7 @@
 
 namespace
 {
-    static bool s_echo;
-    static std::function<void(Key, bool)> s_echocb;
-    //when this key is hit, input handling enters "echo" mode. forwards all key input
-    static SDL_Window* s_window;
-    static SDL_Renderer* s_renderer;
-    static Color s_clearColor = { 255, 0, 0, 0 };
-    //create layers. blit to layer. priority
-    //Create internal texture system. All textures are managed by the engine system
-    static int s_target; //used to upsample to display to acheive pixelated effect
-    static int s_windowW, s_windowH;
-    static float s_windowScale;
-    
-    struct UserEvent
+      static struct UserEvent
     {
 
         bool s_isRunning;
@@ -43,6 +31,20 @@ namespace
         ButtonState keymap[512] = { BUTTON_UP } ;
     } s_ue;
 
+ 
+
+    static bool s_echo;
+    static std::function<void(Key, bool)> s_echocb;
+    //when this key is hit, input handling enters "echo" mode. forwards all key input
+    static SDL_Window* s_window;
+    static SDL_Renderer* s_renderer;
+    static Color s_clearColor = { 255, 0, 0, 0 };
+    //create layers. blit to layer. priority
+    //Create internal texture system. All textures are managed by the engine system
+    static int s_target; //used to upsample to display to acheive pixelated effect
+    static int s_windowW, s_windowH;
+    static float s_windowScale;
+    
 
     static std::vector<SDL_Texture* > s_textures;
     //TODO threaded input
@@ -270,6 +272,9 @@ namespace Engine
         SDL_BlendMode sdlmode;
         switch (mode)
         {
+
+        case BLEND_NONE: sdlmode = SDL_BLENDMODE_NONE;
+            break;
         case BLEND_ADD: sdlmode = SDL_BLENDMODE_ADD;
             break;
         case BLEND_MULTIPLY: sdlmode = SDL_BLENDMODE_MUL;

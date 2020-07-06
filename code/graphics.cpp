@@ -84,6 +84,7 @@ namespace Graphics
     void Font::blit(int destTexture, const std::string & text, const Rect & dest)
     {
 
+        int c, sx,sy;
         const int srcW = w / charW;  
         const int destW = dest.w / charW;     
         const int destH = dest.h / charH;     
@@ -106,8 +107,9 @@ namespace Graphics
                 dx = 0;
                 dy++;
             }
-            const int c =  s - start;
-            const int sx = (c % srcW), sy = (c / srcW) ;            
+            c =  s - start;
+            sx = (c % srcW);
+            sy = (c / srcW) ;            
             Rect src = { 
                 sx * charW, sy * charH, 
                 charW, charH 

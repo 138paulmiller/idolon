@@ -37,7 +37,6 @@
 #define ASSERT(cond,...) 
 #endif
 
-
 struct Color
 {
     uint8_t a;
@@ -162,5 +161,3 @@ enum Key
 	KEY_LEFT,
 	KEY_RIGHT
 };
-
-
