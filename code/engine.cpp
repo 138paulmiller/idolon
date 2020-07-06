@@ -2,6 +2,7 @@
 
 #include "pool.h"
 #include "engine.h"
+
 #include <SDL2/SDL.h>
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
@@ -81,6 +82,7 @@ namespace Engine
         s_nextFrameTime = s_startTime + FPS_CAP;
         s_fpsStartTime = s_startTime;
         s_frameStartTime = s_startTime;
+         SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest"); 
     }
 
     void Shutdown()
@@ -392,8 +394,12 @@ namespace Engine
         SDL_Rect sdlrect = { rect.x, rect.y,rect.w,rect.h };
         if (filled)
             SDL_RenderFillRect(s_renderer,&sdlrect);
-        else
+        else{
+            
             SDL_RenderDrawRect(s_renderer,&sdlrect);
+            //there is currently a bug in sdl draw rect that misses the bottom-right most pixel
+            SDL_RenderDrawPoint(s_renderer, rect.x+rect.w-1,rect.y+rect.h-1);
+        }
     }
 
     // ----------- Getters . Should Inline these with externs! ---------------------------

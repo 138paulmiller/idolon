@@ -7,21 +7,6 @@
 #include "fs.h"
 #include "err.h"
 
-//Default settings
-//TODO make font 8x8
-#define FONT_W 7
-#define FONT_H 9
-//Default Sheet size
-#define SHEET_W 128
-#define SHEET_H 128
-//Default Sheet size
-#define TILE_W 16
-#define TILE_H 16
-
-#define SCREEN_W 320
-#define SCREEN_H 270
-#define WINDOW_SCALE 1.0/2
-
 
 enum ViewType
 {
@@ -135,7 +120,7 @@ void ConvertAsset(const Args& args)
 		memcpy(sheet->pixels, pixels, w * h * sizeof(Color));
 		sheet->update();
 		sheet->filepath = SystemAssetPath<Graphics::Sheet>(name);
-		Assets::Save(sheet, sheet->name);
+		Assets::Save(sheet);
 
 	}
 	else if(args[0] == "font" )
@@ -153,7 +138,7 @@ void ConvertAsset(const Args& args)
 		memcpy(font->pixels, pixels, w * h * sizeof(Color));
 		font->update();
 		font->filepath = SystemAssetPath<Graphics::Font>(name);
-		Assets::Save(font, font->name);
+		Assets::Save(font);
 	}
 }
 

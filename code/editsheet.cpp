@@ -14,6 +14,7 @@ void EditSheet::onEnter()
 	//if sheet exists load, else create
 	//Create an overlay to see potential changes. Committing this changes replaces current ui texture.
 	m_sheet = Assets::Load<Graphics::Sheet>(m_sheetName);
+	m_cursor = {0,0,TILE_W* m_sheetScale,TILE_H* m_sheetScale };
 }
 
 void EditSheet::onExit()
@@ -25,44 +26,48 @@ void EditSheet::onExit()
 
 void EditSheet::onTick()
 {
+
+	const int boxX = 0;
+	const int boxY = TILE_H / 4 * m_sheetScale;
 	Engine::AlignMouse(m_sheetScale, m_sheetScale);
 	Engine::ClearScreen();
+
+	const Color &color = {255, 255, 0, 0 };
+	const Rect & src = { 0, 0, m_sheet->w, m_sheet->h };
+	const Rect & dest = { boxX, boxY, m_sheet->w* m_sheetScale, m_sheet->h* m_sheetScale }; 
+
 	int mx,my;
 	Engine::GetMousePosition(mx, my);
-	//align to pixel size
+	
 	if (Engine::GetMouseButtonState(MOUSEBUTTON_LEFT) != BUTTON_UP)
 	{
 		//get mouse position relative to texture rect
+		int rmx = mx-dest.x;
+        int rmy = my-dest.y;
+        if(rmx >= 0 && rmx < dest.w && rmy >= 0 && rmy < dest.h)
+		{
+			//get x y relative to texture
+			m_cursor.x = (rmx / m_cursor.w) * m_cursor.w;
+			m_cursor.y = (rmy / m_cursor.h) * m_cursor.h;
+		}
 	}
-	const int boxX = 2;
-	const int boxY = 2;
-	
-	mx-=boxX;
-	my-=boxY;
-	const Color &color = {255, 255, 0, 0 };
-	const Rect & src = { 0, 0, m_sheet->w, m_sheet->h };
-	const Rect & dest = { boxX, boxY, m_sheet->w * m_sheetScale, m_sheet->h * m_sheetScale};  
-	
-
-	Engine::DrawRect(color, { mx, my, m_sheetScale, m_sheetScale}, true);
+	 
 	Engine::DrawTexture(m_sheet->texture, src, dest);
+	const Rect & worldCursor = 
+	{
+		m_cursor.x + dest.x, 
+		m_cursor.y + dest.y, 
+		m_cursor.w, 
+		m_cursor.h
+	};
+	Engine::DrawRect({255, 120, 120, 120}, worldCursor, false);
+
+	//TODO - draw entire sheet with cursor rect. 
+	// Then render in an edit viewport the selcted tile 
 	
-	//draw "cursor"
+	//draw pixel brush
 	if(mx >= dest.x && mx < dest.x+dest.w && my >= dest.y && my < dest.y+dest.h)
 		Engine::DrawRect(color, { mx, my, m_sheetScale, m_sheetScale}, true);
-
-	//draw grid
-	const Color &gridColor = {255, 200, 200, 200 };
-	for(int x = dest.x; x < dest.x+dest.w; x+=m_gridSize)
-	{
-		const int sx = x * m_sheetScale ;
-		Engine::DrawLine(gridColor, sx, dest.y, sx, dest.y+dest.h );
-	}
-	for(int y = dest.y; y < dest.y+dest.h; y+=m_gridSize)
-	{
-		const int sy = y * m_sheetScale ;
-		Engine::DrawLine(gridColor, dest.x, sy, dest.x+dest.w, sy );
-	}
 
 	Engine::AlignMouse(1, 1);
 }

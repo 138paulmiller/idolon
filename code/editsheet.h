@@ -16,7 +16,7 @@ public:
 private:
 	std::string m_sheetName;
 	Graphics::Sheet * m_sheet;
-	int m_gridSize = 8;
 	int m_sheetScale = 2;
+	Rect m_cursor;
 	
 };

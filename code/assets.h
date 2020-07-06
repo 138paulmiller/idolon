@@ -50,9 +50,9 @@ namespace Assets
 	}
 	
 	template <typename Type>
-	void Save(Type * asset, const std::string& name) 
+	void Save(Type * asset) 
 	{
-		return SaveImpl(asset, typeid(Type), name);
+		return SaveImpl(asset, typeid(Type), asset->name);
 	}
 		
 	template <typename Type>
