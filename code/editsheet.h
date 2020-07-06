@@ -14,8 +14,9 @@ public:
 
 	void setSheet(const std::string & name);
 private:
-	std::string s_sheetname;
-	Graphics::TextBox * s_text, * s_text2;
-	int mx, my;
-	int w, h;
+	std::string m_sheetName;
+	Graphics::Sheet * m_sheet;
+	int m_gridSize = 8;
+	int m_sheetScale = 2;
+	
 };

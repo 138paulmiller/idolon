@@ -44,6 +44,7 @@ namespace
     static int s_target; //used to upsample to display to acheive pixelated effect
     static int s_windowW, s_windowH;
     static float s_windowScale;
+    static int s_alignX = 1, s_alignY = 1;
     
 
     static std::vector<SDL_Texture* > s_textures;
@@ -102,7 +103,15 @@ namespace Engine
     {
         s_echocb = cb;
     }
+    void AlignMouse(int x, int y)
+    {
+        s_alignX = x;
+        s_alignY = y;
+    }
+
+    //forward 
     Key GetKeyFromKeyCode(SDL_Keycode code, bool cap);
+    
     void PollEvents()
     {
         SDL_Event event;
@@ -146,7 +155,7 @@ namespace Engine
                 else
                     state = BUTTON_DOWN;
             }
-            break;
+                break;
             case SDL_MOUSEWHEEL:
                 s_ue.wheeldx = s_ue.wheelx - event.wheel.x;
                 s_ue.wheeldy = s_ue.wheely - event.wheel.y;
@@ -154,8 +163,9 @@ namespace Engine
                 s_ue.wheely = event.wheel.y;
                 break;
             case SDL_MOUSEMOTION:
-                s_ue.mousex = (int)(event.motion.x * s_windowScale);
-                s_ue.mousey = (int)(event.motion.y * s_windowScale);
+                //align to pixel size
+                s_ue.mousex = event.motion.x;
+                s_ue.mousey = event.motion.y;
                 break;
 
             case SDL_MOUSEBUTTONDOWN:
@@ -400,8 +410,13 @@ namespace Engine
 
     void GetMousePosition(int& x, int& y)
     {
-        x = s_ue.mousex;
-        y = s_ue.mousey;
+        x = s_ue.mousex * s_windowScale;
+        y = s_ue.mousey * s_windowScale;
+        int sx = s_alignX ;
+        int sy = s_alignY ;
+        x = (int)(( x / sx)* sx);
+        y = (int)(( y / sy)* sy);
+
     }
 
     void GetMouseWheel(int & x, int & y, int & dx, int & dy)

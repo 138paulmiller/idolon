@@ -39,6 +39,7 @@ namespace Engine
     void SetKeyEcho(bool on);
     //only use in edit/debug mode
     void SetKeyHandler(std::function<void(Key, bool)> cb);
+    void AlignMouse(int x, int y);
 
     // Texture 
     int CreateTexture(int width, int height, bool target = false);

@@ -183,6 +183,11 @@ void NewAsset(const Args& args)
 
 void EditAsset(const Args& args)
 {			
+	//clear previous asset paths
+	// use current working directory
+	Assets::ClearPaths();
+	Assets::AddPath(g_context.workPath);
+	
 	//edit <asset>   
 	ARG_COUNT(args, 1);
 	const std::string& ext = FS::FileExt(args[0]);
@@ -192,7 +197,6 @@ void EditAsset(const Args& args)
 		EditSheet * editsheet = GetView<EditSheet>(VIEW_EDIT_SHEET); //references the
 		editsheet->setSheet(name);
 		SwitchView(VIEW_EDIT_SHEET);
-		printf("Ending Edit Asset\n");
 	}
 	else if(ext == "font")
 	{

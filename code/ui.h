@@ -5,6 +5,8 @@
 namespace Graphics 
 {
 	class Font;
+	class Sheet;
+	class Sprite;
 	class TextBox;
 }
 

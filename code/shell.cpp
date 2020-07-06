@@ -157,7 +157,6 @@ void Shell::onTick()
 		Execute(m_command, m_commands);
 		m_command = "";
 	}
-
 }
 
 void Shell::addCommands(const CommandTable & commands)

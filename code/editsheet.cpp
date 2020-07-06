@@ -13,48 +13,58 @@ void EditSheet::onEnter()
 {
 	//if sheet exists load, else create
 	//Create an overlay to see potential changes. Committing this changes replaces current ui texture.
-
-	Engine::GetSize(w, h);
-
-
-	s_text = new Graphics::TextBox(18, 5, " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~");
-	s_text->font = "default";
-	s_text->x = 10;
-	s_text->y = 1;        
-	s_text->reload();
-
-	s_text2 = new Graphics::TextBox (7, 4, "Hello\nWorld\n!!!!!!!!");
-	s_text2->font = "default";
-	s_text2->y = 100;
-	s_text2->textColor = {255, 255, 0, 0};
-	s_text2->filled = true;
-	s_text2->fillColor = {255, 0, 255, 0};
-	s_text2->reload();
-	printf("Entered Sheet Editor\n");
-
+	m_sheet = Assets::Load<Graphics::Sheet>(m_sheetName);
 }
 
 void EditSheet::onExit()
 {
-	delete s_text;
-	delete s_text2;
-	printf("Exited Sheet Editor\n");
-
+	Assets::Unload(m_sheetName);
+	m_sheetName = "";
 }
 
 
 void EditSheet::onTick()
 {
+	Engine::AlignMouse(m_sheetScale, m_sheetScale);
 	Engine::ClearScreen();
-
+	int mx,my;
+	Engine::GetMousePosition(mx, my);
+	//align to pixel size
 	if (Engine::GetMouseButtonState(MOUSEBUTTON_LEFT) != BUTTON_UP)
 	{
-		Engine::GetMousePosition(mx, my);
+		//get mouse position relative to texture rect
 	}
-	s_text->draw();
-	s_text2->draw();
-	const Color &line = {255, 255, 0, 0 };
-	Engine::DrawLine(line, 1, 1, w, h);
+	const int boxX = 2;
+	const int boxY = 2;
+	
+	mx-=boxX;
+	my-=boxY;
+	const Color &color = {255, 255, 0, 0 };
+	const Rect & src = { 0, 0, m_sheet->w, m_sheet->h };
+	const Rect & dest = { boxX, boxY, m_sheet->w * m_sheetScale, m_sheet->h * m_sheetScale};  
+	
+
+	Engine::DrawRect(color, { mx, my, m_sheetScale, m_sheetScale}, true);
+	Engine::DrawTexture(m_sheet->texture, src, dest);
+	
+	//draw "cursor"
+	if(mx >= dest.x && mx < dest.x+dest.w && my >= dest.y && my < dest.y+dest.h)
+		Engine::DrawRect(color, { mx, my, m_sheetScale, m_sheetScale}, true);
+
+	//draw grid
+	const Color &gridColor = {255, 200, 200, 200 };
+	for(int x = dest.x; x < dest.x+dest.w; x+=m_gridSize)
+	{
+		const int sx = x * m_sheetScale ;
+		Engine::DrawLine(gridColor, sx, dest.y, sx, dest.y+dest.h );
+	}
+	for(int y = dest.y; y < dest.y+dest.h; y+=m_gridSize)
+	{
+		const int sy = y * m_sheetScale ;
+		Engine::DrawLine(gridColor, dest.x, sy, dest.x+dest.w, sy );
+	}
+
+	Engine::AlignMouse(1, 1);
 }
 
 //
@@ -67,5 +77,5 @@ void EditSheet::onKey(Key key, bool isDown)
 //Create buttons to resize?
 void EditSheet::setSheet(const std::string& name)
 {
-	s_sheetname = name;
+	m_sheetName = name;
 }
