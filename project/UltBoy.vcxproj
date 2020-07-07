@@ -146,7 +146,7 @@
     <ClCompile Include="..\code\assets.cpp" />
     <ClCompile Include="..\code\commands.cpp" />
     <ClCompile Include="..\code\core.cpp" />
-    <ClCompile Include="..\code\editsheet.cpp" />
+    <ClCompile Include="..\code\sheeteditor.cpp" />
     <ClCompile Include="..\code\fs.cpp" />
     <ClCompile Include="..\code\main.cpp" />
     <ClCompile Include="..\code\engine.cpp" />
@@ -159,7 +159,7 @@
     <ClInclude Include="..\code\assets.h" />
     <ClInclude Include="..\code\commands.h" />
     <ClInclude Include="..\code\core.h" />
-    <ClInclude Include="..\code\editsheet.h" />
+    <ClInclude Include="..\code\sheeteditor.h" />
     <ClInclude Include="..\code\engine.h" />
     <ClInclude Include="..\code\err.h" />
     <ClInclude Include="..\code\fs.h" />

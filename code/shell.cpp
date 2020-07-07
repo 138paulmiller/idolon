@@ -230,15 +230,11 @@ void Shell::log(const std::string & msg)
 
 	m_buffer->refresh();
 }
-void Shell::setCurrentDir(const std::string& path)
-{
-	m_currentDir = path;
-}
 
 void Shell::showOption()
 {
 	std::vector<std::string> files;
-	FS::List(m_currentDir, files);
+	FS::Ls(files);
 	//if files exist, and input line has at least >, and no options. then fill options
 	if(files.size() && m_input->text.size() > 0 && m_options.size() == 0)
 	{
@@ -272,7 +268,7 @@ void Shell::showOption()
 		if(m_options.size())
 			overrideInput(m_options[m_option]);	
 	}
-	else
+	else if(m_options.size())
 	{
 		m_option += m_optionDirection;
 		if(m_option < 0) 

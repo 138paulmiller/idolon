@@ -47,8 +47,8 @@ void SheetEditor::onTick()
 		//get pixel in sheet 
 		if (tmx >= 0 && tmx < tileDest.w && tmy >= 0 && tmy < tileDest.h)
 		{
-			int smx = ( tmx  m_tileScale + tileSrc.x;
-			int smy = ( tmy  m_tileScale + tileSrc.y;
+			int smx = ( tmx  / m_tileScale) + tileSrc.x;
+			int smy = ( tmy  / m_tileScale) + tileSrc.y;
 			m_sheet->pixels[m_sheet->w * smy + smx] = color;
 			m_sheet->update();
 		}

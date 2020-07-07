@@ -21,7 +21,6 @@ struct Context
 	std::string sysPath;
 	std::string sysAssetPath;
 	//current working dir
-	std::string cwd;
 	ViewType prevView;
 	ViewType view;
 	UI * ui ;
@@ -55,7 +54,6 @@ void Startup(const Context & context)
 	g_context.sysPath = FS::ExePath() + "/system";
 	g_context.sysAssetPath = g_context.sysPath + "/assets";
 	//root is in user space 
-	g_context.cwd = FS::Root();
 	g_context.ui = 0;
 
 
@@ -64,7 +62,6 @@ void Startup(const Context & context)
 	Assets::Startup(context.sysAssetPath);
 	
 	Shell *shell = new Shell();
-	shell->setCurrentDir(g_context.cwd);
 
 	g_ui[VIEW_SHELL]      = shell;
 	g_ui[VIEW_SHEET_EDITOR] = new SheetEditor();
@@ -166,7 +163,7 @@ void NewAsset(const Args& args)
 	if(asset == "sheet")
 	{
 		Graphics::Sheet * sheet = new Graphics::Sheet(name, SHEET_W, SHEET_H);
-		const std::string & path = FS::Append(g_context.cwd, sheet->name) + Assets::GetAssetTypeExt<Graphics::Sheet>();
+		const std::string & path = FS::Append(FS::Cwd(), sheet->name) + Assets::GetAssetTypeExt<Graphics::Sheet>();
 		Assets::SaveAs(sheet, path);
 	}
 	else if(asset == "font")
@@ -176,7 +173,7 @@ void NewAsset(const Args& args)
 		int h = 18 * 8;
 		char start = ' ';
 		Graphics::Font* font= new Graphics::Font(name, w, h, 8, 8, start);
-		const std::string & path = FS::Append(g_context.cwd, font->name) + Assets::GetAssetTypeExt<Graphics::Font>();
+		const std::string & path = FS::Append(FS::Cwd(), font->name) + Assets::GetAssetTypeExt<Graphics::Font>();
 		Assets::SaveAs(font, path);
 	}
 }
@@ -186,7 +183,7 @@ void EditAsset(const Args& args)
 	//clear previous asset paths
 	// use current working directory
 	Assets::ClearPaths();
-	Assets::AddPath(g_context.cwd);
+	Assets::AddPath(FS::Cwd());
 	
 	//edit <asset>   
 	ARG_COUNT(args, 1);
@@ -255,10 +252,8 @@ const CommandTable & shellcommands =
 		[](Args args)
 		{ 
 			Shell * shell = GetView<Shell>(VIEW_SHELL); //references the
-			std::string path = g_context.cwd;
 			std::vector<std::string> files;
-			path += (args.size() == 1) ? "/"+args[0] : "";
-			FS::List(path, files);
+			FS::Ls(files);
 			for (const std::string& file : files)
 				shell->log(file);
 		} 
@@ -269,18 +264,8 @@ const CommandTable & shellcommands =
 		{ 
 			ARG_COUNT(args, 1); // 	
 			Shell * shell = GetView<Shell>(VIEW_SHELL); //references the
-
-			const std::string & root = FS::Root();
-			const std::string & path = FS::Append(g_context.cwd, args[0]);
-			//do not naviage beyond root. compare substring to see if new dir is subdir of root
-			if ( path.compare(0, root.size(), root.c_str(), root.size()) != 0 )
-				return;
-
-			if (FS::IsDir(path))
-				g_context.cwd = path;
-			else
+			if (!FS::Cd(args[0]))
 				shell->log("Directory does not exist");
-			shell->setCurrentDir(g_context.cwd);
 		} 
 	},
 	{
@@ -288,7 +273,7 @@ const CommandTable & shellcommands =
 		[](Args args)
 		{ 
 			Shell * shell = GetView<Shell>(VIEW_SHELL); //references the
-			shell->log(g_context.cwd);
+			shell->log(FS::Cwd());
 		} 
 	},
 	{
@@ -298,8 +283,7 @@ const CommandTable & shellcommands =
 			Shell * shell = GetView<Shell>(VIEW_SHELL); //references the
 
 			ARG_COUNT(args, 1); // 	
-			const std::string & path = FS::Append(g_context.cwd, args[0]);
-			if (!FS::MkDir(path))
+			if (!FS::MkDir(args[0]))
 				shell->log("Could not create directory");
 		} 
 	},
@@ -310,9 +294,7 @@ const CommandTable & shellcommands =
 			Shell * shell = GetView<Shell>(VIEW_SHELL); //references the
 
 			ARG_COUNT(args, 1); // 	
-			const std::string & path = FS::Append(g_context.cwd, args[0]);
-
-			if (!FS::Remove(path))
+			if (!FS::Remove(args[0]))
 				shell->log("Failed to remove path");
 		} 
 	},
@@ -323,10 +305,8 @@ const CommandTable & shellcommands =
 			Shell * shell = GetView<Shell>(VIEW_SHELL); //references the
 
 			ARG_COUNT(args, 2); // 
-			const std::string & oldpath = FS::Append(g_context.cwd, args[0]);
-			const std::string & newpath = FS::Append(g_context.cwd, args[1]);
-
-			if (!FS::Move(oldpath, newpath))
+			
+			if (!FS::Move(args[0], args[1]))
 				shell->log("Failed to move");
 		} 
 	},

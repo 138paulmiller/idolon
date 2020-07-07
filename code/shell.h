@@ -19,7 +19,6 @@ public:
 	void log(const std::string & msg);
 	void setFont(const std::string & font);
 	void addCommands(const CommandTable & commands);
-	void setCurrentDir(const std::string& path);
 
 private:
 	void showOption();
@@ -39,7 +38,6 @@ private:
 	int m_option;
 	std::vector<std::string> 	m_options;
 	std::list<std::string> 	m_lines;
-	std::string m_currentDir;
 	int m_optionDirection;
 
 	CommandTable m_commands;

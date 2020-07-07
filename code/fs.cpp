@@ -27,7 +27,7 @@
 
 namespace
 {
-	static std::string s_cwd;
+	static std::string s_cwd = "";
 }
 
 void ReplaceAll(std::string& str, const std::string& from, const std::string& to) 
@@ -44,11 +44,32 @@ void ReplaceAll(std::string& str, const std::string& from, const std::string& to
 
 namespace FS
 {
+	std::string Cwd()
+	{
+		if (s_cwd.size() == 0)
+			s_cwd = Root();
+		return s_cwd;
+	}
+	
+	bool Cd(const std::string path)
+	{
+		const std::string & newpath =  Append(Cwd(), path);
 
+		const std::string& root = FS::Root();
+		//do not navigate beyond root. compare substring to see if new dir is subdir of root
+		//minus one, ignore the trailing / on root
+		int cmplen = root.size() - 1;
+		if (IsDir(newpath) && (newpath.compare(0, cmplen, root.c_str(), cmplen) == 0))
+		{
+			s_cwd = newpath;
+			return true;
+		}
+		return false;
+	}
 	bool Move(const std::string& path, const std::string& newPath)
 	{
-		const std::string & a = FullPath(path);
-		const std::string & b = FullPath(newPath);
+		const std::string & a =  Append(Cwd(), path);
+		const std::string & b =  Append(Cwd(), newPath);
 		bool success = rename(a.c_str(), b.c_str()) != -1;
 		if (!success)
 		{
@@ -61,23 +82,29 @@ namespace FS
 
 	bool Remove(const std::string& path)
 	{
-		if (IsDir(path))
+		const std::string & fullpath = Append(Cwd(), path);
+
+		if (IsDir(fullpath))
 		{
 			std::vector<std::string> files;
-			List(path, files);
+			Ls(fullpath, files);
 			for (const std::string& file : files)
 				if (!Remove(file))
 					return 0;
-			return rmdir(path.c_str()) != -1;
+			return rmdir(fullpath.c_str()) != -1;
 		}
 		else
-			return remove(path.c_str()) != 0;
+			return remove(fullpath.c_str()) != 0;
 	}
-
-	void List(const std::string& path, std::vector<std::string>& files)
+	void Ls(std::vector<std::string>& files)
 	{
+		Ls("", files);
+	}
+	void Ls(const std::string& path, std::vector<std::string>& files)
+	{
+		const std::string & fullpath = Append(Cwd(), path);
 #ifdef OS_WINDOWS
-        std::string pattern = path + "\\*";
+        std::string pattern = fullpath  + "\\*";
         HANDLE hFind;
 		WIN32_FIND_DATAA data ;
         if ((hFind = FindFirstFileA(pattern.c_str(), &data)) != INVALID_HANDLE_VALUE) 
@@ -89,7 +116,7 @@ namespace FS
 				if (filename != "."  )
 				{
 					//do not allow to navigate beyond root
-					if (path == FS::Root() && filename == "..")
+					if (fullpath  == FS::Root() && filename == "..")
 						continue;
 					files.push_back(filename);
 				}
@@ -97,7 +124,7 @@ namespace FS
             FindClose(hFind);
         }
 #elif defined(OS_LINUX)
-		DIR* dir = opendir(path.c_str());
+		DIR* dir = opendir(fullpath .c_str());
 		dirent * entry;
 		while ((entry = readdir(dir))) 
 		{
@@ -105,7 +132,7 @@ namespace FS
 			if (filename != "."  )
 			{
 				//do not allow to navigate beyond root
-				if (path == FS::Root() && filename == "..")
+				if (fullpath  == FS::Root() && filename == "..")
 					continue;
 				files.push_back(filename);
 			}
@@ -139,12 +166,12 @@ namespace FS
 	std::string Root()
 	{
 #ifdef OS_WINDOWS
-		const char* mountPoint = "C:/Program Files/UltBoy/root";
+		const char* mountPoint = "C:/Program Files/UltBoy/root/";
 #elif defined(OS_LINUX)
 		char mountPoint[MAX_PATH];
 	    glob_t globbuf;
 	 	glob("~", GLOB_TILDE, NULL, &globbuf);
-        snprintf(mountPoint, sizeof(mountPoint), "%s/ultboy/root", globbuf.gl_pathv[0]);
+        snprintf(mountPoint, sizeof(mountPoint), "%s/ultboy/root/", globbuf.gl_pathv[0]);
 #endif	
 		int status = mkdir(mountPoint);
 		return mountPoint;
@@ -164,11 +191,13 @@ namespace FS
 
 	bool MkDir(const std::string& path)
 	{
+		const std::string & fullpath = Append(Cwd(), path);
+
 		//do not create dirs beyond root
 		const std::string & root = FS::Root();
-		if ( path.compare(0, root.size(), root.c_str(), root.size()) != 0 )
+		if ( fullpath.compare(0, root.size(), root.c_str(), root.size()) != 0 )
 				return false;
-		return mkdir(path.c_str()) != -1;	
+		return mkdir(fullpath.c_str()) != -1;	
 	}
 
 
