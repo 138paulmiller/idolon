@@ -1,8 +1,14 @@
 #include "shell.h"
 #include "engine.h"
 #include "graphics.h"
+#include "fs.h"
 #include "assets.h"
 #include <sstream>
+
+#ifndef SHELL_PREFIX
+#define SHELL_PREFIX ">"
+#define SHELL_PREFIXSIZE sizeof(SHELL_PREFIX)-1
+#endif
 
 Shell::Shell() 
 {
@@ -28,7 +34,7 @@ void Shell::onEnter()
 	m_cursor->fillColor = { 255, 255, 255, 255 } ;
 	m_cursor->reload();
 
-	m_input = new Graphics::TextBox(m_w/m_charW, 1, ">");
+	m_input = new Graphics::TextBox(m_w/m_charW, 1, SHELL_PREFIX);
 	m_input->font = m_fontName ;    
 	m_input->reload();
 
@@ -40,10 +46,10 @@ void Shell::onEnter()
 	m_buffer->reload();
 
 	m_lineW = m_w / m_charW;
-	m_cursorPos = 1; //offset by > 
+	m_cursorPos = SHELL_PREFIXSIZE; //offset by > 
 	m_stashedInput = "";
 	m_timer = 0;
-
+	m_optionDirection = 1;
 
 	//Maintain buffer input
 /*	std::string linesText;
@@ -83,12 +89,23 @@ void Shell::onExit()
 void Shell::onKey(Key key, bool isDown)
 {
 
-	if (isDown)
+	if (!isDown)
 	{
+		switch(key)
+		{
+		case KEY_SHIFT:
+			m_optionDirection = 1;
+			break;
+		default: break;
+		}
+	}
+	else 
+	{
+
 		switch (key)
 		{
-		case KEY_TAB:
-			//auto fill ? execute the "auto-complete" command and delegate main to list options by overriding input
+		case KEY_SHIFT:
+			m_optionDirection = -1;
 			break;
 		case KEY_LEFT:
 			if(m_cursorPos > 1) 
@@ -101,28 +118,34 @@ void Shell::onKey(Key key, bool isDown)
 		case KEY_UP:
 		case KEY_DOWN:
 			break;
+		case KEY_TAB:
+			showOption();				
+			break;
 		case KEY_BACKSPACE:
 			//do not remove >
-			if (m_input->text.size() > 1)
+			if (m_input->text.size() > SHELL_PREFIXSIZE)
 			{
 				if (m_cursorPos >= m_input->text.size())
 					m_input->text.pop_back();
 				else
 					m_input->text.erase(m_cursorPos, 1);
-				if(m_cursorPos > 1)
+				if(m_cursorPos > SHELL_PREFIXSIZE)
 					m_cursorPos--;
 			}
+			m_options.clear(); //clear options
 			break;
 		case KEY_RETURN:
 
 			log(m_input->text);
-			if (m_input->text.size() > 1)
-				m_command = m_input->text.substr(1);
-			m_cursorPos = 1; //reset
-			m_input->text = ">";
+			if (m_input->text.size() > SHELL_PREFIXSIZE)
+				m_command = m_input->text.substr(SHELL_PREFIXSIZE);
+			m_cursorPos = SHELL_PREFIXSIZE; //reset
+			m_input->text = SHELL_PREFIX;
+			m_options.clear(); //clear options
+
 			break;
 		default:
-			if (m_cursorPos < m_lineW-1)
+			if (m_cursorPos < m_lineW-SHELL_PREFIXSIZE)
 			{
 				if (m_cursorPos == m_input->text.size()) 
 					m_input->text += key;
@@ -130,8 +153,11 @@ void Shell::onKey(Key key, bool isDown)
 					m_input->text.insert(m_cursorPos, 1, key);
 				m_cursorPos++;
 			}
+			m_options.clear(); //clear options
+
 		}
 		m_input->refresh();
+
 	}
 }
 
@@ -173,7 +199,9 @@ void Shell::setFont(const std::string & font)
 void Shell::overrideInput(const std::string& msg)
 {
 	//should wrap ? 
-	m_buffer->text = msg; 
+	m_input->text = msg; 
+	m_input->refresh();
+	m_cursorPos = m_input->text.size();
 }
 //Can only be called in command
 void Shell::log(const std::string & msg)
@@ -201,4 +229,59 @@ void Shell::log(const std::string & msg)
 	}
 
 	m_buffer->refresh();
+}
+void Shell::setCurrentDir(const std::string& path)
+{
+	m_currentDir = path;
+}
+
+void Shell::showOption()
+{
+	std::vector<std::string> files;
+	FS::List(m_currentDir, files);
+	//if files exist, and input line has at least >, and no options. then fill options
+	if(files.size() && m_input->text.size() > 0 && m_options.size() == 0)
+	{
+		m_options.reserve(files.size());
+		int inputLen = m_input->text.size();
+		//move input to last "arg"
+		int pos = inputLen-1;
+		//remove >
+		std::string arg = m_input->text.substr(SHELL_PREFIXSIZE);
+		std::string command = "";
+
+		pos = arg.find_last_of(" ");
+		if(pos != std::string::npos)
+		{ 
+			pos++;
+			//remove ' '
+			arg = arg.substr(pos);
+			command = m_input->text.substr(SHELL_PREFIXSIZE, pos);
+		}
+		int argLen = arg.size();
+		m_option = 0;
+		//filter all nonmatching
+		for(int i = 0 ; i < files.size(); i++)
+		{
+			const std::string & option = files[i];
+			if(option.size() >= argLen && strncmp(arg.c_str(), option.c_str(), argLen) == 0)
+			{
+				m_options.push_back(SHELL_PREFIX + command + option);
+			}
+		}
+		if(m_options.size())
+			overrideInput(m_options[m_option]);	
+	}
+	else
+	{
+		m_option += m_optionDirection;
+		if(m_option < 0) 
+			m_option = 0;
+		else if(m_option >= m_options.size()) 
+			m_option=m_options.size()-1;
+		overrideInput(m_options[m_option]);	
+	}
+
+
+
 }

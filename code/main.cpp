@@ -20,7 +20,7 @@ struct Context
 	std::string sysPath;
 	std::string sysAssetPath;
 	//current working dir
-	std::string workPath;
+	std::string cwd;
 	ViewType prevView;
 	ViewType view;
 	UI * ui ;
@@ -50,9 +50,11 @@ void SwitchView(ViewType view)
 void Startup(const Context & context)
 {
 	//default config
+	//system are for default system data
 	g_context.sysPath = FS::ExePath() + "/system";
 	g_context.sysAssetPath = g_context.sysPath + "/assets";
-	g_context.workPath = FS::Root();
+	//root is in user space 
+	g_context.cwd = FS::Root();
 	g_context.ui = 0;
 
 
@@ -60,10 +62,14 @@ void Startup(const Context & context)
 	//add system assets path
 	Assets::Startup(context.sysAssetPath);
 	
-	g_ui[VIEW_SHELL]      = new Shell();
+	Shell *shell = new Shell();
+	g_ui[VIEW_SHELL]      = shell;
 	g_ui[VIEW_EDIT_SHEET] = new EditSheet();
 
 	SwitchView(VIEW_SHELL);
+	printf("\n%s\n---------\n",g_context.cwd.c_str());
+	shell->setCurrentDir(g_context.cwd);
+
 }
 
 void Shutdown()
@@ -151,7 +157,7 @@ void NewAsset(const Args& args)
 	if(asset == "sheet")
 	{
 		Graphics::Sheet * sheet = new Graphics::Sheet(name, SHEET_W, SHEET_H);
-		const std::string & path = FS::Append(g_context.workPath, sheet->name) + Assets::GetAssetTypeExt<Graphics::Sheet>();
+		const std::string & path = FS::Append(g_context.cwd, sheet->name) + Assets::GetAssetTypeExt<Graphics::Sheet>();
 		Assets::SaveAs(sheet, path);
 	}
 	else if(asset == "font")
@@ -161,7 +167,7 @@ void NewAsset(const Args& args)
 		int h = 18 * 8;
 		char start = ' ';
 		Graphics::Font* font= new Graphics::Font(name, w, h, 8, 8, start);
-		const std::string & path = FS::Append(g_context.workPath, font->name) + Assets::GetAssetTypeExt<Graphics::Font>();
+		const std::string & path = FS::Append(g_context.cwd, font->name) + Assets::GetAssetTypeExt<Graphics::Font>();
 		Assets::SaveAs(font, path);
 	}
 }
@@ -171,7 +177,7 @@ void EditAsset(const Args& args)
 	//clear previous asset paths
 	// use current working directory
 	Assets::ClearPaths();
-	Assets::AddPath(g_context.workPath);
+	Assets::AddPath(g_context.cwd);
 	
 	//edit <asset>   
 	ARG_COUNT(args, 1);
@@ -242,7 +248,7 @@ const CommandTable & shellcommands =
 		[](Args args)
 		{ 
 			Shell * shell = GetView<Shell>(VIEW_SHELL); //references the
-			std::string path = g_context.workPath;
+			std::string path = g_context.cwd;
 			std::vector<std::string> files;
 			path += (args.size() == 1) ? "/"+args[0] : "";
 			FS::List(path, files);
@@ -258,15 +264,16 @@ const CommandTable & shellcommands =
 			Shell * shell = GetView<Shell>(VIEW_SHELL); //references the
 
 			const std::string & root = FS::Root();
-			const std::string & path = FS::Append(g_context.workPath, args[0]);
+			const std::string & path = FS::Append(g_context.cwd, args[0]);
 			//do not naviage beyond root. compare substring to see if new dir is subdir of root
 			if ( path.compare(0, root.size(), root.c_str(), root.size()) != 0 )
 				return;
 
 			if (FS::IsDir(path))
-				g_context.workPath = path;
+				g_context.cwd = path;
 			else
 				shell->log("Directory does not exist");
+			shell->setCurrentDir(g_context.cwd);
 		} 
 	},
 	{
@@ -274,7 +281,7 @@ const CommandTable & shellcommands =
 		[](Args args)
 		{ 
 			Shell * shell = GetView<Shell>(VIEW_SHELL); //references the
-			shell->log(g_context.workPath);
+			shell->log(g_context.cwd);
 		} 
 	},
 	{
@@ -284,7 +291,7 @@ const CommandTable & shellcommands =
 			Shell * shell = GetView<Shell>(VIEW_SHELL); //references the
 
 			ARG_COUNT(args, 1) // 	
-			const std::string & path = FS::Append(g_context.workPath, args[0]);
+			const std::string & path = FS::Append(g_context.cwd, args[0]);
 			if (!FS::MkDir(path))
 				shell->log("Could not create directory");
 		} 

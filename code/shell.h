@@ -16,11 +16,16 @@ public:
 	void onTick() override ;
 
 
-	void overrideInput(const std::string& msg);
 	void log(const std::string & msg);
 	void setFont(const std::string & font);
 	void addCommands(const CommandTable & commands);
+	void setCurrentDir(const std::string& path);
+
 private:
+	void showOption();
+
+	void overrideInput(const std::string& msg);
+
 	std::string m_fontName = "default";
 	Graphics::Font* m_font;
 	Graphics::TextBox * m_cursor, * m_input, * m_buffer;
@@ -29,8 +34,13 @@ private:
 	int m_w, m_h;
 
 	const int cursorFlickRate = 3;
-
+	//when tab is pressed, ls fills this if empty, else goes to next option
+	//if shift, goes to prev on enter this is cleared
+	int m_option;
+	std::vector<std::string> 	m_options;
 	std::list<std::string> 	m_lines;
+	std::string m_currentDir;
+	int m_optionDirection;
 
 	CommandTable m_commands;
 	//current command
