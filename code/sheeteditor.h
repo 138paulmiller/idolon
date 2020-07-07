@@ -1,9 +1,8 @@
 #pragma once
 #include "ui.h"
 
-//Create terminal system. Echos key input to a buffer. has line offset nd render the text to the screen
-
-class  EditSheet : public UI 
+//Edit sheet should be renamed TileSheetEditor
+class  SheetEditor : public UI 
 {
 public:
 
@@ -14,9 +13,10 @@ public:
 
 	void setSheet(const std::string & name);
 private:
+	
 	std::string m_sheetName;
 	Graphics::Sheet * m_sheet;
-	int m_sheetScale = 1;
-	Rect m_cursor;
-	
+	int m_tileScale = 5;
+	SheetPicker * m_sheetPicker;
+	int m_colorIndex = 4;
 };

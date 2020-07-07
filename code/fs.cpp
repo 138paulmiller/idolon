@@ -7,6 +7,7 @@
 
 #define getcwd _getcwd
 #define mkdir _mkdir
+#define rmdir _rmdir
 #define chmod()
 
 #elif defined(OS_LINUX)
@@ -24,6 +25,10 @@
 
 #endif
 
+namespace
+{
+	static std::string s_cwd;
+}
 
 void ReplaceAll(std::string& str, const std::string& from, const std::string& to) 
 {
@@ -39,6 +44,36 @@ void ReplaceAll(std::string& str, const std::string& from, const std::string& to
 
 namespace FS
 {
+
+	bool Move(const std::string& path, const std::string& newPath)
+	{
+		const std::string & a = FullPath(path);
+		const std::string & b = FullPath(newPath);
+		bool success = rename(a.c_str(), b.c_str()) != -1;
+		if (!success)
+		{
+			char msg[1024];
+			strerror_s(msg, errno);
+			printf("\nFS: Error Renaming %s : %s\n", a.c_str(),msg);
+		}
+		return success;
+	}
+
+	bool Remove(const std::string& path)
+	{
+		if (IsDir(path))
+		{
+			std::vector<std::string> files;
+			List(path, files);
+			for (const std::string& file : files)
+				if (!Remove(file))
+					return 0;
+			return rmdir(path.c_str()) != -1;
+		}
+		else
+			return remove(path.c_str()) != 0;
+	}
+
 	void List(const std::string& path, std::vector<std::string>& files)
 	{
 #ifdef OS_WINDOWS

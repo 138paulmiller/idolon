@@ -35,8 +35,8 @@
 #define TILE_W 16
 #define TILE_H 16
 
-#define SCREEN_W 320
-#define SCREEN_H 270
+#define SCREEN_W 256
+#define SCREEN_H 240
 #define WINDOW_SCALE 1.0/2
 
 //Runtime debugging
@@ -52,6 +52,7 @@
 #define ASSERT(cond,...) 
 #endif
 
+
 struct Color
 {
     uint8_t a;
@@ -59,6 +60,10 @@ struct Color
     uint8_t g;
     uint8_t b;
 };
+
+extern const Color Palette[];
+extern const int PaletteCount;
+
 
 struct Rect
 {

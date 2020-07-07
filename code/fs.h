@@ -3,6 +3,9 @@
 
 namespace FS
 {
+	//file to remove
+	bool Move(const std::string& path, const std::string& newPath);
+	bool Remove(const std::string& path);
 	//list files at the given dir 
 	void List(const std::string& path, std::vector<std::string> &files);
 	//path to exe

@@ -30,9 +30,6 @@
     <ClCompile Include="..\code\graphics.cpp">
       <Filter>../Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\code\editor.cpp">
-      <Filter>../Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\code\ui.cpp">
       <Filter>../Source Files</Filter>
     </ClCompile>
@@ -45,12 +42,15 @@
     <ClCompile Include="..\code\fs.cpp">
       <Filter>../Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\code\editsheet.cpp">
+      <Filter>../Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\core.cpp">
+      <Filter>../Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\code\assets.h">
-      <Filter>../Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\code\engine.h">
       <Filter>../Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\code\pool.h">
@@ -75,6 +75,18 @@
       <Filter>../Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\code\fs.h">
+      <Filter>../Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\editsheet.h">
+      <Filter>../Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\engine.h">
+      <Filter>../Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\err.h">
+      <Filter>../Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\tests.h">
       <Filter>../Header Files</Filter>
     </ClInclude>
   </ItemGroup>
