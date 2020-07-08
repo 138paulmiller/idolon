@@ -278,22 +278,21 @@ namespace Engine
     
         ClearTexture(s_target, color);
     }
-   
-    void SetTextureBlendMode(int textureId, BlendMode mode)
+    SDL_BlendMode GetSDLBlendMode(BlendMode mode)
     {
-        SDL_BlendMode sdlmode;
         switch (mode)
         {
 
-        case BLEND_NONE: sdlmode = SDL_BLENDMODE_NONE;
-            break;
-        case BLEND_ADD: sdlmode = SDL_BLENDMODE_ADD;
-            break;
-        case BLEND_MULTIPLY: sdlmode = SDL_BLENDMODE_MUL;
-            break;
-        case BLEND_MIX: sdlmode = SDL_BLENDMODE_BLEND;
-            break;
+        case BLEND_NONE: return SDL_BLENDMODE_NONE;
+        case BLEND_ADD: return SDL_BLENDMODE_ADD;
+        case BLEND_MULTIPLY: return SDL_BLENDMODE_MUL;
+        case BLEND_MIX: return SDL_BLENDMODE_BLEND;
         }
+    }
+   
+    void SetTextureBlendMode(int textureId, BlendMode mode)
+    {
+        SDL_BlendMode sdlmode = GetSDLBlendMode(mode);
         SDL_SetTextureBlendMode(  s_textures[textureId], sdlmode );
     
     }
@@ -348,11 +347,17 @@ namespace Engine
         stbi_image_free(data);
         return pixels;
     }
-    void ClearTexture(int textureId, const Color& color)
+    void ClearTexture(int textureId, const Color& color, BlendMode mode)
     {
         CHECK_TEXTURE(textureId);
+
         SDL_SetRenderTarget(s_renderer, s_textures[textureId] );
+        SDL_BlendMode sdlmode;
+        SDL_GetRenderDrawBlendMode(s_renderer, &sdlmode);
+        SDL_SetRenderDrawBlendMode(s_renderer, GetSDLBlendMode(mode));
+
         SDL_SetRenderDrawColor(s_renderer, color.r, color.g, color.b, color.a);
+        SDL_SetRenderDrawBlendMode(s_renderer, sdlmode);
         SDL_RenderClear(s_renderer);
     }
 

@@ -17,6 +17,6 @@ private:
 	std::string m_sheetName;
 	Graphics::Sheet * m_sheet;
 	int m_tileScale = 5;
-	SheetPicker * m_sheetPicker;
 	int m_colorIndex = 4;
+	SheetPicker * m_sheetPicker;
 };

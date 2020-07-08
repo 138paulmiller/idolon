@@ -49,7 +49,7 @@ namespace Engine
     void UnlockTexture(int textureId);
     //multiply color of texture on each texture draw 
     void MultiplyTexture(int textureId, const Color& color);
-    void ClearTexture(int textureId, const Color& color);
+    void ClearTexture(int textureId, const Color& color, BlendMode mode= BLEND_MIX);
     void SetTextureBlendMode(int textureId, BlendMode mode);
 
 

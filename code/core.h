@@ -59,7 +59,12 @@ struct Color
     uint8_t r;
     uint8_t g;
     uint8_t b;
+    bool operator==(const Color & c) const;
 };
+
+
+#define WHITE Palette[0]
+#define BLACK Palette[1]
 
 extern const Color Palette[];
 extern const int PaletteCount;
@@ -69,6 +74,7 @@ struct Rect
 {
     int x, y;
     int w, h;
+	bool intersects(const Rect & other) const;
 };
 
 //note : order matches sdl2

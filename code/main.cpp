@@ -347,7 +347,10 @@ int main(int argc, char** argv)
 	float timer = 0;
 	while (Engine::Run())
 	{
+		g_context.ui->update();
 		g_context.ui->onTick();
+		//draw ui layer on top
+		g_context.ui->draw();
 	}
 	Engine::SetKeyEcho(false);
 

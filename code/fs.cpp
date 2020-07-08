@@ -71,12 +71,6 @@ namespace FS
 		const std::string & a =  Append(Cwd(), path);
 		const std::string & b =  Append(Cwd(), newPath);
 		bool success = rename(a.c_str(), b.c_str()) != -1;
-		if (!success)
-		{
-			char msg[1024];
-			strerror_s(msg, errno);
-			printf("\nFS: Error Renaming %s : %s\n", a.c_str(),msg);
-		}
 		return success;
 	}
 
@@ -103,6 +97,7 @@ namespace FS
 	void Ls(const std::string& path, std::vector<std::string>& files)
 	{
 		const std::string & fullpath = Append(Cwd(), path);
+
 #ifdef OS_WINDOWS
         std::string pattern = fullpath  + "\\*";
         HANDLE hFind;
@@ -124,15 +119,16 @@ namespace FS
             FindClose(hFind);
         }
 #elif defined(OS_LINUX)
-		DIR* dir = opendir(fullpath .c_str());
+		DIR* dir = opendir(fullpath.c_str());
 		dirent * entry;
 		while ((entry = readdir(dir))) 
 		{
 			std::string filename = entry->d_name;
 			if (filename != "."  )
 			{
+				//
 				//do not allow to navigate beyond root
-				if (fullpath  == FS::Root() && filename == "..")
+				if (fullpath+"/"  == FS::Root() && filename == "..")
 					continue;
 				files.push_back(filename);
 			}

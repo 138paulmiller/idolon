@@ -15,14 +15,17 @@ void SheetEditor::onEnter()
 	memset(m_sheet->pixels, 255, m_sheet->w * m_sheet->h * sizeof(Color));
 	m_sheet->update();
 
-	m_sheetPicker = new SheetPicker(m_sheet);
+	addElement( m_sheetPicker = new SheetPicker(m_sheet) );
+
+	int buttonId = addButton(new TextButton("Save", 0, 0, 4, 1));
+	getButton(buttonId)->cbClick = [&](){
+		Assets::Save(m_sheet);
+	};
 }
 
 void SheetEditor::onExit()
 {
-	Assets::Unload(m_sheetName);
 	m_sheetName = "";
-	delete m_sheetPicker ;
 }
 
 
@@ -31,7 +34,6 @@ void SheetEditor::onTick()
 	Engine::ClearScreen();
 
 	//update 
-	m_sheetPicker->update();
 	int mx, my;
 	Engine::GetMousePosition(mx, my);
 	const Color &color = Palette[m_colorIndex];
@@ -53,11 +55,8 @@ void SheetEditor::onTick()
 			m_sheet->update();
 		}
 	}
-
-	// draw
-	m_sheetPicker->draw();
+	// draw tile
 	Engine::DrawTexture(m_sheet->texture, tileSrc, tileDest);
-	
 	//draw pixel brush
 	if (tmx >= 0 && tmx < tileDest.w && tmy >= 0 && tmy < tileDest.h)
 		Engine::DrawRect(color, { tileDest.x+tmx, tileDest.y+tmy, m_tileScale, m_tileScale}, true);

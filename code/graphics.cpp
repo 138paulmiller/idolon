@@ -138,7 +138,7 @@ namespace Graphics
         tw(w), th(h),
         scrolly(0),filled(false),
         textColor({255,255,255,255}),
-        fillColor({255,0,0,0}),
+        fillColor({0,0,0,0}),
         visible(true)
     {
     }
@@ -150,8 +150,7 @@ namespace Graphics
     void TextBox::draw()
     {
         if (!visible) return;
-        if(!fontcache) return;
-        if(filled) Engine::DrawRect(fillColor, {x,y,w,h}, true);
+        if(!fontcache) return;        
         Engine::DrawTexture(texture, {0,0,w,h}, {x,y,w,h});
     }
 
@@ -159,6 +158,15 @@ namespace Graphics
     {
         Engine::ClearTexture(texture, fillColor);
         fontcache->blit(texture, text, {0,0,w,h});
+        for(int y =0 ; y < fontcache->h; y++ )
+            for(int x =0 ; x < fontcache->w; x++ )
+            {
+                //color only text 
+                Color & color = fontcache->pixels[y * fontcache->w + x];
+                if(color == fillColor)
+                    color = textColor;
+            }
+
     }
     void TextBox::reload()
     {
@@ -168,9 +176,9 @@ namespace Graphics
         if(texture) Engine::DestroyTexture(texture);
         w = tw * fontcache->charW;
         h = th * fontcache->charH;
-         
         texture = Engine::CreateTexture(w, h, true);
-        Engine::MultiplyTexture(texture, textColor);
+        if(!filled)
+            Engine::SetTextureBlendMode(texture, BLEND_ADD);
         refresh();
     }
 }

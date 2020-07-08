@@ -1,4 +1,5 @@
 #include "assets.h"
+#include "fs.h"
 #include "graphics.h"
 //#include "scripts.h"
 #include <fstream>
@@ -45,7 +46,7 @@ namespace Assets
 		std::string path ;
 		for(const std::string & dirpath : s_assetdirs)
 		{
-			path = dirpath + std::string("/") + name + GetAssetTypeExtImpl(type);
+			path = FS::Append(dirpath, name) + GetAssetTypeExtImpl(type);
 			if(FileExists(path))
 			{
 				return path;

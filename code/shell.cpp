@@ -39,10 +39,12 @@ void Shell::onEnter()
 	m_input->reload();
 
 	//used to render lines
-	m_buffer = new Graphics::TextBox(m_w/m_charW, (m_h-1)/m_charH, "");
+	m_buffer = new Graphics::TextBox(m_w/m_charW, m_h/m_charH, "");
 	m_buffer->font = m_fontName ;
 	m_buffer->x = 0;
-	m_buffer->y = 0;        
+	m_buffer->y = 0; 
+	m_buffer->fillColor = { 255, 0, 0, 0 } ;       
+	m_buffer->filled = true;
 	m_buffer->reload();
 
 	m_lineW = m_w / m_charW;
@@ -216,9 +218,9 @@ void Shell::log(const std::string & msg)
 		m_lines.push_back(msg);
 		//move input down, if cannot go down further pop lines off buffer
 		m_input->y += m_charH;
-		if (m_input->y >= m_h)
+		if (m_input->y > m_buffer->h - m_charH)
 		{
-			m_input->y = m_h - m_charH;
+			m_input->y = m_buffer->h - m_charH;
 			m_lines.pop_front();
 		}
 	}

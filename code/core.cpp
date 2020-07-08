@@ -1,5 +1,19 @@
 #include "core.h"
 
+
+bool Rect::intersects(const Rect & other) const
+{
+	return x < other.x+other.w && x+w > other.x 
+		&& y < other.y+other.h && y+h > other.y;
+}
+bool Color::operator==(const Color & c) const
+{
+	return c.a == a 
+		&& c.r == r 
+		&& c.g == g 
+		&& c.b == b;
+} 
+
 const Color Palette[32] =
 {
 	{0xff, 0x00, 0x00, 0x00},
