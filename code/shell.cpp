@@ -31,7 +31,7 @@ void Shell::onEnter()
 	m_cursor = new Graphics::TextBox(1, 1, " ");
 	m_cursor->font = m_fontName ;
 	m_cursor->filled = true;
-	m_cursor->fillColor = { 255, 255, 255, 255 } ;
+	m_cursor->fillColor = WHITE ;
 	m_cursor->reload();
 
 	m_input = new Graphics::TextBox(m_w/m_charW, 1, SHELL_PREFIX);
@@ -43,7 +43,7 @@ void Shell::onEnter()
 	m_buffer->font = m_fontName ;
 	m_buffer->x = 0;
 	m_buffer->y = 0; 
-	m_buffer->fillColor = { 255, 0, 0, 0 } ;       
+	m_buffer->fillColor = BLACK ;       
 	m_buffer->filled = true;
 	m_buffer->reload();
 

@@ -3,10 +3,9 @@
 #include "ui.h"
 #include "commands.h"
 
-class Shell : public UI 
+class Shell : public UI::Widget 
 {
 public:
-	
 	Shell();
 	~Shell();
 	void onEnter() override ;

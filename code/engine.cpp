@@ -39,7 +39,7 @@ namespace
     //when this key is hit, input handling enters "echo" mode. forwards all key input
     static SDL_Window* s_window;
     static SDL_Renderer* s_renderer;
-    static Color s_clearColor = { 255, 0, 0, 0 };
+    static Color s_clearColor = BLACK;
     //create layers. blit to layer. priority
     //Create internal texture system. All textures are managed by the engine system
     static int s_target; //used to upsample to display to acheive pixelated effect

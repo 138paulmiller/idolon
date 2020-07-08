@@ -6,6 +6,7 @@
 
 
 using namespace Graphics;
+using namespace UI;
 
 
 
@@ -14,13 +15,17 @@ void SheetEditor::onEnter()
 	m_sheet = Assets::Load<Graphics::Sheet>(m_sheetName);
 	m_sheet->update();
 
-	UI::addElement( m_sheetPicker = new SheetPicker(m_sheet) );
+	Widget::addElement( m_sheetPicker = new SheetPicker(m_sheet) );
+	Widget::addElement( m_colorPicker = new ColorPicker() );
 
-	int buttonId = UI::addButton(new TextButton("Save", 0, 0, 4, 1));
-	UI::getButton(buttonId)->cbClick = [&](){
-		m_sheet->update();
-		Assets::Save(m_sheet);
-	};
+	int buttonId = Widget::addButton(new TextButton("Save", 0, 0, 4, 1));
+	Widget::getButton(buttonId)->cbClick = 
+		[&]()
+		{
+			m_sheet->update();
+			Assets::Save(m_sheet);
+		};
+
 }
 
 void SheetEditor::onExit()
@@ -29,18 +34,18 @@ void SheetEditor::onExit()
 	Assets::Unload(m_sheetName );
 	m_sheetName = "";
 	//remove all ui elements/buttons
-	UI::clear();
+	Widget::clear();
 }
 
 
 void SheetEditor::onTick()
 {
-	Engine::ClearScreen();
+	Engine::ClearScreen(EDITOR_COLOR);
 
 	//update 
 	int mx, my;
 	Engine::GetMousePosition(mx, my);
-	const Color &color = Palette[m_colorIndex];
+	const Color &color = m_colorPicker->color();
 	//draw current tile
 	const Rect& tileSrc = m_sheetPicker->selection();
 	const Rect & tileDest = { 24, 24, tileSrc.w * m_tileScale, tileSrc.h * m_tileScale }; 	
@@ -59,8 +64,16 @@ void SheetEditor::onTick()
 			m_sheet->update();
 		}
 	}
-	// draw tile
+	// draw tile and border
 	Engine::DrawTexture(m_sheet->texture, tileSrc, tileDest);
+	const Rect& border = {
+			tileDest.x - 1,
+			tileDest.y - 1,
+			tileDest.w + 2,
+			tileDest.h + 2
+	};
+	Engine::DrawRect(BORDER_COLOR, border, false);
+
 	//draw pixel brush
 	if (tmx >= 0 && tmx < tileDest.w && tmy >= 0 && tmy < tileDest.h)
 		Engine::DrawRect(color, { tileDest.x+tmx, tileDest.y+tmy, m_tileScale, m_tileScale}, true);

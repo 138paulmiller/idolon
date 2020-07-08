@@ -63,8 +63,12 @@ struct Color
 };
 
 
-#define WHITE Palette[0]
-#define BLACK Palette[1]
+#define BLACK Palette[0]
+#define WHITE Palette[1]
+#define CURSOR_COLOR Palette[25]
+#define BORDER_COLOR Palette[0]
+//editor "background"
+#define EDITOR_COLOR Palette[17]
 
 extern const Color Palette[];
 extern const int PaletteCount;

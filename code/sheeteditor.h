@@ -2,7 +2,7 @@
 #include "ui.h"
 
 //Edit sheet should be renamed TileSheetEditor
-class  SheetEditor : public UI 
+class  SheetEditor : public UI::Widget 
 {
 public:
 
@@ -16,7 +16,7 @@ private:
 	
 	std::string m_sheetName;
 	Graphics::Sheet * m_sheet;
-	int m_tileScale = 5;
-	int m_colorIndex = 4;
-	SheetPicker * m_sheetPicker;
+	const int m_tileScale = 8;
+	UI::SheetPicker * m_sheetPicker;
+	UI::ColorPicker * m_colorPicker;
 };

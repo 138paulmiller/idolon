@@ -9,7 +9,7 @@
 #include "sheeteditor.h"
 
 
-enum ViewType
+enum ViewId
 {
 	VIEW_SHELL = 0,
 	VIEW_SHEET_EDITOR,
@@ -21,30 +21,30 @@ struct Context
 	std::string sysPath;
 	std::string sysAssetPath;
 	//current working dir
-	ViewType prevView;
-	ViewType view;
-	UI * ui ;
+	ViewId prevViewId;
+	ViewId viewId;
+	UI::Widget * view ;
 };
 //system context
 Context g_context;
-UI * g_ui[VIEW_COUNT];
+UI::Widget * g_views[VIEW_COUNT];
 
 template <typename Type>
 Type * GetView(int index)
 {
-	return dynamic_cast<Type*>(g_ui[index]);
+	return dynamic_cast<Type*>(g_views[index]);
 }
 
-void SwitchView(ViewType view)
+void SwitchView(ViewId view)
 {
-	if(g_context.ui)
-		g_context.ui->onExit();
+	if(g_context.view)
+		g_context.view->onExit();
 	
-	g_context.prevView = g_context.view;
-	g_context.ui = g_ui[view];
-	g_context.view = view; 
+	g_context.prevViewId = g_context.viewId;
+	g_context.view = g_views[view];
+	g_context.viewId = view; 
 	
-	g_context.ui->onEnter();
+	g_context.view->onEnter();
 }
 
 void Startup(const Context & context)
@@ -54,7 +54,7 @@ void Startup(const Context & context)
 	g_context.sysPath = FS::ExePath() + "/system";
 	g_context.sysAssetPath = g_context.sysPath + "/assets";
 	//root is in user space 
-	g_context.ui = 0;
+	g_context.view = 0;
 
 
 	Engine::Startup(SCREEN_W, SCREEN_H, WINDOW_SCALE);
@@ -63,8 +63,8 @@ void Startup(const Context & context)
 	
 	Shell *shell = new Shell();
 
-	g_ui[VIEW_SHELL]      = shell;
-	g_ui[VIEW_SHEET_EDITOR] = new SheetEditor();
+	g_views[VIEW_SHELL]      = shell;
+	g_views[VIEW_SHEET_EDITOR] = new SheetEditor();
 
 	SwitchView(VIEW_SHELL);
 
@@ -72,10 +72,10 @@ void Startup(const Context & context)
 
 void Shutdown()
 {
-	if(	g_context.ui)
-		g_context.ui->onExit();
+	if(	g_context.view)
+		g_context.view->onExit();
 	for(int i=0; i < VIEW_COUNT; i++)
-		delete g_ui[i];
+		delete g_views[i];
 
 	Assets::Shutdown();
 	Engine::Shutdown();
@@ -339,18 +339,18 @@ int main(int argc, char** argv)
 		[&](Key key, bool isDown) 
 		{
 			if(isDown && key == KEY_ESCAPE)
-				SwitchView(g_context.prevView);	
+				SwitchView(g_context.prevViewId);	
 			else 
-				g_context.ui->onKey(key, isDown);
+				g_context.view->onKey(key, isDown);
 		}
 	);
 	float timer = 0;
 	while (Engine::Run())
 	{
-		g_context.ui->update();
-		g_context.ui->onTick();
+		g_context.view->update();
+		g_context.view->onTick();
 		//draw ui layer on top
-		g_context.ui->draw();
+		g_context.view->draw();
 	}
 	Engine::SetKeyEcho(false);
 
