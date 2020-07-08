@@ -12,20 +12,24 @@ using namespace Graphics;
 void SheetEditor::onEnter()
 {
 	m_sheet = Assets::Load<Graphics::Sheet>(m_sheetName);
-	memset(m_sheet->pixels, 255, m_sheet->w * m_sheet->h * sizeof(Color));
 	m_sheet->update();
 
-	addElement( m_sheetPicker = new SheetPicker(m_sheet) );
+	UI::addElement( m_sheetPicker = new SheetPicker(m_sheet) );
 
-	int buttonId = addButton(new TextButton("Save", 0, 0, 4, 1));
-	getButton(buttonId)->cbClick = [&](){
+	int buttonId = UI::addButton(new TextButton("Save", 0, 0, 4, 1));
+	UI::getButton(buttonId)->cbClick = [&](){
+		m_sheet->update();
 		Assets::Save(m_sheet);
 	};
 }
 
 void SheetEditor::onExit()
 {
+	//allow for reloading data
+	Assets::Unload(m_sheetName );
 	m_sheetName = "";
+	//remove all ui elements/buttons
+	UI::clear();
 }
 
 

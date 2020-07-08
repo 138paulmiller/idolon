@@ -45,10 +45,14 @@ public:
 	virtual void onTick() = 0;
 	virtual void onKey(Key key, bool isDown) = 0;
 	
+
 	void update();
 	void draw();
 
 protected:
+	void clear();
+
+
 	int addElement(Element * element);
 	int addButton(Button * button);
 	

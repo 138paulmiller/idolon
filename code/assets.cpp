@@ -219,7 +219,6 @@ namespace Assets
 			Asset * asset = it->second;	
 			if(asset)
 			{
-
 				asset->refcounter -= 1;							
 				if (asset->refcounter == 0)
 				{
@@ -265,7 +264,8 @@ namespace Assets
 			asset = LoadFont(name, path );
 	
 		s_assets[name] = asset;
-	
+		asset->refcounter += 1;								
+
 		return asset;
 	}
 	void SaveAsImpl(const Asset* asset, const std::type_info& type, const std::string& path)

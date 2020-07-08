@@ -12,6 +12,11 @@ const Rect & Button::rect()
 
 UI::~UI()
 {
+	clear();
+}
+
+void UI::clear()
+{
 	for(Element * elem : m_elements)
 	{
 		if(elem)
@@ -22,6 +27,8 @@ UI::~UI()
 		if(button)
 			delete button;
 	}
+	m_elements.clear();
+	m_buttons.clear();
 }
 
 void UI::update()
