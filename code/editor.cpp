@@ -11,55 +11,34 @@ Toolbar::Toolbar()
 
 //----------------------------------------------------------------------------
 
-Editor::Editor()
+Editor::Editor() 
+	: m_context(VIEW_COUNT)
 {
 
 }
 
 void Editor::onEnter()
 {
-	m_views[VIEW_SHEET_EDITOR] = new SheetEditor();
-	m_view = 0;
+	m_context.create(VIEW_SHEET_EDITOR, m_sheetEditor = new SheetEditor());
 }
 
 void Editor::onExit() 
 {
-	if(	m_view)
-		m_view->onExit();
-	for(int i=0; i < VIEW_COUNT; i++)
-		delete m_views[i];
 }
 
 void Editor::onTick() 
 {
-	if(!m_view) return;
-	m_view->update( );
-	m_view->onTick( );
-	m_view->draw( );
+	m_context.run();
 }
 
 void Editor::onKey(Key key, bool isDown) 
 {
-	if(m_view)
-		m_view->onKey( key, isDown);
-}
-void Editor::switchView(int viewId)
-{
-	if(m_view)
-		m_view->onExit();
-
-	m_prevViewId = m_viewId;
-	m_viewId = viewId;
-	m_view = m_views[m_viewId ];
-
-	if(m_view)
-		m_view->onEnter();
-
+	m_context.handleKey(key,  isDown);
 }
 
 
 void Editor::editSheet(const std::string & sheetname)
 {
-	getView<SheetEditor>(VIEW_SHEET_EDITOR)->setSheet(sheetname);
-	switchView(VIEW_SHEET_EDITOR);	
+	m_sheetEditor->setSheet(sheetname);
+	m_context.enter(VIEW_SHEET_EDITOR);	
 }

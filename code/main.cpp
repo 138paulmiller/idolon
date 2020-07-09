@@ -25,7 +25,7 @@ enum : uint8_t
 
 Shell  * g_shell;
 Editor * g_editor;
-
+Context g_context(APP_COUNT);
 
 
 void Startup()
@@ -39,17 +39,14 @@ void Startup()
 	Engine::Startup(SCREEN_W, SCREEN_H, WINDOW_SCALE);
 	//add system assets path
 	Assets::Startup(g_sysAssetPath);
-	Context::Startup(APP_COUNT);
 
-	Context::Register(APP_SHELL, g_shell = new Shell());
-	Context::Register(APP_EDITOR, g_editor = new Editor());
-
+	g_context.create(APP_SHELL, g_shell = new Shell());
+	g_context.create(APP_EDITOR, g_editor = new Editor());
 }
 
 
 void Shutdown()
 {
-	Context::Shutdown();
 	Assets::Shutdown();
 	Engine::Shutdown();
 	printf("Goodbye :)\n");
@@ -163,7 +160,7 @@ void EditAsset(const Args& args)
 	const std::string& name = FS::BaseName(args[0]);
 	if(ext == "sheet")
 	{
-		Context::Enter(APP_EDITOR);
+		g_context.enter(APP_EDITOR);
 		g_editor->editSheet(name);
 	}
 	else if(ext == "font")
@@ -285,8 +282,9 @@ int main(int argc, char** argv)
 	stacktrace();
 	Startup();
 	
-	Context::Enter(APP_SHELL);	
 	g_shell->addCommands(shellcommands);
+
+	g_context.enter(APP_SHELL);	
 
 	//Editor views, Shell will return a code that indicates the action to take. 
 	//ie switch to another context, exit, or run game.  
@@ -296,15 +294,15 @@ int main(int argc, char** argv)
 		[&](Key key, bool isDown) 
 		{
 			if(isDown && key == KEY_ESCAPE)
-				Context::Exit();	
+				g_context.exit();	
 			else 
-				Context::HandleKey(key, isDown);
+				g_context.handleKey(key, isDown);
 		}
 	);
 	float timer = 0;
 	while (Engine::Run())
 	{
-		Context::Run();
+		g_context.run();
 	}
 	Engine::SetKeyEcho(false);
 

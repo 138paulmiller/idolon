@@ -130,11 +130,11 @@ namespace UI
 
 	TextButton::TextButton(const std::string & text, int x, int y, int tw, int th)
 	{
-		hoverTextColor = Palette[7];
-		hoverColor = Palette[5];
+		hoverTextColor = WHITE;
+		hoverColor = Palette[25];
 
-		textColor = Palette[6];
-		color=  Palette[4];
+		textColor = WHITE;
+		color=  BLACK;
 
 		m_isDirty = true;
 	

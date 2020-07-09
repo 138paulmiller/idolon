@@ -3,13 +3,35 @@
 #include "ui.h"
 
 //App context
-namespace Context
+class Context
 {
-	void Startup( uint8_t appCount );
-	void Shutdown();
-	void Register( uint8_t appId, UI::App * app );
-	void Enter(uint8_t appId);
-	void Exit();
-	void HandleKey( Key key, bool isDown );
-	void Run( );
-}
+public:
+	Context( uint8_t appCount );
+	~Context();
+	void create( uint8_t appId, UI::App * app );
+	void enter(uint8_t appId);
+	void exit();
+	void handleKey( Key key, bool isDown );
+	void run( );
+
+	template <typename Type>
+	Type * app()
+	{
+		return dynamic_cast<Type*>(g_app);
+	}
+
+	template <typename Type>
+	Type * app(int appId)
+	{
+		return dynamic_cast<Type*>(g_apps[appId]);
+	}
+
+private:
+
+	uint8_t g_appId;
+	uint8_t g_prevAppId;
+	UI::App * g_app;	
+
+	uint8_t g_appCount;
+	UI::App ** g_apps = { 0} ;
+};

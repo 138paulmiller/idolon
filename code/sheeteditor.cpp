@@ -41,6 +41,7 @@ void SheetEditor::onExit()
 
 void SheetEditor::onTick()
 {
+	
 	Engine::ClearScreen(EDITOR_COLOR);
 
 	//update 
