@@ -48,6 +48,12 @@
     <ClCompile Include="..\code\sheeteditor.cpp">
       <Filter>../Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\code\editor.cpp">
+      <Filter>../Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\context.cpp">
+      <Filter>../Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\code\assets.h">
@@ -87,6 +93,9 @@
       <Filter>../Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\code\sheeteditor.h">
+      <Filter>../Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\context.h">
       <Filter>../Header Files</Filter>
     </ClInclude>
   </ItemGroup>

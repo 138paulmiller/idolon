@@ -47,6 +47,7 @@ void Startup()
 
 void Shutdown()
 {
+	g_context.clear();
 	Assets::Shutdown();
 	Engine::Shutdown();
 	printf("Goodbye :)\n");

@@ -8,6 +8,7 @@ class Context
 public:
 	Context( uint8_t appCount );
 	~Context();
+	void clear();
 	void create( uint8_t appId, UI::App * app );
 	void enter(uint8_t appId);
 	void exit();
@@ -17,21 +18,21 @@ public:
 	template <typename Type>
 	Type * app()
 	{
-		return dynamic_cast<Type*>(g_app);
+		return dynamic_cast<Type*>(m_app);
 	}
 
 	template <typename Type>
 	Type * app(int appId)
 	{
-		return dynamic_cast<Type*>(g_apps[appId]);
+		return dynamic_cast<Type*>(m_apps[appId]);
 	}
 
 private:
 
-	uint8_t g_appId;
-	uint8_t g_prevAppId;
-	UI::App * g_app;	
+	uint8_t m_appId;
+	uint8_t m_prevAppId;
+	UI::App * m_app;	
 
-	uint8_t g_appCount;
-	UI::App ** g_apps = { 0} ;
+	uint8_t m_appCount;
+	UI::App ** m_apps = { 0} ;
 };
