@@ -150,7 +150,7 @@ namespace Graphics
     void TextBox::draw()
     {
         if (!visible) return;
-        if(!fontcache) return;        
+        if(!fontcache) return;   
         Engine::DrawTexture(texture, {0,0,w,h}, {x,y,w,h});
     }
 

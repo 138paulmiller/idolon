@@ -15,33 +15,34 @@ namespace UI
 		return m_rect;
 	}
 
-	Widget::~Widget()
+	App::~App()
 	{
 		clear();
 	}
 
-	void Widget::clear()
+	void App::clear()
 	{
-		for(Element * elem : m_elements)
+
+		for(Widget * widget : m_widgets)
 		{
-			if(elem)
-				delete elem;
+			if(widget)
+				delete widget;
 		}
 		for(Button * button : m_buttons)
 		{
 			if(button)
 				delete button;
 		}
-		m_elements.clear();
+		m_widgets.clear();
 		m_buttons.clear();
 	}
 
-	void Widget::update()
+	void App::update()
 	{
-		for(Element * elem : m_elements)
+		for(Widget * widget : m_widgets)
 		{
-			if(elem)
-				elem->onUpdate();
+			if(widget)
+				widget->onUpdate();
 		}
 		for(Button * button : m_buttons)
 		{
@@ -69,12 +70,12 @@ namespace UI
 			}
 		}
 	}
-	void Widget::draw()
+	void App::draw()
 	{	
-		for(Element * elem : m_elements)
+		for(Widget * widget : m_widgets)
 		{
-			if(elem)
-				elem->onDraw();
+			if(widget)
+				widget->onDraw();
 		}
 		for(Button * button : m_buttons)
 		{
@@ -83,34 +84,35 @@ namespace UI
 		}
 	}
 
-	int Widget::addElement(Element * element)
+	int App::addWidget(Widget * widget)
 	{
-		int idx = m_elements.size();
-		m_elements.push_back(element);
+		printf("Adding Widget");
+		int idx = m_widgets.size();
+		m_widgets.push_back(widget);
 		return idx;
 	}
 
-	int Widget::addButton(Button * button)
+	int App::addButton(Button * button)
 	{
 
 		int idx = m_buttons.size();
 		m_buttons.push_back(button);
 		return idx;
 	}
-	Button * Widget::getButton(int idx)
+	Button * App::getButton(int idx)
 	{
 		if(idx < m_buttons.size())
 			return m_buttons[idx];
 		return 0;
 	}
 
-	Element * Widget::getElement(int idx)
+	Widget * App::getWidget(int idx)
 	{
-		if(idx < m_elements.size())
-			return m_elements[idx];
+		if(idx < m_widgets.size())
+			return m_widgets[idx];
 		return 0;
 	}
-	void Widget::removeButton(int idx)
+	void App::removeButton(int idx)
 	{
 
 		if(idx >= m_buttons.size()) return;
@@ -118,11 +120,11 @@ namespace UI
 		m_buttons[idx] = 0;
 	}
 
-	void Widget::removeElement(int idx)
+	void App::removeWidget(int idx)
 	{
-		if(idx >= m_elements.size()) return;
-		delete m_elements[idx];
-		m_elements[idx] = 0;
+		if(idx >= m_widgets.size()) return;
+		delete m_widgets[idx];
+		m_widgets[idx] = 0;
 
 	}
 
@@ -269,19 +271,7 @@ namespace UI
 
 	SheetPicker::SheetPicker(const Graphics::Sheet * sheet)
 	{
-		m_sheet = sheet;
-		int w, h;
-		Engine::GetSize(w, h);
-
-		m_box = { 0, h - m_sheet->h / 2, m_sheet->w * 2, m_sheet->h / 2 };
-
-		m_cursor = {0,0,TILE_W,TILE_H};	
-		m_srcLeft = { 0, 0, m_sheet->w, m_sheet->h/2 };
-		m_destLeft = { m_box.x, m_box.y, m_sheet->w, m_sheet->h/2 }; 
-	
-		m_srcRight = { 0, m_sheet->h/2, m_sheet->w, m_sheet->h/2 };
-		m_destRight = {m_box.x + m_sheet->w, m_box.y,  m_sheet->w, m_sheet->h/2 }; 
-		
+		setSheet(sheet);
 	}
 
 	SheetPicker::~SheetPicker()
@@ -290,6 +280,8 @@ namespace UI
 
 	Rect SheetPicker::selection()
 	{
+
+		if(!m_sheet) return {-1,-1,0,0};
 		//since texture is half height and twice width, remap back to square sheet
 		int x = m_cursor.x;
 		int y = m_cursor.y;
@@ -318,8 +310,26 @@ namespace UI
 			}
 		}
 	}
+	void SheetPicker::setSheet(const Graphics::Sheet * sheet)
+	{
+		m_sheet = sheet;
+		int w, h;
+		Engine::GetSize(w, h);
+		m_box = { 0, h - m_sheet->h / 2, m_sheet->w * 2, m_sheet->h / 2 };
+
+		m_cursor = {0,0,TILE_W,TILE_H};	
+		m_srcLeft = { 0, 0, m_sheet->w, m_sheet->h/2 };
+		m_destLeft = { m_box.x, m_box.y, m_sheet->w, m_sheet->h/2 }; 
+	
+		m_srcRight = { 0, m_sheet->h/2, m_sheet->w, m_sheet->h/2 };
+		m_destRight = {m_box.x + m_sheet->w, m_box.y,  m_sheet->w, m_sheet->h/2 }; 
+		
+
+	}
+
 	void SheetPicker::onDraw()
 	{
+		if(!m_sheet) return;
 		const Rect & worldCursor = 
 		{
 			m_cursor.x + m_box.x, 

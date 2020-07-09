@@ -53,7 +53,7 @@ void Shell::onEnter()
 	m_timer = 0;
 	m_optionDirection = 1;
 
-	//Maintain buffer input
+	//Persist buffer input
 /*	std::string linesText;
 	for(const std::string & line : m_lines)
 	{
@@ -235,12 +235,16 @@ void Shell::log(const std::string & msg)
 
 void Shell::showOption()
 {
-	std::vector<std::string> files;
-	FS::Ls(files);
-	//if files exist, and input line has at least >, and no options. then fill options
-	if(files.size() && m_input->text.size() > 0 && m_options.size() == 0)
+	std::vector<std::string> options;
+	FS::Ls(options);
+	for(auto command : m_commands)
 	{
-		m_options.reserve(files.size());
+		options.push_back(command.first);
+	}
+	//if files exist, and input line has at least >, and no options. then fill options
+	if(options.size() && m_input->text.size() > 0 && m_options.size() == 0)
+	{
+		m_options.reserve(options.size());
 		int inputLen = m_input->text.size();
 		//move input to last "arg"
 		int pos = inputLen-1;
@@ -259,9 +263,9 @@ void Shell::showOption()
 		int argLen = arg.size();
 		m_option = 0;
 		//filter all nonmatching
-		for(int i = 0 ; i < files.size(); i++)
+		for(int i = 0 ; i < options.size(); i++)
 		{
-			const std::string & option = files[i];
+			const std::string & option = options[i];
 			if(option.size() >= argLen && strncmp(arg.c_str(), option.c_str(), argLen) == 0)
 			{
 				m_options.push_back(SHELL_PREFIX + command + option);

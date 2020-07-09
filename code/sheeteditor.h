@@ -2,7 +2,7 @@
 #include "ui.h"
 
 //Edit sheet should be renamed TileSheetEditor
-class  SheetEditor : public UI::Widget 
+class  SheetEditor : public UI::App 
 {
 public:
 

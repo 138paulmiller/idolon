@@ -3,7 +3,7 @@
 #include "ui.h"
 #include "commands.h"
 
-class Shell : public UI::Widget 
+class Shell : public UI::App 
 {
 public:
 	Shell();

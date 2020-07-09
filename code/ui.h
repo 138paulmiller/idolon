@@ -12,36 +12,36 @@ namespace Graphics
 
 namespace UI
 {
-	class Element
+	class Widget
 	{
 	public:
-		virtual ~Element() = default;
+		virtual ~Widget() = default;
 		virtual void onUpdate() = 0;
 		virtual void onDraw() = 0;
 	};
 
-	class Button : public Element
+	class Button : public Widget
 	{
 	public:
 		Button();
 		virtual ~Button() = default;
-		const Rect & rect();
 
 		virtual void onClick() = 0;
 		virtual void onHover() = 0;
 
+		const Rect & rect();
+
 		std::function<void()> cbClick;
 		std::function<void()> cbHover;
+
 	protected: 
 		Rect m_rect;
 	};
 
-	//TODO Create universal toolbar that runs when editor is running. Used to navigate the various editor pages. return back to terminal
-	//This toolbar broadcasts events that each UI can regoister to
-	class Widget
+	class App
 	{
 	public:
-		virtual ~Widget();
+		virtual ~App();
 		virtual void onEnter() = 0;
 		virtual void onExit() = 0;
 		virtual void onTick() = 0;
@@ -54,18 +54,18 @@ namespace UI
 		void clear();
 
 
-		int addElement(Element * element);
+		int addWidget(Widget * widget);
 		int addButton(Button * button);
 	
 		Button * getButton(int idx);
-		Element * getElement(int idx);
+		Widget * getWidget(int idx);
 
 		void removeButton(int idx);
-		void removeElement(int idx);
+		void removeWidget(int idx);
 	
 	private:
 
-		std::vector<Element*> m_elements;
+		std::vector<Widget*> m_widgets;
 		std::vector<Button*> m_buttons;
 	};
 
@@ -97,7 +97,7 @@ namespace UI
 
 	*/
 
-	class ColorPicker : public Element
+	class ColorPicker : public Widget
 	{
 	public:
 		ColorPicker();
@@ -119,7 +119,7 @@ namespace UI
 		Sheet Tile/Frame picker
 		- Renders the sheet at the bottom of the screen.
 	*/
-	class SheetPicker : public Element
+	class SheetPicker : public Widget
 	{
 	public:
 		SheetPicker(const Graphics::Sheet * sheet);
@@ -127,7 +127,7 @@ namespace UI
 
 		void onUpdate();
 		void onDraw();
-
+		void setSheet(const Graphics::Sheet * sheet);
 		//get tile/frame relative to given sheet
 		Rect selection();
 	private:

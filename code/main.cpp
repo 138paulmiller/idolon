@@ -6,98 +6,70 @@
 #include "fs.h"
 #include "err.h"
 //editor
-#include "sheeteditor.h"
+#include "shell.h"
+#include "editor.h"
+#include "context.h"
 
+//default config
+//system are for default system data
+std::string g_sysPath ;
+std::string g_sysAssetPath;
 
-enum ViewId
+enum : uint8_t
 {
-	VIEW_SHELL = 0,
-	VIEW_SHEET_EDITOR,
-	VIEW_COUNT,
+	APP_SHELL = 0,
+	APP_EDITOR,
+	APP_COUNT
 };
 
-struct Context
-{
-	std::string sysPath;
-	std::string sysAssetPath;
-	//current working dir
-	ViewId prevViewId;
-	ViewId viewId;
-	UI::Widget * view ;
-};
-//system context
-Context g_context;
-UI::Widget * g_views[VIEW_COUNT];
 
-template <typename Type>
-Type * GetView(int index)
-{
-	return dynamic_cast<Type*>(g_views[index]);
-}
+Shell  * g_shell;
+Editor * g_editor;
 
-void SwitchView(ViewId view)
-{
-	if(g_context.view)
-		g_context.view->onExit();
-	
-	g_context.prevViewId = g_context.viewId;
-	g_context.view = g_views[view];
-	g_context.viewId = view; 
-	
-	g_context.view->onEnter();
-}
 
-void Startup(const Context & context)
+
+void Startup()
 {
 	//default config
-	//system are for default system data
-	g_context.sysPath = FS::ExePath() + "/system";
-	g_context.sysAssetPath = g_context.sysPath + "/assets";
-	//root is in user space 
-	g_context.view = 0;
+	g_sysPath = FS::ExePath() + "/system";
+	g_sysAssetPath = g_sysPath + "/assets";
+
 
 
 	Engine::Startup(SCREEN_W, SCREEN_H, WINDOW_SCALE);
 	//add system assets path
-	Assets::Startup(context.sysAssetPath);
-	
-	Shell *shell = new Shell();
+	Assets::Startup(g_sysAssetPath);
+	Context::Startup(APP_COUNT);
 
-	g_views[VIEW_SHELL]      = shell;
-	g_views[VIEW_SHEET_EDITOR] = new SheetEditor();
-
-	SwitchView(VIEW_SHELL);
+	Context::Register(APP_SHELL, g_shell = new Shell());
+	Context::Register(APP_EDITOR, g_editor = new Editor());
 
 }
 
+
 void Shutdown()
 {
-	if(	g_context.view)
-		g_context.view->onExit();
-	for(int i=0; i < VIEW_COUNT; i++)
-		delete g_views[i];
-
+	Context::Shutdown();
 	Assets::Shutdown();
 	Engine::Shutdown();
-	printf("Goodbye :)");
+	printf("Goodbye :)\n");
 	exit(1);
 }
 
 void PrintHelp()
 {
 
-	Shell * shell = GetView<Shell>(VIEW_SHELL); //references the
-	shell->log("Commands");
-	shell->log("help - print this message");
-	shell->log("exit - power down system");
-	shell->log("font <name> - set shell font");
+	g_shell->log("Commands");
+	g_shell->log("help - print this message");
+	g_shell->log("exit - power down system");
+	g_shell->log("font <name> - set shell font");
 }
 
 void LogArgError()
 {
 	char msg[24];
 	snprintf(msg, 24, "Incorrect number of arguments");
-	GetView<Shell>(VIEW_SHELL)->log(msg);
+	g_shell->log(msg);
 }
 
 
@@ -111,7 +83,7 @@ void LogArgError()
 template <typename Type>
 std::string SystemAssetPath(const std::string & name )
 {
-	return g_context.sysAssetPath + ("/" + name + Assets::GetAssetTypeExt<Type>());
+	return g_sysAssetPath + ("/" + name + Assets::GetAssetTypeExt<Type>());
 }
 // -------------- Convert raw to asset ------------------------
 
@@ -191,9 +163,8 @@ void EditAsset(const Args& args)
 	const std::string& name = FS::BaseName(args[0]);
 	if(ext == "sheet")
 	{
-		SheetEditor * editsheet = GetView<SheetEditor>(VIEW_SHEET_EDITOR); //references the
-		editsheet->setSheet(name);
-		SwitchView(VIEW_SHEET_EDITOR);
+		Context::Enter(APP_EDITOR);
+		g_editor->editSheet(name);
 	}
 	else if(ext == "font")
 	{
@@ -232,7 +203,7 @@ const CommandTable & shellcommands =
 		[](Args args)
 		{ 
 			ARG_COUNT(args, 1);
-			GetView<Shell>(VIEW_SHELL)->setFont(args[0]);
+			g_shell->setFont(args[0]);
 		} 
 	},
 	{
@@ -251,11 +222,10 @@ const CommandTable & shellcommands =
 		"ls", 
 		[](Args args)
 		{ 
-			Shell * shell = GetView<Shell>(VIEW_SHELL); //references the
 			std::vector<std::string> files;
 			FS::Ls(files);
 			for (const std::string& file : files)
-				shell->log(file);
+				g_shell->log(file);
 		} 
 	},
 	{
@@ -263,51 +233,43 @@ const CommandTable & shellcommands =
 		[](Args args)
 		{ 
 			ARG_COUNT(args, 1); // 	
-			Shell * shell = GetView<Shell>(VIEW_SHELL); //references the
 			if (!FS::Cd(args[0]))
-				shell->log("Directory does not exist");
+				g_shell->log("Directory does not exist");
 		} 
 	},
 	{
 		"cwd", 
 		[](Args args)
 		{ 
-			Shell * shell = GetView<Shell>(VIEW_SHELL); //references the
-			shell->log(FS::Cwd());
+			g_shell->log(FS::Cwd());
 		} 
 	},
 	{
 		"mkdir", 
 		[](Args args)
 		{ 
-			Shell * shell = GetView<Shell>(VIEW_SHELL); //references the
-
 			ARG_COUNT(args, 1); // 	
 			if (!FS::MkDir(args[0]))
-				shell->log("Could not create directory");
+				g_shell->log("Could not create directory");
 		} 
 	},
 	{
 		"rm", 
 		[](Args args)
 		{ 
-			Shell * shell = GetView<Shell>(VIEW_SHELL); //references the
-
 			ARG_COUNT(args, 1); // 	
 			if (!FS::Remove(args[0]))
-				shell->log("Failed to remove path");
+				g_shell->log("Failed to remove path");
 		} 
 	},
 	{
 		"mv", 
 		[](Args args)
 		{ 
-			Shell * shell = GetView<Shell>(VIEW_SHELL); //references the
-
 			ARG_COUNT(args, 2); // 
 			
 			if (!FS::Move(args[0], args[1]))
-				shell->log("Failed to move");
+				g_shell->log("Failed to move");
 		} 
 	},
 	//if running game, add all sub-directories as search dir for assets
@@ -321,16 +283,11 @@ int main(int argc, char** argv)
 { 
 
 	stacktrace();
+	Startup();
+	
+	Context::Enter(APP_SHELL);	
+	g_shell->addCommands(shellcommands);
 
-	Startup(g_context);
-	Shell * shell = GetView<Shell>(VIEW_SHELL); //references the
-
-	shell->addCommands(shellcommands);
-
-	//TODO - capture all input here, forward it to the shell 
-	// "trampoline" contexts. 
-	//Create base "class View  for shell and editors. the view will return contexts. 
-	//also, each context will register its commands 
 	//Editor views, Shell will return a code that indicates the action to take. 
 	//ie switch to another context, exit, or run game.  
 	
@@ -339,18 +296,15 @@ int main(int argc, char** argv)
 		[&](Key key, bool isDown) 
 		{
 			if(isDown && key == KEY_ESCAPE)
-				SwitchView(g_context.prevViewId);	
+				Context::Exit();	
 			else 
-				g_context.view->onKey(key, isDown);
+				Context::HandleKey(key, isDown);
 		}
 	);
 	float timer = 0;
 	while (Engine::Run())
 	{
-		g_context.view->update();
-		g_context.view->onTick();
-		//draw ui layer on top
-		g_context.view->draw();
+		Context::Run();
 	}
 	Engine::SetKeyEcho(false);
 

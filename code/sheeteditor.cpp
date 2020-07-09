@@ -12,14 +12,15 @@ using namespace UI;
 
 void SheetEditor::onEnter()
 {
+	m_sheet = 0;
 	m_sheet = Assets::Load<Graphics::Sheet>(m_sheetName);
 	m_sheet->update();
 
-	Widget::addElement( m_sheetPicker = new SheetPicker(m_sheet) );
-	Widget::addElement( m_colorPicker = new ColorPicker() );
+	App::addWidget( m_sheetPicker = new SheetPicker(m_sheet) );
+	App::addWidget( m_colorPicker = new ColorPicker() );
 
-	int buttonId = Widget::addButton(new TextButton("Save", 0, 0, 4, 1));
-	Widget::getButton(buttonId)->cbClick = 
+	int buttonId = App::addButton(new TextButton("Save", 0, 0, 4, 1));
+	App::getButton(buttonId)->cbClick = 
 		[&]()
 		{
 			m_sheet->update();
@@ -33,8 +34,8 @@ void SheetEditor::onExit()
 	//allow for reloading data
 	Assets::Unload(m_sheetName );
 	m_sheetName = "";
-	//remove all ui elements/buttons
-	Widget::clear();
+	//remove all ui Widgets/buttons
+	App::clear();
 }
 
 
