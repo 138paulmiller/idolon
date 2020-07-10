@@ -83,6 +83,9 @@ namespace UI
 		Color hoverColor;
 		Color textColor;
 		Color color;
+		//will render as hover color, clicking again will undo 
+		void setUp() ;
+		void setDown() ;
 	private: 
 		bool m_isDirty;
 		Graphics::TextBox * m_textbox; 
@@ -125,6 +128,7 @@ namespace UI
 		SheetPicker(const Graphics::Sheet * sheet);
 		~SheetPicker();
 
+		const Rect & rect();
 		void onUpdate();
 		void onDraw();
 		void setSheet(const Graphics::Sheet * sheet);

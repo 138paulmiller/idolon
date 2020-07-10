@@ -9,6 +9,7 @@ Context::Context( uint8_t appCount )
 	memset( m_apps, 0, appCount * sizeof( UI::App *) );
 	m_prevAppId =  0;
 	m_appId  = 0;
+	m_app = 0;
 }
 Context::~Context()
 {
@@ -29,15 +30,16 @@ void Context::clear( )
 
 void Context::create( uint8_t appId, UI::App * app )
 {
-	ASSERT(appId < m_appCount);
+	ASSERT(appId < m_appCount, "Invalid App ID");
 	m_apps[appId] = app;
 }
 
 void Context::enter(uint8_t appId)
 {
-	ASSERT(appId < m_appCount);
+	ASSERT(appId < m_appCount, "Invalid App ID");
+	printf("Context Switch: from %d to %d\n", m_prevAppId, appId);
 	if(m_app)
-	m_app->onExit();
+		m_app->onExit();
 
 	m_prevAppId = m_appId;
 	m_app = m_apps[m_appId = appId];
@@ -46,6 +48,8 @@ void Context::enter(uint8_t appId)
 }
 void Context::exit()
 {
+	printf("Exiting Context...\n");
+
 	enter(m_prevAppId);
 }
 void Context::handleKey( Key key, bool isDown )

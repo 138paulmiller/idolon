@@ -1,6 +1,14 @@
 #pragma once
 #include "ui.h"
 
+
+enum ToolMode
+{
+	TOOL_PIXEL = 0,
+	TOOL_FILL,
+	TOOL_COUNT,
+};
+
 //Edit sheet should be renamed TileSheetEditor
 class  SheetEditor : public UI::App 
 {
@@ -19,4 +27,6 @@ private:
 	const int m_tileScale = 8;
 	UI::SheetPicker * m_sheetPicker;
 	UI::ColorPicker * m_colorPicker;
+	UI::TextButton * m_buttons[TOOL_COUNT];
+	ToolMode m_tool;
 };

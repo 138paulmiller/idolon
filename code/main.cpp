@@ -41,7 +41,7 @@ void Startup()
 	g_context.create(APP_SHELL, g_shell = new Shell());
 	g_context.create(APP_EDITOR, g_editor = new Editor());
 
-	printf("System On!");
+	printf("System On!\n");
 }
 
 

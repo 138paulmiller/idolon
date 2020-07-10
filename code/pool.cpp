@@ -1,5 +1,10 @@
 #include "core.h"
 #include "pool.h"
+
+#include <mutex>
+#include <thread>
+#include <condition_variable>
+
 namespace
 {
 	uint32_t s_count;

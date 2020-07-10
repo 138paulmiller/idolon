@@ -16,11 +16,8 @@
 #include <list>
 #include <queue>
 #include <vector>
-#include <mutex>
-#include <thread>
 #include <functional>
 #include <unordered_map>
-#include <condition_variable>
 
 
 //Add Vector / Math classes
@@ -60,6 +57,7 @@ struct Color
     uint8_t g;
     uint8_t b;
     bool operator==(const Color & c) const;
+    bool operator!=(const Color & c) const;
 };
 
 

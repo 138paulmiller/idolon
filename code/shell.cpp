@@ -22,7 +22,7 @@ Shell::~Shell()
 
 void Shell::onEnter()
 {
-	printf("Entering shell...");
+	printf("Entering shell...\n");
 
 	Engine::GetSize(m_w, m_h);
 
@@ -35,7 +35,6 @@ void Shell::onEnter()
 	m_cursor->filled = true;
 	m_cursor->fillColor = WHITE ;
 	m_cursor->reload();
-
 
 
 	m_lineW = m_w / m_charW;

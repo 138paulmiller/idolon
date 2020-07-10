@@ -135,9 +135,8 @@ namespace UI
 
 		textColor = WHITE;
 		color=  BLACK;
-
 		m_isDirty = true;
-	
+
 		m_textbox = new Graphics::TextBox(tw, th, text);
 		m_textbox->x = x;
 		m_textbox->y = y;
@@ -158,12 +157,8 @@ namespace UI
 	{
 		if(m_isDirty)
 		{
-
-			m_textbox->textColor = textColor;
-			m_textbox->fillColor = color;
-			m_textbox->refresh();
+			setUp();
 			m_isDirty = false;
-
 		}
 	}
 
@@ -179,12 +174,26 @@ namespace UI
 
 	}
 
-
-	void TextButton::onHover()
+	void TextButton::setUp() 
 	{
+		m_textbox->textColor = textColor;
+		m_textbox->fillColor = color;
+		m_textbox->refresh();
+		m_isDirty = false;
+	}
+
+	void TextButton::setDown() 
+	{
+
 		m_textbox->textColor = hoverTextColor;
 		m_textbox->fillColor = hoverColor;
 		m_textbox->refresh();
+		m_isDirty = false;
+
+	}
+	void TextButton::onHover()
+	{
+		setDown();
 		m_isDirty = true;
 	}
 
@@ -278,6 +287,10 @@ namespace UI
 	{
 	}
 
+	const Rect & SheetPicker::rect()
+	{
+		return m_box;
+	}
 	Rect SheetPicker::selection()
 	{
 

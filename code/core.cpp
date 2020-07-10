@@ -6,6 +6,11 @@ bool Rect::intersects(const Rect & other) const
 	return x < other.x+other.w && x+w > other.x 
 		&& y < other.y+other.h && y+h > other.y;
 }
+
+bool Color::operator!=(const Color & c) const
+{
+	return !(c == *this);
+} 
 bool Color::operator==(const Color & c) const
 {
 	return c.a == a 

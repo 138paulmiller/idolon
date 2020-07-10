@@ -49,9 +49,6 @@ namespace
     
 
     static std::vector<SDL_Texture* > s_textures;
-    //TODO threaded input
-    static std::mutex s_uemutex;
-
     static uint32_t s_fpsStartTime, s_nextFrameTime, s_frameStartTime, s_startTime, s_frame = 0;
     static float s_fps = 0;
     static uint32_t s_deltaMs;
