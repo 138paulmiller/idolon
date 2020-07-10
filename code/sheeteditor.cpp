@@ -12,6 +12,8 @@ using namespace UI;
 
 void SheetEditor::onEnter()
 {
+
+	printf("Entering sheet editor ... ");
 	m_sheet = 0;
 	m_sheet = Assets::Load<Graphics::Sheet>(m_sheetName);
 	m_sheet->update();
@@ -36,12 +38,13 @@ void SheetEditor::onExit()
 	m_sheetName = "";
 	//remove all ui Widgets/buttons
 	App::clear();
+	printf("Extited sheet editor");
 }
 
 
 void SheetEditor::onTick()
 {
-	
+
 	Engine::ClearScreen(EDITOR_COLOR);
 
 	//update 

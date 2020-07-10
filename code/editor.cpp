@@ -19,11 +19,14 @@ Editor::Editor()
 
 void Editor::onEnter()
 {
+	printf("Entering Editor ... ");
 	m_context.create(VIEW_SHEET_EDITOR, m_sheetEditor = new SheetEditor());
 }
 
 void Editor::onExit() 
 {
+
+	printf("Exited Editor ");
 }
 
 void Editor::onTick() 

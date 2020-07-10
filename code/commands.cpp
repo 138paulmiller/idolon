@@ -1,6 +1,39 @@
 #include "commands.h"
 #include <sstream>
 
+
+
+CommandDesc::CommandDesc(const std::string & name, const std::string & help )
+	:name(name), help(help)
+{
+
+}
+bool operator==(const CommandDesc& lhs, const CommandDesc& rhs)
+{
+	return lhs.name == rhs.name;
+}
+
+std::size_t CommandDescHash::operator()(const CommandDesc& desc) const
+{
+	return std::hash<std::string>()(desc.name);
+}
+
+void HelpAll(const CommandTable& commands, std::string & help)
+{
+	help.clear();
+	for(auto it : commands)
+		help += it.first.name + "\n - " + it.first.help + "\n";
+
+}
+
+void Help(const CommandTable& commands, const std::string & name, std::string & help)
+{
+	help.clear();
+	auto it = commands.find({name});
+	if(it != commands.end())
+		help = name + " : " + it->first.help;
+}
+
 void Execute(const std::string & input, const CommandTable & commands ) 
 {
 	//split string by white space. 
@@ -16,7 +49,9 @@ void Execute(const std::string & input, const CommandTable & commands )
 		copy[word.size()] = '\0';
 		args.push_back(copy);
 	}
+	
 	Execute(args.size(), &args[0], commands);
+	
 	for (int i = 0; i < args.size(); i++)
 		delete args[i];
 }
@@ -28,7 +63,7 @@ void Execute(int argc, char** argv, const CommandTable& commands)
 	int i = 0;
 	while( i < argc)
 	{
-		CommandTable::const_iterator it = commands.find(argv[i]);
+		CommandTable::const_iterator it = commands.find({argv[i]});
 		if(it == commands.end())
 		{
 			printf("Execute: Invalid Command (%s)\n", argv[i]);
@@ -40,7 +75,7 @@ void Execute(int argc, char** argv, const CommandTable& commands)
 		while(i < argc)
 		{
 			const char *arg=  argv[i];
-			it = commands.find(arg);
+			it = commands.find({arg});
 			if (it == commands.end()) //if does not exist
 				args.push_back(arg);
 			else

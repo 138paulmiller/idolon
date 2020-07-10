@@ -22,6 +22,8 @@ Shell::~Shell()
 
 void Shell::onEnter()
 {
+	printf("Entering shell...");
+
 	Engine::GetSize(m_w, m_h);
 
 	m_font = Assets::Load<Graphics::Font>(m_fontName );
@@ -34,12 +36,18 @@ void Shell::onEnter()
 	m_cursor->fillColor = WHITE ;
 	m_cursor->reload();
 
-	m_input = new Graphics::TextBox(m_w/m_charW, 1, SHELL_PREFIX);
+
+
+	m_lineW = m_w / m_charW;
+	//space for input line 
+	m_lineH = m_h / m_charH - 1;
+
+	m_input = new Graphics::TextBox(m_lineW, 1, SHELL_PREFIX);
 	m_input->font = m_fontName ;    
 	m_input->reload();
 
-	//used to render lines
-	m_buffer = new Graphics::TextBox(m_w/m_charW, m_h/m_charH, "");
+	//draw buffer as the entire background. last line is rendered but never filled
+	m_buffer = new Graphics::TextBox(m_lineW, m_lineH+1, "");
 	m_buffer->font = m_fontName ;
 	m_buffer->x = 0;
 	m_buffer->y = 0; 
@@ -47,7 +55,6 @@ void Shell::onEnter()
 	m_buffer->filled = true;
 	m_buffer->reload();
 
-	m_lineW = m_w / m_charW;
 	m_cursorPos = SHELL_PREFIXSIZE; //offset by > 
 	m_stashedInput = "";
 	m_timer = 0;
@@ -68,6 +75,8 @@ void Shell::onEnter()
 
 void Shell::onExit()
 {
+	clear();
+	Assets::Unload(m_fontName );
 	if(m_input)
 	{
 		delete m_input;
@@ -83,7 +92,6 @@ void Shell::onExit()
 		delete m_buffer;
 		m_buffer = 0;
 	}	
-	
 	printf("Exited Shell\n");
 
 }
@@ -137,14 +145,12 @@ void Shell::onKey(Key key, bool isDown)
 			m_options.clear(); //clear options
 			break;
 		case KEY_RETURN:
-
 			log(m_input->text);
 			if (m_input->text.size() > SHELL_PREFIXSIZE)
 				m_command = m_input->text.substr(SHELL_PREFIXSIZE);
 			m_cursorPos = SHELL_PREFIXSIZE; //reset
 			m_input->text = SHELL_PREFIX;
 			m_options.clear(); //clear options
-
 			break;
 		default:
 			if (m_cursorPos < m_lineW-SHELL_PREFIXSIZE)
@@ -205,6 +211,14 @@ void Shell::overrideInput(const std::string& msg)
 	m_input->refresh();
 	m_cursorPos = m_input->text.size();
 }
+void Shell::clear()
+{
+	m_input->y = m_charH;
+	m_buffer->text = "";
+	m_lines.clear();
+	log("");
+}
+
 //Can only be called in command
 void Shell::log(const std::string & msg)
 {
@@ -213,24 +227,22 @@ void Shell::log(const std::string & msg)
 	std::istringstream iss;
 	iss.str(msg);
 	m_buffer->text = ""; //reset buffer. will be rebuilt
-	while (std::getline(iss, line))
+	while (std::getline(iss, line, '\n'))
 	{
-		m_lines.push_back(msg);
 		//move input down, if cannot go down further pop lines off buffer
-		m_input->y += m_charH;
-		if (m_input->y > m_buffer->h - m_charH)
-		{
-			m_input->y = m_buffer->h - m_charH;
+		m_lines.push_back(line);
+		if (m_lines.size() >= m_lineH)
 			m_lines.pop_front();
-		}
+		else
+			m_input->y += m_charH;
 	}
 
 	for (const std::string& line : m_lines)
-	{
 		m_buffer->text += line + '\n';
-	}
 
 	m_buffer->refresh();
+
+			
 }
 
 void Shell::showOption()
@@ -239,7 +251,7 @@ void Shell::showOption()
 	FS::Ls(options);
 	for(auto command : m_commands)
 	{
-		options.push_back(command.first);
+		options.push_back(command.first.name);
 	}
 	//if files exist, and input line has at least >, and no options. then fill options
 	if(options.size() && m_input->text.size() > 0 && m_options.size() == 0)

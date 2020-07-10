@@ -82,7 +82,7 @@ namespace Engine
         s_nextFrameTime = s_startTime + FPS_CAP;
         s_fpsStartTime = s_startTime;
         s_frameStartTime = s_startTime;
-         SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest"); 
+        SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest"); 
     }
 
     void Shutdown()

@@ -13,7 +13,7 @@ public:
 	void enter(uint8_t appId);
 	void exit();
 	void handleKey( Key key, bool isDown );
-	void run( );
+	int run( );
 
 	template <typename Type>
 	Type * app()

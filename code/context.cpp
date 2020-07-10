@@ -2,7 +2,6 @@
 
 #include "context.h"
 
-
 Context::Context( uint8_t appCount )
 {
 	m_appCount = appCount;
@@ -55,12 +54,14 @@ void Context::handleKey( Key key, bool isDown )
 		m_app->onKey(key, isDown);
 }
 
-void Context::run( )
+int Context::run( )
 {
-	if(!m_app) return;
+	if(!m_app) return 1;
 	m_app->update();
 	//
 	m_app->onTick();
 	//draw ui layer on top
 	m_app->draw();
+
+	return 1;
 }

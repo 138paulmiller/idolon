@@ -34,33 +34,27 @@ void Startup()
 	g_sysPath = FS::ExePath() + "/system";
 	g_sysAssetPath = g_sysPath + "/assets";
 
-
-
 	Engine::Startup(SCREEN_W, SCREEN_H, WINDOW_SCALE);
 	//add system assets path
 	Assets::Startup(g_sysAssetPath);
 
 	g_context.create(APP_SHELL, g_shell = new Shell());
 	g_context.create(APP_EDITOR, g_editor = new Editor());
+
+	printf("System On!");
 }
 
 
 void Shutdown()
 {
+	printf("Clearing context ...\n");
 	g_context.clear();
+	printf("Shutting down assets ...\n");
 	Assets::Shutdown();
+	printf("Shutting down engine ...\n");
 	Engine::Shutdown();
 	printf("Goodbye :)\n");
 	exit(1);
-}
-
-void PrintHelp()
-{
-
-	g_shell->log("Commands");
-	g_shell->log("help - print this message");
-	g_shell->log("exit - power down system");
-	g_shell->log("font <name> - set shell font");
 }
 
 void LogArgError()
@@ -69,20 +63,171 @@ void LogArgError()
 	snprintf(msg, 24, "Incorrect number of arguments");
 	g_shell->log(msg);
 }
-
-
 //TODO - handle error more elegantly. Throw exception with msg ? Log mesage to shell ? with usage. 
 #define ARG_NONEMPTY(args) if(args.size() <= 0  ) { LogArgError(); return; }
 #define ARG_RANGE(args, min, max) if(args.size() < min || args.size() > max ) { LogArgError(); return; }
 #define ARG_COUNT(args, i) if(args.size() != i ){ LogArgError(); return; }
-
-
 
 template <typename Type>
 std::string SystemAssetPath(const std::string & name )
 {
 	return g_sysAssetPath + ("/" + name + Assets::GetAssetTypeExt<Type>());
 }
+
+void PrintHelp(const Args& args);
+void ConvertAsset(const Args& args);
+void NewAsset(const Args& args);
+void EditAsset(const Args& args);
+
+/*
+	load <game>.ult
+	- loads game code as well as map/sheet/sprite editor. 
+	- you can have up to 4 sheets. And A few maps. Can select assets to be used.  
+
+*/
+
+const CommandTable & shellcommands = 
+{
+	{ 	
+		{ "help", "[action]" },
+		PrintHelp
+	},
+	{
+		{ "exit", "shutdown system" },
+		[](Args args)
+		{ 
+			Shutdown();
+		} 
+	},
+	{
+		{ "font", "name : set system font" }, 
+		[](Args args)
+		{ 
+			ARG_COUNT(args, 1);
+			g_shell->setFont(args[0]);
+		} 
+	},
+	{
+		{ "import", "asset name.png - create asset from file"}, 
+		ConvertAsset
+	},
+	{
+		{ "new", "asset : create asset"} ,
+		NewAsset
+	},
+	{
+		{ "edit", "name.asset"}, 
+		EditAsset
+	},
+	{
+		{ "ls", "[dir] : list dir"}, 
+		[](Args args)
+		{ 
+			std::vector<std::string> files;
+			FS::Ls(files);
+			for (const std::string& file : files)
+				g_shell->log(file);
+		} 
+	},
+	{
+		{ "cd", "dir : change dir"}, 
+		[](Args args)
+		{ 
+			ARG_COUNT(args, 1); // 	
+			if (!FS::Cd(args[0]))
+				g_shell->log("Directory does not exist");
+		} 
+	},
+	{
+		{ "cwd", "print current path"}, 
+		[](Args args)
+		{ 
+			g_shell->log(FS::Cwd());
+		} 
+	},
+	{
+		{ "mkdir", "dir : create directory"}, 
+		[](Args args)
+		{ 
+			ARG_COUNT(args, 1); // 	
+			if (!FS::MkDir(args[0]))
+				g_shell->log("Could not create directory");
+		} 
+	},
+	{
+		{ "rm", "dir : remove directory"}, 
+		[](Args args)
+		{ 
+			ARG_COUNT(args, 1); // 	
+			if (!FS::Remove(args[0]))
+				g_shell->log("Failed to remove path");
+		} 
+	},
+	{
+		{ "mv", "path newpath : move to new path"}, 
+		[](Args args)
+		{ 
+			ARG_COUNT(args, 2); // 
+			
+			if (!FS::Move(args[0], args[1]))
+				g_shell->log("Failed to move");
+		} 
+	},
+	//if running game, add all sub-directories as search dir for assets
+	//on exit, clear the asset paths (will remove all but system)
+};
+	
+//----------------------------
+
+
+int main(int argc, char** argv)
+{ 
+
+	stacktrace();
+	Startup();
+
+	g_shell->addCommands(shellcommands);
+	g_context.enter(APP_SHELL);	
+
+	g_shell->log("Ultboy v0.0");
+	g_shell->log("type help to see commands");
+
+	Engine::SetKeyEcho(true);
+	Engine::SetKeyHandler(
+		[&](Key key, bool isDown) 
+		{
+			if(isDown && key == KEY_ESCAPE)
+				g_context.exit();	
+			else 
+				g_context.handleKey(key, isDown);
+		}
+	);
+	float timer = 0;
+	while (Engine::Run())
+	{
+		g_context.run();
+	}
+	Engine::SetKeyEcho(false);
+
+	Shutdown();
+	return 0;
+}
+
+////////////////// Commands  ///////////////////////////////////////
+
+
+void PrintHelp(const Args& args)
+{
+	std::string out;
+
+	if(args.size()==1)
+		Help(shellcommands, args[0], out);
+	else 
+		HelpAll(shellcommands, out);
+	g_shell->clear();
+	g_shell->log(out);
+}
+
 // -------------- Convert raw to asset ------------------------
 
 
@@ -168,145 +313,4 @@ void EditAsset(const Args& args)
 	{
 	//	SwitchView(g_context, VIEW_FONT_EDITOR);
 	}
-}
-
-
-// Commands --------------------------------- 
-
-/*
-	load <game>.ult
-	- loads game code as well as map/sheet/sprite editor. 
-	- you can have up to 4 sheets. And A few maps. Can select assets to be used.  
-
-*/
-
-const CommandTable & shellcommands = 
-{
-	{ 	
-		"help", 
-		[](Args args)
-		{ 
-			PrintHelp();
-		},
-	},
-	{
-		"exit", 
-		[](Args args)
-		{ 
-			Shutdown();
-		} 
-	},
-	{
-		"font", 
-		[](Args args)
-		{ 
-			ARG_COUNT(args, 1);
-			g_shell->setFont(args[0]);
-		} 
-	},
-	{
-		"convert", 
-		ConvertAsset
-	},
-	{
-		"new", 
-		NewAsset
-	},
-	{
-		"edit", 
-		EditAsset
-	},
-	{
-		"ls", 
-		[](Args args)
-		{ 
-			std::vector<std::string> files;
-			FS::Ls(files);
-			for (const std::string& file : files)
-				g_shell->log(file);
-		} 
-	},
-	{
-		"cd", 
-		[](Args args)
-		{ 
-			ARG_COUNT(args, 1); // 	
-			if (!FS::Cd(args[0]))
-				g_shell->log("Directory does not exist");
-		} 
-	},
-	{
-		"cwd", 
-		[](Args args)
-		{ 
-			g_shell->log(FS::Cwd());
-		} 
-	},
-	{
-		"mkdir", 
-		[](Args args)
-		{ 
-			ARG_COUNT(args, 1); // 	
-			if (!FS::MkDir(args[0]))
-				g_shell->log("Could not create directory");
-		} 
-	},
-	{
-		"rm", 
-		[](Args args)
-		{ 
-			ARG_COUNT(args, 1); // 	
-			if (!FS::Remove(args[0]))
-				g_shell->log("Failed to remove path");
-		} 
-	},
-	{
-		"mv", 
-		[](Args args)
-		{ 
-			ARG_COUNT(args, 2); // 
-			
-			if (!FS::Move(args[0], args[1]))
-				g_shell->log("Failed to move");
-		} 
-	},
-	//if running game, add all sub-directories as search dir for assets
-	//on exit, clear the asset paths (will remove all but system)
-};
-	
-//----------------------------
-
-
-int main(int argc, char** argv)
-{ 
-
-	stacktrace();
-	Startup();
-	
-	g_shell->addCommands(shellcommands);
-
-	g_context.enter(APP_SHELL);	
-
-	//Editor views, Shell will return a code that indicates the action to take. 
-	//ie switch to another context, exit, or run game.  
-	
-	Engine::SetKeyEcho(true);
-	Engine::SetKeyHandler(
-		[&](Key key, bool isDown) 
-		{
-			if(isDown && key == KEY_ESCAPE)
-				g_context.exit();	
-			else 
-				g_context.handleKey(key, isDown);
-		}
-	);
-	float timer = 0;
-	while (Engine::Run())
-	{
-		g_context.run();
-	}
-	Engine::SetKeyEcho(false);
-
-	Shutdown();
-	return 0;
 }

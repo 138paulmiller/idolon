@@ -14,7 +14,7 @@ public:
 	void onKey(Key key, bool isDown)override ;
 	void onTick() override ;
 
-
+	void clear();
 	void log(const std::string & msg);
 	void setFont(const std::string & font);
 	void addCommands(const CommandTable & commands);
@@ -42,9 +42,9 @@ private:
 	CommandTable m_commands;
 	//current command
 	std::string m_command;
-	int m_lineW;
+	int m_lineW, m_lineH; //max number of chars
+
 	int m_cursorPos;
 	std::string m_stashedInput;
 	int m_timer;
-
 };
