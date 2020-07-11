@@ -17,7 +17,7 @@ namespace Graphics
         Sheet(const std::string& name, int w, int h);
         ~Sheet();
         
-        //call sparingly 
+        //call sparingly . if no rect, will update entire. push data to gpu
         void update(const Rect & rect = { 0, 0, 0, 0 } ); 
 
         Color * const pixels;

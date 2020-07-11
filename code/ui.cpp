@@ -61,6 +61,12 @@ namespace UI
 	{
 		return m_rect;
 	}
+	void Button::click()
+	{
+		onClick();
+		if(cbClick)
+			cbClick();
+	}
 
 	//////////////////////////////////////////////////////////////////////////////////
 	App::~App()
@@ -105,9 +111,7 @@ namespace UI
 					if( Engine::GetMouseButtonState(MouseButton::MOUSEBUTTON_LEFT) 
 						== BUTTON_DOWN)
 					{
-						button->onClick();
-						if(button->cbClick)
-							button->cbClick();
+						button->click();
 					}	
 					else
 					{
@@ -233,7 +237,7 @@ namespace UI
 		for ( int id : m_buttonIds )
 			m_parent->removeButton( id );
 	}
-	TextButton *  Toolbar::add(const std::string & text, std::function<void()> click)
+	int  Toolbar::add(const std::string & text, std::function<void()> click)
 	{
 		m_count++;
 		TextButton * textbutton = new TextButton(text, m_xoff, m_y, text.size(), 1);
@@ -257,7 +261,13 @@ namespace UI
 			click();
 		} ;
 		m_buttonIds.push_back(buttonId);
-		return textbutton;
+		return m_buttonIds.size()-1;
+	}
+
+	Button *  Toolbar::get(int id)
+	{
+		ASSERT(id >= 0 && id < m_buttonIds.size(), "Toolbar Invalid Id");
+		return m_parent->getButton(m_buttonIds[id]);
 	}
 
 	void Toolbar::onUpdate()

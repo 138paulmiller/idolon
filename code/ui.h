@@ -38,6 +38,8 @@ namespace UI
 		
 		const Rect & rect();
 
+		void click();
+
 		std::function<void()> cbClick;
 		std::function<void()> cbHover;
 		
@@ -108,7 +110,9 @@ namespace UI
 		public:
 		Toolbar(App* parent, int x, int y);
 		~Toolbar();
-		TextButton *  add(const std::string & text, std::function<void()> click);
+		int  add(const std::string & text, std::function<void()> click);
+		Button *  get(int id);
+		
 		void onUpdate();
 		void onDraw() ;
 		Color textColor;

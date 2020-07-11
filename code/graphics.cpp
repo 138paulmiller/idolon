@@ -15,8 +15,7 @@ namespace Graphics
         texture(Engine::CreateTexture(w, h))
     {
         memset(pixels, 0, w * h * sizeof(Color));
- 
-
+        update();
     }
     Sheet::~Sheet()
     {

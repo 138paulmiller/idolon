@@ -6,6 +6,7 @@
 
 #include <iostream>
 
+#define MAX_REVISION_COUNT 100
 
 using namespace Graphics;
 using namespace UI;
@@ -16,16 +17,23 @@ void SheetEditor::onEnter()
 {
 
 	printf("Entering sheet editor ... ");
+	
 	m_sheet = 0;
-	m_tool = TOOL_PIXEL;
+
 	m_sheet = Assets::Load<Graphics::Sheet>(m_sheetName);
 	
 	if(m_sheet)
 		m_sheet->update();
 
+
 	m_sheetPicker = new SheetPicker( m_sheet );
 	m_colorPicker = new ColorPicker();
 	m_toolbar = new Toolbar(this, 0, m_sheetPicker->rect().y - FONT_H);
+
+	int overlayW = m_sheetPicker->selection().w;
+	int overlayH = m_sheetPicker->selection().h;
+	m_overlay = 0;
+
 	
 	//add undo, redo. 
 	TextButton * savebutton = new TextButton("Save", 0, 0, 4, 1);
@@ -38,39 +46,54 @@ void SheetEditor::onEnter()
 	//click it
 	m_toolbar->add("PIXEL", [&](){
 		m_tool = TOOL_PIXEL;                     
-	})->onClick();
+	});
 	
 	m_toolbar->add("FILL", [&](){
-		m_tool = TOOL_FILL;                     
+		m_tool = TOOL_FILL;             
 	});
 
 	m_toolbar->add("LINE", [&](){
-		m_tool = TOOL_LINE;  
+		m_tool = TOOL_LINE;
 		m_shapeRect = { -1, -1, -1, -1 };
 	});
 
-	
+	//first add toolbat	
 	//add the ui widgets
-	App::addButton( savebutton );	
 	App::addWidget( m_toolbar );
+	App::addButton( savebutton );	
 	App::addWidget( m_sheetPicker );
 	App::addWidget( m_colorPicker );
+
+	//choose pixel tool on start
+	m_toolbar->get(TOOL_PIXEL)->click();
+
 }
 
 void SheetEditor::onExit()
-{
-	//allow for reloading data
+{	//allow for reloading data
 	Assets::Unload(m_sheetName );
 	m_sheetName = "";
 	//remove all ui Widgets/buttons
 	App::clear();
+	for(Color * colors : m_revisions)
+	{
+		if(colors)
+			delete colors;
+	}
+	m_revisionId = 0;
+	m_revisions.clear();
+
+	delete m_overlay;
+	m_overlay = 0;
+
 	printf("Extited sheet editor");
 }
 
 
+
 void SheetEditor::onTick()
 {
-
+	//set pixel tool by default if not set
 	Engine::ClearScreen(EDITOR_COLOR);
 	//update 
 	int mx, my;
@@ -79,33 +102,50 @@ void SheetEditor::onTick()
 	//draw current tile
 	const Rect& tileSrc = m_sheetPicker->selection();
 	const Rect & tileDest = { FONT_W, FONT_H * 2, tileSrc.w * m_tileScale, tileSrc.h * m_tileScale }; 	
-
-	//tile x y 
-	int tmx = ((mx-tileDest.x) / m_tileScale) * m_tileScale;
-	int tmy = ((my-tileDest.y)/ m_tileScale) * m_tileScale;
+	
+	//tile x y of mouse
+	int tilex = ((mx-tileDest.x) / m_tileScale);
+	int tiley = ((my-tileDest.y)/ m_tileScale) ;
 
 	if ( m_sheet )
 	{
-		if (tmx >= 0 && tmx < tileDest.w && tmy >= 0 && tmy < tileDest.h)
+
+		//Perhaps each tool could have an interface ratherthan switching ...
+		// mouse leave, new mouse pos , with state   
+		//if mouse has gone out of boundes
+		if (tilex < 0 || tilex >= tileSrc.w || tiley < 0 || tiley >= tileSrc.h)
+		{
+			switch ( m_tool )
+			{
+			case TOOL_LINE:	
+
+				//invalidate
+				if (Engine::GetMouseButtonState(MOUSEBUTTON_LEFT) == BUTTON_UP)
+					m_shapeRect = { -1, -1, -1, -1 };
+				break;
+			default:
+				break;
+			}
+		}
+		//mouse in bounds!
+		else
 		{
 			//xy in sheet
-			int smx = ( tmx  / m_tileScale) + tileSrc.x;
-			int smy = ( tmy  / m_tileScale) + tileSrc.y;
+			int sheetx = tilex + tileSrc.x;
+			int sheety = tiley + tileSrc.y;
 			
-
-
 			if ( Engine::GetMouseButtonState( MOUSEBUTTON_LEFT ) == BUTTON_HOLD )
 			{
 				switch ( m_tool )
 				{
 				case TOOL_PIXEL:
-					m_sheet->pixels[smy * m_sheet->w + smx] = color;
+					m_sheet->pixels[sheety * m_sheet->w + sheetx] = color;
 					m_sheet->update(tileSrc);
 					break;
 				case TOOL_LINE:
 					//set shape end (x,y)
-					m_shapeRect.w = smx;
-					m_shapeRect.h = smy;
+					m_shapeRect.w = tilex;
+					m_shapeRect.h = tiley;
 					break;
 				default:
 					break;
@@ -116,41 +156,45 @@ void SheetEditor::onTick()
 				switch(m_tool)
 				{
 				case TOOL_FILL:
-					FloodFill(m_sheet->pixels, m_sheet->w, tileSrc, color, smx, smy);
+					FloodFill(m_sheet->pixels, m_sheet->w, tileSrc, color, sheetx, sheety);
 					m_sheet->update(tileSrc);
 				break;
 				case TOOL_PIXEL:
-					m_sheet->pixels[smy * m_sheet->w + smx] = color;
+					m_sheet->pixels[sheety * m_sheet->w + sheetx] = color;
 					m_sheet->update(tileSrc);
 					break;
 				case TOOL_LINE:
-					//set shape origin (x,y)
-					m_shapeRect.x = smx;
-					m_shapeRect.y = smy;
+					//set shape origin (x,y) and dest
+					m_shapeRect.x = tilex;
+					m_shapeRect.y = tiley;
+					m_shapeRect.w = tilex;
+					m_shapeRect.h = tiley;
 					break;
 				}
 
 			}
 			else if (Engine::GetMouseButtonState(MOUSEBUTTON_LEFT) == BUTTON_UP)
 			{
-				//submit shape 
+				//commit shape 
 				switch(m_tool)
 				{
 				case TOOL_LINE:
 				{
-					const int x1 = m_shapeRect.x;
-					const int y1 = m_shapeRect.y;
-					const int x2 = m_shapeRect.w;
-					const int y2 = m_shapeRect.h;
-
+					const int x1 = tileSrc.x + m_shapeRect.x;
+					const int y1 = tileSrc.y + m_shapeRect.y;
+					const int x2 = tileSrc.x + m_shapeRect.w;
+					const int y2 = tileSrc.y + m_shapeRect.h;
 					LineBresenham( m_sheet->pixels, m_sheet->w, x1, y1, x2, y2, color );
 					m_sheet->update(tileSrc);
 					m_shapeRect = { -1, -1, -1, -1 };
 					break;
 				}
 				default:
-				break;
+					break;
 				}
+				//--- Commit the pixels ----
+				//commit();
+					
 			}	
 		}	
 	}
@@ -165,28 +209,52 @@ void SheetEditor::onTick()
 	};
 	Engine::DrawRect(BORDER_COLOR, border, false);
 
-	//draw tool 
-	//if line (shift down)
-	if (tmx >= 0 && tmx < tileDest.w && tmy >= 0 && tmy < tileDest.h)
-		Engine::DrawRect(color, { tileDest.x+tmx, tileDest.y+tmy, m_tileScale, m_tileScale}, true);
-	
+	drawOverlay(tilex, tiley, tileDest);
+}
 
+
+void SheetEditor::drawOverlay(int tilex, int tiley, const Rect & dest)
+{
+	const Rect & overlaySrc = { 0, 0, m_sheetPicker->selection().w, m_sheetPicker->selection().h }; 	
+	const Color &color = m_colorPicker->color();
+
+	if(tilex < 0  || tilex >= overlaySrc.w || tiley < 0  || tiley >= overlaySrc.h)
+		return;
+	//local space of canvas in pixels
+	//get new overlay if selection size changes
+	if(m_overlay == 0 || m_overlay->w != overlaySrc.w || m_overlay->h != overlaySrc.h)
+	{
+		if(m_overlay == 0)
+			delete m_overlay;
+		m_overlay = new Graphics::Sheet("SheetEditor_Overlay", overlaySrc.w, overlaySrc.h);
+	}
+
+	memset(m_overlay->pixels, 0,  overlaySrc.w * overlaySrc.h * sizeof(Color));
+	
 	switch(m_tool)
 	{
 	case TOOL_LINE:
-	{
-		if ( m_shapeRect.x == -1 ) break;
-		const int x1 = tileDest.x + m_shapeRect.x * m_tileScale;
-		const int y1 = tileDest.y + m_shapeRect.y * m_tileScale;
-		const int x2 = tileDest.x + m_shapeRect.w * m_tileScale;
-		const int y2 = tileDest.y + m_shapeRect.h * m_tileScale;
-		//stash old tile value. reset then redraw with line
-		Engine::DrawLine(color, x1, y1, x2, y2);
+		if ( m_shapeRect.x == -1 )
+		{
+			m_overlay->pixels[tiley * m_overlay->w + tilex] = color;
+		}
+		else
+		{
+			const int x1 = m_shapeRect.x;
+			const int y1 = m_shapeRect.y;
+			const int x2 = m_shapeRect.w;
+			const int y2 = m_shapeRect.h;
+			LineBresenham(m_overlay->pixels, m_overlay->w, x1, y1, x2, y2, color);
+		}
 		break;
-	}
 	default:
+		m_overlay->pixels[tiley * m_overlay->w + tilex] = color;
 		break;
 	}
+
+	//update every odd  frame ? 
+	m_overlay->update();
+	Engine::DrawTexture(m_overlay->texture, overlaySrc, dest);
 
 }
 
@@ -202,5 +270,59 @@ void SheetEditor::setSheet(const std::string& name)
 {
 	printf("Loading sheet %s ...\n", name.c_str());
 	m_sheetName = name;
+}
+
+void SheetEditor::commit()
+{
+
+	int size = m_sheet->w * m_sheet->h;
+	Color * colors = new Color [size];
+	memcpy(colors, m_sheet->pixels, size * sizeof(Color)); 
+	
+	m_revisionId++; 
+
+
+	if(m_revisionId >= m_revisions.size())
+	{
+		m_revisions.push_back(colors);
+	}
+	else
+	{
+		m_revisions[m_revisionId] = colors;
+		//clear the future
+		for(int i = m_revisionId+1; i < m_revisions.size(); i++)
+			delete m_revisions[i];
+		
+			//very inefficient
+		m_revisions.erase(m_revisions.begin()+m_revisionId+1, m_revisions.end());
+
+	}
+	
+	if(m_revisions.size() >= MAX_REVISION_COUNT)
+	{
+		int delta = m_revisions.size() - MAX_REVISION_COUNT;
+		//very inefficient
+		m_revisions.erase(m_revisions.begin(), m_revisions.begin()+delta);
+	}
+}
+
+void SheetEditor::undo()
+{ 	
+	if(m_revisionId > 0)
+		m_revisionId--;
+
+
+}
+
+void SheetEditor::redo()
+{
+
+	if(m_revisionId < m_revisions.size()-1)
+		m_revisionId++;
+
+
+	int size = m_sheet->w * m_sheet->h;
+	memcpy(m_sheet->pixels, m_revisions[m_revisionId], size * sizeof(Color)); 
+
 }
 
