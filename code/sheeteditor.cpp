@@ -10,64 +10,48 @@
 using namespace Graphics;
 using namespace UI;
 
-//reset all other buttons in toolbar
-#define SET_TOOL(tool)                           \
-	for(int i = 0 ; i < TOOL_COUNT; i++)         \
-		if(i != tool && m_buttons[i]->isDown())  \
-			m_buttons[i]->reset();/*unclick*/  \
-	m_tool = tool;                     
 
 
 void SheetEditor::onEnter()
 {
 
 	printf("Entering sheet editor ... ");
-	m_tool = TOOL_PIXEL;
 	m_sheet = 0;
+	m_tool = TOOL_PIXEL;
 	m_sheet = Assets::Load<Graphics::Sheet>(m_sheetName);
+	
 	if(m_sheet)
 		m_sheet->update();
 
-	App::addWidget( m_sheetPicker = new SheetPicker(m_sheet) );
-	App::addWidget( m_colorPicker = new ColorPicker() );
-
-	TextButton * saveButton;
-	int buttonId = App::addButton(saveButton = new TextButton("Save", 0, 0, 4, 1));
-	App::getButton(buttonId)->cbClick = 
-		[&]()
-		{
-			if(!m_sheet) return;
-			m_sheet->update();
-			Assets::Save(m_sheet);
-		};
-	saveButton ->sticky = false;
-	int y= m_sheetPicker->rect().y - FONT_H;
-
-	int x = 0;
-
-	buttonId = App::addButton(m_buttons[TOOL_PIXEL] = new TextButton("Pixel", x, y, 5, 1));
-	m_buttons[TOOL_PIXEL]->cbClick = 
-		[&]()
-		{
-			SET_TOOL(TOOL_PIXEL)
-
-		};
+	m_sheetPicker = new SheetPicker( m_sheet );
+	m_colorPicker = new ColorPicker();
+	m_toolbar = new Toolbar(this, 0, m_sheetPicker->rect().y - FONT_H);
 	
+	TextButton * savebutton = new TextButton("Save", 0, 0, 4, 1);
+	savebutton->sticky = false;
+	savebutton->cbClick = [&](){
+		if(!m_sheet) return;
+		m_sheet->update();
+		Assets::Save(m_sheet);
+	};
+	
+	m_toolbar->add("PIXEL", [&](){
+		m_tool = TOOL_PIXEL;                     
+	});
 
-	x+=App::getButton(buttonId)->rect().w;
+	m_toolbar->add("FILL", [&](){
+		m_tool = TOOL_FILL;                     
+	});
 
-	buttonId = App::addButton(m_buttons[TOOL_FILL] = new TextButton("Fill", x, y, 4, 1));
-	m_buttons[TOOL_FILL]->cbClick = 
-		[&]()
-		{
-			SET_TOOL(TOOL_FILL)
-
-		};
+	//add the ui widgets
+	App::addButton( savebutton );	
+	App::addWidget( m_toolbar );
+	App::addWidget( m_sheetPicker );
+	App::addWidget( m_colorPicker );
 }
 
 void SheetEditor::onExit()
 {
-
 	//allow for reloading data
 	Assets::Unload(m_sheetName );
 	m_sheetName = "";
@@ -87,7 +71,7 @@ void SheetEditor::onTick()
 	const Color &color = m_colorPicker->color();
 	//draw current tile
 	const Rect& tileSrc = m_sheetPicker->selection();
-	const Rect & tileDest = { 24, 24, tileSrc.w * m_tileScale, tileSrc.h * m_tileScale }; 	
+	const Rect & tileDest = { FONT_W, FONT_H * 2, tileSrc.w * m_tileScale, tileSrc.h * m_tileScale }; 	
 
 	int tmx = ((mx-tileDest.x) / m_tileScale) * m_tileScale;
 	int tmy = ((my-tileDest.y)/ m_tileScale) * m_tileScale;

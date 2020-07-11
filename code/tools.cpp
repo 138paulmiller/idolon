@@ -40,8 +40,8 @@ void FloodFill(Color * colors, int stride, const Rect & region, const Color & ne
 			Color & ncolor = colors[n.y * stride + n.x];
 			if(n.x >= region.x 
 			&& n.y >= region.y 
-			&& n.x <= region.x + region.w 
-			&& n.y <= region.y + region.h 
+			&& n.x <= region.x + region.w-1 
+			&& n.y <= region.y + region.h-1 
 			&& (ncolor == oldColor)
 			)
 			{

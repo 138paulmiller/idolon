@@ -279,6 +279,8 @@ void NewAsset(const Args& args)
 	{
 		Graphics::Sheet * sheet = new Graphics::Sheet(name, SHEET_W, SHEET_H);
 		const std::string & path = FS::Append(FS::Cwd(), sheet->name) + Assets::GetAssetTypeExt<Graphics::Sheet>();
+		memset(sheet->pixels, 255, sheet->w * sheet->h * sizeof(Color));
+		sheet->update();
 		Assets::SaveAs(sheet, path);
 	}
 	else if(asset == "font")
@@ -289,6 +291,8 @@ void NewAsset(const Args& args)
 		char start = ' ';
 		Graphics::Font* font= new Graphics::Font(name, w, h, 8, 8, start);
 		const std::string & path = FS::Append(FS::Cwd(), font->name) + Assets::GetAssetTypeExt<Graphics::Font>();
+		memset(font->pixels, 255, w * h * sizeof(Color));
+		font->update();
 		Assets::SaveAs(font, path);
 	}
 }

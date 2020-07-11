@@ -27,6 +27,6 @@ private:
 	const int m_tileScale = 8;
 	UI::SheetPicker * m_sheetPicker;
 	UI::ColorPicker * m_colorPicker;
-	UI::TextButton * m_buttons[TOOL_COUNT];
+	UI::Toolbar * m_toolbar;
 	ToolMode m_tool;
 };

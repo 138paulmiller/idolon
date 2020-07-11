@@ -2,9 +2,15 @@
 #include "graphics.h"
 #include "engine.h"
 
+#define DEFAULT_COLOR_TEXT WHITE
+#define DEFAULT_COLOR_FILL  Palette[25]
+#define DEFAULT_COLOR_CLICK Palette[26] 
+#define DEFAULT_COLOR_HOVER BLACK
+
 
 namespace UI
 {
+	//////////////////////////////////////////////////////////////////////////////////
 	Button::Button()
 	:m_rect{0,0,0,0}
 	{
@@ -56,6 +62,7 @@ namespace UI
 		return m_rect;
 	}
 
+	//////////////////////////////////////////////////////////////////////////////////
 	App::~App()
 	{
 		clear();
@@ -170,14 +177,15 @@ namespace UI
 		m_widgets[idx] = 0;
 
 	}
-
+	
+	//////////////////////////////////////////////////////////////////////////////////
 	TextButton::TextButton(const std::string & text, int x, int y, int tw, int th)
 	{
-		textColor = WHITE;
-		
-		hoverColor = Palette[25];		
-		clickColor = Palette[26];
-		fillColor=  BLACK;
+
+		textColor  = DEFAULT_COLOR_TEXT ;
+		hoverColor = DEFAULT_COLOR_FILL ;		
+		clickColor = DEFAULT_COLOR_CLICK;
+		fillColor  = DEFAULT_COLOR_HOVER;
 
 		m_textbox = new Graphics::TextBox(tw, th, text);
 		m_textbox->x = x;
@@ -210,7 +218,54 @@ namespace UI
 	{
 		m_textbox->draw();
 	}
+	Toolbar::Toolbar( App* parent, int x, int y )
+		:m_parent(parent), 
+		m_x(x),m_y(y),
+		m_count(0), m_xoff(0)
+	{
+		textColor  = DEFAULT_COLOR_TEXT ;
+		hoverColor = DEFAULT_COLOR_FILL ;		
+		clickColor = DEFAULT_COLOR_CLICK;
+		fillColor  = DEFAULT_COLOR_HOVER;
+	}
+	Toolbar::~Toolbar()
+	{
+		for ( int id : m_buttonIds )
+			m_parent->removeButton( id );
+	}
+	void Toolbar::add(const std::string & text, std::function<void()> click)
+	{
+		m_count++;
+		TextButton * textbutton = new TextButton(text, m_xoff, m_y, text.size(), 1);
+		m_xoff += textbutton->rect().w;
+		
+		int buttonId = m_parent->addButton( textbutton );
+		textbutton->textColor  = textColor ;
+		textbutton->hoverColor = hoverColor;
+		textbutton->clickColor = clickColor;
+		textbutton->fillColor  = fillColor ;
+		textbutton->sticky = true;
+		//perhaps avoidable
+		textbutton->cbClick = [=] () 
+		{ 
+			//unclick all others
+			for ( int i = 0; i < m_buttonIds.size(); i++ )
+			{
+				if(i != buttonId && m_parent->getButton(i)->isDown())  
+					m_parent->getButton(i)->reset();		
+			}
+			click();
+		} ;
+		m_buttonIds.push_back(buttonId);
+	}
 
+	void Toolbar::onUpdate()
+	{
+	}
+	void Toolbar::onDraw()
+	{}
+		
+	//////////////////////////////////////////////////////////////////////////////////
 	ColorPicker::ColorPicker()
 	{
 		static int colorPickerId = 0;
@@ -226,7 +281,7 @@ namespace UI
 
 		const int border = m_colorSize / 2;
 		const int x = w - m_sheet->w * m_colorSize - border;
-		const int y = border;
+		const int y = FONT_H * 2;
 
 		m_color = Palette[0];
 		m_src = { 0, 0, m_sheet->w, m_sheet->h };
@@ -291,7 +346,8 @@ namespace UI
 		int y = m_cursor.y / m_cursor.h;
 		return Palette[m_sheet->w * y + x];
 	}
-
+	
+	//////////////////////////////////////////////////////////////////////////////////
 	SheetPicker::SheetPicker(const Graphics::Sheet * sheet)
 	{
 		setSheet(sheet);

@@ -12,6 +12,8 @@ namespace Graphics
 
 namespace UI
 {
+	
+	//////////////////////////////////////////////////////////////////////////////////
 	class Widget
 	{
 	public:
@@ -19,7 +21,8 @@ namespace UI
 		virtual void onUpdate() = 0;
 		virtual void onDraw() = 0;
 	};
-
+	
+	//////////////////////////////////////////////////////////////////////////////////
 	class Button : public Widget
 	{
 	public:
@@ -53,7 +56,8 @@ namespace UI
 		bool m_isHover;
 		bool m_isDown;
 	};
-
+	
+	//////////////////////////////////////////////////////////////////////////////////
 	class App
 	{
 	public:
@@ -66,9 +70,7 @@ namespace UI
 		void update();
 		void draw();
 
-	protected:
 		void clear();
-
 
 		int addWidget(Widget * widget);
 		int addButton(Button * button);
@@ -85,7 +87,8 @@ namespace UI
 		std::vector<Button*> m_buttons;
 	};
 
-
+	
+	//////////////////////////////////////////////////////////////////////////////////
 	class TextButton : public Button
 	{
 	public:
@@ -99,10 +102,31 @@ namespace UI
 	private:
 		Graphics::TextBox * m_textbox; 
 	};
+	//////////////////////////////////////////////////////////////////////////////////
+	class Toolbar : public Widget
+	{
+		public:
+		Toolbar(App* parent, int x, int y);
+		~Toolbar();
+		void add(const std::string & text, std::function<void()> click);
+		void onUpdate();
+		void onDraw() ;
+		Color textColor;
+		Color hoverColor;
+		Color clickColor;
+		Color fillColor;
+	private:
+		//non-owning
+		App* m_parent;
+		int m_x, m_y, m_tw, m_th;
+		int m_count;
+		int m_xoff;
+		std::vector<int> m_buttonIds;
+
+	};
 
 
-
-
+	//////////////////////////////////////////////////////////////////////////////////
 	/*
 		Create Color Selector
 			- Renders the sheet at the top-right of the screen.
@@ -126,7 +150,8 @@ namespace UI
 		Rect m_src, m_dest, m_border;
 		Color m_color;
 	};
-
+	
+	//////////////////////////////////////////////////////////////////////////////////
 	/*
 		Sheet Tile/Frame picker
 		- Renders the sheet at the bottom of the screen.

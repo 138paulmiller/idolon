@@ -76,7 +76,13 @@ namespace FS
 
 	bool Remove(const std::string& path)
 	{
-		const std::string & fullpath = Append(Cwd(), path);
+		const int errcode=
+#ifdef OS_WINDOWS
+			ENOENT;
+#elif defined(OS_LINUX)
+			-1;
+#endif
+			const std::string & fullpath = Append(Cwd(), path);
 
 		if (IsDir(fullpath))
 		{
@@ -85,10 +91,10 @@ namespace FS
 			for (const std::string& file : files)
 				if (!Remove(file))
 					return 0;
-			return rmdir(fullpath.c_str()) != -1;
+			return rmdir(fullpath.c_str()) != errcode;
 		}
 		else
-			return remove(fullpath.c_str()) != 0;
+			return remove(fullpath.c_str());
 	}
 	void Ls(std::vector<std::string>& files)
 	{
