@@ -58,14 +58,15 @@ void Context::handleKey( Key key, bool isDown )
 		m_app->onKey(key, isDown);
 }
 
-int Context::run( )
+UI::AppCode Context::run( )
 {
-	if(!m_app) return 1;
+	if(!m_app) return UI::APPCODE_EXIT;
+	
 	m_app->update();
 	//
 	m_app->onTick();
 	//draw ui layer on top
 	m_app->draw();
 
-	return 1;
+	return m_app->status();
 }

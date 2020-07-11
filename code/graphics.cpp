@@ -180,4 +180,4 @@ namespace Graphics
             Engine::SetTextureBlendMode(texture, BLEND_ADD);
         refresh();
     }
-}
+} // namespace Graphics

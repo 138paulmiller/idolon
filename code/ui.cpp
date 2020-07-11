@@ -91,6 +91,16 @@ namespace UI
 		m_buttons.clear();
 	}
 
+	void App::signal(AppCode code)
+	{
+		m_status = code;
+	}
+	
+	AppCode App::status()
+	{
+		return m_status ;
+	}
+
 	void App::update()
 	{
 		for(Widget * widget : m_widgets)
@@ -190,7 +200,7 @@ namespace UI
 		hoverColor = DEFAULT_COLOR_FILL ;		
 		clickColor = DEFAULT_COLOR_CLICK;
 		fillColor  = DEFAULT_COLOR_HOVER;
-
+		sticky = false;
 		m_textbox = new Graphics::TextBox(tw, th, text);
 		m_textbox->x = x;
 		m_textbox->y = y;
@@ -237,7 +247,7 @@ namespace UI
 		for ( int id : m_buttonIds )
 			m_parent->removeButton( id );
 	}
-	int  Toolbar::add(const std::string & text, std::function<void()> click)
+	int  Toolbar::add(const std::string & text, std::function<void()> click, bool sticky )
 	{
 		m_count++;
 		TextButton * textbutton = new TextButton(text, m_xoff, m_y, text.size(), 1);
@@ -248,7 +258,7 @@ namespace UI
 		textbutton->hoverColor = hoverColor;
 		textbutton->clickColor = clickColor;
 		textbutton->fillColor  = fillColor ;
-		textbutton->sticky = true;
+		textbutton->sticky = sticky ;
 		//perhaps avoidable
 		textbutton->cbClick = [=] () 
 		{ 
@@ -437,4 +447,4 @@ namespace UI
 
 	}
 
-}
+} // namespace UI

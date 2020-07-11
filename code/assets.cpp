@@ -15,7 +15,7 @@ namespace
 
 	std::vector<std::string> s_assetdirs; 
 
-}
+} // namespace
 
 Asset::Asset(const std::string& name) :name(name)
 {}
@@ -293,4 +293,4 @@ namespace Assets
 		SaveAsImpl(asset, type, path);
 	}
 
-}
+} // namespace Assets

@@ -13,9 +13,11 @@ public:
 	void enter(uint8_t appId);
 	void exit();
 	void handleKey( Key key, bool isDown );
-	int run( );
+	UI::AppCode run( );
 
-	template <typename Type>
+
+
+	template <typename Type= UI::App>
 	Type * app()
 	{
 		return dynamic_cast<Type*>(m_app);

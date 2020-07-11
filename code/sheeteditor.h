@@ -38,7 +38,7 @@ private:
 	const int m_tileScale = 8;
 	UI::SheetPicker * m_sheetPicker;
 	UI::ColorPicker * m_colorPicker;
-	UI::Toolbar * m_toolbar;
+	UI::Toolbar * m_toolbar, * m_menu;
 	ToolMode m_tool;
 	//shape bounds
 	Rect m_shapeRect;

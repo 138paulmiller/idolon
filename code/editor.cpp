@@ -31,7 +31,7 @@ void Editor::onExit()
 
 void Editor::onTick() 
 {
-	m_context.run();
+	signal(m_context.run());
 }
 
 void Editor::onKey(Key key, bool isDown) 

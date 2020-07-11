@@ -32,14 +32,13 @@ namespace UI
 		virtual void onReset();
 		virtual void onClick();
 		virtual void onHover();
+
+		void click();
 		bool isDown();
 		bool isDirty();
 		virtual void reset();
-		
 		const Rect & rect();
-
-		void click();
-
+		
 		std::function<void()> cbClick;
 		std::function<void()> cbHover;
 		
@@ -60,6 +59,14 @@ namespace UI
 	};
 	
 	//////////////////////////////////////////////////////////////////////////////////
+	enum AppCode
+	{
+		APPCODE_CONTINUE = 0, 
+		APPCODE_EXIT, 		//exit app
+		APPCODE_SHUTDOWN, 	//shutdown system
+		// ? 
+		//APP_PAUSE,
+	};
 	class App
 	{
 	public:
@@ -69,6 +76,9 @@ namespace UI
 		virtual void onTick() = 0;
 		virtual void onKey(Key key, bool isDown) = 0;
 	
+		void signal(AppCode code);
+		AppCode status();
+
 		void update();
 		void draw();
 
@@ -84,7 +94,7 @@ namespace UI
 		void removeWidget(int idx);
 	
 	private:
-
+		AppCode m_status;
 		std::vector<Widget*> m_widgets;
 		std::vector<Button*> m_buttons;
 	};
@@ -110,7 +120,7 @@ namespace UI
 		public:
 		Toolbar(App* parent, int x, int y);
 		~Toolbar();
-		int  add(const std::string & text, std::function<void()> click);
+		int  add(const std::string & text, std::function<void()> click, bool sticky = true);
 		Button *  get(int id);
 		
 		void onUpdate();

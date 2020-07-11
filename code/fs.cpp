@@ -28,7 +28,7 @@
 namespace
 {
 	static std::string s_cwd = "";
-}
+} // namespace
 
 void ReplaceAll(std::string& str, const std::string& from, const std::string& to) 
 {
@@ -237,4 +237,4 @@ namespace FS
 			return path.substr(0, sep);
 		return "";
 	}
-}
+} // namespace FS

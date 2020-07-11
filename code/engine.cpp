@@ -53,7 +53,7 @@ namespace
     static float s_fps = 0;
     static uint32_t s_deltaMs;
 
-}
+} // namespace
 
 //Functions
 namespace Engine
@@ -520,4 +520,4 @@ namespace Engine
         default: return KEY_UNKNOWN;
         }
     }
-}
+} // namespace Engine

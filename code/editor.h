@@ -11,6 +11,10 @@ private:
 
 };
 
+/*
+	The editor manages its own subcontext to make app view switching easier.
+*/
+
 class Editor : public UI::App
 {
 public:

@@ -43,7 +43,7 @@ namespace Graphics
 
         std::string sheet;
         std::string animation; //current animation        
-        std::map<std::string, std::vector<Frame>> animframes;
+        std::map<std::string, std::vector<Frame> > animframes;
         //position/size
         Rect rect;
 

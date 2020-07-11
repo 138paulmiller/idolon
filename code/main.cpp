@@ -205,9 +205,19 @@ int main(int argc, char** argv)
 	float timer = 0;
 	while (Engine::Run())
 	{
-		g_context.run();
+		switch(g_context.run())
+		{
+			case UI::APPCODE_CONTINUE:
+				break;
+			case UI::APPCODE_SHUTDOWN:
+				Shutdown();
+				break;
+			case UI::APPCODE_EXIT:
+				g_context.app()->signal( UI::APPCODE_CONTINUE );
+				g_context.exit();
+				break;
+		}
 	}
-	Engine::SetKeyEcho(false);
 
 	Shutdown();
 	return 0;

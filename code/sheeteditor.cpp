@@ -19,31 +19,31 @@ void SheetEditor::onEnter()
 	printf("Entering sheet editor ... ");
 	
 	m_sheet = 0;
+	m_overlay = 0;
 
 	m_sheet = Assets::Load<Graphics::Sheet>(m_sheetName);
 	
 	if(m_sheet)
 		m_sheet->update();
 
-
 	m_sheetPicker = new SheetPicker( m_sheet );
 	m_colorPicker = new ColorPicker();
+
+	m_menu = new Toolbar(this, 0, 0);
 	m_toolbar = new Toolbar(this, 0, m_sheetPicker->rect().y - FONT_H);
 
-	int overlayW = m_sheetPicker->selection().w;
-	int overlayH = m_sheetPicker->selection().h;
-	m_overlay = 0;
 
+	m_menu->add("BACK", [&](){
+		App::signal(APPCODE_EXIT);
+	}, false);
 	
-	//add undo, redo. 
-	TextButton * savebutton = new TextButton("Save", 0, 0, 4, 1);
-	savebutton->sticky = false;
-	savebutton->cbClick = [&](){
+	m_menu->add("SAVE", [&](){
 		if(!m_sheet) return;
 		m_sheet->update();
 		Assets::Save(m_sheet);
-	};
-	//click it
+	}, false);
+
+
 	m_toolbar->add("PIXEL", [&](){
 		m_tool = TOOL_PIXEL;                     
 	});
@@ -60,7 +60,7 @@ void SheetEditor::onEnter()
 	//first add toolbat	
 	//add the ui widgets
 	App::addWidget( m_toolbar );
-	App::addButton( savebutton );	
+	App::addWidget( m_menu );
 	App::addWidget( m_sheetPicker );
 	App::addWidget( m_colorPicker );
 
@@ -170,6 +170,8 @@ void SheetEditor::onTick()
 					m_shapeRect.w = tilex;
 					m_shapeRect.h = tiley;
 					break;
+				default: 
+					break;
 				}
 
 			}
@@ -215,9 +217,9 @@ void SheetEditor::onTick()
 
 void SheetEditor::drawOverlay(int tilex, int tiley, const Rect & dest)
 {
-	const Rect & overlaySrc = { 0, 0, m_sheetPicker->selection().w, m_sheetPicker->selection().h }; 	
 	const Color &color = m_colorPicker->color();
-
+	const Rect & overlaySrc = { 0, 0, m_sheetPicker->selection().w, m_sheetPicker->selection().h }; 	
+	//not valid
 	if(tilex < 0  || tilex >= overlaySrc.w || tiley < 0  || tiley >= overlaySrc.h)
 		return;
 	//local space of canvas in pixels
@@ -234,6 +236,7 @@ void SheetEditor::drawOverlay(int tilex, int tiley, const Rect & dest)
 	switch(m_tool)
 	{
 	case TOOL_LINE:
+		//if not selected
 		if ( m_shapeRect.x == -1 )
 		{
 			m_overlay->pixels[tiley * m_overlay->w + tilex] = color;
