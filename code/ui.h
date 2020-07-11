@@ -108,7 +108,7 @@ namespace UI
 		public:
 		Toolbar(App* parent, int x, int y);
 		~Toolbar();
-		void add(const std::string & text, std::function<void()> click);
+		TextButton *  add(const std::string & text, std::function<void()> click);
 		void onUpdate();
 		void onDraw() ;
 		Color textColor;

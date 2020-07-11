@@ -6,6 +6,7 @@ enum ToolMode
 {
 	TOOL_PIXEL = 0,
 	TOOL_FILL,
+	TOOL_LINE,
 	TOOL_COUNT,
 };
 
@@ -20,6 +21,7 @@ public:
 	void onKey(Key key , bool isDown) override;
 
 	void setSheet(const std::string & name);
+	
 private:
 	
 	std::string m_sheetName;
@@ -29,4 +31,6 @@ private:
 	UI::ColorPicker * m_colorPicker;
 	UI::Toolbar * m_toolbar;
 	ToolMode m_tool;
+	//shape bounds
+	Rect m_shapeRect;
 };
