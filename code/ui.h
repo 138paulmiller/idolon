@@ -25,17 +25,33 @@ namespace UI
 	public:
 		Button();
 		virtual ~Button() = default;
-
-		virtual void onClick() = 0;
-		virtual void onHover() = 0;
-
+		virtual void onUpdate();
+		virtual void onReset();
+		virtual void onClick();
+		virtual void onHover();
+		bool isDown();
+		bool isDirty();
+		virtual void reset();
+		
 		const Rect & rect();
 
 		std::function<void()> cbClick;
 		std::function<void()> cbHover;
-
+		
+		//User settings
+		Color hoverColor;
+		Color clickColor;
+		Color fillColor;
+		bool sticky = true;
+		
 	protected: 
 		Rect m_rect;
+		//internal settings
+		Color m_color;
+	private: 
+		bool m_isDirty;
+		bool m_isHover;
+		bool m_isDown;
 	};
 
 	class App
@@ -77,17 +93,10 @@ namespace UI
 		~TextButton();
 		void onUpdate() ;
 		void onDraw() ;
-		void onHover() ;
-		void onClick() ;
-		Color hoverTextColor;
-		Color hoverColor;
+		
 		Color textColor;
-		Color color;
-		//will render as hover color, clicking again will undo 
-		void setUp() ;
-		void setDown() ;
-	private: 
-		bool m_isDirty;
+
+	private:
 		Graphics::TextBox * m_textbox; 
 	};
 

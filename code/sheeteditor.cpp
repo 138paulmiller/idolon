@@ -10,12 +10,11 @@
 using namespace Graphics;
 using namespace UI;
 
-#define SET_TOOL(tool)\
-	for(int i = 0 ; i < TOOL_COUNT; i++) \
-		if(i == tool)                   \
-			m_buttons[i]->setDown();    \
-		else                            \
-			m_buttons[i]->setUp();      \
+//reset all other buttons in toolbar
+#define SET_TOOL(tool)                           \
+	for(int i = 0 ; i < TOOL_COUNT; i++)         \
+		if(i != tool && m_buttons[i]->isDown())  \
+			m_buttons[i]->reset();/*unclick*/  \
 	m_tool = tool;                     
 
 
@@ -32,7 +31,8 @@ void SheetEditor::onEnter()
 	App::addWidget( m_sheetPicker = new SheetPicker(m_sheet) );
 	App::addWidget( m_colorPicker = new ColorPicker() );
 
-	int buttonId = App::addButton(new TextButton("Save", 0, 0, 4, 1));
+	TextButton * saveButton;
+	int buttonId = App::addButton(saveButton = new TextButton("Save", 0, 0, 4, 1));
 	App::getButton(buttonId)->cbClick = 
 		[&]()
 		{
@@ -40,6 +40,7 @@ void SheetEditor::onEnter()
 			m_sheet->update();
 			Assets::Save(m_sheet);
 		};
+	saveButton ->sticky = false;
 	int y= m_sheetPicker->rect().y - FONT_H;
 
 	int x = 0;

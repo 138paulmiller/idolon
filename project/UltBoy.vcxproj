@@ -155,6 +155,7 @@
     <ClCompile Include="..\code\pool.cpp" />
     <ClCompile Include="..\code\graphics.cpp" />
     <ClCompile Include="..\code\shell.cpp" />
+    <ClCompile Include="..\code\tools.cpp" />
     <ClCompile Include="..\code\ui.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -171,6 +172,7 @@
     <ClInclude Include="..\code\editor.h" />
     <ClInclude Include="..\code\shell.h" />
     <ClInclude Include="..\code\tests.h" />
+    <ClInclude Include="..\code\tools.h" />
     <ClInclude Include="..\code\ui.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

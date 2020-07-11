@@ -9,7 +9,48 @@ namespace UI
 	:m_rect{0,0,0,0}
 	{
 	}
+	void Button::onClick()
+	{
+		m_isDown = true;
+		m_isDirty = true;
+	}
 	
+	bool Button::isDown()
+	{
+		return m_isDown;
+	}
+	
+	bool Button::isDirty()
+	{
+		return m_isDirty;
+	}
+	void Button::onReset()
+	{
+		m_color = fillColor;
+		m_isHover = false;
+		m_isDown = m_isDown && sticky;
+		m_isDirty = true;
+	}
+	void Button::onUpdate() 
+	{
+		if ( !m_isDirty ) return;
+		if ( m_isDown )
+			m_color = clickColor;
+		else if(m_isHover)
+			m_color = hoverColor;
+		
+		m_isDirty = false;
+	}
+	void Button::onHover()
+	{
+		m_isHover = true;
+		m_isDirty = true;
+	}
+	void Button::reset()
+	{
+		m_isDown = false;
+		onReset();
+	}
 	const Rect & Button::rect()
 	{
 		return m_rect;
@@ -48,7 +89,8 @@ namespace UI
 		{
 			if(button)
 			{
-				button->onUpdate();
+				button->onReset();
+
 				int mx, my;
 				Engine::GetMousePosition(mx, my);
 				if(button->rect().intersects({mx, my, 1,1}))
@@ -67,6 +109,7 @@ namespace UI
 						button->onHover();
 					}
 				}
+				button->onUpdate();
 			}
 		}
 	}
@@ -130,18 +173,17 @@ namespace UI
 
 	TextButton::TextButton(const std::string & text, int x, int y, int tw, int th)
 	{
-		hoverTextColor = WHITE;
-		hoverColor = Palette[25];
-
 		textColor = WHITE;
-		color=  BLACK;
-		m_isDirty = true;
+		
+		hoverColor = Palette[25];		
+		clickColor = Palette[26];
+		fillColor=  BLACK;
 
 		m_textbox = new Graphics::TextBox(tw, th, text);
 		m_textbox->x = x;
 		m_textbox->y = y;
 		m_textbox->textColor = textColor;
-		m_textbox->fillColor = color;
+		m_textbox->fillColor = fillColor;
 		m_textbox->filled = true;
 		m_textbox->reload();
 
@@ -155,46 +197,18 @@ namespace UI
 
 	void TextButton::onUpdate() 
 	{
-		if(m_isDirty)
+		bool update = Button::isDirty();
+		Button::onUpdate();
+		if ( update )
 		{
-			setUp();
-			m_isDirty = false;
+			m_textbox->fillColor = Button::m_color;
+			m_textbox->refresh();
 		}
 	}
 
 	void TextButton::onDraw() 
 	{
 		m_textbox->draw();
-	}
-
-	void TextButton::onClick()
-	{
-		m_textbox->refresh();	
-		m_isDirty = true;
-
-	}
-
-	void TextButton::setUp() 
-	{
-		m_textbox->textColor = textColor;
-		m_textbox->fillColor = color;
-		m_textbox->refresh();
-		m_isDirty = false;
-	}
-
-	void TextButton::setDown() 
-	{
-
-		m_textbox->textColor = hoverTextColor;
-		m_textbox->fillColor = hoverColor;
-		m_textbox->refresh();
-		m_isDirty = false;
-
-	}
-	void TextButton::onHover()
-	{
-		setDown();
-		m_isDirty = true;
 	}
 
 	ColorPicker::ColorPicker()
