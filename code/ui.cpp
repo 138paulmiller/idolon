@@ -14,6 +14,9 @@ namespace UI
 	Button::Button()
 	:m_rect{0,0,0,0}
 	{
+		m_isDown = false;
+		m_isHover = false;
+		m_isDirty = true;
 	}
 	void Button::onClick()
 	{
@@ -44,7 +47,9 @@ namespace UI
 			m_color = clickColor;
 		else if(m_isHover)
 			m_color = hoverColor;
-		
+		else
+			m_color = fillColor;
+
 		m_isDirty = false;
 	}
 	void Button::onHover()
@@ -55,6 +60,8 @@ namespace UI
 	void Button::reset()
 	{
 		m_isDown = false;
+		m_isHover = false;
+		m_isDirty = true;
 		onReset();
 	}
 	const Rect & Button::rect()
@@ -176,6 +183,16 @@ namespace UI
 			return m_widgets[idx];
 		return 0;
 	}
+	int App::getButtonCount()
+	{
+		return m_buttons.size();
+	}
+	
+	int App::getWidgetCount()
+	{
+		return m_widgets.size();
+	}
+
 	void App::removeButton(int idx)
 	{
 
@@ -263,7 +280,7 @@ namespace UI
 		textbutton->cbClick = [=] () 
 		{ 
 			//unclick all others
-			for ( int i = 0; i < m_buttonIds.size(); i++ )
+			for ( int i = 0; i < m_parent->getButtonCount(); i++ )
 			{
 				if(i != buttonId && m_parent->getButton(i)->isDown())  
 					m_parent->getButton(i)->reset();		

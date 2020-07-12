@@ -90,6 +90,9 @@ namespace UI
 		Button * getButton(int idx);
 		Widget * getWidget(int idx);
 
+		int getButtonCount();
+		int getWidgetCount();
+
 		void removeButton(int idx);
 		void removeWidget(int idx);
 	
