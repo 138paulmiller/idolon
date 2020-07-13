@@ -133,6 +133,7 @@ namespace UI
 		Color clickColor;
 		Color fillColor;
 	private:
+		const int border = 1;
 		//non-owning
 		App* m_parent;
 		int m_x, m_y, m_tw, m_th;
@@ -185,6 +186,7 @@ namespace UI
 		void setSheet(const Graphics::Sheet * sheet);
 		//get tile/frame relative to given sheet
 		Rect selection();
+		void moveCursor(int dx, int dy);
 	private:
 		const Graphics::Sheet * m_sheet;
 		Rect m_cursor;

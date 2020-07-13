@@ -53,3 +53,6 @@
 
 - Create AABB collision system
 	- use quadtree to resolve collisions. handle both ui and sprite collision with this
+
+
+FS - Should handle paths with directory prefix. Asset loading should omit incoming dir  

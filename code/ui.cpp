@@ -268,7 +268,7 @@ namespace UI
 	{
 		m_count++;
 		TextButton * textbutton = new TextButton(text, m_xoff, m_y, text.size(), 1);
-		m_xoff += textbutton->rect().w;
+		m_xoff += textbutton->rect().w + border;
 		
 		int buttonId = m_parent->addButton( textbutton );
 		textbutton->textColor  = textColor ;
@@ -413,6 +413,17 @@ namespace UI
 		}
 		return {x,y , m_cursor.w, m_cursor.h };
 	}
+	void SheetPicker::moveCursor(int dx, int dy)
+	{
+		int mx = m_cursor.x + (dx * m_cursor.w);
+		int my = m_cursor.y + (dy * m_cursor.w);
+		if(	mx >= 0 && mx < m_box.w 
+		&&  my >= 0 && my < m_box.h)
+		{
+			m_cursor.x = mx;
+			m_cursor.y = my;
+		}
+	}
 
 	void SheetPicker::onUpdate()
 	{
@@ -423,9 +434,10 @@ namespace UI
 			//get mouse position relative to texture rect
 			int rmx = mx-m_box.x;
 			int rmy = my-m_box.y;
+
 			if(rmx >= 0 && rmx < m_box.w && rmy >= 0 && rmy < m_box.h)
 			{
-				//get x y relative to texture
+				//get x y from mouse loca xy
 				m_cursor.x = (rmx / m_cursor.w) * m_cursor.w;
 				m_cursor.y = (rmy / m_cursor.h) * m_cursor.h;
 			}

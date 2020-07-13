@@ -264,7 +264,26 @@ void SheetEditor::drawOverlay(int tilex, int tiley, const Rect & dest)
 //
 void SheetEditor::onKey(Key key, bool isDown)
 {
-
+	if(isDown)
+	{
+		switch(key)
+		{
+			case KEY_UP:
+				m_sheetPicker->moveCursor(0, -1);
+				break;
+			case KEY_DOWN:
+				m_sheetPicker->moveCursor(0, 1);
+				break;
+			case KEY_RIGHT:
+				m_sheetPicker->moveCursor(1, 0);
+				break;
+			case KEY_LEFT:
+				m_sheetPicker->moveCursor(-1, 0);
+				break;
+			default:
+				break;
+		}
+	}
 }
 
 

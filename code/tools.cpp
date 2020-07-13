@@ -1,11 +1,12 @@
 #include "tools.h"
 
 #include <queue>
+#include <cmath>
 
 void LineBresenham(Color *colors, int stride, int x1, int y1, int x2, int y2, const Color & color)
 {
     // bresenham line
-	int steep = fabs( y2 - y1 ) > fabs( x2 - x1 );
+	int steep = abs( y2 - y1 ) > abs( x2 - x1 );
     int inc = -1;
 
     if (steep) {
@@ -32,12 +33,12 @@ void LineBresenham(Color *colors, int stride, int x1, int y1, int x2, int y2, co
 		inc = 1;
     }
 
-    int dx = fabs(x2 - x1),
-        dy = fabs(y2 - y1),
+    int dx = abs(x2 - x1),
+        dy = abs(y2 - y1),
         y = y1, x = x1,
         e = 0;
 
-    for (x; x <= x2; x++) {
+    for (; x <= x2; x++) {
 		if (steep) 
 			colors[x * stride + y] = color;
 		else 

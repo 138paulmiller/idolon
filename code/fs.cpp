@@ -109,7 +109,7 @@ namespace FS
 			printf("Path %s is byond mount dir", fullpath.c_str());
 			return 0;
 		}
-
+		bool status = 0;
 		if (IsDir(fullpath))
 		{
 			std::vector<std::string> files;
@@ -118,10 +118,13 @@ namespace FS
 			for (const std::string& file : files)
 				if(file != ".." && !Remove(file)) return 0;
 
-			int rmstatus = rmdir(fullpath.c_str() );
-			return rmstatus != errcode;
+			status  = rmdir(fullpath.c_str() ) != errcode;
 		}
-		return remove(fullpath.c_str());
+		else
+		{
+			status = remove(fullpath.c_str()) == 0;		
+		}
+		return status;
 	}
 	void Ls(std::vector<std::string>& files)
 	{
