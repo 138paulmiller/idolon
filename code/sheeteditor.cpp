@@ -232,14 +232,15 @@ void SheetEditor::drawOverlay(int tilex, int tiley, const Rect & dest)
 	}
 
 	memset(m_overlay->pixels, 0,  overlaySrc.w * overlaySrc.h * sizeof(Color));
-	
+	const Color& cursorColor = (color == COLOR_EMPTY ? EDITOR_COLOR : color);
 	switch(m_tool)
 	{
 	case TOOL_LINE:
 		//if not selected
 		if ( m_shapeRect.x == -1 )
 		{
-			m_overlay->pixels[tiley * m_overlay->w + tilex] = color;
+			//draw clear color if empty, otherwise nothing will display since clear has 0 alpha
+			m_overlay->pixels[tiley * m_overlay->w + tilex] = cursorColor;
 		}
 		else
 		{
@@ -247,11 +248,11 @@ void SheetEditor::drawOverlay(int tilex, int tiley, const Rect & dest)
 			const int y1 = m_shapeRect.y;
 			const int x2 = m_shapeRect.w;
 			const int y2 = m_shapeRect.h;
-			LineBresenham(m_overlay->pixels, m_overlay->w, x1, y1, x2, y2, color);
+			LineBresenham(m_overlay->pixels, m_overlay->w, x1, y1, x2, y2, cursorColor);
 		}
 		break;
 	default:
-		m_overlay->pixels[tiley * m_overlay->w + tilex] = color;
+		m_overlay->pixels[tiley * m_overlay->w + tilex] = cursorColor;
 		break;
 	}
 

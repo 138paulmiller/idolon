@@ -446,6 +446,7 @@ namespace UI
 	}
 	void SheetPicker::setSheet(const Graphics::Sheet * sheet)
 	{
+		if ( !sheet ) return;
 		m_sheet = sheet;
 		int w, h;
 		Engine::GetSize(w, h);

@@ -34,7 +34,7 @@ void ReplaceAll(std::string& str, const std::string& from, const std::string& to
 {
     if(from.empty())
         return;
-    int pos = 0;
+    size_t pos = 0;
     while((pos = str.find(from, pos )) != std::string::npos) 
 	{
         str.replace(pos , from.length(), to);
@@ -60,15 +60,33 @@ namespace FS
 	std::string Root()
 	{
 #ifdef OS_WINDOWS
-		const char* mountPoint = "C:/Program Files/UltBoy/root/";
+		const char* mountPoint = "C:/Program Files/idolon/";
 #elif defined(OS_LINUX)
 		char mountPoint[MAX_PATH];
 	    glob_t globbuf;
 	 	glob("~", GLOB_TILDE, NULL, &globbuf);
-        snprintf(mountPoint, sizeof(mountPoint), "%s/ultboy/root/", globbuf.gl_pathv[0]);
+        snprintf(mountPoint, sizeof(mountPoint), "%s/idolon/", globbuf.gl_pathv[0]);
 #endif	
-		int status = mkdir(mountPoint);
-		return mountPoint;
+		if ( !FS::IsDir( mountPoint ) )
+		{
+			int status = mkdir(mountPoint);
+			if ( status == -1 )
+			{
+				printf( "Failed to create user space! Check app privileges" );
+				exit( -1 );
+			}
+		}
+		std::string root = mountPoint + std::string("root/") ;
+		if ( !FS::IsDir( root ) )
+		{
+			int status = mkdir(root.c_str());
+			if ( status == -1 )
+			{
+				printf( "Failed to create user root! Check app privileges" );
+				exit( -1 );
+			}
+		}
+		return root;
 	}
 	std::string Cwd()
 	{
@@ -105,10 +123,8 @@ namespace FS
 #endif
 		const std::string & fullpath = Append(Cwd(), path);
 		if(!CheckPath(fullpath))
-		{
-			printf("Path %s is byond mount dir", fullpath.c_str());
 			return 0;
-		}
+
 		bool status = 0;
 		if (IsDir(fullpath))
 		{
@@ -209,6 +225,7 @@ namespace FS
 
 	bool MkDir(const std::string& path)
 	{
+		if ( path.size() == 0 )return false;
 		const std::string & fullpath = Append(Cwd(), path);
 
 		//do not create dirs beyond root

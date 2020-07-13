@@ -196,7 +196,7 @@ int main(int argc, char** argv)
 	g_shell->addCommands(shellcommands);
 	g_context.enter(APP_SHELL);	
 
-	g_shell->log("Ultboy v0.0");
+	g_shell->log("idolon v0.0");
 	g_shell->log("type help to see commands");
 
 	Engine::SetKeyEcho(true);
@@ -332,6 +332,5 @@ void EditAsset(const Args& args)
 	}
 	else if(ext == "font")
 	{
-	//	SwitchView(g_context, VIEW_FONT_EDITOR);
 	}
 }

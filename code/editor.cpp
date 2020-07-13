@@ -42,7 +42,6 @@ void Editor::onKey(Key key, bool isDown)
 
 void Editor::editSheet(const std::string & sheetname)
 {
-
 	m_sheetEditor->setSheet(sheetname);
 	m_context.enter(VIEW_SHEET_EDITOR);	
 }

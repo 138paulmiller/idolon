@@ -1,1 +1,1 @@
-make all && ./ultboy 
+make all && ./idolon 

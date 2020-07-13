@@ -6,8 +6,9 @@
 #define OS_WINDOWS
 #endif
 
+#include "err.h"
+
 #include <cmath>
-#include <cassert>
 #include <cstring>
 #include <stdio.h> 
 #include <stdlib.h>
@@ -20,9 +21,13 @@
 #include <unordered_map>
 
 
-//Add Vector / Math classes
+
 //Default settings
-//TODO make font 8x8
+#define SCREEN_W 256
+#define SCREEN_H 240
+#define WINDOW_SCALE 1.0/2
+#define WINDOW_TITLE "idolon"
+//TODO make font 8x8. need to edit sheet and then reconvert
 #define FONT_W 7
 #define FONT_H 9
 //Default Sheet size
@@ -32,22 +37,7 @@
 #define TILE_W 16
 #define TILE_H 16
 
-#define SCREEN_W 256
-#define SCREEN_H 240
-#define WINDOW_SCALE 1.0/2
-
-//Runtime debugging
-#define DEBUG_RT 1
-
-#if ULT_DEBUG 
-#define ASSERT(cond,...) \
-{	\
-	if (!(cond)) { printf((__VA_ARGS__)); } \
-	assert(cond);\
-}
-#else 
-#define ASSERT(cond,...) 
-#endif
+//Add Vector / Math classes
 
 
 struct Color
