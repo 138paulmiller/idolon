@@ -51,3 +51,5 @@
 	- uses buttons and hotkeys
 	- When game runs it is hidden. Can be displayed when "start" button is triggered 
 
+- Create AABB collision system
+	- use quadtree to resolve collisions. handle both ui and sprite collision with this

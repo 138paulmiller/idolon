@@ -1,11 +1,6 @@
 #pragma once
 #include "core.h"
 #include "assets.h"
-/*
-    Basis 2D Render system. 
-    Create asset serialization lib. Given a name. load a sprite/sheet/palette. Each asset can have references to each other. 
-*/
-
 
 namespace Graphics
 {

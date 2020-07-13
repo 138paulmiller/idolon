@@ -120,11 +120,18 @@ const CommandTable & shellcommands =
 		EditAsset
 	},
 	{
-		{ "ls", "[dir] : list dir"}, 
+		{ "ls", "[dir]+ : list content"}, 
 		[](Args args)
 		{ 
 			std::vector<std::string> files;
-			FS::Ls(files);
+			if(args.size() > 0)
+			{
+				for(const std::string & arg: args)
+					FS::Ls(arg, files);
+			}
+			else
+				FS::Ls(files);
+			
 			for (const std::string& file : files)
 				g_shell->log(file);
 		} 
