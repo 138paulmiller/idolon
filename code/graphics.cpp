@@ -128,17 +128,19 @@ namespace Graphics
 
     ///////////////////////////////////////////////////////////////////////////////
     
-    TextBox::TextBox(int w, int h, const std::string & text)
+    TextBox::TextBox(int tw, int th, const std::string & text)
         :text(text),
         font("default"),
         texture (0),
         x(0), y(0), 
         w(0), h(0),
-        tw(w), th(h),
+        tw(tw), th(th),
         scrolly(0),filled(false),
         textColor({255,255,255,255}),
         fillColor({0,0,0,0}),
-        visible(true)
+        visible(true),
+        borderX(0),
+        borderY(0)
     {
     }
     TextBox::~TextBox()
@@ -156,7 +158,7 @@ namespace Graphics
     void TextBox::refresh()
     {
         Engine::ClearTexture(texture, fillColor);
-        fontcache->blit(texture, text, {0,0,w,h});
+        fontcache->blit(texture, text, { borderX, borderY , w, h });
         for(int y =0 ; y < fontcache->h; y++ )
             for(int x =0 ; x < fontcache->w; x++ )
             {
@@ -173,8 +175,8 @@ namespace Graphics
         if(!fontcache) return;
         //only do if texture w/h changes
         if(texture) Engine::DestroyTexture(texture);
-        w = tw * fontcache->charW;
-        h = th * fontcache->charH;
+        w = tw * fontcache->charW + borderX*2;
+        h = th * fontcache->charH + borderY*2;
         texture = Engine::CreateTexture(w, h, true);
         if(!filled)
             Engine::SetTextureBlendMode(texture, BLEND_ADD);

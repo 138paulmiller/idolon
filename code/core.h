@@ -61,10 +61,12 @@ struct Color
 };
 
 
-#define BLACK Palette[0]
-#define WHITE Palette[1]
+#define COLOR_EMPTY Palette[0]
+#define BLACK Palette[1]
+#define WHITE Palette[2]
+
 #define CURSOR_COLOR Palette[25]
-#define BORDER_COLOR Palette[0]
+#define BORDER_COLOR BLACK
 //editor "background"
 #define EDITOR_COLOR Palette[17]
 

@@ -74,8 +74,6 @@ namespace Graphics
         void draw();
         
         Color textColor;
-        //Fill should be texture!
-        bool filled; //
         Color fillColor;
         std::string text;
         std::string font;
@@ -83,6 +81,9 @@ namespace Graphics
         int x,y;
         int w,h;
         int tw,th;
+        int borderX, borderY;
+
+        bool filled; 
         bool visible;
 
     private:

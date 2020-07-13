@@ -221,6 +221,7 @@ namespace UI
 		m_textbox = new Graphics::TextBox(tw, th, text);
 		m_textbox->x = x;
 		m_textbox->y = y;
+		m_textbox->borderX = 2;
 		m_textbox->textColor = textColor;
 		m_textbox->fillColor = fillColor;
 		m_textbox->filled = true;
@@ -268,7 +269,7 @@ namespace UI
 	{
 		m_count++;
 		TextButton * textbutton = new TextButton(text, m_xoff, m_y, text.size(), 1);
-		m_xoff += textbutton->rect().w + border;
+		m_xoff += textbutton->rect().w;
 		
 		int buttonId = m_parent->addButton( textbutton );
 		textbutton->textColor  = textColor ;

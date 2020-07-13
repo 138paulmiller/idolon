@@ -54,5 +54,8 @@
 - Create AABB collision system
 	- use quadtree to resolve collisions. handle both ui and sprite collision with this
 
+- Create Clear Color. In sheeteditor, can erase color. will be transparent
+
 
 FS - Should handle paths with directory prefix. Asset loading should omit incoming dir  
+
