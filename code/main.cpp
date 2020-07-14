@@ -7,19 +7,22 @@
 #include "err.h"
 //editor
 #include "shell.h"
-#include "editor.h"
+#include "sheeteditor.h"
 #include "context.h"
+
+
 
 enum : uint8_t
 {
 	APP_SHELL = 0,
-	APP_EDITOR,
+	APP_SHEET_EDITOR,
 	APP_COUNT
 };
 
 
 Shell  * g_shell;
 Editor * g_editor;
+UI::Toolbar * g_menu;
 Context g_context(APP_COUNT);
 
 //default config
@@ -46,7 +49,7 @@ void Startup()
 	Assets::Startup(g_sysAssetPath);
 
 	g_context.create(APP_SHELL, g_shell = new Shell());
-	g_context.create(APP_EDITOR, g_editor = new Editor());
+	g_context.create(APP_SHEET_EDITOR, g_editor = new SheetEditor());
 
 	printf("System On!\n");
 }
@@ -353,10 +356,13 @@ void EditAsset(const Args& args)
 	const std::string& name = FS::BaseName(args[0]);
 	if(ext == "sheet")
 	{
-		g_context.enter(APP_EDITOR);
-		g_editor->editSheet(name);
+		g_context.app<SheetEditor>(APP_SHEET_EDITOR)->setSheet(name);
+		g_context.enter(APP_SHEET_EDITOR);
+
 	}
 	else if(ext == "font")
 	{
 	}
 }
+
+

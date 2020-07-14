@@ -1,5 +1,5 @@
 #pragma once
-#include "ui.h"
+#include "editor.h"
 
 
 enum ToolMode : char
@@ -11,8 +11,7 @@ enum ToolMode : char
 	TOOL_COUNT,
 };
 
-//Edit sheet should be renamed TileSheetEditor
-class  SheetEditor : public UI::App 
+class  SheetEditor : public Editor 
 {
 public:
 	SheetEditor();

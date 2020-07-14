@@ -77,29 +77,12 @@ namespace UI
 
 	//////////////////////////////////////////////////////////////////////////////////
 	
-	App::App(uint8_t support)
-		:m_support(support)
+	App::App()
 	{}
 
 	App::~App()
 	{
 		clear();
-	}
-
-	void App::redo()  
-	{
-		printf( "App: Redo unimplemented" );
-	}
-
-	void App::undo()  
-	{
-	
-		printf( "App: Undo unimplemented" );
-	}
-
-	void App::save()  
-	{
-		printf( "App: Save unimplemented" );
 	}
 
 	void App::clear()
@@ -129,11 +112,6 @@ namespace UI
 		return m_status ;
 	}
 	
-	bool App::supports(AppSupport support)
-	{
-		return (m_support >> support) & 1U; 
-	}
-
 	void App::update()
 	{
 		for(Widget * widget : m_widgets)
@@ -307,12 +285,13 @@ namespace UI
 		textbutton->fillColor  = fillColor ;
 		textbutton->sticky = sticky ;
 		//perhaps avoidable
-		textbutton->cbClick = [=] () 
+		textbutton->cbClick = [this, buttonId, click] () 
 		{ 
 			//unclick all others
-			for ( int i = 0; i < m_parent->getButtonCount(); i++ )
+			for ( int i = 0; i < m_buttonIds.size(); i++ )
 			{
-				if(i != buttonId && m_parent->getButton(i)->isDown())  
+				int id = m_buttonIds[i];
+				if(id != buttonId && m_parent->getButton(id)->isDown())  
 					m_parent->getButton(i)->reset();		
 			}
 			click();

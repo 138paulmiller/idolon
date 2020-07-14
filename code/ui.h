@@ -82,20 +82,16 @@ namespace UI
 	class App
 	{
 	public:
-		App(uint8_t support = 0);
+		App();
 		virtual ~App();
 		virtual void onEnter() = 0;
 		virtual void onExit() = 0;
 		virtual void onTick() = 0;
 		virtual void onKey(Key key, bool isDown) = 0;
-								
-		virtual void redo()  ;
-		virtual void undo()  ;
-		virtual void save()  ;
+							
 	
 		void signal(AppCode code);
 		AppCode status();
-		bool supports(AppSupport support);
 
 		void update();
 		void draw();
@@ -116,7 +112,6 @@ namespace UI
 	
 	private:
 		AppCode m_status;
-		uint8_t m_support;
 		std::vector<Widget*> m_widgets;
 		std::vector<Button*> m_buttons;
 	};

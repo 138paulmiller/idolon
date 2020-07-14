@@ -13,7 +13,7 @@ using namespace UI;
 
 
 SheetEditor::SheetEditor()
-	:App(
+	:Editor(
 		SUPPORT( APP_SAVE ) |
 		SUPPORT( APP_UNDO ) |
 		SUPPORT( APP_REDO )  
@@ -63,7 +63,7 @@ void SheetEditor::onEnter()
 		m_sheet->update();
 		commit();
 	}
-
+	Editor::onEnter();
 }
 
 void SheetEditor::onExit()
@@ -82,7 +82,9 @@ void SheetEditor::onExit()
 	delete m_overlay;
 	m_overlay = 0;
 
+	Editor::onExit();
 	printf("Extited sheet editor");
+
 }
 
 

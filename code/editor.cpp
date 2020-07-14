@@ -4,78 +4,69 @@
 #include "shell.h"
 #include "sheeteditor.h"
 
-Toolbar::Toolbar()
-{
-
-}
-
 //----------------------------------------------------------------------------
 
-Editor::Editor() 
-	: m_context(VIEW_COUNT)
+Editor::Editor(uint8_t support) 
+		:m_support(support)
+{
+	m_menu = -1;
+}
+void Editor::redo()  
+{
+	printf( "Editor: Redo unimplemented" );
+}
+
+void Editor::undo()  
 {
 
+	printf( "Editor: Undo unimplemented" );
+}
+
+void Editor::save()  
+{
+	printf( "Editor: Save unimplemented" );
+}
+
+
+bool Editor::supports(AppSupport support)
+{
+	return (m_support >> support) & 1U; 
+}
+void Editor::onExit()
+{
+	if(m_menu != -1) 
+		App::removeWidget(m_menu);
 }
 
 void Editor::onEnter()
 {
+	if(m_menu != -1) 
+		App::removeWidget(m_menu);
+	
+	UI::Toolbar * menu = new UI::Toolbar(this, 0, 0);
+	m_menu = App::addWidget(menu);
 
-	printf("Entering Editor ...\n");
-	m_sheetEditor = new SheetEditor(  );
-	m_context.create(VIEW_SHEET_EDITOR, m_sheetEditor );
-}
-
-void Editor::onExit() 
-{
-	printf("Exited Editor ");
-	App::clear();
-}
-
-void Editor::onTick() 
-{
-	if(App::status() != APP_CODE_EXIT)
-		App::signal(m_context.run());
-}
-
-void Editor::onKey(Key key, bool isDown) 
-{
-	m_context.handleKey(key,  isDown);
-}
-
-void Editor::switchView()
-{	
-	App::clear();
-	App::addWidget(m_menu = new UI::Toolbar(this, 0, 0));
-
-	m_menu->add("BACK", [&](){
+	menu->add("BACK", [&](){
 		App::signal(APP_CODE_EXIT);
 	}, false);
 	
-	if(m_context.app()->supports(APP_SAVE))
+	if(supports(APP_SAVE))
 	{	
-		m_menu->add("SAVE", [&](){
-			m_context.app()->save();
+		menu->add("SAVE", [&](){
+			this->save();
 		}, false);
 	}
 
-	if(m_context.app()->supports(APP_UNDO))
+	if(supports(APP_UNDO))
 	{	
-		m_menu->add("UNDO", [&](){
-			m_context.app()->undo();
+		menu->add("UNDO", [&](){
+			this->undo();
 		}, false);
 	}
-	if(m_context.app()->supports(APP_REDO))
+	if(supports(APP_REDO))
 	{
-		m_menu->add("REDO", [&](){
-			m_context.app()->redo();
+		menu->add("REDO", [&](){
+			this->redo();
 		}, false);
 	}
-}	
-
-void Editor::editSheet(const std::string & sheetname)
-{
-	m_sheetEditor->setSheet(sheetname);
-	m_context.enter(VIEW_SHEET_EDITOR);	
-
-	switchView();
 }
