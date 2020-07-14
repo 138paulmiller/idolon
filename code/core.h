@@ -23,19 +23,23 @@
 
 
 //Default settings
+
+#define WINDOW_TITLE "idolon"
+#define WINDOW_SCALE 1.0/2
+//in virtual pixel space. not window size
 #define SCREEN_W 256
 #define SCREEN_H 240
-#define WINDOW_SCALE 1.0/2
-#define WINDOW_TITLE "idolon"
 //TODO make font 8x8. need to edit sheet and then reconvert
 #define FONT_W 7
 #define FONT_H 9
 //Default Sheet size
-#define SHEET_W 128
-#define SHEET_H 128
-//Default Sheet size
+#define SHEET_W 64
+#define SHEET_H 64
+//Default Sheet sizes
 #define TILE_W 16
 #define TILE_H 16
+#define TILE_W_SMALL 8
+#define TILE_H_SMALL 8
 
 //Add Vector / Math classes
 
@@ -46,20 +50,21 @@ struct Color
     uint8_t r;
     uint8_t g;
     uint8_t b;
-    bool operator==(const Color & c) const;
+	Color( uint8_t a = 0, uint8_t r= 0, uint8_t g= 0, uint8_t b = 0);
+	bool operator==(const Color & c) const;
     bool operator!=(const Color & c) const;
 };
 
-
-#define COLOR_EMPTY Palette[0]
-#define BLACK Palette[1]
-#define WHITE Palette[2]
-
+#define BLACK Palette[0]
+#define WHITE Palette[1]
+#define CLEAR Color()
+#define HIGHLIGHT Color( 255 / 2, 255, 255, 255 )
 #define CURSOR_COLOR Palette[25]
-#define BORDER_COLOR BLACK
-//editor "background"
+#define BORDER_COLOR WHITE
+//editor "background" color. This color should not be selectable
 #define EDITOR_COLOR Palette[17]
 
+//Clear color
 extern const Color Palette[];
 extern const int PaletteCount;
 

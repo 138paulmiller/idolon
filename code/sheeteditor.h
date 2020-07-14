@@ -8,6 +8,7 @@ enum ToolMode : char
 	TOOL_PIXEL = 0,
 	TOOL_FILL,
 	TOOL_LINE,
+	TOOL_ERASE,
 	TOOL_COUNT,
 };
 

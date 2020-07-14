@@ -213,6 +213,7 @@ namespace UI
 		Rect m_srcRight, m_destRight;
 		//entire box
 		Rect m_box;
+		const int m_scale;
 	};
 
 

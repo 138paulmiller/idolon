@@ -6,7 +6,9 @@ bool Rect::intersects(const Rect & other) const
 	return x < other.x+other.w && x+w > other.x 
 		&& y < other.y+other.h && y+h > other.y;
 }
-
+Color::Color( uint8_t a, uint8_t r, uint8_t g, uint8_t b )
+ : a(a), r(r), g(g),b(b)
+{}
 bool Color::operator!=(const Color & c) const
 {
 	return !(c == *this);
@@ -21,9 +23,10 @@ bool Color::operator==(const Color & c) const
 
 const Color Palette[32] =
 {
-	{0x00, 0x00, 0x00, 0x00},
+	
 	{0xff, 0x00, 0x00, 0x00},
 	{0xff, 0xff, 0xff, 0xff},
+	{0xff, 0x12, 0x25, 0x24},
 	{0xff, 0x22, 0x20, 0x34},
 	{0xff, 0x45, 0x28, 0x3c},
 	{0xff, 0x66, 0x39, 0x31},

@@ -10,9 +10,9 @@
 #define TILE_SIZE_COUNT 4
 #define TILE_SIZE_MAX 16
 
-const int tileSizes[TILE_SIZE_COUNT][2] = {
-	{8, 8 },
-	{16, 16 }
+const int s_tileSizes[TILE_SIZE_COUNT][2] = {
+	{TILE_W_SMALL, TILE_H_SMALL },
+	{TILE_W, TILE_H }
 };
 
 using namespace Graphics;
@@ -37,8 +37,9 @@ void SheetEditor::onEnter()
 	m_revision = -1;
 	m_sheet = Assets::Load<Graphics::Sheet>(m_sheetName);
 	
-	m_sheetPicker = new SheetPicker( m_sheet );
 	m_colorPicker = new ColorPicker();
+	m_sheetPicker = new SheetPicker( m_sheet );
+	m_sheetPicker->resizeCursor( s_tileSizes[0][0], s_tileSizes[0][1] );
 
 	m_toolbar = new Toolbar(this, 0, m_sheetPicker->rect().y - FONT_H);
 
@@ -53,6 +54,10 @@ void SheetEditor::onEnter()
 	m_toolbar->add("LINE", [&](){
 		m_tool = TOOL_LINE;
 		m_shapeRect = { -1, -1, -1, -1 };
+	});
+
+	m_toolbar->add("ERASE", [&](){
+		m_tool = TOOL_ERASE;
 	});
 
 	//first add toolbat	
@@ -149,6 +154,10 @@ void SheetEditor::onTick()
 					FloodFill(m_sheet->pixels, m_sheet->w, tileSrc, color, sheetx, sheety);
 					commit();
 					break;
+				case TOOL_ERASE:
+					m_sheet->pixels[sheety * m_sheet->w + sheetx] = CLEAR;
+					m_sheet->update(m_sheetPicker->selection());
+					break;
 				case TOOL_PIXEL:
 					m_sheet->pixels[sheety * m_sheet->w + sheetx] = color;
 					m_sheet->update(m_sheetPicker->selection());
@@ -169,6 +178,10 @@ void SheetEditor::onTick()
 			{
 				switch ( m_tool )
 				{
+				case TOOL_ERASE:
+					m_sheet->pixels[sheety * m_sheet->w + sheetx] = CLEAR;
+					m_sheet->update(m_sheetPicker->selection());
+					break;
 				case TOOL_PIXEL:
 					m_sheet->pixels[sheety * m_sheet->w + sheetx] = color;
 					m_sheet->update(m_sheetPicker->selection());
@@ -189,6 +202,9 @@ void SheetEditor::onTick()
 					//commit shape 
 					switch(m_tool)
 					{
+					case TOOL_ERASE:
+						commit();
+						break;
 					case TOOL_PIXEL:
 						commit();
 						break;
@@ -248,7 +264,6 @@ void SheetEditor::drawOverlay(int tilex, int tiley, const Rect & dest)
 	}
 
 	memset(m_overlay->pixels, 0,  overlaySrc.w * overlaySrc.h * sizeof(Color));
-	const Color& cursorColor = (color == COLOR_EMPTY ? EDITOR_COLOR : color);
 	switch(m_tool)
 	{
 	case TOOL_LINE:
@@ -256,7 +271,7 @@ void SheetEditor::drawOverlay(int tilex, int tiley, const Rect & dest)
 		if ( m_shapeRect.x == -1 )
 		{
 			//draw clear color if empty, otherwise nothing will display since clear has 0 alpha
-			m_overlay->pixels[tiley * m_overlay->w + tilex] = cursorColor;
+			m_overlay->pixels[tiley * m_overlay->w + tilex] = color;
 		}
 		else
 		{
@@ -264,11 +279,16 @@ void SheetEditor::drawOverlay(int tilex, int tiley, const Rect & dest)
 			const int y1 = m_shapeRect.y;
 			const int x2 = m_shapeRect.w;
 			const int y2 = m_shapeRect.h;
-			LineBresenham(m_overlay->pixels, m_overlay->w, x1, y1, x2, y2, cursorColor);
+			LineBresenham(m_overlay->pixels, m_overlay->w, x1, y1, x2, y2, color);
 		}
 		break;
+	case TOOL_ERASE:
+		//rudimentary "saturate" color to indicate highlight by rendering low alpha white over it
+		m_overlay->pixels[tiley * m_overlay->w + tilex] = HIGHLIGHT ;
+		break;
+
 	default:
-		m_overlay->pixels[tiley * m_overlay->w + tilex] = cursorColor;
+		m_overlay->pixels[tiley * m_overlay->w + tilex] = color;
 		break;
 	}
 
@@ -298,10 +318,10 @@ void SheetEditor::onKey(Key key, bool isDown)
 				m_sheetPicker->moveCursor(-1, 0);
 				break;
 			case KEY_1:
-				m_sheetPicker->resizeCursor( tileSizes[0][0], tileSizes[0][1] );
+				m_sheetPicker->resizeCursor( s_tileSizes[0][0], s_tileSizes[0][1] );
 				break;
 			case KEY_2:
-				m_sheetPicker->resizeCursor( tileSizes[1][0], tileSizes[1][1] );
+				m_sheetPicker->resizeCursor( s_tileSizes[1][0], s_tileSizes[1][1] );
 				break;
 			default:
 				break;

@@ -401,6 +401,7 @@ namespace UI
 	
 	//////////////////////////////////////////////////////////////////////////////////
 	SheetPicker::SheetPicker(const Graphics::Sheet * sheet)
+		:m_scale(2)
 	{
 		setSheet(sheet);
 	}
@@ -464,12 +465,12 @@ namespace UI
 			int mx, my;
 			Engine::GetMousePosition(mx, my);
 			//get mouse position relative to texture rect
-			int rmx = mx-m_box.x;
-			int rmy = my-m_box.y;
+			int rmx = (mx-m_box.x ) / m_scale;
+			int rmy = (my-m_box.y ) / m_scale;
 
 			if(rmx >= 0 && rmx < m_box.w && rmy >= 0 && rmy < m_box.h)
 			{
-				//get x y from mouse loca xy
+				//get x *  y from mouse loca xy
 				m_cursor.x = (rmx / m_cursor.w) * m_cursor.w;
 				m_cursor.y = (rmy / m_cursor.h) * m_cursor.h;
 			}
@@ -482,14 +483,14 @@ namespace UI
 		int w, h;
 		Engine::GetSize(w, h);
 		m_box = { 0, h - m_sheet->h / 2, m_sheet->w * 2, m_sheet->h / 2 };
-
-		m_cursor = {0,0,TILE_W,TILE_H};	
-		m_srcLeft = { 0, 0, m_sheet->w, m_sheet->h/2 };
-		m_destLeft = { m_box.x, m_box.y, m_sheet->w, m_sheet->h/2 }; 
-	
-		m_srcRight = { 0, m_sheet->h/2, m_sheet->w, m_sheet->h/2 };
-		m_destRight = {m_box.x + m_sheet->w, m_box.y,  m_sheet->w, m_sheet->h/2 }; 
 		
+		m_cursor = {0,0,TILE_W,TILE_H};	
+
+		m_srcLeft = { 0, 0, m_sheet->w, m_sheet->h/2 };
+		m_destLeft = { m_box.x, m_box.y, m_sheet->w * m_scale , m_sheet->h/2 * m_scale  }; 
+
+		m_srcRight = { 0, m_sheet->h/2, m_sheet->w, m_sheet->h/2 };
+		m_destRight = {m_box.x + m_sheet->w, m_box.y,  m_sheet->w * m_scale , m_sheet->h/2 * m_scale  }; 
 
 	}
 
@@ -498,10 +499,10 @@ namespace UI
 		if(!m_sheet) return;
 		const Rect & worldCursor = 
 		{
-			m_cursor.x + m_box.x, 
-			m_cursor.y + m_box.y, 
-			m_cursor.w, 
-			m_cursor.h
+			m_cursor.x * m_scale  + m_box.x, 
+			m_cursor.y * m_scale  + m_box.y, 
+			m_cursor.w * m_scale , 
+			m_cursor.h * m_scale 
 		};
 		Engine::DrawTexture(m_sheet->texture, m_srcLeft, m_destLeft);
 		Engine::DrawTexture(m_sheet->texture, m_srcRight, m_destRight);
