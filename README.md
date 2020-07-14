@@ -1,14 +1,20 @@
 # idolon
+-----
 
-# Coding Pattern
-All singletons are written in a C-like static module using anonymous namespace. I had never written code using this pattern, so not sure how well it scales, but seems to work well for this project
+A fantasy console.
 
-# Requirements
+![alt text](./data/video/idolon_demo_0.webm)
 
-- C++14 
-`sudo apt-get install clang` 
+### Development
+-----
 
+##### Linux
 
-# Demo 
+1. Install
+`make install`
 
-[](data/video/idolon_demo_0.webm)
+2. Build `make`
+
+##### Windows
+1. Install [Visual Studio 2019](https://visualstudio.microsoft.com/downloads/)
+2. Open `idolon.sln`
