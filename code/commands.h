@@ -1,7 +1,6 @@
 #pragma once
 #include "core.h"
 
-
 struct CommandDesc 
 {
 	//command name

@@ -81,6 +81,23 @@ namespace UI
 		clear();
 	}
 
+
+	void App::redo()  
+	{
+		printf( "App: Redo unimplemented" );
+	}
+
+	void App::undo()  
+	{
+	
+		printf( "App: Undo unimplemented" );
+	}
+
+	void App::save()  
+	{
+		printf( "App: Save unimplemented" );
+	}
+
 	void App::clear()
 	{
 

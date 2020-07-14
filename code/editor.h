@@ -40,6 +40,8 @@ private:
 	//view context
 	Context m_context;
 	class SheetEditor * m_sheetEditor;
+	//primary menu
+	UI::Toolbar * m_menu;
 
 };
 

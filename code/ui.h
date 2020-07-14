@@ -75,6 +75,11 @@ namespace UI
 		virtual void onExit() = 0;
 		virtual void onTick() = 0;
 		virtual void onKey(Key key, bool isDown) = 0;
+								
+		virtual void redo()  ;
+		virtual void undo()  ;
+		virtual void save()  ;
+
 	
 		void signal(AppCode code);
 		AppCode status();

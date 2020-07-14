@@ -20,29 +20,13 @@ void SheetEditor::onEnter()
 	
 	m_sheet = 0;
 	m_overlay = 0;
-
+	m_revisionId = -1;
 	m_sheet = Assets::Load<Graphics::Sheet>(m_sheetName);
 	
-	if(m_sheet)
-		m_sheet->update();
-
 	m_sheetPicker = new SheetPicker( m_sheet );
 	m_colorPicker = new ColorPicker();
 
-	m_menu = new Toolbar(this, 0, 0);
 	m_toolbar = new Toolbar(this, 0, m_sheetPicker->rect().y - FONT_H);
-
-
-	m_menu->add("BACK", [&](){
-		App::signal(APPCODE_EXIT);
-	}, false);
-	
-	m_menu->add("SAVE", [&](){
-		if(!m_sheet) return;
-		m_sheet->update();
-		Assets::Save(m_sheet);
-	}, false);
-
 
 	m_toolbar->add("PIXEL", [&](){
 		m_tool = TOOL_PIXEL;                     
@@ -60,12 +44,17 @@ void SheetEditor::onEnter()
 	//first add toolbat	
 	//add the ui widgets
 	App::addWidget( m_toolbar );
-	App::addWidget( m_menu );
 	App::addWidget( m_sheetPicker );
 	App::addWidget( m_colorPicker );
 
 	//choose pixel tool on start
 	m_toolbar->get(TOOL_PIXEL)->click();
+	
+	if ( m_sheet )
+	{
+		m_sheet->update();
+		commit();
+	}
 
 }
 
@@ -80,7 +69,6 @@ void SheetEditor::onExit()
 		if(colors)
 			delete colors;
 	}
-	m_revisionId = 0;
 	m_revisions.clear();
 
 	delete m_overlay;
@@ -140,7 +128,8 @@ void SheetEditor::onTick()
 				{
 				case TOOL_PIXEL:
 					m_sheet->pixels[sheety * m_sheet->w + sheetx] = color;
-					m_sheet->update(tileSrc);
+					m_sheet->update(m_sheetPicker->selection());
+
 					break;
 				case TOOL_LINE:
 					//set shape end (x,y)
@@ -153,15 +142,16 @@ void SheetEditor::onTick()
 			}
 			else if ( Engine::GetMouseButtonState( MOUSEBUTTON_LEFT ) == BUTTON_DOWN )
 			{
+				printf( "Down\n" );
 				switch(m_tool)
 				{
 				case TOOL_FILL:
 					FloodFill(m_sheet->pixels, m_sheet->w, tileSrc, color, sheetx, sheety);
-					m_sheet->update(tileSrc);
-				break;
+					commit();
+					break;
 				case TOOL_PIXEL:
 					m_sheet->pixels[sheety * m_sheet->w + sheetx] = color;
-					m_sheet->update(tileSrc);
+					m_sheet->update(m_sheetPicker->selection());
 					break;
 				case TOOL_LINE:
 					//set shape origin (x,y) and dest
@@ -180,22 +170,26 @@ void SheetEditor::onTick()
 				//commit shape 
 				switch(m_tool)
 				{
+				case TOOL_PIXEL:
+					break;
 				case TOOL_LINE:
 				{
+					//if valid
+					if ( m_shapeRect.x == -1 ) break;
 					const int x1 = tileSrc.x + m_shapeRect.x;
 					const int y1 = tileSrc.y + m_shapeRect.y;
 					const int x2 = tileSrc.x + m_shapeRect.w;
 					const int y2 = tileSrc.y + m_shapeRect.h;
 					LineBresenham( m_sheet->pixels, m_sheet->w, x1, y1, x2, y2, color );
-					m_sheet->update(tileSrc);
+					//commit to revision stack 
+					commit();
 					m_shapeRect = { -1, -1, -1, -1 };
+
 					break;
 				}
 				default:
 					break;
 				}
-				//--- Commit the pixels ----
-				//commit();
 					
 			}	
 		}	
@@ -296,7 +290,8 @@ void SheetEditor::setSheet(const std::string& name)
 }
 
 void SheetEditor::commit()
-{
+{	
+	m_sheet->update(m_sheetPicker->selection());
 
 	int size = m_sheet->w * m_sheet->h;
 	Color * colors = new Color [size];
@@ -316,7 +311,7 @@ void SheetEditor::commit()
 		for(int i = m_revisionId+1; i < m_revisions.size(); i++)
 			delete m_revisions[i];
 		
-			//very inefficient
+		//very inefficient
 		m_revisions.erase(m_revisions.begin()+m_revisionId+1, m_revisions.end());
 
 	}
@@ -331,21 +326,30 @@ void SheetEditor::commit()
 
 void SheetEditor::undo()
 { 	
-	if(m_revisionId > 0)
+
+	int size = m_sheet->w * m_sheet->h;
+	memcpy(m_sheet->pixels, m_revisions[m_revisionId], size * sizeof(Color)); 
+	m_sheet->update();
+	if ( m_revisionId > 0 )
 		m_revisionId--;
-
-
 }
 
 void SheetEditor::redo()
 {
 
-	if(m_revisionId < m_revisions.size()-1)
+	if(m_revisionId <= m_revisions.size()-1)
 		m_revisionId++;
-
+	else
+		return;
 
 	int size = m_sheet->w * m_sheet->h;
 	memcpy(m_sheet->pixels, m_revisions[m_revisionId], size * sizeof(Color)); 
-
+	m_sheet->update();
 }
 
+void SheetEditor::save()
+{
+	if(!m_sheet) return;
+	m_sheet->update();
+	Assets::Save(m_sheet);
+}

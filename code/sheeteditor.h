@@ -23,11 +23,14 @@ public:
 
 	void setSheet(const std::string & name);
 	
-private:
 	//commit change
 	void commit();
 	void redo();
 	void undo();
+	void save();
+
+
+private:
 
 	//draw the propoed changes with mouse at tilex,y
 	void drawOverlay(int tilex, int tiley, const Rect & dest);
@@ -38,7 +41,7 @@ private:
 	const int m_tileScale = 8;
 	UI::SheetPicker * m_sheetPicker;
 	UI::ColorPicker * m_colorPicker;
-	UI::Toolbar * m_toolbar, * m_menu;
+	UI::Toolbar * m_toolbar;
 	ToolMode m_tool;
 	//shape bounds
 	Rect m_shapeRect;

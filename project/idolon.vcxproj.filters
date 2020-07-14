@@ -48,9 +48,6 @@
     <ClCompile Include="..\code\sheeteditor.cpp">
       <Filter>../Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\code\editor.cpp">
-      <Filter>../Header Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\code\context.cpp">
       <Filter>../Source Files</Filter>
     </ClCompile>
@@ -58,6 +55,9 @@
       <Filter>../Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\code\err.cpp">
+      <Filter>../Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\editor.cpp">
       <Filter>../Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -10,11 +10,6 @@
 #include "editor.h"
 #include "context.h"
 
-//default config
-//system are for default system data
-std::string g_sysPath ;
-std::string g_sysAssetPath;
-
 enum : uint8_t
 {
 	APP_SHELL = 0,
@@ -26,6 +21,18 @@ enum : uint8_t
 Shell  * g_shell;
 Editor * g_editor;
 Context g_context(APP_COUNT);
+
+//default config
+//system are for default system data
+std::string g_sysPath ;
+std::string g_sysAssetPath;
+
+
+
+void PrintHelp(const Args& args);
+void ImportAsset(const Args& args);
+void NewAsset(const Args& args);
+void EditAsset(const Args& args);
 
 
 void Startup()
@@ -44,7 +51,6 @@ void Startup()
 	printf("System On!\n");
 }
 
-
 void Shutdown()
 {
 	printf("Clearing context ...\n");
@@ -57,6 +63,7 @@ void Shutdown()
 	exit(1);
 }
 
+
 void LogArgError()
 {
 	char msg[24];
@@ -68,25 +75,13 @@ void LogArgError()
 #define ARG_RANGE(args, min, max) if(args.size() < min || args.size() > max ) { LogArgError(); return; }
 #define ARG_COUNT(args, i) if(args.size() != i ){ LogArgError(); return; }
 
-template <typename Type>
-std::string SystemAssetPath(const std::string & name )
-{
-	return g_sysAssetPath + ("/" + name + Assets::GetAssetTypeExt<Type>());
-}
-
-void PrintHelp(const Args& args);
-void ConvertAsset(const Args& args);
-void NewAsset(const Args& args);
-void EditAsset(const Args& args);
-
 /*
 	load <game>.ult
 	- loads game code as well as map/sheet/sprite editor. 
 	- you can have up to 4 sheets. And A few maps. Can select assets to be used.  
 
 */
-
-const CommandTable & shellcommands = 
+static const CommandTable & g_cmds = 
 {
 	{ 	
 		{ "help", "[action]" },
@@ -100,16 +95,20 @@ const CommandTable & shellcommands =
 		} 
 	},
 	{
-		{ "font", "name : set system font" }, 
+		{ "sys", "id [args] system settings" }, 
 		[](Args args)
 		{ 
-			ARG_COUNT(args, 1);
-			g_shell->setFont(args[0]);
+			ARG_NONEMPTY(args);
+			if ( args[0] == "font" )
+			{
+				ARG_COUNT(args, 1);
+				g_shell->setFont(args[0]);
+			}
 		} 
 	},
 	{
 		{ "import", "asset name.png - create asset from file"}, 
-		ConvertAsset
+		ImportAsset
 	},
 	{
 		{ "new", "asset : create asset"} ,
@@ -184,16 +183,37 @@ const CommandTable & shellcommands =
 	//on exit, clear the asset paths (will remove all but system)
 };
 	
+static const CommandTable & g_cli = 
+{
+	{ 	
+		{ "-cmd", "execute system commands " },
+		[] ( Args args )
+		{ 
+			if ( args.size() <= 0 ) return;
+			std::string command = "";
+			while ( args.size() > 0 )
+			{
+				command = args.back() + " " +  command;
+				args.pop_back();
+			}
+			Execute( command, g_cmds );
+		}
+	},	
+	
+};
 //----------------------------
 
 
 int main(int argc, char** argv)
 { 
-
 	stacktrace();
 	Startup();
+	//skip exe path arg
+	argc--;
+	argv++;
+	Execute( argc, argv, g_cli );
 
-	g_shell->addCommands(shellcommands);
+	g_shell->addCommands(g_cmds);
 	g_context.enter(APP_SHELL);	
 
 	g_shell->log("idolon v0.0");
@@ -233,14 +253,20 @@ int main(int argc, char** argv)
 ////////////////// Commands  ///////////////////////////////////////
 
 
+template <typename Type>
+std::string SystemAssetPath(const std::string & name )
+{
+	return g_sysAssetPath + ("/" + name + Assets::GetAssetTypeExt<Type>());
+}
+
 void PrintHelp(const Args& args)
 {
 	std::string out;
 
 	if(args.size()==1)
-		Help(shellcommands, args[0], out);
+		Help(g_cmds, args[0], out);
 	else 
-		HelpAll(shellcommands, out);
+		HelpAll(g_cmds, out);
 	g_shell->clear();
 	g_shell->log(out);
 }
@@ -248,7 +274,7 @@ void PrintHelp(const Args& args)
 // -------------- Convert raw to asset ------------------------
 
 
-void ConvertAsset(const Args& args)
+void ImportAsset(const Args& args)
 {			
 	ARG_NONEMPTY(args);
 
