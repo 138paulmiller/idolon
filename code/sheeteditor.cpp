@@ -7,6 +7,12 @@
 #include <iostream>
 
 #define MAX_REVISION_COUNT 100
+#define TILE_SIZE_COUNT 4
+
+const int tileSizes[TILE_SIZE_COUNT][2] = {
+	{8, 8 },
+	{16, 16 }
+};
 
 using namespace Graphics;
 using namespace UI;
@@ -99,6 +105,7 @@ void SheetEditor::onTick()
 	const Color &color = m_colorPicker->color();
 	//draw current tile
 	const Rect& tileSrc = m_sheetPicker->selection();
+	//if using smal tile size. make pixels larger! 
 	const Rect & tileDest = { FONT_W, FONT_H * 2, tileSrc.w * m_tileScale, tileSrc.h * m_tileScale }; 	
 	
 	//tile x y of mouse
@@ -287,6 +294,12 @@ void SheetEditor::onKey(Key key, bool isDown)
 				break;
 			case KEY_LEFT:
 				m_sheetPicker->moveCursor(-1, 0);
+				break;
+			case KEY_1:
+				m_sheetPicker->resizeCursor( tileSizes[0][0], tileSizes[0][1] );
+				break;
+			case KEY_2:
+				m_sheetPicker->resizeCursor( tileSizes[1][0], tileSizes[1][1] );
 				break;
 			default:
 				break;

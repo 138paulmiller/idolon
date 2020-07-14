@@ -203,6 +203,7 @@ namespace UI
 		Rect selection();
 		int selectionIndex();
 		void moveCursor(int dx, int dy);
+		void resizeCursor(int w, int h);
 	private:
 		const Graphics::Sheet * m_sheet;
 		Rect m_cursor;

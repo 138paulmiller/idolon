@@ -438,7 +438,7 @@ namespace UI
 	void SheetPicker::moveCursor(int dx, int dy)
 	{
 		int mx = m_cursor.x + (dx * m_cursor.w);
-		int my = m_cursor.y + (dy * m_cursor.w);
+		int my = m_cursor.y + (dy * m_cursor.h);
 		if(	mx >= 0 && mx < m_box.w 
 		&&  my >= 0 && my < m_box.h)
 		{
@@ -446,7 +446,14 @@ namespace UI
 			m_cursor.y = my;
 		}
 	}
-
+	void SheetPicker::resizeCursor( int w, int h )
+	{
+		if ( w > 0 && h > 0 )
+		{
+			m_cursor.w = w;
+			m_cursor.h = h;	
+		}
+	}
 	void SheetPicker::onUpdate()
 	{
 		if (Engine::GetMouseButtonState(MOUSEBUTTON_LEFT) != BUTTON_UP)
