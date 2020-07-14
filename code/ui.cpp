@@ -434,6 +434,14 @@ namespace UI
 	{
 		return m_box;
 	}
+
+	int SheetPicker::selectionIndex()
+	{
+		int x = m_cursor.x / m_cursor.w;
+		int y = m_cursor.y / m_cursor.h;
+		return m_sheet->w * y + x;
+	}
+
 	Rect SheetPicker::selection()
 	{
 

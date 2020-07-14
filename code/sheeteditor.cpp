@@ -27,7 +27,7 @@ void SheetEditor::onEnter()
 	m_usingTool = 0;
 	m_sheet = 0;
 	m_overlay = 0;
-	m_revisionId = -1;
+	m_revision = -1;
 	m_sheet = Assets::Load<Graphics::Sheet>(m_sheetName);
 	
 	m_sheetPicker = new SheetPicker( m_sheet );
@@ -57,6 +57,7 @@ void SheetEditor::onEnter()
 	//choose pixel tool on start
 	m_toolbar->get(TOOL_PIXEL)->click();
 	
+
 	if ( m_sheet )
 	{
 		m_sheet->update();
@@ -71,12 +72,12 @@ void SheetEditor::onExit()
 	m_sheetName = "";
 	//remove all ui Widgets/buttons
 	App::clear();
-	for(Color * colors : m_revisions)
+	for(Color * colors : m_revisionData)
 	{
 		if(colors)
 			delete colors;
 	}
-	m_revisions.clear();
+	m_revisionData.clear();
 
 	delete m_overlay;
 	m_overlay = 0;
@@ -129,24 +130,7 @@ void SheetEditor::onTick()
 			int sheetx = tilex + tileSrc.x;
 			int sheety = tiley + tileSrc.y;
 			
-			if ( Engine::GetMouseButtonState( MOUSEBUTTON_LEFT ) == BUTTON_HOLD )
-			{
-				switch ( m_tool )
-				{
-				case TOOL_PIXEL:
-					m_sheet->pixels[sheety * m_sheet->w + sheetx] = color;
-					m_sheet->update(m_sheetPicker->selection());
-					break;
-				case TOOL_LINE:
-					//set shape end (x,y)
-					m_shapeRect.w = tilex;
-					m_shapeRect.h = tiley;
-					break;
-				default:
-					break;
-				}
-			}
-			else if ( Engine::GetMouseButtonState( MOUSEBUTTON_LEFT ) == BUTTON_DOWN )
+			if ( Engine::GetMouseButtonState( MOUSEBUTTON_LEFT ) == BUTTON_DOWN )
 			{
 				switch(m_tool)
 				{
@@ -169,6 +153,23 @@ void SheetEditor::onTick()
 					break;
 				}
 				m_usingTool = 1;
+			}
+			else if ( Engine::GetMouseButtonState( MOUSEBUTTON_LEFT ) == BUTTON_HOLD )
+			{
+				switch ( m_tool )
+				{
+				case TOOL_PIXEL:
+					m_sheet->pixels[sheety * m_sheet->w + sheetx] = color;
+					m_sheet->update(m_sheetPicker->selection());
+					break;
+				case TOOL_LINE:
+					//set shape end (x,y)
+					m_shapeRect.w = tilex;
+					m_shapeRect.h = tiley;
+					break;
+				default:
+					break;
+				}
 			}
 			else if (Engine::GetMouseButtonState(MOUSEBUTTON_LEFT) == BUTTON_UP)
 			{
@@ -307,12 +308,20 @@ void SheetEditor::commit()
 	int size = m_sheet->w * m_sheet->h;
 	Color * colors = new Color [size];
 	memcpy(colors, m_sheet->pixels, size * sizeof(Color)); 
-	
-	m_revisionId++; 
 
-	if(m_revisionId >= m_revisions.size())
+/*	
+	TODO:
+	const int sheetIndex = m_sheetPicker->selectionIndex();
+	auto it = m_revisions.find(sheetIndex);
+	if(it == m_revisions.end())
+		m_revisions[sheetIndex] = -1;
+	int revisionId = ++m_revisions[sheetIndex];
+
+*/
+	m_revision++;
+	if(m_revision >= m_revisionData.size())
 	{
-		m_revisions.push_back(colors);
+		m_revisionData.push_back(colors);
 	}
 	else
 	{
@@ -326,23 +335,23 @@ void SheetEditor::commit()
 			for(int x = 0; x< selection.w; x++)
 			{
 				i = (y+sy) * sheetw + x+sx;
-				m_revisions[m_revisionId][ i ] = colors[i];
+				m_revisionData[m_revision][ i ] = colors[i];
 			}
 		}	
 		//clear the future
-		for(int i = m_revisionId+1; i < m_revisions.size(); i++)
-			delete m_revisions[i];
+		for(int i = m_revision+1; i < m_revisionData.size(); i++)
+			delete m_revisionData[i];
 		
 		//very inefficient
-		m_revisions.erase(m_revisions.begin()+m_revisionId+1, m_revisions.end());
+		m_revisionData.erase(m_revisionData.begin()+m_revision+1, m_revisionData.end());
 
 	}
 	
-	if(m_revisions.size() >= MAX_REVISION_COUNT)
+	if(m_revisionData.size() >= MAX_REVISION_COUNT)
 	{
-		int delta = m_revisions.size() - MAX_REVISION_COUNT;
+		int delta = m_revisionData.size() - MAX_REVISION_COUNT;
 		//very inefficient
-		m_revisions.erase(m_revisions.begin(), m_revisions.begin()+delta);
+		m_revisionData.erase(m_revisionData.begin(), m_revisionData.begin()+delta);
 	}
 
 }
@@ -350,10 +359,19 @@ void SheetEditor::commit()
 void SheetEditor::undo()
 { 	
 	const Rect & selection = m_sheetPicker->selection();
-	if ( m_revisionId > 0 )
-	{
-		m_revisionId--;
 
+	const int & sheetIndex = m_sheetPicker->selectionIndex();
+	/*TODO
+	auto it = m_revisions.find(sheetIndex);
+	if(it == m_revisions.end())
+		return; //does not exist
+	int & revisionId = m_revisions[sheetIndex];
+	*/
+	
+	if ( m_revision > 0 )
+	{
+		m_revision--;
+	
 		int i;
 		int size = m_sheet->w * m_sheet->h;
 		const int sx = selection.x;
@@ -365,7 +383,7 @@ void SheetEditor::undo()
 			for(int x = 0; x< selection.w; x++)
 			{
 				i = (y+sy) * sheetw + x+sx;
-				m_sheet->pixels[i] = m_revisions[m_revisionId][ i ];
+				m_sheet->pixels[i] = m_revisionData[m_revision][ i ];
 			}
 		}
 		m_sheet->update();
@@ -374,11 +392,19 @@ void SheetEditor::undo()
 
 void SheetEditor::redo()
 {
-	int revLen = m_revisions.size()-1;
 	const Rect & selection = m_sheetPicker->selection();
-	if(m_revisionId <= revLen-1)
+	
+	const int & sheetIndex = m_sheetPicker->selectionIndex();
+/*TODO 
+	auto it = m_revisions.find(sheetIndex);
+	if(it == m_revisions.end())
+		return; //does not exist
+	int & revisionId = m_revisions[sheetIndex];
+*/
+
+	if(m_revision < m_revisionData.size()-1)
 	{
-		m_revisionId++;
+		m_revision++;
 		int i;
 		int size = m_sheet->w * m_sheet->h;
 		const int sx = selection.x;
@@ -389,7 +415,7 @@ void SheetEditor::redo()
 			for(int x = 0; x< selection.w; x++)
 			{
 				i = (y+sy) * sheetw + x+sx;
-				m_sheet->pixels[i] = m_revisions[m_revisionId][ i ];
+				m_sheet->pixels[i] = m_revisionData[m_revision][ i ];
 			}
 		}
 		m_sheet->update();

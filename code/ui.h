@@ -206,6 +206,7 @@ namespace UI
 		void setSheet(const Graphics::Sheet * sheet);
 		//get tile/frame relative to given sheet
 		Rect selection();
+		int selectionIndex();
 		void moveCursor(int dx, int dy);
 	private:
 		const Graphics::Sheet * m_sheet;

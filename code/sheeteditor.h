@@ -45,7 +45,12 @@ private:
 	Rect m_shapeRect;
 	//used to render the potential modifications 
 	Graphics::Sheet * m_overlay;
-	int m_revisionId; 
-	std::vector<Color * > m_revisions; 
+
+	std::vector<Color * > m_revisionData;
+	//selection id to revision count 
+	//TODO
+	//std::unordered_map<int, int > m_revisions; 
+	int m_revision; 
+
 	bool m_usingTool;
 };
