@@ -8,6 +8,7 @@
 
 #define MAX_REVISION_COUNT 100
 #define TILE_SIZE_COUNT 4
+#define TILE_SIZE_MAX 16
 
 const int tileSizes[TILE_SIZE_COUNT][2] = {
 	{8, 8 },
@@ -106,11 +107,12 @@ void SheetEditor::onTick()
 	//draw current tile
 	const Rect& tileSrc = m_sheetPicker->selection();
 	//if using smal tile size. make pixels larger! 
-	const Rect & tileDest = { FONT_W, FONT_H * 2, tileSrc.w * m_tileScale, tileSrc.h * m_tileScale }; 	
+	const int scale = ( TILE_SIZE_MAX / tileSrc.w ) * m_tileScale;
+	const Rect & tileDest = { FONT_W, FONT_H * 2, tileSrc.w * scale, tileSrc.h * scale }; 	
 	
 	//tile x y of mouse
-	int tilex = ((mx-tileDest.x) / m_tileScale);
-	int tiley = ((my-tileDest.y)/ m_tileScale) ;
+	int tilex = ((mx-tileDest.x) / scale);
+	int tiley = ((my-tileDest.y)/ scale) ;
 
 	if ( m_sheet )
 	{

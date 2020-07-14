@@ -452,6 +452,9 @@ namespace UI
 		{
 			m_cursor.w = w;
 			m_cursor.h = h;	
+			//snap cursor x y to new w h
+			m_cursor.x = (m_cursor.x / w) * w;
+			m_cursor.y = (m_cursor.y / h) * h;
 		}
 	}
 	void SheetPicker::onUpdate()
