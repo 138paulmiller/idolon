@@ -7,3 +7,8 @@ All singletons are written in a C-like static module using anonymous namespace. 
 
 - C++14 
 `sudo apt-get install clang` 
+
+
+# Demo 
+
+[](data/video/idolon_demo_0.webm)
