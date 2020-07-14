@@ -23,6 +23,7 @@ public:
 	void onEnter();
 	void onExit() ;
 	void onTick() ;
+	void switchView();
 	void onKey(Key key, bool isDown) ;
 	void editSheet(const std::string & sheetname);
 

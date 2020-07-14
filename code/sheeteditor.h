@@ -15,7 +15,7 @@ enum ToolMode : char
 class  SheetEditor : public UI::App 
 {
 public:
-
+	SheetEditor();
 	void onEnter() override;
 	void onExit() override;
 	void onTick()override;
@@ -29,9 +29,7 @@ public:
 	void undo();
 	void save();
 
-
 private:
-
 	//draw the propoed changes with mouse at tilex,y
 	void drawOverlay(int tilex, int tiley, const Rect & dest);
 	

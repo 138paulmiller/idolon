@@ -76,11 +76,15 @@ namespace UI
 	}
 
 	//////////////////////////////////////////////////////////////////////////////////
+	
+	App::App(uint8_t support)
+		:m_support(support)
+	{}
+
 	App::~App()
 	{
 		clear();
 	}
-
 
 	void App::redo()  
 	{
@@ -123,6 +127,11 @@ namespace UI
 	AppCode App::status()
 	{
 		return m_status ;
+	}
+	
+	bool App::supports(AppSupport support)
+	{
+		return (m_support >> support) & 1U; 
 	}
 
 	void App::update()
@@ -267,6 +276,7 @@ namespace UI
 	{
 		m_textbox->draw();
 	}
+
 	Toolbar::Toolbar( App* parent, int x, int y )
 		:m_parent(parent), 
 		m_x(x),m_y(y),
@@ -277,11 +287,13 @@ namespace UI
 		clickColor = DEFAULT_COLOR_CLICK;
 		fillColor  = DEFAULT_COLOR_HOVER;
 	}
+	
 	Toolbar::~Toolbar()
 	{
 		for ( int id : m_buttonIds )
 			m_parent->removeButton( id );
 	}
+
 	int  Toolbar::add(const std::string & text, std::function<void()> click, bool sticky )
 	{
 		m_count++;
@@ -307,6 +319,11 @@ namespace UI
 		} ;
 		m_buttonIds.push_back(buttonId);
 		return m_buttonIds.size()-1;
+	}
+
+	void  Toolbar::remove(int id)
+	{
+		m_parent->removeButton(m_buttonIds[id]);
 	}
 
 	Button *  Toolbar::get(int id)

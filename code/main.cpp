@@ -234,13 +234,13 @@ int main(int argc, char** argv)
 	{
 		switch(g_context.run())
 		{
-			case UI::APPCODE_CONTINUE:
+			case APP_CODE_CONTINUE:
 				break;
-			case UI::APPCODE_SHUTDOWN:
+			case APP_CODE_SHUTDOWN:
 				Shutdown();
 				break;
-			case UI::APPCODE_EXIT:
-				g_context.app()->signal( UI::APPCODE_CONTINUE );
+			case APP_CODE_EXIT:
+				g_context.app()->signal( APP_CODE_CONTINUE );
 				g_context.exit();
 				break;
 		}

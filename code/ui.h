@@ -10,6 +10,25 @@ namespace Graphics
 	class TextBox;
 }
 
+enum AppCode
+{
+	APP_CODE_CONTINUE = 0, 
+	APP_CODE_EXIT, 		//exit app
+	APP_CODE_SHUTDOWN, 	//shutdown system
+	// ? 
+	//APP_PAUSE,
+};
+
+#define SUPPORT(support) (1u << support)
+
+enum AppSupport
+{
+	APP_SAVE = 0, 
+	APP_UNDO,
+	APP_REDO,
+};
+
+
 namespace UI
 {
 	
@@ -59,17 +78,11 @@ namespace UI
 	};
 	
 	//////////////////////////////////////////////////////////////////////////////////
-	enum AppCode
-	{
-		APPCODE_CONTINUE = 0, 
-		APPCODE_EXIT, 		//exit app
-		APPCODE_SHUTDOWN, 	//shutdown system
-		// ? 
-		//APP_PAUSE,
-	};
+
 	class App
 	{
 	public:
+		App(uint8_t support = 0);
 		virtual ~App();
 		virtual void onEnter() = 0;
 		virtual void onExit() = 0;
@@ -79,10 +92,10 @@ namespace UI
 		virtual void redo()  ;
 		virtual void undo()  ;
 		virtual void save()  ;
-
 	
 		void signal(AppCode code);
 		AppCode status();
+		bool supports(AppSupport support);
 
 		void update();
 		void draw();
@@ -103,6 +116,7 @@ namespace UI
 	
 	private:
 		AppCode m_status;
+		uint8_t m_support;
 		std::vector<Widget*> m_widgets;
 		std::vector<Button*> m_buttons;
 	};
@@ -129,6 +143,7 @@ namespace UI
 		Toolbar(App* parent, int x, int y);
 		~Toolbar();
 		int  add(const std::string & text, std::function<void()> click, bool sticky = true);
+		void  remove(int id);
 		Button *  get(int id);
 		
 		void onUpdate();

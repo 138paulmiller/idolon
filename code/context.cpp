@@ -58,9 +58,9 @@ void Context::handleKey( Key key, bool isDown )
 		m_app->onKey(key, isDown);
 }
 
-UI::AppCode Context::run( )
+AppCode Context::run( )
 {
-	if(!m_app) return UI::APPCODE_EXIT;
+	if(!m_app) return APP_CODE_EXIT;
 	
 	m_app->update();
 	//

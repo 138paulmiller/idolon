@@ -12,6 +12,11 @@ using namespace Graphics;
 using namespace UI;
 
 
+SheetEditor::SheetEditor()
+	:App(
+		SUPPORT( APP_SAVE )
+	)
+{}
 
 void SheetEditor::onEnter()
 {
@@ -20,7 +25,7 @@ void SheetEditor::onEnter()
 	
 	m_sheet = 0;
 	m_overlay = 0;
-	m_revisionId = -1;
+	m_revisionId = 0;
 	m_sheet = Assets::Load<Graphics::Sheet>(m_sheetName);
 	
 	m_sheetPicker = new SheetPicker( m_sheet );
@@ -291,15 +296,14 @@ void SheetEditor::setSheet(const std::string& name)
 
 void SheetEditor::commit()
 {	
+	printf("COMMIT: %d / %d\n", m_revisionId, m_revisions.size());
+	
 	m_sheet->update(m_sheetPicker->selection());
 
 	int size = m_sheet->w * m_sheet->h;
 	Color * colors = new Color [size];
 	memcpy(colors, m_sheet->pixels, size * sizeof(Color)); 
 	
-	m_revisionId++; 
-
-
 	if(m_revisionId >= m_revisions.size())
 	{
 		m_revisions.push_back(colors);
@@ -322,29 +326,34 @@ void SheetEditor::commit()
 		//very inefficient
 		m_revisions.erase(m_revisions.begin(), m_revisions.begin()+delta);
 	}
+	m_revisionId++; 
+
 }
 
 void SheetEditor::undo()
 { 	
 
-	int size = m_sheet->w * m_sheet->h;
-	memcpy(m_sheet->pixels, m_revisions[m_revisionId], size * sizeof(Color)); 
-	m_sheet->update();
+	printf("UNDO : %d / %d\n", m_revisionId, m_revisions.size());
 	if ( m_revisionId > 0 )
+	{
 		m_revisionId--;
+		int size = m_sheet->w * m_sheet->h;
+		memcpy(m_sheet->pixels, m_revisions[m_revisionId], size * sizeof(Color)); 
+		m_sheet->update();
+	}
 }
 
 void SheetEditor::redo()
 {
-
-	if(m_revisionId <= m_revisions.size()-1)
+	printf("REDO : %d / %d\n", m_revisionId, m_revisions.size());
+	if(m_revisionId < m_revisions.size())
+	{
 		m_revisionId++;
-	else
-		return;
+		int size = m_sheet->w * m_sheet->h;
+		memcpy(m_sheet->pixels, m_revisions[m_revisionId], size * sizeof(Color)); 
+		m_sheet->update();
+	}
 
-	int size = m_sheet->w * m_sheet->h;
-	memcpy(m_sheet->pixels, m_revisions[m_revisionId], size * sizeof(Color)); 
-	m_sheet->update();
 }
 
 void SheetEditor::save()

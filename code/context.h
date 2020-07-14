@@ -13,7 +13,7 @@ public:
 	void enter(uint8_t appId);
 	void exit();
 	void handleKey( Key key, bool isDown );
-	UI::AppCode run( );
+	AppCode run( );
 
 
 
