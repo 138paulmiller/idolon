@@ -24,12 +24,12 @@ public:
 	void setSheet(const std::string & name);
 	
 	//commit change
-	void commit();
 	void redo();
 	void undo();
 	void save();
 
 private:
+	void commit();
 	//draw the propoed changes with mouse at tilex,y
 	void drawOverlay(int tilex, int tiley, const Rect & dest);
 	
@@ -47,4 +47,5 @@ private:
 	Graphics::Sheet * m_overlay;
 	int m_revisionId; 
 	std::vector<Color * > m_revisions; 
+	bool m_usingTool;
 };

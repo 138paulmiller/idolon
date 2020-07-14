@@ -14,7 +14,9 @@ using namespace UI;
 
 SheetEditor::SheetEditor()
 	:App(
-		SUPPORT( APP_SAVE )
+		SUPPORT( APP_SAVE ) |
+		SUPPORT( APP_UNDO ) |
+		SUPPORT( APP_REDO )  
 	)
 {}
 
@@ -22,10 +24,10 @@ void SheetEditor::onEnter()
 {
 
 	printf("Entering sheet editor ... ");
-	
+	m_usingTool = 0;
 	m_sheet = 0;
 	m_overlay = 0;
-	m_revisionId = 0;
+	m_revisionId = -1;
 	m_sheet = Assets::Load<Graphics::Sheet>(m_sheetName);
 	
 	m_sheetPicker = new SheetPicker( m_sheet );
@@ -134,7 +136,6 @@ void SheetEditor::onTick()
 				case TOOL_PIXEL:
 					m_sheet->pixels[sheety * m_sheet->w + sheetx] = color;
 					m_sheet->update(m_sheetPicker->selection());
-
 					break;
 				case TOOL_LINE:
 					//set shape end (x,y)
@@ -147,7 +148,6 @@ void SheetEditor::onTick()
 			}
 			else if ( Engine::GetMouseButtonState( MOUSEBUTTON_LEFT ) == BUTTON_DOWN )
 			{
-				printf( "Down\n" );
 				switch(m_tool)
 				{
 				case TOOL_FILL:
@@ -168,33 +168,38 @@ void SheetEditor::onTick()
 				default: 
 					break;
 				}
-
+				m_usingTool = 1;
 			}
 			else if (Engine::GetMouseButtonState(MOUSEBUTTON_LEFT) == BUTTON_UP)
 			{
-				//commit shape 
-				switch(m_tool)
+				if(m_usingTool)
 				{
-				case TOOL_PIXEL:
-					break;
-				case TOOL_LINE:
-				{
-					//if valid
-					if ( m_shapeRect.x == -1 ) break;
-					const int x1 = tileSrc.x + m_shapeRect.x;
-					const int y1 = tileSrc.y + m_shapeRect.y;
-					const int x2 = tileSrc.x + m_shapeRect.w;
-					const int y2 = tileSrc.y + m_shapeRect.h;
-					LineBresenham( m_sheet->pixels, m_sheet->w, x1, y1, x2, y2, color );
-					//commit to revision stack 
-					commit();
-					m_shapeRect = { -1, -1, -1, -1 };
+					//commit shape 
+					switch(m_tool)
+					{
+					case TOOL_PIXEL:
+						commit();
+						break;
+					case TOOL_LINE:
+					{
+						//if valid
+						if ( m_shapeRect.x == -1 ) break;
+						const int x1 = tileSrc.x + m_shapeRect.x;
+						const int y1 = tileSrc.y + m_shapeRect.y;
+						const int x2 = tileSrc.x + m_shapeRect.w;
+						const int y2 = tileSrc.y + m_shapeRect.h;
+						LineBresenham( m_sheet->pixels, m_sheet->w, x1, y1, x2, y2, color );
+						//commit to revision stack 
+						commit();
+						m_shapeRect = { -1, -1, -1, -1 };
 
-					break;
+						break;
+					}
+					default:
+						break;
+					}
 				}
-				default:
-					break;
-				}
+				m_usingTool = 0;
 					
 			}	
 		}	
@@ -296,21 +301,34 @@ void SheetEditor::setSheet(const std::string& name)
 
 void SheetEditor::commit()
 {	
-	printf("COMMIT: %d / %d\n", m_revisionId, m_revisions.size());
-	
-	m_sheet->update(m_sheetPicker->selection());
+	const Rect & selection = m_sheetPicker->selection();
+	m_sheet->update(selection);
 
 	int size = m_sheet->w * m_sheet->h;
 	Color * colors = new Color [size];
 	memcpy(colors, m_sheet->pixels, size * sizeof(Color)); 
 	
+	m_revisionId++; 
+
 	if(m_revisionId >= m_revisions.size())
 	{
 		m_revisions.push_back(colors);
 	}
 	else
 	{
-		m_revisions[m_revisionId] = colors;
+		int i;
+		const int sx = selection.x;
+		const int sy = selection.y;
+		const int sheetw = m_sheet->w;
+		//assign only selection
+		for(int y = 0; y< selection.h; y++)
+		{
+			for(int x = 0; x< selection.w; x++)
+			{
+				i = (y+sy) * sheetw + x+sx;
+				m_revisions[m_revisionId][ i ] = colors[i];
+			}
+		}	
 		//clear the future
 		for(int i = m_revisionId+1; i < m_revisions.size(); i++)
 			delete m_revisions[i];
@@ -326,31 +344,54 @@ void SheetEditor::commit()
 		//very inefficient
 		m_revisions.erase(m_revisions.begin(), m_revisions.begin()+delta);
 	}
-	m_revisionId++; 
 
 }
 
 void SheetEditor::undo()
 { 	
-
-	printf("UNDO : %d / %d\n", m_revisionId, m_revisions.size());
+	const Rect & selection = m_sheetPicker->selection();
 	if ( m_revisionId > 0 )
 	{
 		m_revisionId--;
+
+		int i;
 		int size = m_sheet->w * m_sheet->h;
-		memcpy(m_sheet->pixels, m_revisions[m_revisionId], size * sizeof(Color)); 
+		const int sx = selection.x;
+		const int sy = selection.y;
+		const int sheetw = m_sheet->w;
+		for(int y = 0; y< selection.h; y++)
+		{
+
+			for(int x = 0; x< selection.w; x++)
+			{
+				i = (y+sy) * sheetw + x+sx;
+				m_sheet->pixels[i] = m_revisions[m_revisionId][ i ];
+			}
+		}
 		m_sheet->update();
 	}
 }
 
 void SheetEditor::redo()
 {
-	printf("REDO : %d / %d\n", m_revisionId, m_revisions.size());
-	if(m_revisionId < m_revisions.size())
+	int revLen = m_revisions.size()-1;
+	const Rect & selection = m_sheetPicker->selection();
+	if(m_revisionId <= revLen-1)
 	{
 		m_revisionId++;
+		int i;
 		int size = m_sheet->w * m_sheet->h;
-		memcpy(m_sheet->pixels, m_revisions[m_revisionId], size * sizeof(Color)); 
+		const int sx = selection.x;
+		const int sy = selection.y;
+		const int sheetw = m_sheet->w;
+		for(int y = 0; y< selection.h; y++)
+		{
+			for(int x = 0; x< selection.w; x++)
+			{
+				i = (y+sy) * sheetw + x+sx;
+				m_sheet->pixels[i] = m_revisions[m_revisionId][ i ];
+			}
+		}
 		m_sheet->update();
 	}
 
