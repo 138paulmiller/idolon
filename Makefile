@@ -11,4 +11,4 @@ lint:
 	clang-tidy --fix  $(SRC) -- $(INC) -w $(LIB)
 
 install:
-	$(shell apt-get install libsdl2-dev)
+	$(shell apt-get install libsdl2-dev clang)

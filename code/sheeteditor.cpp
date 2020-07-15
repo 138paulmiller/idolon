@@ -109,141 +109,143 @@ void SheetEditor::onTick()
 	int mx, my;
 	Engine::GetMousePosition(mx, my);
 	const Color &color = m_colorPicker->color();
-	//draw current tile
+	
+	//tile position in sheet
 	const Rect& tileSrc = m_sheetPicker->selection();
 	//if using smal tile size. make pixels larger! 
-	const int scale = ( TILE_SIZE_MAX / tileSrc.w ) * m_tileScale;
-	const Rect & tileDest = { FONT_W, FONT_H * 2, tileSrc.w * scale, tileSrc.h * scale }; 	
 	
+	const float scale = ( TILE_SIZE_MAX / tileSrc.w ) * m_tileScale;
+	
+	//canvas is the tile drawing region in worldspace 
+	const Rect & canvasRect = { FONT_W, FONT_H * 2, (int)(tileSrc.w * scale), (int)(tileSrc.h * scale) }; 	
+
+	const float mtilex = (mx-canvasRect.x);
+	const float mtiley = (my-canvasRect.y);
+	
+	bool mouseInCanvas = !(mtilex < 0.0f || mtilex >= canvasRect.w || mtiley < 0.0f || mtiley >= canvasRect.h);
+	printf("%.f %d %d\n", mtilex, mouseInCanvas, mtilex > 0.0f);
 	//tile x y of mouse
-	int tilex = ((mx-tileDest.x) / scale);
-	int tiley = ((my-tileDest.y)/ scale) ;
-
-	if ( m_sheet )
+	const int tilex = mtilex/scale;
+	const int tiley = mtiley/scale;
+	
+	if (!mouseInCanvas)
 	{
+		switch ( m_tool )
+		{
+		case TOOL_LINE:	
 
-		//Perhaps each tool could have an interface ratherthan switching ...
-		// mouse leave, new mouse pos , with state   
-		//if mouse has gone out of boundes
-		if (tilex < 0 || tilex >= tileSrc.w || tiley < 0 || tiley >= tileSrc.h)
+			//invalidate
+			if (Engine::GetMouseButtonState(MOUSEBUTTON_LEFT) == BUTTON_UP)
+				m_shapeRect = { -1, -1, -1, -1 };
+			break;
+		default:
+			break;
+		}
+	}
+	//mouse in bounds!
+	else
+	{
+		//xy in sheet
+		int sheetx = tilex + tileSrc.x;
+		int sheety = tiley + tileSrc.y;
+		
+		if ( Engine::GetMouseButtonState( MOUSEBUTTON_LEFT ) == BUTTON_DOWN )
+		{
+			switch(m_tool)
+			{
+			case TOOL_FILL:
+				FloodFill(m_sheet->pixels, m_sheet->w, tileSrc, color, sheetx, sheety);
+				commit();
+				break;
+			case TOOL_ERASE:
+				m_sheet->pixels[sheety * m_sheet->w + sheetx] = CLEAR;
+				m_sheet->update(m_sheetPicker->selection());
+				break;
+			case TOOL_PIXEL:
+				m_sheet->pixels[sheety * m_sheet->w + sheetx] = color;
+				m_sheet->update(m_sheetPicker->selection());
+				break;
+			case TOOL_LINE:
+				//set shape origin (x,y) and dest
+				m_shapeRect.x = tilex;
+				m_shapeRect.y = tiley;
+				m_shapeRect.w = tilex;
+				m_shapeRect.h = tiley;
+				break;
+			default: 
+				break;
+			}
+			m_usingTool = 1;
+		}
+		else if ( Engine::GetMouseButtonState( MOUSEBUTTON_LEFT ) == BUTTON_HOLD )
 		{
 			switch ( m_tool )
 			{
-			case TOOL_LINE:	
-
-				//invalidate
-				if (Engine::GetMouseButtonState(MOUSEBUTTON_LEFT) == BUTTON_UP)
-					m_shapeRect = { -1, -1, -1, -1 };
+			case TOOL_ERASE:
+				m_sheet->pixels[sheety * m_sheet->w + sheetx] = CLEAR;
+				m_sheet->update(m_sheetPicker->selection());
+				break;
+			case TOOL_PIXEL:
+				m_sheet->pixels[sheety * m_sheet->w + sheetx] = color;
+				m_sheet->update(m_sheetPicker->selection());
+				break;
+			case TOOL_LINE:
+				//set shape end (x,y)
+				m_shapeRect.w = tilex;
+				m_shapeRect.h = tiley;
 				break;
 			default:
 				break;
 			}
 		}
-		//mouse in bounds!
-		else
+		else if (Engine::GetMouseButtonState(MOUSEBUTTON_LEFT) == BUTTON_UP)
 		{
-			//xy in sheet
-			int sheetx = tilex + tileSrc.x;
-			int sheety = tiley + tileSrc.y;
-			
-			if ( Engine::GetMouseButtonState( MOUSEBUTTON_LEFT ) == BUTTON_DOWN )
+			if(m_usingTool)
 			{
+				//commit shape 
 				switch(m_tool)
 				{
-				case TOOL_FILL:
-					FloodFill(m_sheet->pixels, m_sheet->w, tileSrc, color, sheetx, sheety);
+				case TOOL_ERASE:
 					commit();
 					break;
-				case TOOL_ERASE:
-					m_sheet->pixels[sheety * m_sheet->w + sheetx] = CLEAR;
-					m_sheet->update(m_sheetPicker->selection());
-					break;
 				case TOOL_PIXEL:
-					m_sheet->pixels[sheety * m_sheet->w + sheetx] = color;
-					m_sheet->update(m_sheetPicker->selection());
+					commit();
 					break;
 				case TOOL_LINE:
-					//set shape origin (x,y) and dest
-					m_shapeRect.x = tilex;
-					m_shapeRect.y = tiley;
-					m_shapeRect.w = tilex;
-					m_shapeRect.h = tiley;
-					break;
-				default: 
+				{
+					//if valid
+					if ( m_shapeRect.x == -1 ) break;
+					const int x1 = tileSrc.x + m_shapeRect.x;
+					const int y1 = tileSrc.y + m_shapeRect.y;
+					const int x2 = tileSrc.x + m_shapeRect.w;
+					const int y2 = tileSrc.y + m_shapeRect.h;
+					LineBresenham( m_sheet->pixels, m_sheet->w, x1, y1, x2, y2, color );
+					//commit to revision stack 
+					commit();
+					m_shapeRect = { -1, -1, -1, -1 };
+
 					break;
 				}
-				m_usingTool = 1;
-			}
-			else if ( Engine::GetMouseButtonState( MOUSEBUTTON_LEFT ) == BUTTON_HOLD )
-			{
-				switch ( m_tool )
-				{
-				case TOOL_ERASE:
-					m_sheet->pixels[sheety * m_sheet->w + sheetx] = CLEAR;
-					m_sheet->update(m_sheetPicker->selection());
-					break;
-				case TOOL_PIXEL:
-					m_sheet->pixels[sheety * m_sheet->w + sheetx] = color;
-					m_sheet->update(m_sheetPicker->selection());
-					break;
-				case TOOL_LINE:
-					//set shape end (x,y)
-					m_shapeRect.w = tilex;
-					m_shapeRect.h = tiley;
-					break;
 				default:
 					break;
 				}
 			}
-			else if (Engine::GetMouseButtonState(MOUSEBUTTON_LEFT) == BUTTON_UP)
-			{
-				if(m_usingTool)
-				{
-					//commit shape 
-					switch(m_tool)
-					{
-					case TOOL_ERASE:
-						commit();
-						break;
-					case TOOL_PIXEL:
-						commit();
-						break;
-					case TOOL_LINE:
-					{
-						//if valid
-						if ( m_shapeRect.x == -1 ) break;
-						const int x1 = tileSrc.x + m_shapeRect.x;
-						const int y1 = tileSrc.y + m_shapeRect.y;
-						const int x2 = tileSrc.x + m_shapeRect.w;
-						const int y2 = tileSrc.y + m_shapeRect.h;
-						LineBresenham( m_sheet->pixels, m_sheet->w, x1, y1, x2, y2, color );
-						//commit to revision stack 
-						commit();
-						m_shapeRect = { -1, -1, -1, -1 };
-
-						break;
-					}
-					default:
-						break;
-					}
-				}
-				m_usingTool = 0;
-					
-			}	
+			m_usingTool = 0;
+				
 		}	
-	}
+	}	
 
 	// draw tile and border
-	Engine::DrawTexture(m_sheet->texture, tileSrc, tileDest);
+	Engine::DrawTexture(m_sheet->texture, tileSrc, canvasRect);
 	const Rect& border = {
-			tileDest.x - 1,
-			tileDest.y - 1,
-			tileDest.w + 2,
-			tileDest.h + 2
+			canvasRect.x - 1,
+			canvasRect.y - 1,
+			canvasRect.w + 2,
+			canvasRect.h + 2
 	};
 	Engine::DrawRect(BORDER_COLOR, border, false);
-
-	drawOverlay(tilex, tiley, tileDest);
+	if(mouseInCanvas)
+		drawOverlay(tilex, tiley, canvasRect);
 }
 
 
@@ -341,8 +343,9 @@ void SheetEditor::commit()
 {	
 	const Rect & selection = m_sheetPicker->selection();
 	m_sheet->update(selection);
-
+	
 	int size = m_sheet->w * m_sheet->h;
+
 	Color * colors = new Color [size];
 	memcpy(colors, m_sheet->pixels, size * sizeof(Color)); 
 
@@ -396,7 +399,6 @@ void SheetEditor::commit()
 void SheetEditor::undo()
 { 	
 	const Rect & selection = m_sheetPicker->selection();
-
 	const int & sheetIndex = m_sheetPicker->selectionIndex();
 	/*TODO
 	auto it = m_revisions.find(sheetIndex);
@@ -414,6 +416,7 @@ void SheetEditor::undo()
 		const int sx = selection.x;
 		const int sy = selection.y;
 		const int sheetw = m_sheet->w;
+		
 		for(int y = 0; y< selection.h; y++)
 		{
 
@@ -430,7 +433,6 @@ void SheetEditor::undo()
 void SheetEditor::redo()
 {
 	const Rect & selection = m_sheetPicker->selection();
-	
 	const int & sheetIndex = m_sheetPicker->selectionIndex();
 /*TODO 
 	auto it = m_revisions.find(sheetIndex);
@@ -447,6 +449,7 @@ void SheetEditor::redo()
 		const int sx = selection.x;
 		const int sy = selection.y;
 		const int sheetw = m_sheet->w;
+
 		for(int y = 0; y< selection.h; y++)
 		{
 			for(int x = 0; x< selection.w; x++)
@@ -463,6 +466,7 @@ void SheetEditor::redo()
 void SheetEditor::save()
 {
 	if(!m_sheet) return;
+
 	m_sheet->update();
 	Assets::Save(m_sheet);
 }
