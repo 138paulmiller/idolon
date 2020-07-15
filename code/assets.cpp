@@ -284,11 +284,11 @@ namespace Assets
 	void SaveImpl(const Asset* asset, const std::type_info& type, const std::string& name)
 	{
 		//asset to filename 
-		const std::string & path = FindAssetPath(type, name);
+		std::string path = FindAssetPath(type, name);
 		if(path.size() == 0)
 		{
-			printf("Assets: Failed to Save %s. Could not find asset path \n",name.c_str());
-			return;
+			//printf("Assets: Failed to Save %s! Could not find asset path \n",name.c_str());
+			path = asset->filepath;
 		}
 		SaveAsImpl(asset, type, path);
 	}

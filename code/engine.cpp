@@ -324,8 +324,9 @@ namespace Engine
     }
     Color * LoadTexture(const std::string path, int &w, int &h)
     {
-        int bpp = 4; //force 4 bpp
+        int bpp = 0; //force 4 bpp
         unsigned char *data = stbi_load(path.c_str(), &w, &h, &bpp, 0);
+        if ( data == 0 ) return 0;
         Color * pixels = new Color[w*h];
         for (int y = 0; y < h; y++)
         {

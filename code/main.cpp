@@ -104,8 +104,8 @@ static const CommandTable & g_cmds =
 			ARG_NONEMPTY(args);
 			if ( args[0] == "font" )
 			{
-				ARG_COUNT(args, 1);
-				g_shell->setFont(args[0]);
+				ARG_COUNT(args, 2);
+				g_shell->setFont(args[1]);
 			}
 		} 
 	},
@@ -299,13 +299,14 @@ void ImportAsset(const Args& args)
 	else if(args[0] == "font" )
 	{
 		ARG_COUNT(args, 5); // 
-		const std::string &  imgpath = args[1];
+		const std::string &  imgpath = FS::Append(FS::Root(), args[1]);
 		int cw = std::stoi(args[2]);
 		int ch = std::stoi(args[3]);
 		//charcter offset (ascii value)
 		int start = std::stoi(args[4]);
 		int w, h;
 		Color * pixels = Engine::LoadTexture(imgpath, w, h);
+		if ( !pixels ) return; //log err
 		std::string name = FS::BaseName(imgpath);
 		Graphics::Font * font = new Graphics::Font(name, w, h, cw, ch, start);
 		memcpy(font->pixels, pixels, w * h * sizeof(Color));
@@ -316,7 +317,7 @@ void ImportAsset(const Args& args)
 }
 
 void NewAsset(const Args& args)
-{			
+{			 
 	//new <asset>  <name>  
 	ARG_COUNT(args, 2);
 	const std::string& asset = args[0];
