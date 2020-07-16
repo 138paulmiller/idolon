@@ -203,6 +203,12 @@ void Shell::setFont(const std::string & font)
 	onExit();
 	onEnter();
 }
+
+Graphics::Font* Shell::getFont( )
+{
+	return m_font;
+}
+
 void Shell::overrideInput(const std::string& msg)
 {
 	//should wrap ? 

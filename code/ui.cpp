@@ -318,22 +318,16 @@ namespace UI
 	{}
 		
 	//////////////////////////////////////////////////////////////////////////////////
-	ColorPicker::ColorPicker()
+	ColorPicker::ColorPicker(int x, int y)
 	{
 		static int colorPickerId = 0;
-		int w, h;
 		//Temp sheet
 		m_colorSize = 8; //8x8 
-		Engine::GetSize(w, h);
 
 		const std::string& name = "ColorPicker" + std::to_string(colorPickerId++);
 		m_sheet = new Graphics::Sheet(name, 2, PaletteCount/2);
 		memcpy(m_sheet->pixels, Palette, PaletteCount * sizeof(Color));
 		m_sheet->update();
-
-		const int border = m_colorSize / 2;
-		const int x = w - m_sheet->w * m_colorSize - border;
-		const int y = FONT_H * 2;
 
 		m_color = Palette[0];
 		m_src = { 0, 0, m_sheet->w, m_sheet->h };
@@ -429,19 +423,21 @@ namespace UI
 		//since texture is half height and twice width, remap back to square sheet
 		int x = m_cursor.x;
 		int y = m_cursor.y;
-		if (x >= m_sheet->w )
+		if(x >= m_sheet->w )
 		{
 			y += m_sheet->h/2;
 			x -= m_sheet->w;
 		}
+		printf( "X:%d, Y:%d\n", x, y );
 		return {x,y , m_cursor.w, m_cursor.h };
 	}
 	void SheetPicker::moveCursor(int dx, int dy)
 	{
 		int mx = m_cursor.x + (dx * m_cursor.w);
 		int my = m_cursor.y + (dy * m_cursor.h);
-		if(	mx >= 0 && mx < m_box.w 
-		&&  my >= 0 && my < m_box.h)
+		printf( "%d %d\n", mx, my );
+		if(	mx >= 0 && mx < m_box.w/ m_scale 
+		&&  my >= 0 && my < m_box.h/ m_scale)
 		{
 			m_cursor.x = mx;
 			m_cursor.y = my;
@@ -465,8 +461,8 @@ namespace UI
 			int mx, my;
 			Engine::GetMousePosition(mx, my);
 			//get mouse position relative to texture rect
-			int rmx = (mx-m_box.x ) / m_scale;
-			int rmy = (my-m_box.y ) / m_scale;
+			int rmx = ((mx- m_box.x) / m_scale);
+			int rmy = ((my- m_box.y) / m_scale);
 
 			if(rmx >= 0 && rmx < m_box.w && rmy >= 0 && rmy < m_box.h)
 			{
@@ -482,15 +478,28 @@ namespace UI
 		m_sheet = sheet;
 		int w, h;
 		Engine::GetSize(w, h);
-		m_box = { 0, h - m_sheet->h / 2, m_sheet->w * 2, m_sheet->h / 2 };
 		
+		m_aspect = 2;//w / (m_sheet->w* m_scale);
+		const int adjw = ( int ) ( m_sheet->w * m_aspect );
+		const int adjh = ( int ) ( m_sheet->w / m_aspect );
+
 		m_cursor = {0,0,TILE_W,TILE_H};	
+		m_box = { 0, h - adjh * m_scale, adjw * m_scale, adjh * m_scale };
 
-		m_srcLeft = { 0, 0, m_sheet->w, m_sheet->h/2 };
-		m_destLeft = { m_box.x, m_box.y, m_sheet->w * m_scale , m_sheet->h/2 * m_scale  }; 
 
-		m_srcRight = { 0, m_sheet->h/2, m_sheet->w, m_sheet->h/2 };
-		m_destRight = {m_box.x + m_sheet->w, m_box.y,  m_sheet->w * m_scale , m_sheet->h/2 * m_scale  }; 
+		m_srcLeft = { 0, 0, adjw, adjh };
+		
+		m_destLeft = { 
+			m_box.x,     m_box.y, 
+			m_box.w / 2, m_box.h
+		}; 
+
+		m_srcRight = { 0, adjh , adjw, adjh };
+
+		m_destRight = {
+			m_box.x + m_box.w / 2, m_box.y,  
+			m_box.w / 2, m_box.h
+		}; 
 
 	}
 
@@ -499,8 +508,8 @@ namespace UI
 		if(!m_sheet) return;
 		const Rect & worldCursor = 
 		{
-			m_cursor.x * m_scale  + m_box.x, 
-			m_cursor.y * m_scale  + m_box.y, 
+			m_cursor.x * m_scale + m_box.x, 
+			m_cursor.y * m_scale + m_box.y, 
 			m_cursor.w * m_scale , 
 			m_cursor.h * m_scale 
 		};

@@ -1,77 +1,16 @@
-#include "core.h"
-#include "assets.h"
-#include "graphics.h"
-#include "engine.h"
-#include "shell.h"
-#include "fs.h"
-#include "err.h"
-//editor
-#include "shell.h"
+#include "sys.h"
 #include "sheeteditor.h"
-#include "context.h"
-
-
-
-enum : uint8_t
-{
-	APP_SHELL = 0,
-	APP_SHEET_EDITOR,
-	APP_COUNT
-};
-
-
-Shell  * g_shell;
-Editor * g_editor;
-UI::Toolbar * g_menu;
-Context g_context(APP_COUNT);
-
-//default config
-//system are for default system data
-std::string g_sysPath ;
-std::string g_sysAssetPath;
-
-
 
 void PrintHelp(const Args& args);
 void ImportAsset(const Args& args);
 void NewAsset(const Args& args);
 void EditAsset(const Args& args);
 
-
-void Startup()
-{
-	//default config
-	g_sysPath = FS::ExePath() + "/system";
-	g_sysAssetPath = g_sysPath + "/assets";
-
-	Engine::Startup(SCREEN_W, SCREEN_H, WINDOW_SCALE);
-	//add system assets path
-	Assets::Startup(g_sysAssetPath);
-
-	g_context.create(APP_SHELL, g_shell = new Shell());
-	g_context.create(APP_SHEET_EDITOR, g_editor = new SheetEditor());
-
-	printf("System On!\n");
-}
-
-void Shutdown()
-{
-	printf("Clearing context ...\n");
-	g_context.clear();
-	printf("Shutting down assets ...\n");
-	Assets::Shutdown();
-	printf("Shutting down engine ...\n");
-	Engine::Shutdown();
-	printf("Goodbye :)\n");
-	exit(1);
-}
-
-
 void LogArgError()
 {
 	char msg[24];
 	snprintf(msg, 24, "Incorrect number of arguments");
-	g_shell->log(msg);
+	Sys::GetShell()->log(msg);
 }
 //TODO - handle error more elegantly. Throw exception with msg ? Log mesage to shell ? with usage. 
 #define ARG_NONEMPTY(args) if(args.size() <= 0  ) { LogArgError(); return; }
@@ -94,7 +33,7 @@ static const CommandTable & g_cmds =
 		{ "exit", "shutdown system" },
 		[](Args args)
 		{ 
-			Shutdown();
+			Sys::Shutdown();
 		} 
 	},
 	{
@@ -105,7 +44,7 @@ static const CommandTable & g_cmds =
 			if ( args[0] == "font" )
 			{
 				ARG_COUNT(args, 2);
-				g_shell->setFont(args[1]);
+				Sys::GetShell()->setFont(args[1]);
 			}
 		} 
 	},
@@ -135,7 +74,7 @@ static const CommandTable & g_cmds =
 				FS::Ls(files);
 			
 			for (const std::string& file : files)
-				g_shell->log(file);
+				Sys::GetShell()->log(file);
 		} 
 	},
 	{
@@ -144,14 +83,14 @@ static const CommandTable & g_cmds =
 		{ 
 			ARG_COUNT(args, 1); // 	
 			if (!FS::Cd(args[0]))
-				g_shell->log("Directory does not exist");
+				Sys::GetShell()->log("Directory does not exist");
 		} 
 	},
 	{
 		{ "cwd", "print current path"}, 
 		[](Args args)
 		{ 
-			g_shell->log(FS::Cwd());
+			Sys::GetShell()->log(FS::Cwd());
 		} 
 	},
 	{
@@ -160,7 +99,7 @@ static const CommandTable & g_cmds =
 		{ 
 			ARG_COUNT(args, 1); // 	
 			if (!FS::MkDir(args[0]))
-				g_shell->log("Could not create directory");
+				Sys::GetShell()->log("Could not create directory");
 		} 
 	},
 	{
@@ -169,7 +108,7 @@ static const CommandTable & g_cmds =
 		{ 
 			ARG_COUNT(args, 1); // 	
 			if (!FS::Remove(args[0]))
-				g_shell->log("Failed to remove path");
+				Sys::GetShell()->log("Failed to remove path");
 		} 
 	},
 	{
@@ -179,7 +118,7 @@ static const CommandTable & g_cmds =
 			ARG_COUNT(args, 2); // 
 			
 			if (!FS::Move(args[0], args[1]))
-				g_shell->log("Failed to move");
+				Sys::GetShell()->log("Failed to move");
 		} 
 	},
 	//if running game, add all sub-directories as search dir for assets
@@ -209,48 +148,18 @@ static const CommandTable & g_cli =
 
 int main(int argc, char** argv)
 { 
-	stacktrace();
-	Startup();
-	//skip exe path arg
-	argc--;
-	argv++;
+	argc--; argv++;	//skip exe path arg
+
+	Err::Stacktrace();
+
+	Sys::Startup(g_cmds);
+
 	Execute( argc, argv, g_cli );
 
-	g_shell->addCommands(g_cmds);
-	g_context.enter(APP_SHELL);	
+	Sys::GetShell()->log("idolon v0.0");
+	Sys::GetShell()->log("type help to see commands");
 
-	g_shell->log("idolon v0.0");
-	g_shell->log("type help to see commands");
-
-	Engine::SetKeyEcho(true);
-	Engine::SetKeyHandler(
-		[&](Key key, bool isDown) 
-		{
-			if(isDown && key == KEY_ESCAPE)
-				g_context.exit();	
-			else 
-				g_context.handleKey(key, isDown);
-		}
-	);
-	float timer = 0;
-	while (Engine::Run())
-	{
-		switch(g_context.run())
-		{
-			case APP_CODE_CONTINUE:
-				break;
-			case APP_CODE_SHUTDOWN:
-				Shutdown();
-				break;
-			case APP_CODE_EXIT:
-				g_context.app()->signal( APP_CODE_CONTINUE );
-				g_context.exit();
-				break;
-		}
-	}
-
-	Shutdown();
-	return 0;
+	return Sys::Run();
 }
 
 ////////////////// Commands  ///////////////////////////////////////
@@ -259,7 +168,7 @@ int main(int argc, char** argv)
 template <typename Type>
 std::string SystemAssetPath(const std::string & name )
 {
-	return g_sysAssetPath + ("/" + name + Assets::GetAssetTypeExt<Type>());
+	return Sys::AssetPath() + ("/" + name + Assets::GetAssetTypeExt<Type>());
 }
 
 void PrintHelp(const Args& args)
@@ -270,8 +179,8 @@ void PrintHelp(const Args& args)
 		Help(g_cmds, args[0], out);
 	else 
 		HelpAll(g_cmds, out);
-	g_shell->clear();
-	g_shell->log(out);
+	Sys::GetShell()->clear();
+	Sys::GetShell()->log(out);
 }
 
 // -------------- Convert raw to asset ------------------------
@@ -357,9 +266,8 @@ void EditAsset(const Args& args)
 	const std::string& name = FS::BaseName(args[0]);
 	if(ext == "sheet")
 	{
-		g_context.app<SheetEditor>(APP_SHEET_EDITOR)->setSheet(name);
-		g_context.enter(APP_SHEET_EDITOR);
-
+		Sys::GetContext()->app<SheetEditor>(APP_SHEET_EDITOR)->setSheet(name);
+		Sys::GetContext()->enter(APP_SHEET_EDITOR);
 	}
 	else if(ext == "font")
 	{

@@ -17,6 +17,7 @@ public:
 	void clear();
 	void log(const std::string & msg);
 	void setFont(const std::string & font);
+	Graphics::Font* getFont();
 	void addCommands(const CommandTable & commands);
 
 private:

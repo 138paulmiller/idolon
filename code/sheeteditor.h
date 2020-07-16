@@ -1,5 +1,6 @@
 #pragma once
 #include "editor.h"
+#include "sys.h"
 
 
 enum ToolMode : char
@@ -53,4 +54,6 @@ private:
 	int m_revision; 
 
 	bool m_usingTool;
+
+	int m_charW, m_charH;
 };

@@ -1,9 +1,4 @@
-#include "graphics.h"
-#include "engine.h"
-#include "assets.h"
 #include "sheeteditor.h"
-#include "tools.h"
-
 #include <iostream>
 
 #define MAX_REVISION_COUNT 100
@@ -37,11 +32,21 @@ void SheetEditor::onEnter()
 	m_revision = -1;
 	m_sheet = Assets::Load<Graphics::Sheet>(m_sheetName);
 	
-	m_colorPicker = new ColorPicker();
+	
+	m_charW = Sys::GetShell()->getFont()->charW;
+	m_charH = Sys::GetShell()->getFont()->charH;
+
+	int w, h;
+	Engine::GetSize(w, h);
+
+	const int x = w - 16 - 8;
+	const int y = 8 * 2;
+
+	m_colorPicker = new ColorPicker(x,y);
 	m_sheetPicker = new SheetPicker( m_sheet );
 	m_sheetPicker->resizeCursor( s_tileSizes[0][0], s_tileSizes[0][1] );
 
-	m_toolbar = new Toolbar(this, 0, m_sheetPicker->rect().y - FONT_H);
+	m_toolbar = new Toolbar(this, 0, m_sheetPicker->rect().y - m_charH);
 
 	m_toolbar->add("PIXEL", [&](){
 		m_tool = TOOL_PIXEL;                     
@@ -117,13 +122,13 @@ void SheetEditor::onTick()
 	const float scale = ( TILE_SIZE_MAX / tileSrc.w ) * m_tileScale;
 	
 	//canvas is the tile drawing region in worldspace 
-	const Rect & canvasRect = { FONT_W, FONT_H * 2, (int)(tileSrc.w * scale), (int)(tileSrc.h * scale) }; 	
+	const Rect & canvasRect = { m_charW, m_charH * 2, (int)(tileSrc.w * scale), (int)(tileSrc.h * scale) }; 	
 
 	const float mtilex = (mx-canvasRect.x);
 	const float mtiley = (my-canvasRect.y);
 	
 	bool mouseInCanvas = !(mtilex < 0.0f || mtilex >= canvasRect.w || mtiley < 0.0f || mtiley >= canvasRect.h);
-	printf("%.f %d %d\n", mtilex, mouseInCanvas, mtilex > 0.0f);
+
 	//tile x y of mouse
 	const int tilex = mtilex/scale;
 	const int tiley = mtiley/scale;
@@ -419,7 +424,6 @@ void SheetEditor::undo()
 		
 		for(int y = 0; y< selection.h; y++)
 		{
-
 			for(int x = 0; x< selection.w; x++)
 			{
 				i = (y+sy) * sheetw + x+sx;

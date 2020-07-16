@@ -143,6 +143,7 @@ namespace UI
 		
 		void onUpdate();
 		void onDraw() ;
+		
 		Color textColor;
 		Color hoverColor;
 		Color clickColor;
@@ -151,9 +152,9 @@ namespace UI
 		const int border = 1;
 		//non-owning
 		App* m_parent;
-		int m_x, m_y, m_tw, m_th;
 		int m_count;
 		int m_xoff;
+		int m_x, m_y;
 		std::vector<int> m_buttonIds;
 
 	};
@@ -169,7 +170,7 @@ namespace UI
 	class ColorPicker : public Widget
 	{
 	public:
-		ColorPicker();
+		ColorPicker(int x, int y);
 		~ColorPicker();
 
 		void onUpdate();
@@ -214,6 +215,7 @@ namespace UI
 		//entire box
 		Rect m_box;
 		const int m_scale;
+		int m_aspect;
 	};
 
 

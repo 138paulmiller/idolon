@@ -30,8 +30,7 @@
 #define SCREEN_W 256
 #define SCREEN_H 240
 //TODO make font 8x8. need to edit sheet and then reconvert
-#define FONT_W 7
-#define FONT_H 9
+
 //Default Sheet size
 #define SHEET_W 64
 #define SHEET_H 64

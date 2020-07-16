@@ -17,7 +17,9 @@
 #define ASSERT(cond,...) 
 #endif
 
-
-void stacktrace();
+namespace Err
+{
+	void Stacktrace();
+}
 
 

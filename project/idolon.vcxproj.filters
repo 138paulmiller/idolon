@@ -60,6 +60,9 @@
     <ClCompile Include="..\code\editor.cpp">
       <Filter>../Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\code\sys.cpp">
+      <Filter>../Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\code\assets.h">
@@ -105,6 +108,9 @@
       <Filter>../Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\code\tools.h">
+      <Filter>../Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\sys.h">
       <Filter>../Header Files</Filter>
     </ClInclude>
   </ItemGroup>
