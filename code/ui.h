@@ -125,9 +125,11 @@ namespace UI
 		~TextButton();
 		void onUpdate() ;
 		void onDraw() ;
+		//if font is changed reload
+		void setFont(std::string & font) ;
 		
 		Color textColor;
-
+		
 	private:
 		Graphics::TextBox * m_textbox; 
 	};
@@ -148,6 +150,7 @@ namespace UI
 		Color hoverColor;
 		Color clickColor;
 		Color fillColor;
+		std::string font;
 	private:
 		const int border = 1;
 		//non-owning

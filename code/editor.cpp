@@ -43,8 +43,9 @@ void Editor::onEnter()
 		App::removeWidget(m_menu);
 	
 	UI::Toolbar * menu = new UI::Toolbar(this, 0, 0);
-	m_menu = App::addWidget(menu);
+	menu->font = "full"; //has glyphs
 	
+	m_menu = App::addWidget(menu);
 	//BACK
 	menu->add({27}, [&](){
 		App::signal(APP_CODE_EXIT);
@@ -52,21 +53,21 @@ void Editor::onEnter()
 	//SAVE
 	if(supports(APP_SAVE))
 	{	
-		menu->add({25}, [&](){
+		menu->add({20}, [&](){
 			this->save();
 		}, false);
 	}
 	//UNDO
 	if(supports(APP_UNDO))
 	{	
-		menu->add({17}, [&](){
+		menu->add({18}, [&](){
 			this->undo();
 		}, false);
 	}
 	//REDO
 	if(supports(APP_UNDO))
 	{
-		menu->add({16}, [&](){
+		menu->add({19}, [&](){
 			this->redo();
 		}, false);
 	}

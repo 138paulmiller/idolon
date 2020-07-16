@@ -20,7 +20,7 @@
 #define SCREEN_H 256
 //TODO make font 8x8. need to edit sheet and then reconvert
 
-#define FONT_DEFAULT "basic"
+#define DEFAULT_FONT "default"
 //Default Tileset size
 #define TILESET_W 64
 #define TILESET_H 64

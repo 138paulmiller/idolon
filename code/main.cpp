@@ -6,16 +6,14 @@ void ImportAsset(const Args& args);
 void NewAsset(const Args& args);
 void EditAsset(const Args& args);
 
-void LogArgError()
-{
-	char msg[24];
-	snprintf(msg, 24, "Incorrect number of arguments");
-	Sys::GetShell()->log(msg);
-}
+
+#define SysLog(msg) Sys::GetShell()->log(msg);
+
+
 //TODO - handle error more elegantly. Throw exception with msg ? Log mesage to shell ? with usage. 
-#define ARG_NONEMPTY(args) if(args.size() <= 0  ) { LogArgError(); return; }
-#define ARG_RANGE(args, min, max) if(args.size() < min || args.size() > max ) { LogArgError(); return; }
-#define ARG_COUNT(args, i) if(args.size() != i ){ LogArgError(); return; }
+#define ARG_NONEMPTY(args) if(args.size() <= 0  ) { SysLog("Missing arguments"); return; }
+#define ARG_RANGE(args, min, max) if(args.size() < min || args.size() > max ) { SysLog("Incorrect argument range"); return; }
+#define ARG_COUNT(args, i) if(args.size() != i ){ SysLog("Incorrect number of arguments"); return; }
 
 /*
 	load <game>.ult
@@ -53,7 +51,7 @@ static const CommandTable & g_cmds =
 		ImportAsset
 	},
 	{
-		{ "new", "asset : create asset"} ,
+		{ "new", "asset name: create asset"} ,
 		NewAsset
 	},
 	{
@@ -74,7 +72,7 @@ static const CommandTable & g_cmds =
 				FS::Ls(files);
 			
 			for (const std::string& file : files)
-				Sys::GetShell()->log(file);
+				SysLog(file);
 		} 
 	},
 	{
@@ -83,14 +81,14 @@ static const CommandTable & g_cmds =
 		{ 
 			ARG_COUNT(args, 1); // 	
 			if (!FS::Cd(args[0]))
-				Sys::GetShell()->log("Directory does not exist");
+				SysLog("Directory does not exist");
 		} 
 	},
 	{
 		{ "cwd", "print current path"}, 
 		[](Args args)
 		{ 
-			Sys::GetShell()->log(FS::Cwd());
+			SysLog(FS::Cwd());
 		} 
 	},
 	{
@@ -99,7 +97,7 @@ static const CommandTable & g_cmds =
 		{ 
 			ARG_COUNT(args, 1); // 	
 			if (!FS::MkDir(args[0]))
-				Sys::GetShell()->log("Could not create directory");
+				SysLog("Could not create directory");
 		} 
 	},
 	{
@@ -108,7 +106,7 @@ static const CommandTable & g_cmds =
 		{ 
 			ARG_COUNT(args, 1); // 	
 			if (!FS::Remove(args[0]))
-				Sys::GetShell()->log("Failed to remove path");
+				SysLog("Failed to remove path");
 		} 
 	},
 	{
@@ -118,7 +116,7 @@ static const CommandTable & g_cmds =
 			ARG_COUNT(args, 2); // 
 			
 			if (!FS::Move(args[0], args[1]))
-				Sys::GetShell()->log("Failed to move");
+				SysLog("Failed to move");
 		} 
 	},
 	//if running game, add all sub-directories as search dir for assets
@@ -156,8 +154,8 @@ int main(int argc, char** argv)
 
 	Execute( argc, argv, g_cli );
 
-	Sys::GetShell()->log("idolon v0.0");
-	Sys::GetShell()->log("type help to see commands");
+	SysLog("idolon v0.0");
+	SysLog("type help to see commands");
 
 	return Sys::Run();
 }
@@ -180,7 +178,7 @@ void PrintHelp(const Args& args)
 	else 
 		HelpAll(g_cmds, out);
 	Sys::GetShell()->clear();
-	Sys::GetShell()->log(out);
+	SysLog(out);
 }
 
 // -------------- Convert raw to asset ------------------------
@@ -190,7 +188,7 @@ void ImportAsset(const Args& args)
 {			
 	ARG_NONEMPTY(args);
 
-	if(args[0] == "sheet" )
+	if(args[0] == "-s" )
 	{
 		//must be two args
 		ARG_COUNT(args, 2);
@@ -205,23 +203,44 @@ void ImportAsset(const Args& args)
 		Assets::Save(sheet);
 
 	}
-	else if(args[0] == "font" )
+	else if(args[0] == "-f" )
 	{
-		ARG_COUNT(args, 5); // 
+		ARG_RANGE(args, 4, 6); // 
 		const std::string &  imgpath = FS::Append(FS::Root(), args[1]);
 		int cw = std::stoi(args[2]);
 		int ch = std::stoi(args[3]);
 		//charcter offset (ascii value)
-		int start = std::stoi(args[4]);
+		int start = args.size() > 4 ? std::stoi(args[4]) : 0;
 		int w, h;
 		Color * pixels = Engine::LoadTexture(imgpath, w, h);
 		if ( !pixels ) return; //log err
 		std::string name = FS::BaseName(imgpath);
-		Graphics::Font * font = new Graphics::Font(name, w, h, cw, ch, start);
-		memcpy(font->pixels, pixels, w * h * sizeof(Color));
+		//remove spaces Experimental
+		int space = args.size() > 5 ? std::stoi(args[5]) : 0;
+		int ci = w / ( cw + space );
+		int cj = h / ( ch + space );
+		int fw = cw * ci ;
+		int fh = ch * cj;
+		Color* newpixels = new Color[fw * fh * sizeof( Color )];
+		for ( int j = 0; j <= cj; j++)
+		{
+			for ( int i = 0; i <= ci; i++ )
+			{
+				const int fx = i * cw;
+				const int fy = j * ch;
+				const int x =  space/2 + i * (cw+space);
+				const int y =  space/2 + j * (ch+space);
+				for(int dx = 0; dx<cw; dx++ )
+				for(int dy = 0; dy<ch; dy++ )
+					newpixels[(fy+dy) * fw + (fx+dx)] = pixels[(y+dy) * w + (x+dx)];
+			}
+		}
+		Graphics::Font* font = new Graphics::Font( name, fw, fh, cw, ch, start );
+		memcpy(font->pixels, newpixels, fw * fh * sizeof(Color));
 		font->update();
 		font->filepath = SystemAssetPath<Graphics::Font>(name);
 		Assets::Save(font);
+		delete newpixels;
 	}
 }
 

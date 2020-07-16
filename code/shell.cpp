@@ -36,7 +36,6 @@ void Shell::onEnter()
 	m_cursor->filled = true;
 	m_cursor->fillColor = WHITE ;
 	m_cursor->reload();
-printf("%d\n",SHELL_PREFIXSIZE);
 
 	m_lineW = m_w / m_charW;
 	//space for input line 

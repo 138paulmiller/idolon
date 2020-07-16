@@ -99,6 +99,9 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)\code\external;</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(SolutionDir)code\pch.h.gch</PrecompiledHeaderOutputFile>
+      <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -149,14 +152,13 @@
     <ClCompile Include="..\code\core.cpp" />
     <ClCompile Include="..\code\editor.cpp" />
     <ClCompile Include="..\code\err.cpp" />
-    <ClCompile Include="..\code\sheeteditor.cpp" />
     <ClCompile Include="..\code\fs.cpp" />
     <ClCompile Include="..\code\main.cpp" />
     <ClCompile Include="..\code\engine.cpp" />
-    <ClCompile Include="..\code\pool.cpp" />
     <ClCompile Include="..\code\graphics.cpp" />
     <ClCompile Include="..\code\shell.cpp" />
     <ClCompile Include="..\code\sys.cpp" />
+    <ClCompile Include="..\code\tileseteditor.cpp" />
     <ClCompile Include="..\code\tools.cpp" />
     <ClCompile Include="..\code\ui.cpp" />
   </ItemGroup>
@@ -165,16 +167,15 @@
     <ClInclude Include="..\code\commands.h" />
     <ClInclude Include="..\code\context.h" />
     <ClInclude Include="..\code\core.h" />
-    <ClInclude Include="..\code\sheeteditor.h" />
     <ClInclude Include="..\code\engine.h" />
     <ClInclude Include="..\code\err.h" />
     <ClInclude Include="..\code\fs.h" />
-    <ClInclude Include="..\code\pool.h" />
     <ClInclude Include="..\code\graphics.h" />
     <ClInclude Include="..\code\editor.h" />
     <ClInclude Include="..\code\shell.h" />
     <ClInclude Include="..\code\sys.h" />
     <ClInclude Include="..\code\tests.h" />
+    <ClInclude Include="..\code\tileseteditor.h" />
     <ClInclude Include="..\code\tools.h" />
     <ClInclude Include="..\code\ui.h" />
   </ItemGroup>

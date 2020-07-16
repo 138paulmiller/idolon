@@ -255,7 +255,12 @@ namespace UI
 	{
 		m_textbox->draw();
 	}
-
+	
+	void TextButton::setFont( std::string& font )
+	{
+		m_textbox->font = font;
+		m_textbox->reload();	
+	}
 	Toolbar::Toolbar( App* parent, int x, int y )
 		:m_parent(parent), 
 		m_x(x),m_y(y),
@@ -265,6 +270,7 @@ namespace UI
 		hoverColor = DEFAULT_COLOR_FILL ;		
 		clickColor = DEFAULT_COLOR_CLICK;
 		fillColor  = DEFAULT_COLOR_HOVER;
+		font = DEFAULT_FONT;
 	}
 	
 	Toolbar::~Toolbar()
@@ -285,6 +291,7 @@ namespace UI
 		textbutton->clickColor = clickColor;
 		textbutton->fillColor  = fillColor ;
 		textbutton->sticky = sticky ;
+		textbutton->setFont(font);
 		//perhaps avoidable
 		textbutton->cbClick = [this, buttonId, click] () 
 		{ 
