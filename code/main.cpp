@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "sheeteditor.h"
+#include "tileseteditor.h"
 
 void PrintHelp(const Args& args);
 void ImportAsset(const Args& args);
@@ -198,10 +198,10 @@ void ImportAsset(const Args& args)
 		const std::string &  imgpath = args[1];
 		Color * pixels = Engine::LoadTexture(imgpath, w, h);
 		std::string name = FS::BaseName(imgpath);
-		Graphics::Sheet * sheet = new Graphics::Sheet(name, w, h);
+		Graphics::Tileset * sheet = new Graphics::Tileset(name, w, h);
 		memcpy(sheet->pixels, pixels, w * h * sizeof(Color));
 		sheet->update();
-		sheet->filepath = SystemAssetPath<Graphics::Sheet>(name);
+		sheet->filepath = SystemAssetPath<Graphics::Tileset>(name);
 		Assets::Save(sheet);
 
 	}
@@ -233,8 +233,8 @@ void NewAsset(const Args& args)
 	const std::string& name = args[1];
 	if(asset == "sheet")
 	{
-		Graphics::Sheet * sheet = new Graphics::Sheet(name, SHEET_W, SHEET_H);
-		const std::string & path = FS::Append(FS::Cwd(), sheet->name) + Assets::GetAssetTypeExt<Graphics::Sheet>();
+		Graphics::Tileset * sheet = new Graphics::Tileset(name, TILESET_W, TILESET_H);
+		const std::string & path = FS::Append(FS::Cwd(), sheet->name) + Assets::GetAssetTypeExt<Graphics::Tileset>();
 		memset(sheet->pixels, 255, sheet->w * sheet->h * sizeof(Color));
 		sheet->update();
 		Assets::SaveAs(sheet, path);
@@ -266,8 +266,8 @@ void EditAsset(const Args& args)
 	const std::string& name = FS::BaseName(args[0]);
 	if(ext == "sheet")
 	{
-		Sys::GetContext()->app<SheetEditor>(APP_SHEET_EDITOR)->setSheet(name);
-		Sys::GetContext()->enter(APP_SHEET_EDITOR);
+		Sys::GetContext()->app<TilesetEditor>(APP_TILESET_EDITOR)->setTileset(name);
+		Sys::GetContext()->enter(APP_TILESET_EDITOR);
 	}
 	else if(ext == "font")
 	{

@@ -5,7 +5,7 @@
 namespace Graphics 
 {
 	class Font;
-	class Sheet;
+	class Tileset;
 	class Sprite;
 	class TextBox;
 }
@@ -178,7 +178,7 @@ namespace UI
 
 		Color color();
 	private:
-		Graphics::Sheet * m_sheet;
+		Graphics::Tileset * m_sheet;
 		int m_colorSize;
 		Rect m_cursor;
 		Rect m_src, m_dest, m_border;
@@ -187,26 +187,26 @@ namespace UI
 	
 	//////////////////////////////////////////////////////////////////////////////////
 	/*
-		Sheet Tile/Frame picker
+		Tileset Tile/Frame picker
 		- Renders the sheet at the bottom of the screen.
 	*/
-	class SheetPicker : public Widget
+	class TilePicker : public Widget
 	{
 	public:
-		SheetPicker(const Graphics::Sheet * sheet);
-		~SheetPicker();
+		TilePicker(const Graphics::Tileset * sheet);
+		~TilePicker();
 
 		const Rect & rect();
 		void onUpdate();
 		void onDraw();
-		void setSheet(const Graphics::Sheet * sheet);
+		void setTileset(const Graphics::Tileset * sheet);
 		//get tile/frame relative to given sheet
 		Rect selection();
 		int selectionIndex();
 		void moveCursor(int dx, int dy);
 		void resizeCursor(int w, int h);
 	private:
-		const Graphics::Sheet * m_sheet;
+		const Graphics::Tileset * m_sheet;
 		Rect m_cursor;
 		//draw  src and dest of texture. 
 		// draw top half of texture to the left

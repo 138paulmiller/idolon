@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "sheeteditor.h"
+#include "tileseteditor.h"
 #include <iostream>
 
 #define MAX_REVISION_COUNT 100
@@ -15,7 +15,7 @@ using namespace Graphics;
 using namespace UI;
 
 
-SheetEditor::SheetEditor()
+TilesetEditor::TilesetEditor()
 	:Editor(
 		SUPPORT( APP_SAVE ) |
 		SUPPORT( APP_UNDO ) |
@@ -23,7 +23,7 @@ SheetEditor::SheetEditor()
 	)
 {}
 
-void SheetEditor::onEnter()
+void TilesetEditor::onEnter()
 {
 
 	printf("Entering sheet editor ... ");
@@ -31,7 +31,7 @@ void SheetEditor::onEnter()
 	m_sheet = 0;
 	m_overlay = 0;
 	m_revision = -1;
-	m_sheet = Assets::Load<Graphics::Sheet>(m_sheetName);
+	m_sheet = Assets::Load<Graphics::Tileset>(m_sheetName);
 	
 	
 	m_charW = Sys::GetShell()->getFont()->charW;
@@ -44,7 +44,7 @@ void SheetEditor::onEnter()
 	const int y = 8 * 2;
 
 	m_colorPicker = new ColorPicker(x,y);
-	m_sheetPicker = new SheetPicker( m_sheet );
+	m_sheetPicker = new TilePicker( m_sheet );
 	m_sheetPicker->resizeCursor( s_tileSizes[0][0], s_tileSizes[0][1] );
 
 	m_toolbar = new Toolbar(this, 0, m_sheetPicker->rect().y - m_charH);
@@ -84,7 +84,7 @@ void SheetEditor::onEnter()
 	Editor::onEnter();
 }
 
-void SheetEditor::onExit()
+void TilesetEditor::onExit()
 {	//allow for reloading data
 	Assets::Unload(m_sheetName );
 	m_sheetName = "";
@@ -107,7 +107,7 @@ void SheetEditor::onExit()
 
 
 
-void SheetEditor::onTick()
+void TilesetEditor::onTick()
 {
 	//set pixel tool by default if not set
 	Engine::ClearScreen(EDITOR_COLOR);
@@ -255,7 +255,7 @@ void SheetEditor::onTick()
 }
 
 
-void SheetEditor::drawOverlay(int tilex, int tiley, const Rect & dest)
+void TilesetEditor::drawOverlay(int tilex, int tiley, const Rect & dest)
 {
 	const Color &color = m_colorPicker->color();
 	const Rect & overlaySrc = { 0, 0, m_sheetPicker->selection().w, m_sheetPicker->selection().h }; 	
@@ -268,7 +268,7 @@ void SheetEditor::drawOverlay(int tilex, int tiley, const Rect & dest)
 	{
 		if(m_overlay == 0)
 			delete m_overlay;
-		m_overlay = new Graphics::Sheet("SheetEditor_Overlay", overlaySrc.w, overlaySrc.h);
+		m_overlay = new Graphics::Tileset("TilesetEditor_Overlay", overlaySrc.w, overlaySrc.h);
 	}
 
 	memset(m_overlay->pixels, 0,  overlaySrc.w * overlaySrc.h * sizeof(Color));
@@ -307,7 +307,7 @@ void SheetEditor::drawOverlay(int tilex, int tiley, const Rect & dest)
 }
 
 //
-void SheetEditor::onKey(Key key, bool isDown)
+void TilesetEditor::onKey(Key key, bool isDown)
 {
 	if(isDown)
 	{
@@ -339,13 +339,13 @@ void SheetEditor::onKey(Key key, bool isDown)
 
 
 //Create buttons to resize?
-void SheetEditor::setSheet(const std::string& name)
+void TilesetEditor::setTileset(const std::string& name)
 {
 	printf("Loading sheet %s ...\n", name.c_str());
 	m_sheetName = name;
 }
 
-void SheetEditor::commit()
+void TilesetEditor::commit()
 {	
 	const Rect & selection = m_sheetPicker->selection();
 	m_sheet->update(selection);
@@ -402,7 +402,7 @@ void SheetEditor::commit()
 
 }
 
-void SheetEditor::undo()
+void TilesetEditor::undo()
 { 	
 	const Rect & selection = m_sheetPicker->selection();
 	const int & sheetIndex = m_sheetPicker->selectionIndex();
@@ -435,7 +435,7 @@ void SheetEditor::undo()
 	}
 }
 
-void SheetEditor::redo()
+void TilesetEditor::redo()
 {
 	const Rect & selection = m_sheetPicker->selection();
 	const int & sheetIndex = m_sheetPicker->selectionIndex();
@@ -468,7 +468,7 @@ void SheetEditor::redo()
 
 }
 
-void SheetEditor::save()
+void TilesetEditor::save()
 {
 	if(!m_sheet) return;
 

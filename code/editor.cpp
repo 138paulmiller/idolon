@@ -2,7 +2,6 @@
 #include "pch.h"
 #include "editor.h"
 #include "shell.h"
-#include "sheeteditor.h"
 
 //----------------------------------------------------------------------------
 

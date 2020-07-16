@@ -10,7 +10,7 @@ namespace Graphics
 {
     
 
-    Sheet::Sheet(const std::string& name, int w, int h)
+    Tileset::Tileset(const std::string& name, int w, int h)
         :Asset(name), w(w), h(h),
         pixels(new Color[(int)(w * h)]),
         texture(Engine::CreateTexture(w, h))
@@ -18,13 +18,13 @@ namespace Graphics
         memset(pixels, 0, w * h * sizeof(Color));
         update();
     }
-    Sheet::~Sheet()
+    Tileset::~Tileset()
     {
         delete[]pixels;
         Engine::DestroyTexture(texture);
     }
 
-    void Sheet::update(const Rect & rect )
+    void Tileset::update(const Rect & rect )
     {
         ASSERT(rect.x >= 0 && rect.w+rect.x <= w 
             && rect.y >= 0 && rect.h+rect.y <= h,
@@ -55,7 +55,7 @@ namespace Graphics
     }
     void Sprite::reload()
     {
-        sheetcache = Assets::Load<Sheet>(sheet);
+        sheetcache = Assets::Load<Tileset>(sheet);
     }
 
     void Sprite::draw()
@@ -75,7 +75,7 @@ namespace Graphics
     ///////////////////////////////////////////////////////////////////////////////
 
     Font::Font(const std::string& name, int w, int h, int charW, int charH, char start)
-         :Sheet(name, w, h), 
+         :Tileset(name, w, h), 
          charW(charW), charH(charH), 
          start(start)
     { 

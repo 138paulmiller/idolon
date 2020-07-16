@@ -326,7 +326,7 @@ namespace UI
 		m_colorSize = 8; //8x8 
 
 		const std::string& name = "ColorPicker" + std::to_string(colorPickerId++);
-		m_sheet = new Graphics::Sheet(name, 2, PaletteCount/2);
+		m_sheet = new Graphics::Tileset(name, 2, PaletteCount/2);
 		memcpy(m_sheet->pixels, Palette, PaletteCount * sizeof(Color));
 		m_sheet->update();
 
@@ -395,29 +395,29 @@ namespace UI
 	}
 	
 	//////////////////////////////////////////////////////////////////////////////////
-	SheetPicker::SheetPicker(const Graphics::Sheet * sheet)
+	TilePicker::TilePicker(const Graphics::Tileset * sheet)
 		:m_scale(2)
 	{
-		setSheet(sheet);
+		setTileset(sheet);
 	}
 
-	SheetPicker::~SheetPicker()
+	TilePicker::~TilePicker()
 	{
 	}
 
-	const Rect & SheetPicker::rect()
+	const Rect & TilePicker::rect()
 	{
 		return m_box;
 	}
 
-	int SheetPicker::selectionIndex()
+	int TilePicker::selectionIndex()
 	{
 		int x = m_cursor.x / m_cursor.w;
 		int y = m_cursor.y / m_cursor.h;
 		return m_sheet->w * y + x;
 	}
 
-	Rect SheetPicker::selection()
+	Rect TilePicker::selection()
 	{
 
 		if(!m_sheet) return {-1,-1,0,0};
@@ -431,7 +431,7 @@ namespace UI
 		}
 		return {x,y , m_cursor.w, m_cursor.h };
 	}
-	void SheetPicker::moveCursor(int dx, int dy)
+	void TilePicker::moveCursor(int dx, int dy)
 	{
 		int mx = m_cursor.x + (dx * m_cursor.w);
 		int my = m_cursor.y + (dy * m_cursor.h);
@@ -442,7 +442,7 @@ namespace UI
 			m_cursor.y = my;
 		}
 	}
-	void SheetPicker::resizeCursor( int w, int h )
+	void TilePicker::resizeCursor( int w, int h )
 	{
 		if ( w > 0 && h > 0 )
 		{
@@ -453,7 +453,7 @@ namespace UI
 			m_cursor.y = (m_cursor.y / h) * h;
 		}
 	}
-	void SheetPicker::onUpdate()
+	void TilePicker::onUpdate()
 	{
 		if (Engine::GetMouseButtonState(MOUSEBUTTON_LEFT) != BUTTON_UP)
 		{
@@ -471,7 +471,7 @@ namespace UI
 			}
 		}
 	}
-	void SheetPicker::setSheet(const Graphics::Sheet * sheet)
+	void TilePicker::setTileset(const Graphics::Tileset * sheet)
 	{
 		if ( !sheet ) return;
 		m_sheet = sheet;
@@ -502,7 +502,7 @@ namespace UI
 
 	}
 
-	void SheetPicker::onDraw()
+	void TilePicker::onDraw()
 	{
 		if(!m_sheet) return;
 		const Rect & worldCursor = 

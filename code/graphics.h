@@ -4,13 +4,13 @@
 
 namespace Graphics
 {
-    class Sheet : public Asset
+    class Tileset : public Asset
     {
         friend class Sprite;
     public:
         
-        Sheet(const std::string& name, int w, int h);
-        ~Sheet();
+        Tileset(const std::string& name, int w, int h);
+        ~Tileset();
         
         //call sparingly . if no rect, will update entire. push data to gpu
         void update(const Rect & rect = { 0, 0, 0, 0 } ); 
@@ -44,14 +44,14 @@ namespace Graphics
 
     private:
         //if sheetcache->name != name, then unload old sheet. and load sheet
-        Sheet * sheetcache;
+        Tileset * sheetcache;
         //current animation
         int iframe;
 
         float timer;
     };
 
-    class Font : public Sheet
+    class Font : public Tileset
     {
     public:
         Font(const std::string& name, int w, int h, int charW, int charH, char start);

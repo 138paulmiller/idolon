@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "sys.h"
 //
-#include "sheeteditor.h"
+#include "tileseteditor.h"
 
 namespace
 {
@@ -33,7 +33,7 @@ namespace Sys
 		printf("System On!\n");
 
 		s_context->create(APP_SHELL, s_shell = new Shell());
-		s_context->create(APP_SHEET_EDITOR, s_editor = new SheetEditor());
+		s_context->create(APP_TILESET_EDITOR, s_editor = new TilesetEditor());
 	
 		Engine::SetKeyEcho(true);
 		Engine::SetKeyHandler(

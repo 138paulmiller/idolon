@@ -14,7 +14,7 @@
 enum : uint8_t
 {
 	APP_SHELL = 0,
-	APP_SHEET_EDITOR,
+	APP_TILESET_EDITOR,
 	APP_COUNT
 };
 

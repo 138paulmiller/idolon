@@ -29,7 +29,7 @@ namespace Assets
 
 		if(type ==  typeid(Graphics::Sprite))
 			return ".sprite";
-		if(type ==  typeid(Graphics::Sheet))
+		if(type ==  typeid(Graphics::Tileset))
 			return ".sheet";
 		if(type ==  typeid(Graphics::Font))
 			return ".font";
@@ -81,9 +81,9 @@ namespace Assets
 		s_assetdirs.push_back(path);   
 	}
 	
-	Graphics::Sheet* LoadSheet(const std::string & name, const std::string & path)
+	Graphics::Tileset* LoadTileset(const std::string & name, const std::string & path)
 	{
-		Graphics::Sheet* sheet =0;
+		Graphics::Tileset* sheet =0;
 		try 
 		{
 			std::fstream infile;
@@ -100,7 +100,7 @@ namespace Assets
 			infile.read(imagedata, blocksize);
 			infile.close();
 
-			sheet = new Graphics::Sheet(name, w, h);
+			sheet = new Graphics::Tileset(name, w, h);
 			//uncompress bytes into pixels data
 			memcpy(sheet->pixels, imagedata, sizeof(Color) * w * h);
 			sheet->update();
@@ -116,7 +116,7 @@ namespace Assets
 		}
 		return sheet;
 	}
-	void SaveSheet(const Graphics::Sheet* sheet, const std::string & path)
+	void SaveTileset(const Graphics::Tileset* sheet, const std::string & path)
 	{
 		try 
 		{		
@@ -258,8 +258,8 @@ namespace Assets
 		if(type ==  typeid(Graphics::Sprite))
 			asset= LoadSprite(name, path );
 
-		else if(type ==  typeid(Graphics::Sheet))
-			asset = LoadSheet(name, path );
+		else if(type ==  typeid(Graphics::Tileset))
+			asset = LoadTileset(name, path );
 	
 		else if(type ==  typeid(Graphics::Font))
 			asset = LoadFont(name, path );
@@ -276,8 +276,8 @@ namespace Assets
 		if(type ==  typeid(Graphics::Sprite))
 			SaveSprite(dynamic_cast<const Graphics::Sprite*>(asset),  path );
 		
-		else if(type ==  typeid(Graphics::Sheet))
-			SaveSheet(dynamic_cast<const Graphics::Sheet*>(asset), path );	
+		else if(type ==  typeid(Graphics::Tileset))
+			SaveTileset(dynamic_cast<const Graphics::Tileset*>(asset), path );	
 		
 		else if(type ==  typeid(Graphics::Font))
 			SaveFont(dynamic_cast<const Graphics::Font*>(asset), path );		

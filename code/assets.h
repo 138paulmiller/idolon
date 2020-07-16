@@ -5,7 +5,7 @@
 // Impl
 namespace Graphics 
 {
-	class Sheet;
+	class Tileset;
 	class Sprite;
 	class Font;
 }

@@ -21,10 +21,10 @@
 //TODO make font 8x8. need to edit sheet and then reconvert
 
 #define FONT_DEFAULT "basic"
-//Default Sheet size
-#define SHEET_W 64
-#define SHEET_H 64
-//Default Sheet sizes
+//Default Tileset size
+#define TILESET_W 64
+#define TILESET_H 64
+//Default Tileset sizes
 #define TILE_W 16
 #define TILE_H 16
 #define TILE_W_SMALL 8
