@@ -67,8 +67,10 @@ namespace Engine
         
         s_windowW = (int)( w / s_windowScale);
         s_windowH = (int)( h / s_windowScale);
-        
-        s_window = SDL_CreateWindow(WINDOW_TITLE, WINDOW_X, WINDOW_Y, s_windowW, s_windowH, WINDOW_FLAGS);
+        char title[24];
+        snprintf( title,24, "%s v%d.%d", SYSTEM_NAME, VERSION_MAJOR, VERSION_MINOR );
+
+        s_window = SDL_CreateWindow(title, WINDOW_X, WINDOW_Y, s_windowW, s_windowH, WINDOW_FLAGS);
         s_renderer = SDL_CreateRenderer(s_window, -1, RENDERER_FLAGS);
         s_target = CreateTexture( w, h, true);
 

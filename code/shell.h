@@ -47,5 +47,5 @@ private:
 
 	int m_cursorPos;
 	std::string m_stashedInput;
-	int m_timer;
+	float m_timer;
 };

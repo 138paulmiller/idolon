@@ -154,8 +154,6 @@ int main(int argc, char** argv)
 
 	Execute( argc, argv, g_cli );
 
-	SysLog("idolon v0.0");
-	SysLog("type help to see commands");
 
 	return Sys::Run();
 }

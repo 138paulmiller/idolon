@@ -6,10 +6,7 @@
 #include "assets.h"
 #include <sstream>
 
-#ifndef SHELL_PREFIX
-#define SHELL_PREFIX ">"
 #define SHELL_PREFIXSIZE sizeof(SHELL_PREFIX)-1
-#endif
 
 Shell::Shell() 
 {
@@ -24,7 +21,7 @@ Shell::~Shell()
 void Shell::onEnter()
 {
 	printf("Entering shell...\n");
-
+	
 	Engine::GetSize(m_w, m_h);
 
 	m_font = Assets::Load<Graphics::Font>(m_fontName );
@@ -70,6 +67,12 @@ void Shell::onEnter()
 */
 	m_lines.clear();
 	Engine::ClearScreen();
+
+	char msg[24];
+	snprintf( msg, 24, "%s v%d.%d", SYSTEM_NAME, VERSION_MAJOR, VERSION_MINOR );
+	log(msg);
+	log("type help to start");
+
 }
 
 void Shell::onExit()

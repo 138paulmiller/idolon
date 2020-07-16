@@ -11,15 +11,18 @@
 #include "err.h"
 
 
-//Default settings
+//Default settings wrap with ifndef to allow config ? 
 
-#define WINDOW_TITLE "idolon"
+#define VERSION_MAJOR 0
+#define VERSION_MINOR 0
+#define SYSTEM_NAME "idolon"
+
 #define WINDOW_SCALE 1.0/2
 //in virtual pixel space. not window size
 #define SCREEN_W 256
 #define SCREEN_H 256
 //TODO make font 8x8. need to edit sheet and then reconvert
-
+#define SHELL_PREFIX ">"
 #define DEFAULT_FONT "default"
 //Default Tileset size
 #define TILESET_W 64
@@ -47,7 +50,7 @@ struct Color
 #define BLACK Palette[0]
 #define WHITE Palette[1]
 #define CLEAR Color()
-#define HIGHLIGHT Color( 255 / 2, 255, 255, 255 )
+#define HIGHLIGHT Color( 255 / 2, 250, 250, 250 )
 #define CURSOR_COLOR Palette[25]
 #define BORDER_COLOR WHITE
 //editor "background" color. This color should not be selectable
@@ -65,7 +68,7 @@ struct Rect
 	bool intersects(const Rect & other) const;
 };
 
-//note : order matches sdl2
+//note : order matches sdl2 keycodes
 enum Key
 {
 	KEY_UNKNOWN = '\0',
