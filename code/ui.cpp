@@ -428,14 +428,12 @@ namespace UI
 			y += m_sheet->h/2;
 			x -= m_sheet->w;
 		}
-		printf( "X:%d, Y:%d\n", x, y );
 		return {x,y , m_cursor.w, m_cursor.h };
 	}
 	void SheetPicker::moveCursor(int dx, int dy)
 	{
 		int mx = m_cursor.x + (dx * m_cursor.w);
 		int my = m_cursor.y + (dy * m_cursor.h);
-		printf( "%d %d\n", mx, my );
 		if(	mx >= 0 && mx < m_box.w/ m_scale 
 		&&  my >= 0 && my < m_box.h/ m_scale)
 		{
