@@ -26,6 +26,5 @@ namespace Sys
 	const std::string& AssetPath();
 	Shell* GetShell();
 	Editor* GetEditor();
-	UI::Toolbar* GetMenu();
 	Context* GetContext();
 }

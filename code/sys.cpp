@@ -6,7 +6,6 @@ namespace
 {
 	Shell  * s_shell;
 	Editor * s_editor;
-	UI::Toolbar * s_menu;
 	Context* s_context;
 	
 	//default config
@@ -101,11 +100,6 @@ namespace Sys
 		return s_editor;
 	}
 
-	UI::Toolbar* GetMenu() 
-	{
-		return s_menu;
-	}
-	
 	Context* GetContext()
 	{
 		return s_context;
