@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "shell.h"
 #include "engine.h"
 #include "graphics.h"
@@ -35,7 +36,7 @@ void Shell::onEnter()
 	m_cursor->filled = true;
 	m_cursor->fillColor = WHITE ;
 	m_cursor->reload();
-
+printf("%d\n",SHELL_PREFIXSIZE);
 
 	m_lineW = m_w / m_charW;
 	//space for input line 
@@ -152,7 +153,7 @@ void Shell::onKey(Key key, bool isDown)
 			m_options.clear(); //clear options
 			break;
 		default:
-			if (m_cursorPos < m_lineW-SHELL_PREFIXSIZE)
+			if (m_cursorPos <= m_lineW - SHELL_PREFIXSIZE+1)
 			{
 				if (m_cursorPos == m_input->text.size()) 
 					m_input->text += key;

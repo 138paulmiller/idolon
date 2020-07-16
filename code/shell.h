@@ -25,7 +25,7 @@ private:
 
 	void overrideInput(const std::string& msg);
 
-	std::string m_fontName = "default";
+	std::string m_fontName = FONT_DEFAULT;
 	Graphics::Font* m_font;
 	Graphics::TextBox * m_cursor, * m_input, * m_buffer;
 

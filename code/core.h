@@ -6,20 +6,9 @@
 #define OS_WINDOWS
 #endif
 
+
+#include "pch.h"
 #include "err.h"
-
-#include <cmath>
-#include <cstring>
-#include <stdio.h> 
-#include <stdlib.h>
-
-#include <map>
-#include <list>
-#include <queue>
-#include <vector>
-#include <functional>
-#include <unordered_map>
-
 
 
 //Default settings
@@ -28,9 +17,10 @@
 #define WINDOW_SCALE 1.0/2
 //in virtual pixel space. not window size
 #define SCREEN_W 256
-#define SCREEN_H 240
+#define SCREEN_H 256
 //TODO make font 8x8. need to edit sheet and then reconvert
 
+#define FONT_DEFAULT "basic"
 //Default Sheet size
 #define SHEET_W 64
 #define SHEET_H 64

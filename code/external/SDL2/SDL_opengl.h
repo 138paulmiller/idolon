@@ -105,7 +105,7 @@
 #    define _System
 #  endif
 #elif (defined(__GNUC__) && __GNUC__ >= 4) || (defined(__SUNPRO_C) && (__SUNPRO_C >= 0x590))
-#  define GLAPI __attribute__((visibility("default")))
+#  define GLAPI __attribute__((visibility(FONT_DEFAULT)))
 #  define GLAPIENTRY
 #endif /* WIN32 && !CYGWIN */
 

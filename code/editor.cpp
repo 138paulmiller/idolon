@@ -1,5 +1,5 @@
-#pragma once
 
+#include "pch.h"
 #include "editor.h"
 #include "shell.h"
 #include "sheeteditor.h"
@@ -45,27 +45,29 @@ void Editor::onEnter()
 	
 	UI::Toolbar * menu = new UI::Toolbar(this, 0, 0);
 	m_menu = App::addWidget(menu);
-
-	menu->add("BACK", [&](){
+	
+	//BACK
+	menu->add({27}, [&](){
 		App::signal(APP_CODE_EXIT);
 	}, false);
-	
+	//SAVE
 	if(supports(APP_SAVE))
 	{	
-		menu->add("SAVE", [&](){
+		menu->add({25}, [&](){
 			this->save();
 		}, false);
 	}
-
+	//UNDO
 	if(supports(APP_UNDO))
 	{	
-		menu->add("UNDO", [&](){
+		menu->add({17}, [&](){
 			this->undo();
 		}, false);
 	}
-	if(supports(APP_REDO))
+	//REDO
+	if(supports(APP_UNDO))
 	{
-		menu->add("REDO", [&](){
+		menu->add({16}, [&](){
 			this->redo();
 		}, false);
 	}

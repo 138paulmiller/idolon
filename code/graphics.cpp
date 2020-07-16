@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "core.h"
 #include "graphics.h"
 #include "assets.h"
@@ -49,7 +50,7 @@ namespace Graphics
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
     Sprite::Sprite(int w, int h, const std::string& name)
-        :Asset(name), sheetcache(0), iframe(0), timer(0), animation("default"), rect({0,0,w,h})
+        :Asset(name), sheetcache(0), iframe(0), timer(0), animation(FONT_DEFAULT), rect({0,0,w,h})
     {
     }
     void Sprite::reload()
@@ -130,7 +131,7 @@ namespace Graphics
     
     TextBox::TextBox(int tw, int th, const std::string & text)
         :text(text),
-        font("default"),
+        font(FONT_DEFAULT),
         texture (0),
         x(0), y(0), 
         w(0), h(0),
