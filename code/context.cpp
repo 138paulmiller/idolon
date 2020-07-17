@@ -1,6 +1,6 @@
-#include "pch.h"
+#include "pch.hpp"
 
-#include "context.h"
+#include "context.hpp"
 
 Context::Context( uint8_t appCount )
 {

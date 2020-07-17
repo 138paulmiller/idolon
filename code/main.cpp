@@ -1,5 +1,6 @@
-#include "pch.h"
-#include "tileseteditor.h"
+#include "pch.hpp"
+
+#include "tileseteditor.hpp"
 
 void PrintHelp(const Args& args);
 void ImportAsset(const Args& args);

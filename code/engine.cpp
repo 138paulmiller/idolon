@@ -1,7 +1,7 @@
-#include "pch.h"
+#include "pch.hpp"
 
-#include "core.h"
-#include "engine.h"
+#include "core.hpp"
+#include "engine.hpp"
 
 #include <SDL2/SDL.h>
 #define STB_IMAGE_IMPLEMENTATION

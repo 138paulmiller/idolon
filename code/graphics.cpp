@@ -1,8 +1,8 @@
-#include "pch.h"
-#include "core.h"
-#include "graphics.h"
-#include "assets.h"
-#include "engine.h"
+#include "pch.hpp"
+#include "core.hpp"
+#include "assets.hpp"
+#include "engine.hpp"
+#include "graphics.hpp"
 
 #include <sstream>
 

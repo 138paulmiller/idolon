@@ -1,16 +1,18 @@
-#include "pch.h"
-#include "tileseteditor.h"
+#include "pch.hpp"
+#include "tileseteditor.hpp"
 #include <iostream>
 
 #define MAX_REVISION_COUNT 100
 #define TILE_SIZE_COUNT 4
 #define TILE_SIZE_MAX 16
 
-const int s_tileSizes[TILE_SIZE_COUNT][2] = {
-	{TILE_W_SMALL, TILE_H_SMALL },
-	{TILE_W, TILE_H }
-};
-
+namespace 
+{
+	const int s_tileSizes[TILE_SIZE_COUNT][2] = {
+		{ TILE_W_SMALL, TILE_H_SMALL },
+		{ TILE_W,       TILE_H }
+	};
+}
 using namespace Graphics;
 using namespace UI;
 
@@ -42,12 +44,17 @@ void TilesetEditor::onEnter()
 
 	const int x = w - 16 - 8;
 	const int y = 8 * 2;
-
 	m_colorPicker = new ColorPicker(x,y);
 	m_sheetPicker = new TilePicker( m_sheet );
+
+	const int idLen  = 3;
+	const int tileidX =  w - m_charW * 3;
+	const int tilesetY =  m_sheetPicker->rect().y - m_charH;
+	m_tileIdBox = new TextButton("00", tileidX, tilesetY, idLen , 1);
+
 	m_sheetPicker->resizeCursor( s_tileSizes[0][0], s_tileSizes[0][1] );
 
-	m_toolbar = new Toolbar(this, 0, m_sheetPicker->rect().y - m_charH);
+	m_toolbar = new Toolbar(this, 0, tilesetY);
 
 	m_toolbar->add("PIXEL", [&](){
 		m_tool = TOOL_PIXEL;                     
@@ -71,6 +78,7 @@ void TilesetEditor::onEnter()
 	App::addWidget( m_toolbar );
 	App::addWidget( m_sheetPicker );
 	App::addWidget( m_colorPicker );
+	App::addWidget( m_tileIdBox );
 
 	//choose pixel tool on start
 	m_toolbar->get(TOOL_PIXEL)->click();
@@ -241,15 +249,24 @@ void TilesetEditor::onTick()
 		}	
 	}	
 
+	//draw box
+	const int id = m_sheetPicker->selectionIndex();
+	char idText[]  = "00";
+	snprintf(idText, 3, "%02d", id);
+	m_tileIdBox->setText(idText);
 	// draw tile and border
 	Engine::DrawTexture(m_sheet->texture, tileSrc, canvasRect);
+
 	const Rect& border = {
 			canvasRect.x - 1,
 			canvasRect.y - 1,
 			canvasRect.w + 2,
 			canvasRect.h + 2
 	};
+
 	Engine::DrawRect(BORDER_COLOR, border, false);
+
+
 	if(mouseInCanvas)
 		drawOverlay(tilex, tiley, canvasRect);
 }

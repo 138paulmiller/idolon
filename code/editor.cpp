@@ -1,7 +1,8 @@
 
-#include "pch.h"
-#include "editor.h"
-#include "shell.h"
+#include "pch.hpp"
+
+#include "shell.hpp"
+#include "editor.hpp"
 
 //----------------------------------------------------------------------------
 

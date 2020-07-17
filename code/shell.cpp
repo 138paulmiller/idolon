@@ -1,9 +1,11 @@
-#include "pch.h"
-#include "shell.h"
-#include "engine.h"
-#include "graphics.h"
-#include "fs.h"
-#include "assets.h"
+#include "pch.hpp"
+
+#include "fs.hpp"
+#include "shell.hpp"
+#include "engine.hpp"
+#include "assets.hpp"
+#include "graphics.hpp"
+
 #include <sstream>
 
 #define SHELL_PREFIXSIZE sizeof(SHELL_PREFIX)-1

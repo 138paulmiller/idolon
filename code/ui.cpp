@@ -1,7 +1,8 @@
-#include "pch.h"
-#include "ui.h"
-#include "graphics.h"
-#include "engine.h"
+#include "pch.hpp"
+
+#include "ui.hpp"
+#include "graphics.hpp"
+#include "engine.hpp"
 
 #define DEFAULT_COLOR_TEXT WHITE
 #define DEFAULT_COLOR_FILL  Palette[25]
@@ -256,11 +257,19 @@ namespace UI
 		m_textbox->draw();
 	}
 	
-	void TextButton::setFont( std::string& font )
+	void TextButton::setFont( const std::string& font )
 	{
 		m_textbox->font = font;
 		m_textbox->reload();	
 	}
+
+	void TextButton::setText(const std::string & text) 
+	{
+		m_textbox->text = text;
+		m_textbox->refresh();	
+
+	}
+
 	Toolbar::Toolbar( App* parent, int x, int y )
 		:m_parent(parent), 
 		m_x(x),m_y(y),
@@ -396,9 +405,10 @@ namespace UI
 	{
 		//get cursor x, y then remap to 1 d array
 		//since texture is half height and twice width, remap back to square sheet
-		int x = m_cursor.x / m_cursor.w;
-		int y = m_cursor.y / m_cursor.h;
-		return Palette[m_sheet->w * y + x];
+		const int x = m_cursor.x / m_cursor.w;
+		const int y = m_cursor.y / m_cursor.h;
+		const int w = m_sheet->w; //width of sheet is number of colors (single pixel)
+		return Palette[w * y + x];
 	}
 	
 	//////////////////////////////////////////////////////////////////////////////////
@@ -419,9 +429,11 @@ namespace UI
 
 	int TilePicker::selectionIndex()
 	{
-		int x = m_cursor.x / m_cursor.w;
-		int y = m_cursor.y / m_cursor.h;
-		return m_sheet->w * y + x;
+		const int x = m_cursor.x / m_cursor.w;
+		const int y = m_cursor.y / m_cursor.h;
+		//scale by aspect since cursor is striding along transformed sheet. each tile is size of cursor
+		const int w = (m_sheet->w * m_aspect ) / m_cursor.h;
+		return w * y + x;
 	}
 
 	Rect TilePicker::selection()

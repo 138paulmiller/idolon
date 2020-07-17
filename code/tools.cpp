@@ -1,5 +1,5 @@
-#include "pch.h"
-#include "tools.h"
+#include "pch.hpp"
+#include "tools.hpp"
 
 #include <queue>
 #include <cmath>

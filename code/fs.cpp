@@ -1,5 +1,6 @@
-#include "pch.h"
-#include "fs.h"
+#include "pch.hpp"
+
+#include "fs.hpp"
 
 #ifdef OS_WINDOWS
 

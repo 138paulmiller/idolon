@@ -1,7 +1,7 @@
-#include "pch.h"
-#include "sys.h"
-//
-#include "tileseteditor.h"
+#include "pch.hpp"
+
+#include "sys.hpp"
+#include "tileseteditor.hpp"
 
 namespace
 {

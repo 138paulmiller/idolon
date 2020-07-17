@@ -1,8 +1,9 @@
-#include "pch.h"
-#include "assets.h"
-#include "fs.h"
-#include "graphics.h"
-//#include "scripts.h"
+#include "pch.hpp"
+
+#include "fs.hpp"
+#include "assets.hpp"
+#include "graphics.hpp"
+
 #include <fstream>
 #include <iostream>
 
@@ -73,6 +74,7 @@ namespace Assets
 	{
 		s_assetdirs.push_back(dirpath);
 	}
+
 	void ClearPaths()
 	{
 		//default path
@@ -116,6 +118,7 @@ namespace Assets
 		}
 		return sheet;
 	}
+	
 	void SaveTileset(const Graphics::Tileset* sheet, const std::string & path)
 	{
 		try 
@@ -193,11 +196,13 @@ namespace Assets
 			outfile.open(path, std::fstream::out);
 			outfile << font->name << std::endl;
 			//TODO - verify endian-ness!
-			int blocksize = sizeof(Color) * font->w * font->h;
-			outfile << font->w << ' ' << font->h << ' '; 
-			outfile << font->charW << ' ' << font->charH  << ' ' ; 
+			const int blocksize = sizeof(Color) * font->w * font->h;
+			
+			outfile << font->w            << ' ' << font->h      << ' '; 
+			outfile << font->charW        << ' ' << font->charH  << ' ' ; 
 			outfile << (int)(font->start) << ' ';
 			outfile << blocksize;
+			
 			outfile.write((char*)font->pixels, blocksize);
 			outfile.close();
 
