@@ -1,6 +1,7 @@
 #include "pch.hpp"
 
 #include "sys.hpp"
+#include "eval.hpp"
 #include "tileseteditor.hpp"
 
 namespace
@@ -30,7 +31,7 @@ namespace Sys
 		//add system assets path
 		Assets::Startup(Sys::AssetPath());
 
-		printf("System On!\n");
+		Eval::Startup();
 
 		s_context->create(APP_SHELL, s_shell = new Shell());
 		s_context->create(APP_TILESET_EDITOR, s_editor = new TilesetEditor());
@@ -50,16 +51,22 @@ namespace Sys
 
 		s_shell->addCommands(cmds);
 
+		printf("System On!\n");
 	}
 	
 	void Shutdown()
 	{
 		s_context->clear();
+		delete s_context;
+
+		Eval::Shutdown();
 		printf("Shutting down assets ...\n");
+
 		Assets::Shutdown();
+
 		printf("Shutting down engine ...\n");
 		Engine::Shutdown();
-		delete s_context;
+
 		printf("Goodbye :)\n");
 		exit(1);
 	}

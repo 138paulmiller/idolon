@@ -4,11 +4,12 @@
 
 */
 #include "fs.hpp"
-#include "tools.hpp"
 #include "shell.hpp"
 #include "engine.hpp"
 #include "editor.hpp"
+#include "tools.hpp"
 #include "assets.hpp"
+#include "commands.hpp"
 #include "graphics.hpp"
 
 enum : uint8

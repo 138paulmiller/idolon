@@ -1,11 +1,12 @@
 OUT = idolon
 ROOT = code
 CXX = clang++
+PYTHON = python-3.4
 # -H 
 FLAGS =-std=c++14  -O2 -Wall 
 SRC = $(wildcard $(ROOT)/*.cpp)
-LIB_INC = -I$(ROOT)/external
-LIB = -lm -ldl -lSDL2
+LIB_INC = -I$(ROOT)/external $(shell pkg-config $(PYTHON) --cflags)
+LIB = -lm -ldl -lSDL2 $(shell pkg-config $(PYTHON) --libs)
 PCH = $(ROOT)/pch.hpp
 PCH_OUT = $(basename $(PCH)).gen.hpp
 
@@ -24,7 +25,7 @@ lint:
 	clang-tidy --fix  $(SRC) -- $(LIB_INC)
 
 install:
-	$(shell apt-get install libsdl2-dev clang)
+	$(shell apt-get install libsdl2-dev clang python3.4-dev)
 
 
 

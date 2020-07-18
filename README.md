@@ -9,7 +9,7 @@ A fantasy system.
 `cd idolon`
 
 ##### Linux
-1. Install 3rd Party Libraries using `make install` . This is only required to do once.
+1. Install 3rd Party Libraries using `sudo make install` . This is only required to do once.
 2. Build the executable with `make`, of which will generate a executable *idolon*. 
 
 ##### Windows

@@ -2,7 +2,7 @@
 
 #include "context.hpp"
 
-Context::Context( uint8_t appCount )
+Context::Context( uint8 appCount )
 {
 	m_appCount = appCount;
 	m_apps = new UI::App * [appCount];
@@ -21,20 +21,20 @@ void Context::clear( )
 	if ( m_app )
 		m_app->onExit( );
 	m_app = 0;
-	for ( uint8_t i = 0; i < m_appCount; i++ )
+	for ( uint8 i = 0; i < m_appCount; i++ )
 	{
 		delete m_apps[i];
 		m_apps[i] = 0;
 	}
 }
 
-void Context::create( uint8_t appId, UI::App * app )
+void Context::create( uint8 appId, UI::App * app )
 {
 	ASSERT(appId < m_appCount, "Invalid App ID");
 	m_apps[appId] = app;
 }
 
-void Context::enter(uint8_t appId)
+void Context::enter(uint8 appId)
 {
 	ASSERT(appId < m_appCount, "Invalid App ID");
 	printf("Context Switch: from %d to %d\n", m_prevAppId, appId);

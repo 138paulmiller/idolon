@@ -6,11 +6,11 @@
 class Context
 {
 public:
-	Context( uint8_t appCount );
+	Context( uint8 appCount );
 	~Context();
 	void clear();
-	void create( uint8_t appId, UI::App * app );
-	void enter(uint8_t appId);
+	void create( uint8 appId, UI::App * app );
+	void enter(uint8 appId);
 	void exit();
 	void handleKey( Key key, bool isDown );
 	AppCode run( );
@@ -31,10 +31,10 @@ public:
 
 private:
 
-	uint8_t m_appId;
-	uint8_t m_prevAppId;
+	uint8 m_appId;
+	uint8 m_prevAppId;
 	UI::App * m_app;	
 
-	uint8_t m_appCount;
+	uint8 m_appCount;
 	UI::App ** m_apps = { 0} ;
 };

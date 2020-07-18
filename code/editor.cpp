@@ -6,7 +6,7 @@
 
 //----------------------------------------------------------------------------
 
-Editor::Editor(uint8_t support) 
+Editor::Editor(uint8 support) 
 		:m_support(support)
 {
 	m_menu = -1;

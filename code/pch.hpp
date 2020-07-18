@@ -1,8 +1,8 @@
 //pch must contain non-relative headers
-#include <cmath>
-#include <cstring>
-#include <cstdio> 
-#include <cstdlib>
+#include <math.h>
+#include <string.h>
+#include <stdio.h> 
+#include <stdlib.h>
 
 #include <map>
 #include <list>
