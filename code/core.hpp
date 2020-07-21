@@ -7,6 +7,7 @@
 #endif
 
 #include "err.hpp"
+#include <string>
 
 
 //Default settings wrap with ifndef to allow config ? 

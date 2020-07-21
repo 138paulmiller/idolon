@@ -24,8 +24,8 @@ namespace Sys
 		s_context = new Context(APP_COUNT);
 
 		//default config
-		s_sysPath = FS::ExePath() + "/system";
-		s_sysAssetPath = s_sysPath + "/assets";
+		s_sysPath = FS::ExePath() + "/system/";
+		s_sysAssetPath = s_sysPath + "/assets/";
 
 		Engine::Startup(SCREEN_W, SCREEN_H, WINDOW_SCALE);
 		//add system assets path
@@ -93,6 +93,11 @@ namespace Sys
 		return 0;
 	}
 
+	const std::string & Path() 
+	{
+		return s_sysPath;
+	}
+	
 	const std::string & AssetPath() 
 	{
 		return s_sysAssetPath;

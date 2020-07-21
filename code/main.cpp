@@ -165,7 +165,7 @@ int main(int argc, char** argv)
 template <typename Type>
 std::string SystemAssetPath(const std::string & name )
 {
-	return Sys::AssetPath() + ("/" + name + Assets::GetAssetTypeExt<Type>());
+	return Sys::AssetPath() + (name + Assets::GetAssetTypeExt<Type>());
 }
 
 void PrintHelp(const Args& args)

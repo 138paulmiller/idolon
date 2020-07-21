@@ -1,6 +1,7 @@
 #include "pch.hpp"
 
 #include "fs.hpp"
+#include <algorithm>
 
 #ifdef OS_WINDOWS
 
@@ -194,7 +195,9 @@ namespace FS
 	{
 		char buff[FILENAME_MAX]; 
 		const char * s = getcwd(buff, FILENAME_MAX);
-		return buff;
+		std::string path = buff;
+		std::replace( path.begin(), path.end(), '\\', '/'); 
+		return path;
 	}
 	
 	std::string FullPath(const std::string& filename)

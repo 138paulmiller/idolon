@@ -24,6 +24,7 @@ namespace Sys
 	void Startup( const CommandTable & cmds);
 	void Shutdown();
 	int Run();
+	const std::string& Path();
 	const std::string& AssetPath();
 	Shell* GetShell();
 	Editor* GetEditor();

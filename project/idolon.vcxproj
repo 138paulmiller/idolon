@@ -135,14 +135,15 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)\code\external\;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\code\external\;$(SolutionDir)\code\external\Python3\include;</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_UNICODE;UNICODE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>$(SolutionDir)\code\external\SDL2\x64</AdditionalLibraryDirectories>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2test.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)\code\external\SDL2\x64;$(SolutionDir)\code\external\Python3\libs</AdditionalLibraryDirectories>
+      <AdditionalDependencies>python38.lib;SDL2.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -152,6 +153,7 @@
     <ClCompile Include="..\code\core.cpp" />
     <ClCompile Include="..\code\editor.cpp" />
     <ClCompile Include="..\code\err.cpp" />
+    <ClCompile Include="..\code\eval.cpp" />
     <ClCompile Include="..\code\fs.cpp" />
     <ClCompile Include="..\code\main.cpp" />
     <ClCompile Include="..\code\engine.cpp" />
@@ -163,21 +165,24 @@
     <ClCompile Include="..\code\ui.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\code\assets.h" />
-    <ClInclude Include="..\code\commands.h" />
-    <ClInclude Include="..\code\context.h" />
-    <ClInclude Include="..\code\core.h" />
-    <ClInclude Include="..\code\engine.h" />
-    <ClInclude Include="..\code\err.h" />
-    <ClInclude Include="..\code\fs.h" />
-    <ClInclude Include="..\code\graphics.h" />
-    <ClInclude Include="..\code\editor.h" />
-    <ClInclude Include="..\code\shell.h" />
-    <ClInclude Include="..\code\sys.h" />
-    <ClInclude Include="..\code\tests.h" />
-    <ClInclude Include="..\code\tileseteditor.h" />
-    <ClInclude Include="..\code\tools.h" />
-    <ClInclude Include="..\code\ui.h" />
+    <ClInclude Include="..\code\assets.hpp" />
+    <ClInclude Include="..\code\commands.hpp" />
+    <ClInclude Include="..\code\context.hpp" />
+    <ClInclude Include="..\code\core.hpp" />
+    <ClInclude Include="..\code\editor.hpp" />
+    <ClInclude Include="..\code\engine.hpp" />
+    <ClInclude Include="..\code\err.hpp" />
+    <ClInclude Include="..\code\eval.hpp" />
+    <ClInclude Include="..\code\fs.hpp" />
+    <ClInclude Include="..\code\graphics.hpp" />
+    <ClInclude Include="..\code\pch.gen.hpp" />
+    <ClInclude Include="..\code\pch.hpp" />
+    <ClInclude Include="..\code\shell.hpp" />
+    <ClInclude Include="..\code\sys.hpp" />
+    <ClInclude Include="..\code\tests.hpp" />
+    <ClInclude Include="..\code\tileseteditor.hpp" />
+    <ClInclude Include="..\code\tools.hpp" />
+    <ClInclude Include="..\code\ui.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

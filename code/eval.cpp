@@ -1,13 +1,15 @@
 #include "pch.hpp"
 
+#include "sys.hpp"
 #include "eval.hpp"
-
 #include <Python.h>
 
 namespace 
 {
+	//////////////////// Begin Module //////////////////
+
 	//Python module
-	static int numargs=0;
+	static int numargs=100;
 	/* Return the number of arguments of the application command line */
 	static PyObject* emb_numargs(PyObject *self, PyObject *args)
 	{
@@ -31,17 +33,47 @@ namespace
 	{
 	    return PyModule_Create(&EmbModule);
 	}
+	//////////////////// End Module //////////////////
+	
 
+	void SetupBindingsPython()
+	{
+		//set up bindings that can be called in python. 
+    	PyImport_AppendInittab("emb", &PyInit_emb);
+	}	
+	
+
+	void StartupPython()
+	{
+		SetupBindingsPython();
+		Py_Initialize();
+		//set import dir to cwd 
+		PyRun_SimpleString("import sys\nimport os\n"); 
+		//create a scripts dir in systm
+		//todo when parsing game code - write it all into a single python file in a temp system dir
+		std::string cmd = "sys.path.append('" +  Sys::Path() + "')\n";
+
+		PyRun_SimpleString(cmd.c_str());
+
+	}
+
+	void ShutdownPython()
+	{
+		Py_Finalize();
+	}
+
+
+	//call pyhton code with arguments
 	//file.py funcname [args]
-	int execute(int argc, char *argv[])
+	int execute(int argc, const char *argv[])
 	{
 		if (argc < 2) {
 	        fprintf(stderr,"Usage: call pythonfile funcname [args]\n");
 	        return 1;
 	    }
-
-		const char * file = argv[0];
+		const std::string file = argv[0] ;
 		const char * funcname = argv[1];
+
 		argv+=2;
 		argc-=2;
 
@@ -49,9 +81,7 @@ namespace
 	    PyObject *pArgs, *pValue;
 	    int i;
 
-	    
-	    Py_Initialize();
-	    pName = PyUnicode_DecodeFSDefault(file);
+	    pName = PyUnicode_DecodeFSDefault(file.c_str());
 	    /* Error checking of pName left out */
 
 	    pModule = PyImport_Import(pName);
@@ -98,10 +128,9 @@ namespace
 	    }
 	    else {
 	        PyErr_Print();
-	        fprintf(stderr, "Failed to load \"%s\"\n", file);
+	        fprintf(stderr, "Failed to load \"%s\"\n", file.c_str());
 	        return 1;
 	    }
-	    Py_Finalize();
 	    return 0;
 	}
 
@@ -110,34 +139,34 @@ namespace
 /*
 	TODO 
 	- Get handles to to all event functions
-	- grab update and draw handles in game code
+	- grab update and draw handles from game code
 
 	- Create Api function bindings for idolon
-
+		- pFunc = PyObject_GetAttrString(pModule, funcname);
 */
 
 namespace Eval
 {
 	void Startup()
-	{
-		numargs = 4;
-		char * args[] = {"test", "multiply", "3", "2"};
-		execute(4 , args);
+	{		
+		StartupPython();
 
-		//set up bindings
-    	PyImport_AppendInittab("emb", &PyInit_emb);
-	    Py_Initialize();
 	   	//execute. 
 	    PyRun_SimpleString("from time import time,ctime\n"
-	                       "print('Today is', ctime(time()))\n"
 							"import emb\n"
+	                       "print('Today is', ctime(time()))\n"
 							"print('Number of arguments', emb.numargs())\n"
 		);
+
+
+		//numargs = 4;
+		const char * args[] = {"test", "multiply", "3", "2"};
+		execute(4 , args);
 
 	}
 	void Shutdown()
 	{
-
+		ShutdownPython();
 	}
 
 	void Load(const std::string & file)
