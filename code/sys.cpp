@@ -87,6 +87,20 @@ namespace Sys
 					s_context->exit();
 					break;
 			}
+
+	    Eval::Execute(	   	
+	    	R"(
+from time import time,ctime
+
+print('Today is', ctime(time()))
+
+import idolon as I
+
+mouse = I.mouse()
+print("Mouse:%s" % (mouse))
+	   	)");
+
+
 		}
 		//
 		Shutdown();
