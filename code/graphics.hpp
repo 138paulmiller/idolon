@@ -42,25 +42,16 @@ namespace Graphics
     class Sprite  : public Asset
     {
     public:
-        Sprite(int w, int h, const std::string & name);
-        //reload cached sheet from disk.
+        Sprite(const std::string & name, int w, int h);
         void reload();
-        //add x y to draw ?
-        void draw();
-
+        void draw(const Rect & src, const Rect & dest);
+        
+        int w,h;
         std::string sheet;
-        std::string animation; //current animation        
         std::map<std::string, std::vector<Frame> > animframes;
-        //current position/size
-        Rect rect;
 
     private:
-        //TODO - if sheetcache->name != name, then unload old sheet. and load sheet
         Tileset * m_tilesetcache;
-        //current animation
-        int m_iframe;
-
-        float m_timer;
     };
   
     /*--------------------------- SpriteInstance ------------------------------------
@@ -69,12 +60,11 @@ namespace Graphics
     class SpriteInstance
     {
     public:
-        SpriteInstance(const std::string & name);
+        SpriteInstance(const std::string & sprite);
         //reload cached sheet from disk.
-        void reload();
         void draw();
 
-        std::string sheet;
+        std::string sprite;
         std::string animation; //current animation        
         //current position/size
         Rect rect;
@@ -101,9 +91,10 @@ namespace Graphics
         //viewport
         Rect view;
 
-        //void removeSprite(const std::string & name);
-        //void addSprite(const std::string & spriteName, const std::string & instanceName, int x, int y);
+        void removeSprite(const std::string & name);
+        void addSprite(const std::string & spriteName, const std::string & instanceName, int x, int y);
     private:
+
 
         std::vector<int> m_tiles;
         //map to sprite instance (cache )

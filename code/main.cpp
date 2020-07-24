@@ -31,9 +31,10 @@ static const CommandTable & g_cmds =
 		PrintHelp
 	},
 	{
-		{ "test", "debug commands here" },
+		{ "debug", "debug commands here" },
 		[](Args args)
 		{ 
+
 			Sys::GetContext()->app<MapEditor>(APP_MAP_EDITOR)->setMap("test");
 			Sys::GetContext()->enter(APP_MAP_EDITOR);
 		} 
@@ -47,7 +48,7 @@ static const CommandTable & g_cmds =
 		} 
 	},
 	{
-		{ "sys", "id [args] system settings" }, 
+		{ "sys", "id [args] -system settings" }, 
 		[](Args args)
 		{ 
 			ARG_NONEMPTY(args);
@@ -59,11 +60,11 @@ static const CommandTable & g_cmds =
 		} 
 	},
 	{
-		{ "import", "asset name.png - create asset from file"}, 
+		{ "import", "asset name.png -create asset from file"}, 
 		ImportAsset
 	},
 	{
-		{ "new", "asset name: create asset"} ,
+		{ "new", "asset name [args] -create asset"} ,
 		NewAsset
 	},
 	{
@@ -179,6 +180,12 @@ std::string SystemAssetPath(const std::string & name )
 	return Sys::AssetPath() + (name + Assets::GetAssetTypeExt<Type>());
 }
 
+template <typename Type>
+std::string UserAssetPath(const std::string & name )
+{
+	return FS::Cwd() + (name + Assets::GetAssetTypeExt<Type>());
+}
+
 void PrintHelp(const Args& args)
 {
 	std::string out;
@@ -254,19 +261,28 @@ void ImportAsset(const Args& args)
 	}
 }
 
+
 void NewAsset(const Args& args)
 {			 
 	//new <asset>  <name>  
-	ARG_COUNT(args, 2);
+	ARG_RANGE(args, 2, 3); // 
 	const std::string& asset = args[0];
 	const std::string& name = args[1];
 	if(asset == "sheet")
 	{
 		Graphics::Tileset * sheet = new Graphics::Tileset(name, TILESET_W, TILESET_H);
-		const std::string & path = FS::Append(FS::Cwd(), sheet->name) + Assets::GetAssetTypeExt<Graphics::Tileset>();
-		memset(sheet->pixels, 255, sheet->w * sheet->h * sizeof(Color));
-		sheet->update();
-		Assets::SaveAs(sheet, path);
+		Assets::SaveAs(sheet, UserAssetPath<Graphics::Tileset>(name));
+	}
+	else if(asset == "sprite")
+	{
+		//new sprite  <name>  <sheet> 
+		ARG_COUNT(args, 3); // 
+
+		Graphics::Sprite * sprite = new Graphics::Sprite(name, SPRITE_W, SPRITE_H);
+		sprite->sheet = args[2];
+		sprite->reload();
+
+		Assets::SaveAs(sprite, UserAssetPath<Graphics::Sprite>(name));
 	}
 	else if(asset == "map")
 	{
@@ -279,10 +295,7 @@ void NewAsset(const Args& args)
 		int h = 18 * 8;
 		char start = ' ';
 		Graphics::Font* font= new Graphics::Font(name, w, h, 8, 8, start);
-		const std::string & path = FS::Append(FS::Cwd(), font->name) + Assets::GetAssetTypeExt<Graphics::Font>();
-		memset(font->pixels, 255, w * h * sizeof(Color));
-		font->update();
-		Assets::SaveAs(font, path);
+		Assets::SaveAs(font, UserAssetPath<Graphics::Font>(name));
 	}
 }
 
@@ -304,8 +317,8 @@ void EditAsset(const Args& args)
 	}
 	else if(ext == "map")
 	{
-		//Sys::GetContext()->app<MapEditor>(APP_MAP_EDITOR)->setMap(name);
-		//Sys::GetContext()->enter(APP_MAP_EDITOR);
+		Sys::GetContext()->app<MapEditor>(APP_MAP_EDITOR)->setMap(name);
+		Sys::GetContext()->enter(APP_MAP_EDITOR);
 	}
 	else if(ext == "font")
 	{

@@ -15,7 +15,7 @@ namespace Graphics
         pixels(new Color[(int)(w * h)]),
         texture(Engine::CreateTexture(w, h))
     {
-        memset(pixels, 0, w * h * sizeof(Color));
+        memset(pixels, 255, w * h * sizeof(Color));
         update();
     }
     Tileset::~Tileset()
@@ -49,23 +49,43 @@ namespace Graphics
     
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
-    Sprite::Sprite(int w, int h, const std::string& name)
-        :Asset(name), m_tilesetcache(0), m_iframe(0), m_timer(0), animation("default"), rect({0,0,w,h})
+    Sprite::Sprite(const std::string & name, int w, int h)
+        :Asset(name), w(w), h(h)
     {
         //default animation is nothing
-        animframes[animation] = {
+        animframes[DEFAULT_ANIMATION] = {
             { -1.0f, {0,0,w,h} }
         };
     }
-    void Sprite::reload()
+     void Sprite::reload()
     {
         m_tilesetcache = Assets::Load<Tileset>(sheet);
     }
 
-    void Sprite::draw()
+    void Sprite::draw(const Rect & src, const Rect & dest)
     {
+        Engine::DrawTexture(m_tilesetcache->texture, src, dest);
+    }
+  
+    /*--------------------------- SpriteInstance ------------------------------------
+        Sprites are instanced. The sprite description 
+    */
+    SpriteInstance::SpriteInstance(const std::string & sprite)
+        :sprite(sprite),
+        m_spritecache(0),
+        m_iframe(0), 
+        m_timer(0), 
+        animation(DEFAULT_ANIMATION)
+    {
+        m_spritecache = Assets::Load<Sprite>(sprite);
+        rect = { 0, 0, m_spritecache->w, m_spritecache->h};
+    }
+     
+    void SpriteInstance::draw()
+    {
+        if(!m_spritecache) return;
         m_timer += Engine::GetTimeDeltaMs();
-        const std::vector<Frame>& frames = animframes[animation];
+        const std::vector<Frame>& frames = m_spritecache->animframes[animation];
         
         if (frames[m_iframe].duration != -1 && m_timer > frames[m_iframe].duration)
         {
@@ -73,9 +93,9 @@ namespace Graphics
             m_iframe++;
             m_iframe %= frames.size();
         }
-        Engine::DrawTexture(m_tilesetcache->texture, frames[m_iframe].region, rect);
+        m_spritecache->draw(frames[m_iframe].region, rect);
     }
-    
+
     ///////////////////////////////////////////////////////////////////////////////
 
     Font::Font(const std::string& name, int w, int h, int charW, int charH, char start)

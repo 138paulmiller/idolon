@@ -63,7 +63,7 @@ namespace Engine
     void Startup(int w, int h, float scale)
     {
         s_echo = false;
-        s_windowScale = scale;
+        s_windowScale = 1.0/scale;
         s_ue.s_isRunning = SDL_Init(SDL_INIT_EVERYTHING) == 0;
         
         

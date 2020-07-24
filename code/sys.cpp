@@ -91,6 +91,7 @@ print("Mouse:%s" % (mouse))
 		TypedArg ret(ARG_STRING);
 		Eval::Call( "multiply", { 3, 2 }, ret );
 		printf( "Call returned %s\n", ret.value.s );
+		
 		while (Engine::Run())
 		{
 			switch(Sys::GetContext()->run())

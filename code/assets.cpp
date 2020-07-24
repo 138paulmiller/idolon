@@ -53,6 +53,7 @@ namespace Assets
 		for(const std::string & dirpath : s_assetdirs)
 		{
 			path = FS::Append(dirpath, name) + GetAssetTypeExtImpl(type);
+			printf("PATH : %s\n", path.c_str());
 			if(FileExists(path))
 			{
 				return path;
@@ -87,7 +88,7 @@ namespace Assets
 		s_assetdirs.push_back(path);   
 	}
 	
-	Graphics::Tileset* LoadTileset(const std::string & name, const std::string & path)
+	Graphics::Tileset* LoadTileset(const std::string & path)
 	{
 		Graphics::Tileset* sheet =0;
 		try 
@@ -118,7 +119,7 @@ namespace Assets
 			if(sheet)
 				delete sheet;
 				sheet = 0;
-			printf("Asset:Failed to load %s\n", name.c_str());
+			printf("Asset:Failed to load %s\n", path.c_str());
 		}
 		return sheet;
 	}
@@ -139,25 +140,102 @@ namespace Assets
 		}
 		catch (...)
 		{
-			if(sheet)
-				delete sheet;
-				sheet = 0;
 			printf("Assets: Failed to save %s", sheet->name.c_str());
 		}
 	}
+	/*
+	Sprite:
+	 	name
+	 	sheet
+	 	x y
+	 	2
+	 	anim0
+		2 0.1 x y w h 0.1 x y w h
+	 	anim2
+		1 0.5 x y w h 
+		
 	
-	Graphics::Sprite* LoadSprite(const std::string & name, const std::string & path)
+	*/
+	Graphics::Sprite* LoadSprite(const std::string & path)
 	{
-		assert(0);
-		return 0;
+		Graphics::Sprite* sprite =0;
+		try 
+		{
+			std::fstream infile;
+			infile.open(path, std::fstream::in);
+			std::string name, sheet, animname; 
+			std::getline( infile, name ); 
+			std::getline( infile, sheet ); 
+
+			int w,h, animcount;
+			infile >> w >> h >> animcount;
+
+			sprite = new Graphics::Sprite(name, w, h);
+			sprite->sheet= sheet;
+			for(int i =0 ; i < animcount; i++)
+			{
+				std::getline( infile, animname ); 
+				int framecount;
+				infile >> framecount;
+				for(int f = 0; f < framecount; f++)
+				{
+					Graphics::Frame frame;
+					infile >> frame.duration >> frame.region.x >> frame.region.y >> frame.region.w >> frame.region.h;
+					sprite->animframes[animname].push_back(frame);
+				}
+			}
+			sprite->reload();
+		}
+		catch (...)
+		{
+			if(sprite)
+				delete sprite;
+				sprite = 0;
+			printf("Assets: Failed to load %s\n", path.c_str());
+		}
+		printf("Assets: Loaded %s\n", path.c_str());
+
+		return sprite;
+
 	}
 
 	void SaveSprite(const Graphics::Sprite* sprite, const std::string & path)
 	{
-		assert(0);
+		try 
+		{		
+			std::fstream outfile;
+			outfile.open(path, std::fstream::out);
+			outfile << sprite->name << std::endl;
+			outfile << sprite->sheet << std::endl;
+			outfile << sprite->w << ' ' << sprite->h << ' ' << sprite->animframes.size() << std::endl;
+			for(const auto pair : sprite->animframes)
+			{
+				const std::string & animname =  pair.first;
+				outfile << animname << std::endl;
+				const std::vector<Graphics::Frame> & frames = pair.second;
+				outfile << frames.size() << std::endl;
+				for( const Graphics::Frame & frame : frames)
+				{
+					outfile << frame.duration << ' ' 
+							<< frame.region.x << ' '
+							<< frame.region.y << ' ' 
+							<< frame.region.w << ' '
+							<< frame.region.h << ' '
+					<< std::endl;
+				}	
+			}
+
+
+			outfile.close();
+
+		}
+		catch (...)
+		{
+			printf("Assets: Failed to save %s", sprite->name.c_str());
+		}
 	}
 
-	Graphics::Font* LoadFont(const std::string & name, const std::string & path)
+	Graphics::Font* LoadFont(const std::string & path)
 	{
 		Graphics::Font* font =0;
 		try 
@@ -213,9 +291,6 @@ namespace Assets
 		}
 		catch (...)
 		{
-			if(font)
-				delete font;
-				font = 0;
 			printf("Assets: Failed to save %s", font->name.c_str());
 		}
 	}
@@ -265,13 +340,13 @@ namespace Assets
 		Asset * asset =0 ;
 	
 		if(type ==  typeid(Graphics::Sprite))
-			asset= LoadSprite(name, path );
+			asset= LoadSprite(path );
 
 		else if(type ==  typeid(Graphics::Tileset))
-			asset = LoadTileset(name, path );
+			asset = LoadTileset(path );
 	
 		else if(type ==  typeid(Graphics::Font))
-			asset = LoadFont(name, path );
+			asset = LoadFont(path );
 	
 		s_assets[name] = asset;
 		asset->refcounter += 1;								

@@ -22,27 +22,31 @@ MapEditor::MapEditor()
 
 void MapEditor::onEnter()
 {
-	printf("Entering map editor ... ");
+	printf("Entering map editor ... \n");
+	int w,h;
+	Engine::GetSize(w,h);
 	//load empty	tilesets.
 	//TODO load these from sprite assets	
-	m_sprite = new Sprite( TILE_W_SMALL, TILE_H_SMALL, "Sprite_test" );
-	m_sprite->sheet = m_mapName ;
-	m_sprite->rect.x = 16;
-	m_sprite->rect.y = 16;
-
-	m_sprite->reload();
+	for(int y = TILE_H_SMALL; y < h; y+=TILE_H_SMALL)
+		for(int x = TILE_W_SMALL; x < w; x+=TILE_W_SMALL)
+		{	
+			SpriteInstance * sprite = new SpriteInstance( m_mapName );
+			sprite->rect.x = x;
+			sprite->rect.y = y;
+			m_sprites.push_back(sprite);
+		}
 
 	Editor::onEnter();
 }
 
 void MapEditor::onExit()
 {	
-	m_tileset = Assets::Load<Graphics::Tileset>(m_mapName );
-	m_mapName = "";
-
+	for(SpriteInstance * sprite : m_sprites )
+		delete sprite;
+	m_sprites.clear();
 	App::clear();
 	Editor::onExit();
-	printf("Extited map editor");
+	printf("Extited map editor\n");
 }
 
 
@@ -50,7 +54,8 @@ void MapEditor::onExit()
 void MapEditor::onTick()
 {
 	Engine::ClearScreen(EDITOR_COLOR);
-	m_sprite->draw();
+	for(SpriteInstance * sprite : m_sprites )
+		sprite->draw();
 }
 
 

@@ -26,7 +26,6 @@ public:
 
 };
 
-
 namespace Assets
 {
 	void Startup(const std::string & dirpath);

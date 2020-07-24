@@ -2,7 +2,7 @@
 #include "sys.hpp"
 #include "editor.hpp"
 
-
+#include <vector>
 class  MapEditor : public Editor 
 {
 public:
@@ -24,7 +24,6 @@ private:
 	//map contains ref to tilesheet
 
 	//DEBUG
-	Graphics::Tileset* m_tileset;
-	Graphics::Sprite* m_sprite;
+	std::vector<Graphics::SpriteInstance*> m_sprites;
 
 };
