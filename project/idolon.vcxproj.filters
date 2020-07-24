@@ -100,9 +100,6 @@
     <ClInclude Include="..\code\graphics.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\code\pch.gen.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\code\pch.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -125,6 +122,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\code\mapeditor.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\defs.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -4,6 +4,7 @@
 #include "eval.hpp"
 
 #define PY_SSIZE_T_CLEAN
+#undef _DEBUG
 #include <Python.h>
 
 /*

@@ -27,21 +27,24 @@ void MapEditor::onEnter()
 	Engine::GetSize(w,h);
 	//load empty	tilesets.
 	//TODO load these from sprite assets	
-	for(int y = TILE_H_SMALL; y < h; y+=TILE_H_SMALL)
-		for(int x = TILE_W_SMALL; x < w; x+=TILE_W_SMALL)
+	for(int y = TILE_H_SMALL; y < h; y+=TILE_H)
+		for(int x = TILE_W_SMALL; x < w; x+=TILE_W)
 		{	
-			SpriteInstance * sprite = new SpriteInstance( m_mapName );
-			sprite->rect.x = x;
-			sprite->rect.y = y;
+			Sprite * sprite = new Sprite( 22, TILE_W_SMALL, TILE_H_SMALL );
+			sprite->sheet = m_mapName;
+			sprite->x = x;
+			sprite->y = y;
+			sprite->reload();
 			m_sprites.push_back(sprite);
 		}
+	printf( "\nLoaded %u\n", m_sprites.size() );
 
 	Editor::onEnter();
 }
 
 void MapEditor::onExit()
 {	
-	for(SpriteInstance * sprite : m_sprites )
+	for(Sprite * sprite : m_sprites )
 		delete sprite;
 	m_sprites.clear();
 	App::clear();
@@ -54,15 +57,42 @@ void MapEditor::onExit()
 void MapEditor::onTick()
 {
 	Engine::ClearScreen(EDITOR_COLOR);
-	for(SpriteInstance * sprite : m_sprites )
+	for(Sprite * sprite : m_sprites )
 		sprite->draw();
 }
 
 
 //
-void MapEditor::onKey(Key key, bool isDown)
+void MapEditor::onKey( Key key, bool isDown )
 {
-
+	int tile = 0;
+	static bool released = true;
+	if ( !isDown )
+	{
+		released = true;
+		return;
+	}
+	if ( released )
+	{
+		released = false;
+		switch ( key )
+		{
+			case KEY_z:
+				for ( Sprite* sprite : m_sprites )
+				{
+					tile = sprite->tile--;
+				}
+			break;
+		
+			case KEY_x:
+				for ( Sprite* sprite : m_sprites )
+				{
+					tile = sprite->tile++;
+				}
+			break;
+		}
+		printf( "\nTile Index %d\n", tile );
+	}
 }
 
 

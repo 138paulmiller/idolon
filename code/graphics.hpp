@@ -18,62 +18,17 @@ namespace Graphics
         
         //call sparingly . if no rect, will update entire. push data to gpu
         void update(const Rect & rect = { 0, 0, 0, 0 } ); 
+        //given tile rect get index
+        int id( const Rect & tile) const;
 
+        //get tile rect of size tx x th 
+        Rect tile( int tileId, int tw, int th ) const;
         Color * const pixels;
         const int w, h;
         const int texture;
     };
 
-    /*--------------------------- Tileset - -----------------------------------
-        animation frame
-    */
-    struct Frame
-    {
-        //time spent at frame
-        float duration;
-        //offset in texture
-        Rect region;
-    };
 
-    /*--------------------------- Sprite ------------------------------------
-        Describes a sprite. nothing about runtime info. 
-    */
-
-    class Sprite  : public Asset
-    {
-    public:
-        Sprite(const std::string & name, int w, int h);
-        void reload();
-        void draw(const Rect & src, const Rect & dest);
-        
-        int w,h;
-        std::string sheet;
-        std::map<std::string, std::vector<Frame> > animframes;
-
-    private:
-        Tileset * m_tilesetcache;
-    };
-  
-    /*--------------------------- SpriteInstance ------------------------------------
-        Sprites are instanced. The sprite description 
-    */
-    class SpriteInstance
-    {
-    public:
-        SpriteInstance(const std::string & sprite);
-        //reload cached sheet from disk.
-        void draw();
-
-        std::string sprite;
-        std::string animation; //current animation        
-        //current position/size
-        Rect rect;
-
-    private:
-        Sprite * m_spritecache;
-        int m_iframe;
-        float m_timer;
-    };
 
     /*--------------------------- Map ------------------------------------
         contains a list of references to some sprites and their positions
@@ -91,16 +46,9 @@ namespace Graphics
         //viewport
         Rect view;
 
-        void removeSprite(const std::string & name);
-        void addSprite(const std::string & spriteName, const std::string & instanceName, int x, int y);
-    private:
-
-
+     private:
         std::vector<int> m_tiles;
-        //map to sprite instance (cache )
-        std::unordered_map<std::string, SpriteInstance*> m_sprites;
-        
-        Tileset * sheetcache;
+        Tileset * m_tilesetcache;
         //TODO - split map into multiple subtextures. Each streamed in on demand. "Super maps"
         int m_texture; 
 
@@ -118,6 +66,28 @@ namespace Graphics
         const int charW,charH;
         const char start;
     };
+
+    // ------------ Drawables. These are runtime. Not serialized assets  ------------
+
+    /*--------------------------- Sprite ------------------------------------
+        Describes a sprite. nothing about runtime info. 
+    */
+    class Sprite
+    {
+    public:
+        Sprite(int tile, int w, int h);
+        void reload();
+        void draw();
+        //tile index
+        int tile ;
+        int x,y;
+        int w,h;
+        std::string sheet;
+
+    private:
+        Tileset * m_tilesetcache;
+    };
+  
 
     /*--------------------------- Textbox ------------------------------------
         TODO Create a texture that is sizeof(boxtexture)/fontw

@@ -221,10 +221,7 @@ namespace UI
 	private:
 		const Graphics::Tileset * m_tileset;
 		Rect m_cursor;
-		//draw  src and dest of texture. 
-		// draw top half of texture to the left
-		Rect m_srcLeft, m_destLeft;
-		Rect m_srcRight, m_destRight;
+
 		//entire box
 		Rect m_box;
 		const int m_scale;

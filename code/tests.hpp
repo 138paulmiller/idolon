@@ -16,7 +16,7 @@ void renderCheck0(int w, int h, float scale)
 		}
 
 		//perf test. create destory
-		int texture = Engine::CreateTexture(w, h);
+		int texture = Engine::CreateTexture(w, h, TEXTURE_LOCKABLE);
 		const int len = w * h;
 		Color* pixels = Engine::LockTexture(texture, { 0,0,w,h });
 

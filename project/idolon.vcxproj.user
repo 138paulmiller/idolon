@@ -5,6 +5,8 @@
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerCommandArguments>
     </LocalDebuggerCommandArguments>
+    <LocalDebuggerEnvironment>PYTHONHOME="C:\Program Files\idolon\root;$(SolutionDir)code\external\Python3"
+PYTHONPATH="$(SolutionDir)code\external\Python3;$(SolutionDir)code\external\Python3\Lib;$(SolutionDir)code\external\Python3\DLLs"</LocalDebuggerEnvironment>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LocalDebuggerWorkingDirectory>$(SolutionDir)</LocalDebuggerWorkingDirectory>

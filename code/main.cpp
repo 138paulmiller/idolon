@@ -268,21 +268,10 @@ void NewAsset(const Args& args)
 	ARG_RANGE(args, 2, 3); // 
 	const std::string& asset = args[0];
 	const std::string& name = args[1];
-	if(asset == "sheet")
+	if(asset == "tileset")
 	{
 		Graphics::Tileset * sheet = new Graphics::Tileset(name, TILESET_W, TILESET_H);
 		Assets::SaveAs(sheet, UserAssetPath<Graphics::Tileset>(name));
-	}
-	else if(asset == "sprite")
-	{
-		//new sprite  <name>  <sheet> 
-		ARG_COUNT(args, 3); // 
-
-		Graphics::Sprite * sprite = new Graphics::Sprite(name, SPRITE_W, SPRITE_H);
-		sprite->sheet = args[2];
-		sprite->reload();
-
-		Assets::SaveAs(sprite, UserAssetPath<Graphics::Sprite>(name));
 	}
 	else if(asset == "map")
 	{
@@ -308,20 +297,24 @@ void EditAsset(const Args& args)
 	
 	//edit <asset>   
 	ARG_COUNT(args, 1);
-	const std::string& ext = FS::FileExt(args[0]);
+	//keep the dot
+	const std::string& ext = "." + FS::FileExt(args[0]);
 	const std::string& name = FS::BaseName(args[0]);
-	if(ext == "sheet")
+	if(ext == Assets::GetAssetTypeExt<Graphics::Tileset>())
 	{
 		Sys::GetContext()->app<TilesetEditor>(APP_TILESET_EDITOR)->setTileset(name);
 		Sys::GetContext()->enter(APP_TILESET_EDITOR);
 	}
-	else if(ext == "map")
+	else if(ext == Assets::GetAssetTypeExt<Graphics::Map>())
 	{
 		Sys::GetContext()->app<MapEditor>(APP_MAP_EDITOR)->setMap(name);
 		Sys::GetContext()->enter(APP_MAP_EDITOR);
 	}
-	else if(ext == "font")
+	else if(ext == Assets::GetAssetTypeExt<Graphics::Font>())
 	{
+		//load font as tls
+		//Sys::GetContext()->app<TilesetEditor>(APP_TILESET_EDITOR)->setTileset(name);
+		//Sys::GetContext()->enter(APP_TILESET_EDITOR);
 	}
 }
 

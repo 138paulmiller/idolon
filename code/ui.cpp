@@ -429,26 +429,13 @@ namespace UI
 
 	int TilePicker::selectionIndex()
 	{
-		const int x = m_cursor.x / m_cursor.w;
-		const int y = m_cursor.y / m_cursor.h;
-		//scale by aspect since cursor is striding along transformed sheet. each tile is size of cursor
-		const int w = (m_tileset->w * m_aspect ) / m_cursor.h;
-		return w * y + x;
+		return m_tileset->id(m_cursor);
 	}
 
 	Rect TilePicker::selection()
 	{
-
 		if(!m_tileset) return {-1,-1,0,0};
-		//since texture is half height and twice width, remap back to square sheet
-		int x = m_cursor.x;
-		int y = m_cursor.y;
-		if(x >= m_tileset->w )
-		{
-			y += m_tileset->h/2;
-			x -= m_tileset->w;
-		}
-		return {x,y , m_cursor.w, m_cursor.h };
+		return m_tileset->tile( selectionIndex(), m_cursor.w, m_cursor.h );
 	}
 	void TilePicker::moveCursor(int dx, int dy)
 	{
@@ -502,22 +489,7 @@ namespace UI
 		const int adjh = ( int ) ( m_tileset->w / m_aspect );
 
 		m_cursor = {0,0,TILE_W,TILE_H};	
-		m_box = { 0, h - adjh * m_scale, adjw * m_scale, adjh * m_scale };
-
-
-		m_srcLeft = { 0, 0, adjw, adjh };
-		
-		m_destLeft = { 
-			m_box.x,     m_box.y, 
-			m_box.w / 2, m_box.h
-		}; 
-
-		m_srcRight = { 0, adjh , adjw, adjh };
-
-		m_destRight = {
-			m_box.x + m_box.w / 2, m_box.y,  
-			m_box.w / 2, m_box.h
-		}; 
+		m_box = { 0, h - m_tileset->h * m_scale , m_tileset->w * m_scale, m_tileset->h * m_scale};
 
 	}
 
@@ -531,8 +503,11 @@ namespace UI
 			m_cursor.w * m_scale , 
 			m_cursor.h * m_scale 
 		};
-		Engine::DrawTexture(m_tileset->texture, m_srcLeft, m_destLeft);
-		Engine::DrawTexture(m_tileset->texture, m_srcRight, m_destRight);
+
+		const Rect& src = { 0, 0, m_tileset->w, m_tileset->h };
+		
+		Engine::DrawTexture( m_tileset->texture, src, m_box);
+
 		Engine::DrawRect(CURSOR_COLOR, worldCursor, false);
 
 	}

@@ -40,7 +40,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <UseDebugLibraries>true</UseDebugLibraries>
+    <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -97,17 +97,20 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)\code\external;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\code\external\;$(SolutionDir)\code\external\Python3\include;</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>$(SolutionDir)code\pch.h.gch</PrecompiledHeaderOutputFile>
+      <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(SolutionDir)code\pch.gen.hpp</PrecompiledHeaderOutputFile>
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
-      <AdditionalLibraryDirectories>$(SolutionDir)\code\external\SDL2\x64;$(SolutionDir)\code\external\SDL2\image</AdditionalLibraryDirectories>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2test.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)\code\external\SDL2\x64;$(SolutionDir)\code\external\Python3\libs</AdditionalLibraryDirectories>
+      <AdditionalDependencies>python38.lib;SDL2.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy /Y "$(SolutionDir)code\external\Python3\*.dll" "$(OutDir)"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -137,6 +140,10 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)\code\external\;$(SolutionDir)\code\external\Python3\include;</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_UNICODE;UNICODE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <PrecompiledHeader>Create</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(SolutionDir)code\pch.gen.hpp</PrecompiledHeaderOutputFile>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -145,6 +152,9 @@
       <AdditionalLibraryDirectories>$(SolutionDir)\code\external\SDL2\x64;$(SolutionDir)\code\external\Python3\libs</AdditionalLibraryDirectories>
       <AdditionalDependencies>python38.lib;SDL2.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy /Y "$(SolutionDir)code\external\Python3\*.dll" "$(OutDir)"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\code\assets.cpp" />
@@ -170,13 +180,13 @@
     <ClInclude Include="..\code\commands.hpp" />
     <ClInclude Include="..\code\context.hpp" />
     <ClInclude Include="..\code\core.hpp" />
+    <ClInclude Include="..\code\defs.hpp" />
     <ClInclude Include="..\code\editor.hpp" />
     <ClInclude Include="..\code\engine.hpp" />
     <ClInclude Include="..\code\err.hpp" />
     <ClInclude Include="..\code\eval.hpp" />
     <ClInclude Include="..\code\fs.hpp" />
     <ClInclude Include="..\code\graphics.hpp" />
-    <ClInclude Include="..\code\pch.gen.hpp" />
     <ClInclude Include="..\code\pch.hpp" />
     <ClInclude Include="..\code\shell.hpp" />
     <ClInclude Include="..\code\sys.hpp" />

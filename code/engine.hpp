@@ -30,6 +30,14 @@ enum BlendMode
     BLEND_MIX
 };
 
+//Mouse button
+enum TextureMode
+{
+    TEXTURE_STATIC = 0, //use update to change pixels
+    TEXTURE_LOCKABLE, //locakable. used for multiple updates
+    TEXTURE_TARGET //render target
+};
+
 
 namespace Engine
 {
@@ -42,8 +50,10 @@ namespace Engine
     void AlignMouse(int x, int y);
 
     // Texture 
-    int CreateTexture(int width, int height, bool target = false);
+    int CreateTexture(int width, int height, TextureMode mode = TEXTURE_STATIC);
     void DestroyTexture(int textureId);
+    //if using static texture. width is pitch in color count
+    void UpdateTexture( int textureId, const Color* colors, int width, const Rect & rect);
     //Gget handle to pixels in memory
     Color * LockTexture(int textureId, const Rect & region);
     void UnlockTexture(int textureId);

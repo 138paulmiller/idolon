@@ -6,14 +6,14 @@
 
 #define WINDOW_SCALE 3
 //in virtual pixel space. not window size
-#define SCREEN_W 240
-#define SCREEN_H 240
+#define SCREEN_W 256
+#define SCREEN_H 256
 //TODO make font 8x8. need to edit sheet and then reconvert
 #define SHELL_PREFIX ">"
 #define DEFAULT_FONT "default"
 //Default Tileset size
-#define TILESET_W 64
-#define TILESET_H 64
+#define TILESET_W 128
+#define TILESET_H 32
 //Default Tileset sizes
 #define TILE_W 16
 #define TILE_H 16

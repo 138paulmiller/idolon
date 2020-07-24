@@ -102,8 +102,9 @@ print("Mouse:%s" % (mouse))
 					Sys::Shutdown();
 					break;
 				case APP_CODE_EXIT:
-					s_context->exit();
+					//set current back to conitnue so can reenter
 					s_context->app()->signal( APP_CODE_CONTINUE );
+					s_context->exit();
 					break;
 			}
 		}

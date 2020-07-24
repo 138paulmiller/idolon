@@ -34,7 +34,6 @@ namespace
     } s_ue;
 
  
-
     static bool s_echo;
     static std::function<void(Key, bool)> s_echocb;
     //when this key is hit, input handling enters "echo" mode. forwards all key input
@@ -44,6 +43,7 @@ namespace
     //create layers. blit to layer. priority
     //Create internal texture system. All textures are managed by the engine system
     static int s_target; //used to upsample to display to acheive pixelated effect
+    static int s_bound; //texture currently bound render target
     static int s_windowW, s_windowH;
     static float s_windowScale;
     static int s_alignX = 1, s_alignY = 1;
@@ -74,7 +74,7 @@ namespace Engine
 
         s_window = SDL_CreateWindow(title, WINDOW_X, WINDOW_Y, s_windowW, s_windowH, WINDOW_FLAGS);
         s_renderer = SDL_CreateRenderer(s_window, -1, RENDERER_FLAGS);
-        s_target = CreateTexture( w, h, true);
+        s_target = CreateTexture( w, h, TEXTURE_TARGET);
 
         s_ue.s_isRunning == s_ue.s_isRunning && s_window && s_renderer;
         s_frame = 0;
@@ -243,11 +243,11 @@ namespace Engine
         {
             DestroyTexture(s_target);
         }
-        s_target = CreateTexture(w, h, true);
+        s_target = CreateTexture(w, h, TEXTURE_TARGET);
         
     }
     
-    int CreateTexture(int width, int height, bool target)
+    int CreateTexture(int width, int height,TextureMode mode)
     {
         //find next slot
         int i;
@@ -259,10 +259,17 @@ namespace Engine
         if (i >= s_textures.size()) {
             s_textures.push_back(0);
         }
-        s_textures[i] = SDL_CreateTexture(s_renderer,
-            SDL_PIXELFORMAT_BGRA8888,
-            target ? SDL_TEXTUREACCESS_TARGET : SDL_TEXTUREACCESS_STREAMING, 
-            width, height);
+        SDL_TextureAccess access;
+        switch ( mode )
+        {
+        case TEXTURE_LOCKABLE: access = SDL_TEXTUREACCESS_STREAMING;
+            break;
+        case TEXTURE_TARGET: access = SDL_TEXTUREACCESS_TARGET;
+            break;
+        case TEXTURE_STATIC: access = SDL_TEXTUREACCESS_STATIC;
+            break;
+        }
+        s_textures[i] = SDL_CreateTexture(s_renderer, SDL_PIXELFORMAT_BGRA8888, access, width, height);
         SetTextureBlendMode(i, BLEND_MIX);
         return i;
     }
@@ -275,7 +282,6 @@ namespace Engine
     }
     void ClearScreen(const Color& color)
     {
-    
         ClearTexture(s_target, color);
     }
     SDL_BlendMode GetSDLBlendMode(BlendMode mode)
@@ -301,7 +307,16 @@ namespace Engine
     {
         SetTextureBlendMode(  s_target, mode );
     }
+    
+    //if texture is static
 
+    void UpdateTexture( int textureId, const Color * colors, int width, const Rect & rect )
+    {
+        CHECK_TEXTURE( textureId );
+        const SDL_Rect & sdlrect = { rect.x, rect.y, rect.w, rect.h };
+        SDL_UpdateTexture( s_textures[textureId], &sdlrect, colors, width * sizeof( Color ) );
+    }
+    //If using streaming 
     Color * LockTexture(int textureId, const Rect & region)
     {
         CHECK_TEXTURE(textureId )
@@ -322,9 +337,7 @@ namespace Engine
     void UnlockTexture(int textureId)
     {
         CHECK_TEXTURE(textureId )
-
-        SDL_Texture* texture = s_textures[textureId];
-        SDL_UnlockTexture(texture);
+        SDL_UnlockTexture(s_textures[textureId]);
     }
     Color * LoadTexture(const std::string path, int &w, int &h)
     {

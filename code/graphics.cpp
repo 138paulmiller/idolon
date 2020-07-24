@@ -32,68 +32,53 @@ namespace Graphics
 
         if( rect.w == 0 || rect.h == 0 )
         {
-            Color * data = Engine::LockTexture( texture, { 0,0,w,h } );
-            memcpy(data, pixels, w * h * sizeof(Color));
+            Engine::UpdateTexture( texture, pixels, w, { 0,0,w,h } );
+            //Color * data = Engine::LockTexture( texture, { 0,0,w,h } );
+            //memcpy(data, pixels, w * h * sizeof(Color));
         }
         else
         {
-            Color * data = Engine::LockTexture( texture, rect );
-            for(int y = 0; y < rect.h; y++)
-                for(int x = 0; x < rect.w; x++)
-                    data[y * w  + x] = pixels[(rect.y+y) * w  + rect.x + x];
+            Engine::UpdateTexture( texture, &pixels[rect.y * w + rect.x], w, rect );
+            //Color * data = Engine::LockTexture( texture, rect );
+            //for(int y = 0; y < rect.h; y++)
+            //    for(int x = 0; x < rect.w; x++)
+            //        data[y * w  + x] = pixels[(rect.y+y) * w  + rect.x + x];
         }   
+        //Engine::UnlockTexture(texture);
 
-        Engine::UnlockTexture(texture);
+    }
+    int Tileset::id( const Rect& tile ) const
+    {
+        const int tw = w/tile.w;
+        const int tx = tile.x / tile.w;
+        const int ty = tile.y / tile.h;
+        return ty * tw + tx;     
+    }
 
+    Rect Tileset::tile( int index, int tw, int th ) const
+    {
+        const int x = ( index % (w/tw) ) * tw;
+        const int y = ( index / (w/tw) ) * th;
+        return { x,y, tw, th };
     }
     
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
-    Sprite::Sprite(const std::string & name, int w, int h)
-        :Asset(name), w(w), h(h)
+    Sprite::Sprite(int tileId, int w, int h)
+        :x(0), y(0), w(w), h(h), sheet(""), tile(tileId)
     {
-        //default animation is nothing
-        animframes[DEFAULT_ANIMATION] = {
-            { -1.0f, {0,0,w,h} }
-        };
+
     }
      void Sprite::reload()
     {
         m_tilesetcache = Assets::Load<Tileset>(sheet);
     }
 
-    void Sprite::draw(const Rect & src, const Rect & dest)
+    void Sprite::draw()
     {
-        Engine::DrawTexture(m_tilesetcache->texture, src, dest);
-    }
-  
-    /*--------------------------- SpriteInstance ------------------------------------
-        Sprites are instanced. The sprite description 
-    */
-    SpriteInstance::SpriteInstance(const std::string & sprite)
-        :sprite(sprite),
-        m_spritecache(0),
-        m_iframe(0), 
-        m_timer(0), 
-        animation(DEFAULT_ANIMATION)
-    {
-        m_spritecache = Assets::Load<Sprite>(sprite);
-        rect = { 0, 0, m_spritecache->w, m_spritecache->h};
-    }
-     
-    void SpriteInstance::draw()
-    {
-        if(!m_spritecache) return;
-        m_timer += Engine::GetTimeDeltaMs();
-        const std::vector<Frame>& frames = m_spritecache->animframes[animation];
-        
-        if (frames[m_iframe].duration != -1 && m_timer > frames[m_iframe].duration)
-        {
-            m_timer = 0;
-            m_iframe++;
-            m_iframe %= frames.size();
-        }
-        m_spritecache->draw(frames[m_iframe].region, rect);
+        if ( !m_tilesetcache ) return;
+        const Rect& src = m_tilesetcache->tile(tile, w, h);
+        Engine::DrawTexture( m_tilesetcache->texture, src, { x,y,w,h } );
     }
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -202,7 +187,7 @@ namespace Graphics
         if(m_texture) Engine::DestroyTexture(m_texture);
         w = tw * m_fontcache->charW + borderX*2;
         h = th * m_fontcache->charH + borderY*2;
-        m_texture = Engine::CreateTexture(w, h, true);
+        m_texture = Engine::CreateTexture(w, h, TEXTURE_TARGET);
         if(!filled)
             Engine::SetTextureBlendMode(m_texture, BLEND_ADD);
         refresh();

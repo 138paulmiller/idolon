@@ -24,6 +24,6 @@ private:
 	//map contains ref to tilesheet
 
 	//DEBUG
-	std::vector<Graphics::SpriteInstance*> m_sprites;
+	std::vector<Graphics::Sprite*> m_sprites;
 
 };

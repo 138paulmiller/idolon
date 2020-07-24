@@ -7,7 +7,6 @@
 namespace Graphics 
 {
 	class Tileset;
-	class Sprite;
 	class Font;
 }
 /*
