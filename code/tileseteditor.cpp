@@ -30,10 +30,10 @@ void TilesetEditor::onEnter()
 
 	printf("Entering sheet editor ... ");
 	m_usingTool = 0;
-	m_sheet = 0;
+	m_tileset = 0;
 	m_overlay = 0;
 	m_revision = -1;
-	m_sheet = Assets::Load<Graphics::Tileset>(m_sheetName);
+	m_tileset = Assets::Load<Graphics::Tileset>(m_tilesetName);
 	
 	
 	m_charW = Sys::GetShell()->getFont()->charW;
@@ -45,7 +45,7 @@ void TilesetEditor::onEnter()
 	const int x = w - 16 - 8;
 	const int y = 8 * 2;
 	m_colorPicker = new ColorPicker(x,y);
-	m_sheetPicker = new TilePicker( m_sheet );
+	m_sheetPicker = new TilePicker( m_tileset );
 
 	const int idLen  = 3;
 	const int tileidX =  w - m_charW * 3;
@@ -84,9 +84,9 @@ void TilesetEditor::onEnter()
 	m_toolbar->get(TOOL_PIXEL)->click();
 	
 
-	if ( m_sheet )
+	if ( m_tileset )
 	{
-		m_sheet->update();
+		m_tileset->update();
 		commit();
 	}
 	Editor::onEnter();
@@ -94,8 +94,8 @@ void TilesetEditor::onEnter()
 
 void TilesetEditor::onExit()
 {	//allow for reloading data
-	Assets::Unload(m_sheetName );
-	m_sheetName = "";
+	Assets::Unload(m_tilesetName );
+	m_tilesetName = "";
 	//remove all ui Widgets/buttons
 	App::clear();
 	for(Color * colors : m_revisionData)
@@ -168,16 +168,16 @@ void TilesetEditor::onTick()
 			switch(m_tool)
 			{
 			case TOOL_FILL:
-				FloodFill(m_sheet->pixels, m_sheet->w, tileSrc, color, sheetx, sheety);
+				FloodFill(m_tileset->pixels, m_tileset->w, tileSrc, color, sheetx, sheety);
 				commit();
 				break;
 			case TOOL_ERASE:
-				m_sheet->pixels[sheety * m_sheet->w + sheetx] = CLEAR;
-				m_sheet->update(m_sheetPicker->selection());
+				m_tileset->pixels[sheety * m_tileset->w + sheetx] = CLEAR;
+				m_tileset->update(m_sheetPicker->selection());
 				break;
 			case TOOL_PIXEL:
-				m_sheet->pixels[sheety * m_sheet->w + sheetx] = color;
-				m_sheet->update(m_sheetPicker->selection());
+				m_tileset->pixels[sheety * m_tileset->w + sheetx] = color;
+				m_tileset->update(m_sheetPicker->selection());
 				break;
 			case TOOL_LINE:
 				//set shape origin (x,y) and dest
@@ -196,12 +196,12 @@ void TilesetEditor::onTick()
 			switch ( m_tool )
 			{
 			case TOOL_ERASE:
-				m_sheet->pixels[sheety * m_sheet->w + sheetx] = CLEAR;
-				m_sheet->update(m_sheetPicker->selection());
+				m_tileset->pixels[sheety * m_tileset->w + sheetx] = CLEAR;
+				m_tileset->update(m_sheetPicker->selection());
 				break;
 			case TOOL_PIXEL:
-				m_sheet->pixels[sheety * m_sheet->w + sheetx] = color;
-				m_sheet->update(m_sheetPicker->selection());
+				m_tileset->pixels[sheety * m_tileset->w + sheetx] = color;
+				m_tileset->update(m_sheetPicker->selection());
 				break;
 			case TOOL_LINE:
 				//set shape end (x,y)
@@ -233,7 +233,7 @@ void TilesetEditor::onTick()
 					const int y1 = tileSrc.y + m_shapeRect.y;
 					const int x2 = tileSrc.x + m_shapeRect.w;
 					const int y2 = tileSrc.y + m_shapeRect.h;
-					LineBresenham( m_sheet->pixels, m_sheet->w, x1, y1, x2, y2, color );
+					LineBresenham( m_tileset->pixels, m_tileset->w, x1, y1, x2, y2, color );
 					//commit to revision stack 
 					commit();
 					m_shapeRect = { -1, -1, -1, -1 };
@@ -255,7 +255,7 @@ void TilesetEditor::onTick()
 	snprintf(idText, 3, "%02d", id);
 	m_tileIdBox->setText(idText);
 	// draw tile and border
-	Engine::DrawTexture(m_sheet->texture, tileSrc, canvasRect);
+	Engine::DrawTexture(m_tileset->texture, tileSrc, canvasRect);
 
 	const Rect& border = {
 			canvasRect.x - 1,
@@ -359,18 +359,18 @@ void TilesetEditor::onKey(Key key, bool isDown)
 void TilesetEditor::setTileset(const std::string& name)
 {
 	printf("Loading sheet %s ...\n", name.c_str());
-	m_sheetName = name;
+	m_tilesetName = name;
 }
 
 void TilesetEditor::commit()
 {	
 	const Rect & selection = m_sheetPicker->selection();
-	m_sheet->update(selection);
+	m_tileset->update(selection);
 	
-	int size = m_sheet->w * m_sheet->h;
+	int size = m_tileset->w * m_tileset->h;
 
 	Color * colors = new Color [size];
-	memcpy(colors, m_sheet->pixels, size * sizeof(Color)); 
+	memcpy(colors, m_tileset->pixels, size * sizeof(Color)); 
 
 /*	
 	TODO:
@@ -391,7 +391,7 @@ void TilesetEditor::commit()
 		int i;
 		const int sx = selection.x;
 		const int sy = selection.y;
-		const int sheetw = m_sheet->w;
+		const int sheetw = m_tileset->w;
 		//assign only selection
 		for(int y = 0; y< selection.h; y++)
 		{
@@ -435,20 +435,20 @@ void TilesetEditor::undo()
 		m_revision--;
 	
 		int i;
-		int size = m_sheet->w * m_sheet->h;
+		int size = m_tileset->w * m_tileset->h;
 		const int sx = selection.x;
 		const int sy = selection.y;
-		const int sheetw = m_sheet->w;
+		const int sheetw = m_tileset->w;
 		
 		for(int y = 0; y< selection.h; y++)
 		{
 			for(int x = 0; x< selection.w; x++)
 			{
 				i = (y+sy) * sheetw + x+sx;
-				m_sheet->pixels[i] = m_revisionData[m_revision][ i ];
+				m_tileset->pixels[i] = m_revisionData[m_revision][ i ];
 			}
 		}
-		m_sheet->update();
+		m_tileset->update();
 	}
 }
 
@@ -467,28 +467,28 @@ void TilesetEditor::redo()
 	{
 		m_revision++;
 		int i;
-		int size = m_sheet->w * m_sheet->h;
+		int size = m_tileset->w * m_tileset->h;
 		const int sx = selection.x;
 		const int sy = selection.y;
-		const int sheetw = m_sheet->w;
+		const int sheetw = m_tileset->w;
 
 		for(int y = 0; y< selection.h; y++)
 		{
 			for(int x = 0; x< selection.w; x++)
 			{
 				i = (y+sy) * sheetw + x+sx;
-				m_sheet->pixels[i] = m_revisionData[m_revision][ i ];
+				m_tileset->pixels[i] = m_revisionData[m_revision][ i ];
 			}
 		}
-		m_sheet->update();
+		m_tileset->update();
 	}
 
 }
 
 void TilesetEditor::save()
 {
-	if(!m_sheet) return;
+	if(!m_tileset) return;
 
-	m_sheet->update();
-	Assets::Save(m_sheet);
+	m_tileset->update();
+	Assets::Save(m_tileset);
 }

@@ -22,41 +22,36 @@ public:
 	void onTick()override;
 	void onKey(Key key , bool isDown) override;
 
-	void setTileset(const std::string & name);
-	
-	//commit change
-	void redo();
-	void undo();
-	void save();
+	void redo()override;
+	void undo()override;
+	void save()override;
 
+	//allow for runtime update of tilesheet
+	void setTileset(const std::string & name);
 private:
 	void commit();
 	//draw the propoed changes with mouse at tilex,y
 	void drawOverlay(int tilex, int tiley, const Rect & dest);
 	
 
-	std::string m_sheetName;
-	Graphics::Tileset * m_sheet;
-	const int m_tileScale = 8;
 	UI::TilePicker * m_sheetPicker;
 	UI::ColorPicker * m_colorPicker;
 	UI::Toolbar * m_toolbar;
-
-	//tileId button replace with text input
 	UI::TextButton * m_tileIdBox;
+	
+	std::string m_tilesetName;
+	Graphics::Tileset * m_tileset;
+	const int m_tileScale = 8;
+	
+	bool m_usingTool;
 	ToolMode m_tool;
-	//shape bounds
+	//shape is data used by the current tool. for line xy = x1y1 wh = x2y2
 	Rect m_shapeRect;
 	//used to render the potential modifications 
 	Graphics::Tileset * m_overlay;
 
-	std::vector<Color * > m_revisionData;
-	//selection id to revision count 
-	//TODO
-	//std::unordered_map<int, int > m_revisions; 
 	int m_revision; 
-
-	bool m_usingTool;
-
+	std::vector<Color * > m_revisionData;
+	//
 	int m_charW, m_charH;
 };

@@ -34,11 +34,11 @@ void Context::create( uint8 appId, UI::App * app )
 	m_apps[appId] = app;
 }
 
-void Context::enter(uint8 appId)
+void Context::enter(uint8 appId, bool kill )
 {
 	ASSERT(appId < m_appCount, "Invalid App ID");
 	printf("Context Switch: from %d to %d\n", m_prevAppId, appId);
-	if(m_app)
+	if(kill && m_app)
 		m_app->onExit();
 
 	m_prevAppId = m_appId;

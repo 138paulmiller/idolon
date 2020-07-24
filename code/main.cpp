@@ -1,5 +1,6 @@
 #include "pch.hpp"
 
+#include "mapeditor.hpp"
 #include "tileseteditor.hpp"
 
 void PrintHelp(const Args& args);
@@ -17,10 +18,11 @@ void EditAsset(const Args& args);
 #define ARG_COUNT(args, i) if(args.size() != i ){ SysLog("Incorrect number of arguments"); return; }
 
 /*
-	load <game>.ult
-	- loads game code as well as map/sheet/sprite editor. 
+	load <game>.game
+	- loads game code as well as map and tileset editor. 
+	- Will also have a code editor. and cmd line. switchable by a single button press
 	- you can have up to 4 sheets. And A few maps. Can select assets to be used.  
-
+	2 modes
 */
 static const CommandTable & g_cmds = 
 {
@@ -28,6 +30,15 @@ static const CommandTable & g_cmds =
 		{ "help", "[action]" },
 		PrintHelp
 	},
+	{
+		{ "test", "debug commands here" },
+		[](Args args)
+		{ 
+			Sys::GetContext()->app<MapEditor>(APP_MAP_EDITOR)->setMap("test");
+			Sys::GetContext()->enter(APP_MAP_EDITOR);
+		} 
+	},
+	
 	{
 		{ "exit", "shutdown system" },
 		[](Args args)
@@ -214,7 +225,7 @@ void ImportAsset(const Args& args)
 		Color * pixels = Engine::LoadTexture(imgpath, w, h);
 		if ( !pixels ) return; //log err
 		std::string name = FS::BaseName(imgpath);
-		//remove spaces Experimental
+		//remove spaces 
 		int space = args.size() > 5 ? std::stoi(args[5]) : 0;
 		int ci = w / ( cw + space );
 		int cj = h / ( ch + space );
@@ -257,6 +268,10 @@ void NewAsset(const Args& args)
 		sheet->update();
 		Assets::SaveAs(sheet, path);
 	}
+	else if(asset == "map")
+	{
+		//TODO create map
+	}
 	else if(asset == "font")
 	{
 		//8x8 font 
@@ -286,6 +301,11 @@ void EditAsset(const Args& args)
 	{
 		Sys::GetContext()->app<TilesetEditor>(APP_TILESET_EDITOR)->setTileset(name);
 		Sys::GetContext()->enter(APP_TILESET_EDITOR);
+	}
+	else if(ext == "map")
+	{
+		//Sys::GetContext()->app<MapEditor>(APP_MAP_EDITOR)->setMap(name);
+		//Sys::GetContext()->enter(APP_MAP_EDITOR);
 	}
 	else if(ext == "font")
 	{

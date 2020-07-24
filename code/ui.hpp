@@ -166,10 +166,16 @@ namespace UI
 
 	};
 
+	//////////////////////////////////////////////////////////////////////////////////
+	/*
+		TODO Create Value Input Selector
+			- Returns path to selected file
+
+	*/
 
 	//////////////////////////////////////////////////////////////////////////////////
 	/*
-		Create Color Selector
+		Color Selector
 			- Renders the sheet at the top-right of the screen.
 
 	*/
@@ -185,7 +191,7 @@ namespace UI
 
 		Color color();
 	private:
-		Graphics::Tileset * m_sheet;
+		Graphics::Tileset * m_tileset;
 		int m_colorSize;
 		Rect m_cursor;
 		Rect m_src, m_dest, m_border;
@@ -213,7 +219,7 @@ namespace UI
 		void moveCursor(int dx, int dy);
 		void resizeCursor(int w, int h);
 	private:
-		const Graphics::Tileset * m_sheet;
+		const Graphics::Tileset * m_tileset;
 		Rect m_cursor;
 		//draw  src and dest of texture. 
 		// draw top half of texture to the left

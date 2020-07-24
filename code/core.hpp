@@ -30,6 +30,8 @@
 #define TILE_W_SMALL 8
 #define TILE_H_SMALL 8
 
+#define MAP_TILESET_COUNT 4
+
 //Add Vector / Math classes
 
 typedef unsigned char uint8;

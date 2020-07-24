@@ -342,16 +342,16 @@ namespace UI
 		m_colorSize = 8; //8x8 
 
 		const std::string& name = "ColorPicker" + std::to_string(colorPickerId++);
-		m_sheet = new Graphics::Tileset(name, 2, PaletteCount/2);
-		memcpy(m_sheet->pixels, Palette, PaletteCount * sizeof(Color));
-		m_sheet->update();
+		m_tileset = new Graphics::Tileset(name, 2, PaletteCount/2);
+		memcpy(m_tileset->pixels, Palette, PaletteCount * sizeof(Color));
+		m_tileset->update();
 
 		m_color = Palette[0];
-		m_src = { 0, 0, m_sheet->w, m_sheet->h };
+		m_src = { 0, 0, m_tileset->w, m_tileset->h };
 		m_dest = { 
 			x,y, 
-			m_sheet->w * m_colorSize, 
-			m_sheet->h * m_colorSize 
+			m_tileset->w * m_colorSize, 
+			m_tileset->h * m_colorSize 
 		};
 		
 		m_border = { 
@@ -366,7 +366,7 @@ namespace UI
 	}
 	ColorPicker::~ColorPicker()
 	{
-		delete m_sheet;
+		delete m_tileset;
 	}
 
 	void ColorPicker::onUpdate()
@@ -396,7 +396,7 @@ namespace UI
 			m_cursor.w, 
 			m_cursor.h
 		};
-		Engine::DrawTexture(m_sheet->texture, m_src, m_dest);
+		Engine::DrawTexture(m_tileset->texture, m_src, m_dest);
 		Engine::DrawRect(CURSOR_COLOR, worldCursor, false);
 		Engine::DrawRect(BORDER_COLOR, m_border, false);
 	}
@@ -407,7 +407,7 @@ namespace UI
 		//since texture is half height and twice width, remap back to square sheet
 		const int x = m_cursor.x / m_cursor.w;
 		const int y = m_cursor.y / m_cursor.h;
-		const int w = m_sheet->w; //width of sheet is number of colors (single pixel)
+		const int w = m_tileset->w; //width of sheet is number of colors (single pixel)
 		return Palette[w * y + x];
 	}
 	
@@ -432,21 +432,21 @@ namespace UI
 		const int x = m_cursor.x / m_cursor.w;
 		const int y = m_cursor.y / m_cursor.h;
 		//scale by aspect since cursor is striding along transformed sheet. each tile is size of cursor
-		const int w = (m_sheet->w * m_aspect ) / m_cursor.h;
+		const int w = (m_tileset->w * m_aspect ) / m_cursor.h;
 		return w * y + x;
 	}
 
 	Rect TilePicker::selection()
 	{
 
-		if(!m_sheet) return {-1,-1,0,0};
+		if(!m_tileset) return {-1,-1,0,0};
 		//since texture is half height and twice width, remap back to square sheet
 		int x = m_cursor.x;
 		int y = m_cursor.y;
-		if(x >= m_sheet->w )
+		if(x >= m_tileset->w )
 		{
-			y += m_sheet->h/2;
-			x -= m_sheet->w;
+			y += m_tileset->h/2;
+			x -= m_tileset->w;
 		}
 		return {x,y , m_cursor.w, m_cursor.h };
 	}
@@ -493,13 +493,13 @@ namespace UI
 	void TilePicker::setTileset(const Graphics::Tileset * sheet)
 	{
 		if ( !sheet ) return;
-		m_sheet = sheet;
+		m_tileset = sheet;
 		int w, h;
 		Engine::GetSize(w, h);
 		
-		m_aspect = 2;//w / (m_sheet->w* m_scale);
-		const int adjw = ( int ) ( m_sheet->w * m_aspect );
-		const int adjh = ( int ) ( m_sheet->w / m_aspect );
+		m_aspect = 2;//w / (m_tileset->w* m_scale);
+		const int adjw = ( int ) ( m_tileset->w * m_aspect );
+		const int adjh = ( int ) ( m_tileset->w / m_aspect );
 
 		m_cursor = {0,0,TILE_W,TILE_H};	
 		m_box = { 0, h - adjh * m_scale, adjw * m_scale, adjh * m_scale };
@@ -523,7 +523,7 @@ namespace UI
 
 	void TilePicker::onDraw()
 	{
-		if(!m_sheet) return;
+		if(!m_tileset) return;
 		const Rect & worldCursor = 
 		{
 			m_cursor.x * m_scale + m_box.x, 
@@ -531,8 +531,8 @@ namespace UI
 			m_cursor.w * m_scale , 
 			m_cursor.h * m_scale 
 		};
-		Engine::DrawTexture(m_sheet->texture, m_srcLeft, m_destLeft);
-		Engine::DrawTexture(m_sheet->texture, m_srcRight, m_destRight);
+		Engine::DrawTexture(m_tileset->texture, m_srcLeft, m_destLeft);
+		Engine::DrawTexture(m_tileset->texture, m_srcRight, m_destRight);
 		Engine::DrawRect(CURSOR_COLOR, worldCursor, false);
 
 	}

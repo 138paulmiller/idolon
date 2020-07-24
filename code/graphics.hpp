@@ -5,6 +5,9 @@
 
 namespace Graphics
 {
+    /*--------------------------- Tileset - -----------------------------------
+        Represents an image
+    */
     class Tileset : public Asset
     {
         friend class Sprite;
@@ -20,7 +23,10 @@ namespace Graphics
         const int w, h;
         const int texture;
     };
-    //animation frame
+
+    /*--------------------------- Tileset - -----------------------------------
+        animation frame
+    */
     struct Frame
     {
         //time spent at frame
@@ -29,29 +35,88 @@ namespace Graphics
         Rect region;
     };
 
+    /*--------------------------- Sprite ------------------------------------
+        Describes a sprite. nothing about runtime info. 
+    */
+
     class Sprite  : public Asset
     {
     public:
         Sprite(int w, int h, const std::string & name);
         //reload cached sheet from disk.
         void reload();
+        //add x y to draw ?
         void draw();
 
         std::string sheet;
         std::string animation; //current animation        
         std::map<std::string, std::vector<Frame> > animframes;
-        //position/size
+        //current position/size
         Rect rect;
 
     private:
-        //if sheetcache->name != name, then unload old sheet. and load sheet
-        Tileset * sheetcache;
+        //TODO - if sheetcache->name != name, then unload old sheet. and load sheet
+        Tileset * m_tilesetcache;
         //current animation
-        int iframe;
+        int m_iframe;
 
-        float timer;
+        float m_timer;
+    };
+  
+    /*--------------------------- SpriteInstance ------------------------------------
+        Sprites are instanced. The sprite description 
+    */
+    class SpriteInstance
+    {
+    public:
+        SpriteInstance(const std::string & name);
+        //reload cached sheet from disk.
+        void reload();
+        void draw();
+
+        std::string sheet;
+        std::string animation; //current animation        
+        //current position/size
+        Rect rect;
+
+    private:
+        Sprite * m_spritecache;
+        int m_iframe;
+        float m_timer;
     };
 
+    /*--------------------------- Map ------------------------------------
+        contains a list of references to some sprites and their positions
+        on load. must override saved sprite positions
+    */
+    class Map : public Asset
+    {
+    public:
+        //width and height is number of tiles
+        Map(int w, int h, const std::string & name);
+        void reload();
+        void draw();
+
+        std::string sheet;
+        //viewport
+        Rect view;
+
+        //void removeSprite(const std::string & name);
+        //void addSprite(const std::string & spriteName, const std::string & instanceName, int x, int y);
+    private:
+
+        std::vector<int> m_tiles;
+        //map to sprite instance (cache )
+        std::unordered_map<std::string, SpriteInstance*> m_sprites;
+        
+        Tileset * sheetcache;
+        //TODO - split map into multiple subtextures. Each streamed in on demand. "Super maps"
+        int m_texture; 
+
+    };
+    /*--------------------------- Font ------------------------------------
+        font is essentially just a tile set, where each character in the alphabet is just a tile
+    */
     class Font : public Tileset
     {
     public:
@@ -62,15 +127,20 @@ namespace Graphics
         const int charW,charH;
         const char start;
     };
-    //TODO Create a texture that is sizeof(boxtexture)/fontw
-    // this contains the colors. then perform additive blending
+
+    /*--------------------------- Textbox ------------------------------------
+        TODO Create a texture that is sizeof(boxtexture)/fontw
+            this contains the colors. then perform additive blending
+    */
 	class TextBox
 	{
 	public:
         // tw and th are number of chars
 		TextBox(int tw, int th, const std::string & text);
         ~TextBox();
+        //update test box
         void refresh();
+        //update font and refresh
         void reload();
         void draw();
         
@@ -88,10 +158,9 @@ namespace Graphics
         bool visible;
 
     private:
-        int texture; 
+        int m_texture; 
         //font sheet to use
-        Font * fontcache;
+        Font * m_fontcache;
 	};
-    //Create a Map. Contains a 2d array or 1d indices that map to a 2d tilesheet.
-    //reload function memcopies tiles into render texture.
+
 }

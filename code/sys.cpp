@@ -2,12 +2,12 @@
 
 #include "sys.hpp"
 #include "eval.hpp"
+#include "mapeditor.hpp"
 #include "tileseteditor.hpp"
 
 namespace
 {
 	Shell  * s_shell;
-	Editor * s_editor;
 	Context* s_context;
 	
 	//default config
@@ -34,7 +34,8 @@ namespace Sys
 		Eval::Startup();
 
 		s_context->create(APP_SHELL, s_shell = new Shell());
-		s_context->create(APP_TILESET_EDITOR, s_editor = new TilesetEditor());
+		s_context->create(APP_TILESET_EDITOR,  new TilesetEditor());
+		s_context->create(APP_MAP_EDITOR, new MapEditor());
 	
 		Engine::SetKeyEcho(true);
 		Engine::SetKeyHandler(
@@ -73,22 +74,7 @@ namespace Sys
 
 	int Run()
 	{
-		while (Engine::Run())
-		{
-			switch(Sys::GetContext()->run())
-			{
-				case APP_CODE_CONTINUE:
-					break;
-				case APP_CODE_SHUTDOWN:
-					Sys::Shutdown();
-					break;
-				case APP_CODE_EXIT:
-					s_context->app()->signal( APP_CODE_CONTINUE );
-					s_context->exit();
-					break;
-			}
-
-	    Eval::Execute(	   	
+		Eval::Execute(	   	
 	    	R"(
 from time import time,ctime
 
@@ -99,8 +85,26 @@ import idolon as I
 mouse = I.mouse()
 print("Mouse:%s" % (mouse))
 	   	)");
+		//import test py functions
+		Eval::Compile( "test" );
 
-
+		TypedArg ret(ARG_STRING);
+		Eval::Call( "multiply", { 3, 2 }, ret );
+		printf( "Call returned %s\n", ret.value.s );
+		while (Engine::Run())
+		{
+			switch(Sys::GetContext()->run())
+			{
+				case APP_CODE_CONTINUE:
+					break;
+				case APP_CODE_SHUTDOWN:
+					Sys::Shutdown();
+					break;
+				case APP_CODE_EXIT:
+					s_context->exit();
+					s_context->app()->signal( APP_CODE_CONTINUE );
+					break;
+			}
 		}
 		//
 		Shutdown();
@@ -120,11 +124,6 @@ print("Mouse:%s" % (mouse))
 	Shell* GetShell()
 	{
 		return s_shell;
-	}
-
-	Editor* GetEditor()
-	{
-		return s_editor;
 	}
 
 	Context* GetContext()

@@ -9,35 +9,21 @@
 namespace 
 {
 
+	//map form filename to module
+	
+	std::unordered_map<std::string, PyObject* > s_fileToModule;
+	std::unordered_map<std::string, PyObject* > s_funcs;
 
-#define DEF_PYTHON_BINDING(module, name)\
-	PyObject* module##_##name(PyObject *self, PyObject *args)
-
-#define ADD_PYTHON_BINDING(module, name,doc)\
-	s_pymethods[index++] = {#name, module##_##name, METH_VARARGS, doc};
-#define NUM_PYTHON_BINDINGS 1
-
-	DEF_PYTHON_BINDING(idolon, mouse)
-	{
-		static int x = 0;
-		static int y = 0;
-		Engine::GetMousePosition( x, y);
-		PyObject *mouse = PyDict_New();
-		PyDict_SetItemString(mouse, "x", PyLong_FromLong(x));
-		PyDict_SetItemString(mouse, "y", PyLong_FromLong(y));
-		return mouse;
-	}
-
-
-	/////////////////////Begin Module ////////////////
+	#include "bindings.inl"
 	/*
 	const char * name, //name of the method
 	PyCFunction method //pointer to the C implementation PyObject* name(PyObject *self, PyObject *args)
 	int flags          //flag bits indicating how the call should be constructed
 	const char * doc   //points to the contents of the docstring
 	*/
-	static PyMethodDef s_pymethods[NUM_PYTHON_BINDINGS+1] = 
+	static PyMethodDef s_pymethods[] =
 	{
+		PYTHON_BINDINGS
 	    {0, 0, 0, 0}
 	};
 
@@ -58,30 +44,20 @@ namespace
 	{
 	    return PyModule_Create(&s_pymodule);
 	}
-	//////////////////// End Module //////////////////
-
-	void SetupPythonBindings()
-	{	
-		int index = 0;
-		ADD_PYTHON_BINDING(idolon, mouse, "Returns mouse data");
-	}
 
 
 	void StartupPython()
 	{
-
-		SetupPythonBindings();
-
 		//set up module initializer. 
     	PyImport_AppendInittab(SYSTEM_NAME, &InitModule);
 
 		Py_Initialize();
 
 		//add system path for imports
-		PyRun_SimpleString("import sys\nimport os\n"); 
-		//todo when parsing game code add its
-		const std::string & cmd = "sys.path.append('" +  Sys::Path() + "')\n";
+		const std::string & cmd = "import sys\nimport os\nsys.path.append('" +  Sys::Path() + "')\n";
 		PyRun_SimpleString(cmd.c_str());
+		//todo when parsing game code add its
+
 	}
 
 	void ShutdownPython()
@@ -109,8 +85,6 @@ namespace
 	    int i;
 
 	    pName = PyUnicode_DecodeFSDefault(file.c_str());
-	    /* Error checking of pName left out */
-
 	    pModule = PyImport_Import(pName);
 	    Py_DECREF(pName);
 
@@ -172,33 +146,142 @@ namespace
 		- pFunc = PyObject_GetAttrString(pModule, funcname);
 */
 
+
+TypedArg::TypedArg( ArgType type )
+	: type(type)
+{
+	value.i = 0;
+}
+
+TypedArg::TypedArg( int i )
+	:type( ARG_INT )
+{
+	value.i = i;
+}
+
+TypedArg::TypedArg( float f )
+	:type( ARG_FLOAT)
+{
+	value.f = f;
+}
+
+TypedArg::TypedArg( char* s )
+	:type( ARG_STRING )
+{
+	value.s = s;
+}
+
+
 namespace Eval
 {
 	void Startup()
 	{		
 		StartupPython();
 
-	   	//execute. 
-		//numargs = 4;
-		const char * args[] = {"test", "multiply", "3", "2"};
-		CallPython(4 , args);
+		//const char * args[] = {"test", "multiply", "3", "2"};
+		//CallPython(4 , args);
 
 	}
 	void Shutdown()
 	{
+		for ( auto pair : s_fileToModule )
+		{
+			Py_DECREF(pair.second);
+		}
+		for ( auto pair : s_funcs)
+		{
+			Py_DECREF(pair.second);
+		}
 		ShutdownPython();
 	}
 
-	void Load(const std::string & file)
-	{}
+	void Compile(const std::string & file)
+	{
+		PyObject * modname = PyUnicode_FromString(file.c_str());
+		if ( s_fileToModule.find( file ) != s_fileToModule.end() )
+		{
+			Py_DECREF(s_fileToModule[file]);
+		}
+	    PyObject *const module = s_fileToModule[file] = PyImport_Import(modname);
+		PyObject *const pDict = PyModule_GetDict(module); // borrowed
+		// find functions
+		PyObject *key = nullptr, *value = nullptr;
+		for (Py_ssize_t i = 0; PyDict_Next(pDict, &i, &key, &value);) 
+		{
+			//if function
+			if (PyFunction_Check(value)) 
+			{
+				s_funcs[PyUnicode_AsUTF8(key)] = value;
+			}
+		}
+	    Py_DECREF(modname);
+	}
 
 	void Execute(const std::string & code)
 	{
 	    PyRun_SimpleString(code.c_str());
 	}
 
-	void Call(const std::string & func, const std::string * args)
+	bool Call(const std::string & func, const std::vector<TypedArg> & args, TypedArg & ret )
 	{
-
+		if ( s_funcs.find( func) == s_funcs.end() )
+		{
+			printf( "Eval : Function %s not loaded ", func.c_str() );
+			return 0;
+		}
+		PyObject* value;
+		PyObject* funcobj = s_funcs[func.c_str()];
+		//create tuple to pass into func
+		PyObject* argsobj = PyTuple_New(args.size());
+		int i = 0;
+	    for (const TypedArg & arg : args ) {
+			switch ( arg.type )
+			{
+			case ARG_INT:
+				value= PyLong_FromLong(arg.value.i);
+				break;
+			case ARG_FLOAT:
+				value= PyFloat_FromDouble(arg.value.f);
+				break;
+			case ARG_STRING:
+				value=  PyUnicode_FromString(arg.value.s);
+				break;
+			default :
+				value = 0;
+				break;
+			}
+	        if (!value) {
+	            Py_DECREF(argsobj);
+	            printf("Eval: Cannot convert argument\n");
+	            return 0;
+	        }
+	        PyTuple_SetItem(argsobj, i, value);
+			i++;
+	    }
+	    value = PyObject_CallObject(funcobj, argsobj);
+	    Py_DECREF(argsobj);
+	    if (value != NULL) 
+		{
+	    	switch ( ret.type )
+			{
+			case ARG_INT:
+				ret.value.i = PyLong_AsLong(value);
+				break;
+			case ARG_FLOAT:
+				ret.value.f = PyFloat_AsDouble(value);
+				break;
+			case ARG_STRING:
+				ret.value.s =  PyUnicode_AsUTF8(value);
+				break;
+			}
+	        Py_DECREF(value);
+	    }
+	    else 
+		{
+	        PyErr_Print();
+	        printf("Eval: Call failed\n");
+	        return 0;
+	    }
+		return 1;
 	}
 }

@@ -8,7 +8,11 @@
 #include <iostream>
 
 
-//TODO replace fstream with C file
+/*TODO 
+	replace fstream with C file
+	have save and load as virtual functions for asset type ? 
+
+ */
 namespace
 {
 	template<class Type>

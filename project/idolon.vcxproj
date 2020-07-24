@@ -160,6 +160,7 @@
     <ClCompile Include="..\code\graphics.cpp" />
     <ClCompile Include="..\code\shell.cpp" />
     <ClCompile Include="..\code\sys.cpp" />
+    <ClCompile Include="..\code\mapeditor.cpp" />
     <ClCompile Include="..\code\tileseteditor.cpp" />
     <ClCompile Include="..\code\tools.cpp" />
     <ClCompile Include="..\code\ui.cpp" />
@@ -180,9 +181,17 @@
     <ClInclude Include="..\code\shell.hpp" />
     <ClInclude Include="..\code\sys.hpp" />
     <ClInclude Include="..\code\tests.hpp" />
+    <ClInclude Include="..\code\mapeditor.hpp" />
     <ClInclude Include="..\code\tileseteditor.hpp" />
     <ClInclude Include="..\code\tools.hpp" />
     <ClInclude Include="..\code\ui.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\code\bindings.inl" />
+    <None Include="..\system\assets\basic.font" />
+    <None Include="..\system\assets\default.font" />
+    <None Include="..\system\assets\full.font" />
+    <None Include="..\system\test.py" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

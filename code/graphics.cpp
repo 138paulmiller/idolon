@@ -50,26 +50,30 @@ namespace Graphics
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
     Sprite::Sprite(int w, int h, const std::string& name)
-        :Asset(name), sheetcache(0), iframe(0), timer(0), animation(DEFAULT_FONT), rect({0,0,w,h})
+        :Asset(name), m_tilesetcache(0), m_iframe(0), m_timer(0), animation("default"), rect({0,0,w,h})
     {
+        //default animation is nothing
+        animframes[animation] = {
+            { -1.0f, {0,0,w,h} }
+        };
     }
     void Sprite::reload()
     {
-        sheetcache = Assets::Load<Tileset>(sheet);
+        m_tilesetcache = Assets::Load<Tileset>(sheet);
     }
 
     void Sprite::draw()
     {
-        timer += Engine::GetTimeDeltaMs();
+        m_timer += Engine::GetTimeDeltaMs();
         const std::vector<Frame>& frames = animframes[animation];
         
-        if (timer > frames[iframe].duration)
+        if (frames[m_iframe].duration != -1 && m_timer > frames[m_iframe].duration)
         {
-            timer = 0;
-            iframe++;
-            iframe %= frames.size();
+            m_timer = 0;
+            m_iframe++;
+            m_iframe %= frames.size();
         }
-        Engine::DrawTexture(sheetcache->texture, frames[iframe].region, rect);
+        Engine::DrawTexture(m_tilesetcache->texture, frames[m_iframe].region, rect);
     }
     
     ///////////////////////////////////////////////////////////////////////////////
@@ -132,7 +136,7 @@ namespace Graphics
     TextBox::TextBox(int tw, int th, const std::string & text)
         :text(text),
         font(DEFAULT_FONT),
-        texture (0),
+        m_texture (0),
         x(0), y(0), 
         w(0), h(0),
         tw(tw), th(th),
@@ -146,25 +150,25 @@ namespace Graphics
     }
     TextBox::~TextBox()
     {
-        Engine::DestroyTexture(texture);
+        Engine::DestroyTexture(m_texture);
     }
 
     void TextBox::draw()
     {
         if (!visible) return;
-        if(!fontcache) return;   
-        Engine::DrawTexture(texture, {0,0,w,h}, {x,y,w,h});
+        if(!m_fontcache) return;   
+        Engine::DrawTexture(m_texture, {0,0,w,h}, {x,y,w,h});
     }
 
     void TextBox::refresh()
     {
-        Engine::ClearTexture(texture, fillColor);
-        fontcache->blit(texture, text, { borderX, borderY , w, h });
-        for(int y =0 ; y < fontcache->h; y++ )
-            for(int x =0 ; x < fontcache->w; x++ )
+        Engine::ClearTexture(m_texture, fillColor);
+        m_fontcache->blit(m_texture, text, { borderX, borderY , w, h });
+        for(int y =0 ; y < m_fontcache->h; y++ )
+            for(int x =0 ; x < m_fontcache->w; x++ )
             {
                 //color only text 
-                Color & color = fontcache->pixels[y * fontcache->w + x];
+                Color & color = m_fontcache->pixels[y * m_fontcache->w + x];
                 if(color == fillColor)
                     color = textColor;
             }
@@ -172,15 +176,15 @@ namespace Graphics
     }
     void TextBox::reload()
     {
-        fontcache = Assets::Load<Font>(font);
-        if(!fontcache) return;
+        m_fontcache = Assets::Load<Font>(font);
+        if(!m_fontcache) return;
         //only do if texture w/h changes
-        if(texture) Engine::DestroyTexture(texture);
-        w = tw * fontcache->charW + borderX*2;
-        h = th * fontcache->charH + borderY*2;
-        texture = Engine::CreateTexture(w, h, true);
+        if(m_texture) Engine::DestroyTexture(m_texture);
+        w = tw * m_fontcache->charW + borderX*2;
+        h = th * m_fontcache->charH + borderY*2;
+        m_texture = Engine::CreateTexture(w, h, true);
         if(!filled)
-            Engine::SetTextureBlendMode(texture, BLEND_ADD);
+            Engine::SetTextureBlendMode(m_texture, BLEND_ADD);
         refresh();
     }
 } // namespace Graphics

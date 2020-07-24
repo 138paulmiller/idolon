@@ -16,6 +16,7 @@ enum : uint8
 {
 	APP_SHELL = 0,
 	APP_TILESET_EDITOR,
+	APP_MAP_EDITOR,
 	APP_COUNT
 };
 
@@ -27,6 +28,5 @@ namespace Sys
 	const std::string& Path();
 	const std::string& AssetPath();
 	Shell* GetShell();
-	Editor* GetEditor();
 	Context* GetContext();
 }

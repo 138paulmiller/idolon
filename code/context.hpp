@@ -10,7 +10,8 @@ public:
 	~Context();
 	void clear();
 	void create( uint8 appId, UI::App * app );
-	void enter(uint8 appId);
+	//kill previous process
+	void enter(uint8 appId, bool kill = true);
 	void exit();
 	void handleKey( Key key, bool isDown );
 	AppCode run( );
