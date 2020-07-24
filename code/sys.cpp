@@ -86,7 +86,7 @@ mouse = I.mouse()
 print("Mouse:%s" % (mouse))
 	   	)");
 		//import test py functions
-		Eval::Compile( "test" );
+		Eval::Compile( "game" );
 
 		TypedArg ret(ARG_STRING);
 		Eval::Call( "multiply", { 3, 2 }, ret );
