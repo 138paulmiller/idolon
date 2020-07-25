@@ -4,7 +4,7 @@
 #define VERSION_MINOR 0
 #define SYSTEM_NAME "idolon"
 
-#define WINDOW_SCALE 3
+#define WINDOW_SCALE 2.5
 //in virtual pixel space. not window size
 #define SCREEN_W 256
 #define SCREEN_H 256

@@ -8,7 +8,8 @@
 
 namespace 
 {
-	const int s_tileSizes[TILE_SIZE_COUNT][2] = {
+	const int s_tileSizes[TILE_SIZE_COUNT][2] = 
+	{
 		{ TILE_W_SMALL, TILE_H_SMALL },
 		{ TILE_W,       TILE_H }
 	};
@@ -71,6 +72,8 @@ void TilesetEditor::onEnter()
 
 	m_toolbar->add("ERASE", [&](){
 		m_tool = TOOL_ERASE;
+		m_shapeRect = { -1, -1, 1, 1 };
+
 	});
 
 	//first add toolbat	
@@ -172,12 +175,14 @@ void TilesetEditor::onTick()
 				commit();
 				break;
 			case TOOL_ERASE:
+				m_shapeRect.x = tilex;
+				m_shapeRect.y = tiley;
 				m_tileset->pixels[sheety * m_tileset->w + sheetx] = CLEAR;
-				m_tileset->update(m_sheetPicker->selection());
+				m_tileset->update(tileSrc);
 				break;
 			case TOOL_PIXEL:
 				m_tileset->pixels[sheety * m_tileset->w + sheetx] = color;
-				m_tileset->update(m_sheetPicker->selection());
+				m_tileset->update(tileSrc);
 				break;
 			case TOOL_LINE:
 				//set shape origin (x,y) and dest
@@ -196,7 +201,21 @@ void TilesetEditor::onTick()
 			switch ( m_tool )
 			{
 			case TOOL_ERASE:
-				m_tileset->pixels[sheety * m_tileset->w + sheetx] = CLEAR;
+
+				m_shapeRect.x = tilex;
+				m_shapeRect.y = tiley;
+
+				for(int y = 0; y < m_shapeRect.h; y++)
+				{
+					const int sy = sheety + y;	
+					if(sy < tileSrc.y + tileSrc.h)
+						for(int x = 0; x < m_shapeRect.w; x++)
+						{
+							const int sx = sheetx + x;
+							if(sx < tileSrc.x + tileSrc.w)
+								m_tileset->pixels[sy * m_tileset->w + sx] = CLEAR;
+						}
+				}
 				m_tileset->update(m_sheetPicker->selection());
 				break;
 			case TOOL_PIXEL:
@@ -220,6 +239,8 @@ void TilesetEditor::onTick()
 				switch(m_tool)
 				{
 				case TOOL_ERASE:
+					m_shapeRect.x = tilex;
+					m_shapeRect.y = tiley;
 					commit();
 					break;
 				case TOOL_PIXEL:
@@ -308,16 +329,23 @@ void TilesetEditor::drawOverlay(int tilex, int tiley, const Rect & dest)
 		}
 		break;
 	case TOOL_ERASE:
-		//rudimentary "saturate" color to indicate highlight by rendering low alpha white over it
-		m_overlay->pixels[tiley * m_overlay->w + tilex] = HIGHLIGHT ;
+		for(int y = tiley; y < tiley + m_shapeRect.h; y++)
+		{
+			if(y < m_overlay->h)
+				for(int x = tilex; x < tilex + m_shapeRect.w; x++)
+				{
+					if(x < m_overlay->w)
+					m_overlay->pixels[y * m_overlay->w + x] = HIGHLIGHT;
+				}
+		}
+		//draw overlay frame ? 
 		break;
 
 	default:
 		m_overlay->pixels[tiley * m_overlay->w + tilex] = color;
 		break;
 	}
-
-	//update every odd  frame ? 
+ 
 	m_overlay->update();
 	Engine::DrawTexture(m_overlay->texture, overlaySrc, dest);
 
@@ -348,6 +376,26 @@ void TilesetEditor::onKey(Key key, bool isDown)
 			case KEY_2:
 				m_sheetPicker->resizeCursor( s_tileSizes[1][0], s_tileSizes[1][1] );
 				break;
+			case KEY_z:
+				if(m_tool == TOOL_ERASE)
+				{
+					if(m_shapeRect.w > 1 )
+					{
+						m_shapeRect.w--;
+						m_shapeRect.h--;
+					}
+				}
+				break;
+			case KEY_x:
+				if(m_tool == TOOL_ERASE)
+				{
+					if(m_shapeRect.w < m_sheetPicker->selection().w)
+					{
+						m_shapeRect.w++;
+						m_shapeRect.h++;
+					}
+				}
+				break;
 			default:
 				break;
 		}
@@ -372,15 +420,6 @@ void TilesetEditor::commit()
 	Color * colors = new Color [size];
 	memcpy(colors, m_tileset->pixels, size * sizeof(Color)); 
 
-/*	
-	TODO:
-	const int sheetIndex = m_sheetPicker->selectionIndex();
-	auto it = m_revisions.find(sheetIndex);
-	if(it == m_revisions.end())
-		m_revisions[sheetIndex] = -1;
-	int revisionId = ++m_revisions[sheetIndex];
-
-*/
 	m_revision++;
 	if(m_revision >= m_revisionData.size())
 	{
@@ -422,7 +461,6 @@ void TilesetEditor::commit()
 void TilesetEditor::undo()
 { 	
 	const Rect & selection = m_sheetPicker->selection();
-	const int & sheetIndex = m_sheetPicker->selectionIndex();
 	/*TODO
 	auto it = m_revisions.find(sheetIndex);
 	if(it == m_revisions.end())
@@ -455,7 +493,6 @@ void TilesetEditor::undo()
 void TilesetEditor::redo()
 {
 	const Rect & selection = m_sheetPicker->selection();
-	const int & sheetIndex = m_sheetPicker->selectionIndex();
 /*TODO 
 	auto it = m_revisions.find(sheetIndex);
 	if(it == m_revisions.end())

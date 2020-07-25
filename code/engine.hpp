@@ -41,7 +41,7 @@ enum TextureMode
 
 namespace Engine
 {
-    void Startup(int w, int h, float = 1/5.0);
+    void Startup(int w, int h, float = 1);
     bool Run();
     void Shutdown();
     void SetKeyEcho(bool on);

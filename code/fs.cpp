@@ -174,20 +174,31 @@ namespace FS
         }
 #elif defined(OS_LINUX)
 		DIR* dir = opendir(fullpath.c_str());
-		dirent * entry;
-		while ((entry = readdir(dir))) 
+		if (dir) 
 		{
-			std::string filename = entry->d_name;
-			if (filename != "."  )
+			dirent * entry;
+			while ((entry = readdir(dir))) 
 			{
-				//
-				//do not allow to navigate beyond root
-				if (fullpath+"/"  == FS::Root() && filename == "..")
-					continue;
-				files.push_back(filename);
+				std::string filename = entry->d_name;
+				if (filename != "."  )
+				{
+					//
+					//do not allow to navigate beyond root
+					if (fullpath+"/"  == FS::Root() && filename == "..")
+						continue;
+					files.push_back(filename);
+				}
 			}
+			closedir(dir);
+
+		} else if (ENOENT == errno) 
+		{
+			printf("FS: %s does not exist", fullpath.c_str());
+		} else 
+		{
+		    /* opendir() failed for some other reason. */
+			printf("FS: %s failed to open", fullpath.c_str());
 		}
-		closedir(dir);
 #endif
 	}
 
