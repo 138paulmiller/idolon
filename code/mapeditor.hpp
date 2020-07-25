@@ -22,7 +22,7 @@ private:
 	//by default are all empty
 	std::string m_mapName;
 	//map contains ref to tilesheet
-
+	Graphics::Map * m_map;
 	//DEBUG
 	std::vector<Graphics::Sprite*> m_sprites;
 

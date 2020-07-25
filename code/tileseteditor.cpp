@@ -8,10 +8,10 @@
 
 namespace 
 {
-	const int s_tileSizes[TILE_SIZE_COUNT][2] = 
+	const int s_canvasSizes[TILE_SIZE_COUNT][2] = 
 	{
-		{ TILE_W_SMALL, TILE_H_SMALL },
-		{ TILE_W,       TILE_H }
+		{ TILE_W,   TILE_H },
+		{ SPRITE_W, SPRITE_W }
 	};
 }
 using namespace Graphics;
@@ -53,7 +53,7 @@ void TilesetEditor::onEnter()
 	const int tilesetY =  m_sheetPicker->rect().y - m_charH;
 	m_tileIdBox = new TextButton("00", tileidX, tilesetY, idLen , 1);
 
-	m_sheetPicker->resizeCursor( s_tileSizes[0][0], s_tileSizes[0][1] );
+	m_sheetPicker->resizeCursor( s_canvasSizes[0][0], s_canvasSizes[0][1] );
 
 	m_toolbar = new Toolbar(this, 0, tilesetY);
 
@@ -97,7 +97,7 @@ void TilesetEditor::onEnter()
 
 void TilesetEditor::onExit()
 {	//allow for reloading data
-	Assets::Unload(m_tilesetName );
+	Assets::Unload<Tileset>(m_tilesetName );
 	m_tilesetName = "";
 	//remove all ui Widgets/buttons
 	App::clear();
@@ -371,10 +371,10 @@ void TilesetEditor::onKey(Key key, bool isDown)
 				m_sheetPicker->moveCursor(-1, 0);
 				break;
 			case KEY_1:
-				m_sheetPicker->resizeCursor( s_tileSizes[0][0], s_tileSizes[0][1] );
+				m_sheetPicker->resizeCursor( s_canvasSizes[0][0], s_canvasSizes[0][1] );
 				break;
 			case KEY_2:
-				m_sheetPicker->resizeCursor( s_tileSizes[1][0], s_tileSizes[1][1] );
+				m_sheetPicker->resizeCursor( s_canvasSizes[1][0], s_canvasSizes[1][1] );
 				break;
 			case KEY_z:
 				if(m_tool == TOOL_ERASE)

@@ -71,9 +71,10 @@ namespace Graphics
         w(w), h(h), 
         tw(tw), th(th), 
         m_tilesetcache(0),
-        texture(Engine::CreateTexture(w*tw, h*th)),
-        m_tiles(new int[w * h]),
-        sheet("")
+        texture(Engine::CreateTexture(w*tw, h*th, TEXTURE_TARGET)),
+        tiles(new char[w * h]),
+        //by default look for sheet with same name
+        sheet(name)
 
     {
         view = {0,0,w,h};
@@ -81,7 +82,7 @@ namespace Graphics
 
     Map::~Map()
     {
-        delete m_tiles;
+        delete tiles;
     }
 
     void Map::reload()
@@ -92,11 +93,12 @@ namespace Graphics
     //rect is in tile space
     void Map::update(const Rect & rect )
     {
+        if(!m_tilesetcache) return;
+
         for(int y = rect.y; y < (rect.y+rect.h); y++)
             for(int x = rect.x; x < (rect.x+rect.w); x++)
             {
-
-                const int tile = m_tiles[ y * w + x]; 
+                const int tile = tiles[ y * w + x]; 
                 const Rect & src = m_tilesetcache->tile(tile, tw, th);
                 const Rect & dest = { x*tw, y*th, tw, th };
                 Engine::Blit(m_tilesetcache->texture, texture, src, dest);

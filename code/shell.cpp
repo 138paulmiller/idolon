@@ -80,7 +80,7 @@ void Shell::onEnter()
 void Shell::onExit()
 {
 	clear();
-	Assets::Unload(m_fontName );
+	Assets::Unload<Graphics::Font>(m_fontName );
 	if(m_input)
 	{
 		delete m_input;
@@ -139,12 +139,12 @@ void Shell::onKey(Key key, bool isDown)
 			//do not remove >
 			if (m_input->text.size() > SHELL_PREFIXSIZE)
 			{
-				if (m_cursorPos >= m_input->text.size())
+				if(m_cursorPos > SHELL_PREFIXSIZE)
+					m_cursorPos--;
+				if (m_cursorPos >= m_input->text.size()-1)
 					m_input->text.pop_back();
 				else
 					m_input->text.erase(m_cursorPos, 1);
-				if(m_cursorPos > SHELL_PREFIXSIZE)
-					m_cursorPos--;
 			}
 			m_options.clear(); //clear options
 			break;

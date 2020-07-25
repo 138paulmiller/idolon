@@ -34,9 +34,25 @@ static const CommandTable & g_cmds =
 		{ "debug", "debug commands here" },
 		[](Args args)
 		{ 
+			printf("Modyfying %s\n", args[0].c_str());
 
-			Sys::GetContext()->app<MapEditor>(APP_MAP_EDITOR)->setMap("test");
-			Sys::GetContext()->enter(APP_MAP_EDITOR);
+			Assets::ClearPaths();
+			Assets::AddPath(FS::Cwd());
+			const std::string& name = FS::BaseName(args[0]);
+			Graphics::Map * map = Assets::Load<Graphics::Map>(name);
+			printf("REturned!!!\n");
+			if(!map)
+			{
+				printf("Failed to load\n");
+				return;
+			}
+			for(int y = 0; y < map->h; y++)
+				for(int x = 0; x < map->w; x++)
+				{
+					const int i = y * map->w + x;
+					map->tiles[i] = i % TILE_COUNT;
+				}
+			map->reload();
 		} 
 	},
 	
@@ -275,7 +291,7 @@ void NewAsset(const Args& args)
 	}
 	else if(asset == "map")
 	{
-		Graphics::Map* map= new Graphics::Map(name, MAP_W, MAP_H, TILE_W_SMALL, TILE_W_SMALL);
+		Graphics::Map* map= new Graphics::Map(name, MAP_W, MAP_H, TILE_W, TILE_W);
 		Assets::SaveAs(map, UserAssetPath<Graphics::Map>(name));
 
 	}
@@ -285,20 +301,20 @@ void NewAsset(const Args& args)
 		int w = 18 * 8;
 		int h =  6 * 8;
 		char start = ' ';
-		Graphics::Font* font= new Graphics::Font(name, w, h, TILE_W_SMALL, TILE_W_SMALL, start);
+		Graphics::Font* font= new Graphics::Font(name, w, h, TILE_W, TILE_W, start);
 		Assets::SaveAs(font, UserAssetPath<Graphics::Font>(name));
 	}
 }
 
 void EditAsset(const Args& args)
 {			
+	
+	//edit <asset>   
+	ARG_COUNT(args, 1);
 	//clear previous asset paths
 	// use current working directory
 	Assets::ClearPaths();
 	Assets::AddPath(FS::Cwd());
-	
-	//edit <asset>   
-	ARG_COUNT(args, 1);
 	//keep the dot
 	const std::string& ext = "." + FS::FileExt(args[0]);
 	const std::string& name = FS::BaseName(args[0]);

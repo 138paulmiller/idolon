@@ -49,8 +49,8 @@ namespace Graphics
         //viewport
         Rect view;
         const int w,h, tw, th;
+        char * const tiles;
      private:
-        int * m_tiles;
         Tileset * m_tilesetcache;
         //TODO - split map into multiple subtextures. Each streamed in on demand. "Super maps"
         const int texture; 

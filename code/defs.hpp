@@ -16,10 +16,9 @@
 #define TILESET_W 128
 #define TILESET_H 32
 //Default Tileset sizes
-#define TILE_W 16
-#define TILE_H 16
-#define TILE_W_SMALL 8
-#define TILE_H_SMALL 8
+#define TILE_W 8
+#define TILE_H 8
+#define TILE_COUNT (TILESET_W/TILE_W * TILESET_H/TILE_H) 
 
 #define MAP_W 64
 #define MAP_H 64
@@ -30,4 +29,7 @@
 #define SPRITE_H 16
 #define SPRITE_W_SMALL 8
 #define SPRITE_H_SMALL 8
+#define SPRITE_COUNT (TILESET_W/SPRITE_W * TILESET_H/SPRITE_W) 
+#define SPRITE_SMALL_COUNT (TILESET_W/SPRITE_W_SMALL * TILESET_H/SPRITE_H_SMALL) 
+
 #define DEFAULT_ANIMATION "default"

@@ -85,14 +85,79 @@ namespace Assets
 		s_assetdirs.clear();
 		s_assetdirs.push_back(path);   
 	}
+	/*
+	        std::string sheet;
+        //viewport
+        Rect view;
+        const int w,h, tw, th;
+     private:
+        int * m_tiles;
+        Tileset * m_tilesetcache;
+        //TODO - split map into multiple subtextures. Each streamed in on demand. "Super maps"
+        const int texture; 
+
+	*/
 	void SaveMap(const Graphics::Map* map, const std::string & path)
 	{
-		ASSERT( 0 , "");
+		try 
+		{		
+			std::fstream outfile;
+			outfile.open(path, std::fstream::out);
+			outfile << map->name << std::endl;
+			outfile << map->sheet << std::endl;
+			//TODO - verify endian-ness!
+			int blocksize =  map->w * map->h;
+			outfile << map->w << ' ' << map->h << ' ';
+			outfile << map->tw << ' ' << map->th << ' ';
+			outfile << blocksize;
+			outfile.write(map->tiles, blocksize);
+			outfile.close();
+			LOG("Assets: Saved map\n");
+
+		}
+		catch (...)
+		{
+			LOG("Assets: Failed to save %s\n", map->name.c_str());
+		}
 	}
 	Graphics::Map* LoadMap( const std::string& path )
 	{
-		ASSERT( 0 , "");
-		return 0;
+		Graphics::Map* map =0;
+		try 
+		{
+			std::fstream infile;
+			infile.open(path, std::fstream::in);
+			std::string name, sheet;
+			std::getline( infile, name ); 
+			std::getline( infile, sheet ); 
+			int w,h, tw, th;
+			infile >> w >> h >> tw >> th;
+
+			//TODO - verify endian-ness!
+			int blocksize;
+			infile >> blocksize ;
+			char * tiledata = new char[blocksize]; 
+			infile.read(tiledata, blocksize);
+			infile.close();
+
+			map = new Graphics::Map(name, w, h, tw, th);
+			map->sheet = sheet;
+			map->reload();
+			//uncompress bytes into pixels data
+			memcpy(map->tiles, tiledata, w * h);
+			map->update();
+			delete[] tiledata;
+
+		}
+		catch (...)
+		{
+			if(map)
+				delete map;
+				map = 0;
+			LOG("Asset:Failed to load %s\n", path.c_str());
+		}
+		return map;
+
 	}
 	Graphics::Tileset* LoadTileset(const std::string & path)
 	{
@@ -142,12 +207,12 @@ namespace Assets
 			outfile << tileset->w << ' ' << tileset->h << ' ' << blocksize;
 			outfile.write((char*)tileset->pixels, blocksize);
 			outfile.close();
-			LOG("Assets: Saved tileset");
+			LOG("Assets: Saved tileset\n");
 
 		}
 		catch (...)
 		{
-			LOG("Assets: Failed to save %s", tileset->name.c_str());
+			LOG("Assets: Failed to save %s\n", tileset->name.c_str());
 		}
 	}
 	Graphics::Font* LoadFont(const std::string & path)
@@ -203,18 +268,21 @@ namespace Assets
 			outfile.write((char*)font->pixels, blocksize);
 			outfile.close();
 
-			LOG("Assets: Saved font");
+			LOG("Assets: Saved font\n");
 		}
 		catch (...)
 		{
-			LOG("Assets: Failed to save %s", font->name.c_str());
+			LOG("Assets: Failed to save %s\n", font->name.c_str());
 		}
 	}
 	// -------------------------- Impl -----------------------
 	
-	void Unload(const std::string& name)
+	void UnloadImpl(const std::type_info& type, const std::string& name)
 	{
-		Table<Asset*>::iterator it = s_assets.find(name);		
+		std::string path =  FindAssetPath(type, name);
+
+		LOG("Assets: Unloading %s\n", path.c_str());
+		Table<Asset*>::iterator it = s_assets.find(path);		
 		if (it != s_assets.end()) 									
 		{														
 			Asset * asset = it->second;	
@@ -224,35 +292,37 @@ namespace Assets
 				if (asset->refcounter == 0)
 				{
 					delete asset;
-					s_assets.erase(name);
+					s_assets.erase(path);
 				}
 				return;
 			}
 		}	
-		LOG("Assets: Failed to unload (%s)\n", name.c_str());
+		LOG("Assets: Failed to unload %s\n", name.c_str());
 	}
 
 	Asset* LoadImpl(const std::type_info& type, const std::string& name)
 	{	
+		//LOG("Assets: loading %s\n", name.c_str());
+		
 		std::string path =  FindAssetPath(type, name);
 		
 		if(path.size() == 0)
 		{
-			LOG("Assets: %s Does not exist\n", name.c_str());
+			LOG("Assets: Could not find %s\n", name.c_str());
 			return 0;
 		}
 
-		Table<Asset*>::iterator it = s_assets.find(name);		
+		Table<Asset*>::iterator it = s_assets.find(path);		
 		if (it != s_assets.end()) 									
 		{						
-			LOG("Assets: Retrieved %s\n", path.c_str());
+			//LOG("Assets: Retrieved %s\n", path.c_str());
 
 			Asset * asset = it->second;					
 			asset->refcounter += 1;								
 			return asset;									
 		}			
 		//asset to filename 
-		LOG("Assets: Loading %s\n", path.c_str());
+		LOG("Assets: %s found at %s\n", name.c_str(), path.c_str());
 		Asset * asset =0 ;
 	
 		if(type ==  typeid(Graphics::Map))
@@ -264,7 +334,7 @@ namespace Assets
 		else if(type ==  typeid(Graphics::Font))
 			asset = LoadFont(path );
 	
-		s_assets[name] = asset;
+		s_assets[path] = asset;
 		asset->refcounter += 1;								
 
 		return asset;

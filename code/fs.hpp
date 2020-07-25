@@ -25,7 +25,7 @@ namespace FS
 	std::string Append(const std::string & path1, const std::string & path2);
 
 	//filename without extension or preceding path
-	std::string BaseName(std::string path);
+	std::string BaseName(const std::string& path);
 	//only returns file extension (ignoring .
 	std::string FileExt(const std::string& path);
 	//returns path to file (excluding filename )
