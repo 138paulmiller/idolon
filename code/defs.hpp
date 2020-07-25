@@ -12,6 +12,7 @@
 #define SHELL_PREFIX ">"
 #define DEFAULT_FONT "default"
 //Default Tileset size
+//Size fits to bottom of the screen
 #define TILESET_W 128
 #define TILESET_H 32
 //Default Tileset sizes
@@ -20,7 +21,8 @@
 #define TILE_W_SMALL 8
 #define TILE_H_SMALL 8
 
-#define MAP_TILESET_COUNT 4
+#define MAP_W 64
+#define MAP_H 64
 
 
 //Default Tileset sizes

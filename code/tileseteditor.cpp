@@ -29,7 +29,7 @@ TilesetEditor::TilesetEditor()
 void TilesetEditor::onEnter()
 {
 
-	printf("Entering sheet editor ... ");
+	LOG("Entering sheet editor ... ");
 	m_usingTool = 0;
 	m_tileset = 0;
 	m_overlay = 0;
@@ -112,7 +112,7 @@ void TilesetEditor::onExit()
 	m_overlay = 0;
 
 	Editor::onExit();
-	printf("Extited sheet editor");
+	LOG("Extited sheet editor");
 
 }
 
@@ -406,7 +406,7 @@ void TilesetEditor::onKey(Key key, bool isDown)
 //Create buttons to resize?
 void TilesetEditor::setTileset(const std::string& name)
 {
-	printf("Loading sheet %s ...\n", name.c_str());
+	LOG("Loading sheet %s ...\n", name.c_str());
 	m_tilesetName = name;
 }
 

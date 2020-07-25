@@ -52,7 +52,7 @@ namespace Sys
 
 		s_shell->addCommands(cmds);
 
-		printf("System On!\n");
+		LOG("System On!\n");
 	}
 	
 	void Shutdown()
@@ -61,14 +61,14 @@ namespace Sys
 		delete s_context;
 
 		Eval::Shutdown();
-		printf("Shutting down assets ...\n");
+		LOG("Shutting down assets ...\n");
 
 		Assets::Shutdown();
 
-		printf("Shutting down engine ...\n");
+		LOG("Shutting down engine ...\n");
 		Engine::Shutdown();
 
-		printf("Goodbye :)\n");
+		LOG("Goodbye :)\n");
 		exit(1);
 	}
 
@@ -90,7 +90,7 @@ print("Mouse:%s" % (mouse))
 
 		TypedArg ret(ARG_STRING);
 		Eval::Call( "multiply", { 3, 2 }, ret );
-		printf( "Call returned %s\n", ret.value.s );
+		LOG( "Call returned %s\n", ret.value.s );
 		
 		while (Engine::Run())
 		{

@@ -38,19 +38,22 @@ namespace Graphics
     {
     public:
         //width and height is number of tiles
-        Map(int w, int h, const std::string & name);
+        Map(const std::string & name, int w, int h, int tw, int th);
+        ~Map();
+        
+        void update(const Rect & rect = { 0, 0, 0, 0 } ); 
         void reload();
         void draw();
 
         std::string sheet;
         //viewport
         Rect view;
-
+        const int w,h, tw, th;
      private:
-        std::vector<int> m_tiles;
+        int * m_tiles;
         Tileset * m_tilesetcache;
         //TODO - split map into multiple subtextures. Each streamed in on demand. "Super maps"
-        int m_texture; 
+        const int texture; 
 
     };
     /*--------------------------- Font ------------------------------------

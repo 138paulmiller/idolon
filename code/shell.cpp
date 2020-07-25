@@ -22,7 +22,7 @@ Shell::~Shell()
 
 void Shell::onEnter()
 {
-	printf("Entering shell...\n");
+	LOG("Entering shell...\n");
 	
 	Engine::GetSize(m_w, m_h);
 
@@ -96,7 +96,7 @@ void Shell::onExit()
 		delete m_buffer;
 		m_buffer = 0;
 	}	
-	printf("Exited Shell\n");
+	LOG("Exited Shell\n");
 
 }
 

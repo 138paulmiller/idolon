@@ -10,6 +10,8 @@
 #include "err.hpp"
 #include <string>
 
+#define LOG(...) printf(__VA_ARGS__);
+
 //Add Vector / Math classes
 
 typedef unsigned char uint8;

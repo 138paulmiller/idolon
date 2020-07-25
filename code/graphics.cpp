@@ -61,7 +61,55 @@ namespace Graphics
         const int y = ( index / (w/tw) ) * th;
         return { x,y, tw, th };
     }
-    
+   
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+
+    //width and height is number of tiles
+    Map::Map(const std::string & name, int w, int h, int tw, int th)
+        :Asset(name), 
+        w(w), h(h), 
+        tw(tw), th(th), 
+        m_tilesetcache(0),
+        texture(Engine::CreateTexture(w*tw, h*th)),
+        m_tiles(new int[w * h]),
+        sheet("")
+
+    {
+        view = {0,0,w,h};
+    }
+
+    Map::~Map()
+    {
+        delete m_tiles;
+    }
+
+    void Map::reload()
+    {
+        m_tilesetcache = Assets::Load<Tileset>(sheet);
+        update({0,0,w,h}); 
+    }
+    //rect is in tile space
+    void Map::update(const Rect & rect )
+    {
+        for(int y = rect.y; y < (rect.y+rect.h); y++)
+            for(int x = rect.x; x < (rect.x+rect.w); x++)
+            {
+
+                const int tile = m_tiles[ y * w + x]; 
+                const Rect & src = m_tilesetcache->tile(tile, tw, th);
+                const Rect & dest = { x*tw, y*th, tw, th };
+                Engine::Blit(m_tilesetcache->texture, texture, src, dest);
+            }
+    }
+
+
+    void Map::draw()
+    {
+        if(!m_tilesetcache) return;
+        Engine::DrawTexture( m_tilesetcache->texture, view, { 0,0,tw*w, tw*h } );
+
+    }
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
     Sprite::Sprite(int tileId, int w, int h)

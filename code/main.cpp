@@ -275,15 +275,17 @@ void NewAsset(const Args& args)
 	}
 	else if(asset == "map")
 	{
-		//TODO create map
+		Graphics::Map* map= new Graphics::Map(name, MAP_W, MAP_H, TILE_W_SMALL, TILE_W_SMALL);
+		Assets::SaveAs(map, UserAssetPath<Graphics::Map>(name));
+
 	}
 	else if(asset == "font")
 	{
-		//8x8 font 
-		int w = 6 * 8;
-		int h = 18 * 8;
+		//8x8 chars. 18 x 6  
+		int w = 18 * 8;
+		int h =  6 * 8;
 		char start = ' ';
-		Graphics::Font* font= new Graphics::Font(name, w, h, 8, 8, start);
+		Graphics::Font* font= new Graphics::Font(name, w, h, TILE_W_SMALL, TILE_W_SMALL, start);
 		Assets::SaveAs(font, UserAssetPath<Graphics::Font>(name));
 	}
 }

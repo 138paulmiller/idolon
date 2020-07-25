@@ -13,18 +13,18 @@ Editor::Editor(uint8 support)
 }
 void Editor::redo()  
 {
-	printf( "Editor: Redo unimplemented" );
+	LOG( "Editor: Redo unimplemented" );
 }
 
 void Editor::undo()  
 {
 
-	printf( "Editor: Undo unimplemented" );
+	LOG( "Editor: Undo unimplemented" );
 }
 
 void Editor::save()  
 {
-	printf( "Editor: Save unimplemented" );
+	LOG( "Editor: Save unimplemented" );
 }
 
 

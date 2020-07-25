@@ -113,7 +113,7 @@ namespace Eval
 
 	void Compile(const std::string & file)
 	{
-		printf("Compiling %s\n", file.c_str());
+		LOG("Compiling %s\n", file.c_str());
 
 		PyObject * modname = PyUnicode_FromString(file.c_str());
 		if ( s_fileToModule.find( file ) != s_fileToModule.end() )
@@ -124,7 +124,7 @@ namespace Eval
 	    if(!module)
 	    {
 	        PyErr_Print();
-	        printf("Eval: Could not import %s\n", file.c_str());
+	        LOG("Eval: Could not import %s\n", file.c_str());
 	        return;	    	
 	    }
 
@@ -151,7 +151,7 @@ namespace Eval
 	{
 		if ( s_funcs.find( func) == s_funcs.end() )
 		{
-			printf( "Eval : Function %s not loaded\n", func.c_str() );
+			LOG( "Eval : Function %s not loaded\n", func.c_str() );
 			return 0;
 		}
 		PyObject* value;
@@ -177,7 +177,7 @@ namespace Eval
 			}
 	        if (!value) {
 	            Py_DECREF(argsobj);
-	            printf("Eval: Cannot convert argument\n");
+	            LOG("Eval: Cannot convert argument\n");
 	            return 0;
 	        }
 	        PyTuple_SetItem(argsobj, i, value);
@@ -204,7 +204,7 @@ namespace Eval
 	    else 
 		{
 	        PyErr_Print();
-	        printf("Eval: Call failed\n");
+	        LOG("Eval: Call failed\n");
 	        return 0;
 	    }
 		return 1;

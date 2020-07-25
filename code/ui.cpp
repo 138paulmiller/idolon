@@ -163,7 +163,7 @@ namespace UI
 
 	int App::addWidget(Widget * widget)
 	{
-		printf("Adding Widget");
+		LOG("Adding Widget");
 		int idx = m_widgets.size();
 		m_widgets.push_back(widget);
 		return idx;

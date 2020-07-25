@@ -69,7 +69,7 @@ void Execute(int argc, char** argv, const CommandTable& commands)
 		CommandTable::const_iterator it = commands.find({argv[i]});
 		if(it == commands.end())
 		{
-			printf("Execute: Invalid Command (%s)\n", argv[i]);
+			LOG("Execute: Invalid Command (%s)\n", argv[i]);
 			return;
 		}
 		//parse until non cmd is found

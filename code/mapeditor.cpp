@@ -22,7 +22,7 @@ MapEditor::MapEditor()
 
 void MapEditor::onEnter()
 {
-	printf("Entering map editor ... \n");
+	LOG("Entering map editor ... \n");
 	int w,h;
 	Engine::GetSize(w,h);
 	//load empty	tilesets.
@@ -37,7 +37,7 @@ void MapEditor::onEnter()
 			sprite->reload();
 			m_sprites.push_back(sprite);
 		}
-	printf( "\nLoaded %u\n", m_sprites.size() );
+	LOG( "\nLoaded %u\n", m_sprites.size() );
 
 	Editor::onEnter();
 }
@@ -49,7 +49,7 @@ void MapEditor::onExit()
 	m_sprites.clear();
 	App::clear();
 	Editor::onExit();
-	printf("Extited map editor\n");
+	LOG("Extited map editor\n");
 }
 
 
@@ -91,7 +91,7 @@ void MapEditor::onKey( Key key, bool isDown )
 				}
 			break;
 		}
-		printf( "\nTile Index %d\n", tile );
+		LOG( "\nTile Index %d\n", tile );
 	}
 }
 

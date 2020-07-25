@@ -125,7 +125,7 @@ namespace Assets
 			if(tileset)
 				delete tileset;
 				tileset = 0;
-			printf("Asset:Failed to load %s\n", path.c_str());
+			LOG("Asset:Failed to load %s\n", path.c_str());
 		}
 		return tileset;
 	}
@@ -142,11 +142,12 @@ namespace Assets
 			outfile << tileset->w << ' ' << tileset->h << ' ' << blocksize;
 			outfile.write((char*)tileset->pixels, blocksize);
 			outfile.close();
+			LOG("Assets: Saved tileset");
 
 		}
 		catch (...)
 		{
-			printf("Assets: Failed to save %s", tileset->name.c_str());
+			LOG("Assets: Failed to save %s", tileset->name.c_str());
 		}
 	}
 	Graphics::Font* LoadFont(const std::string & path)
@@ -178,9 +179,9 @@ namespace Assets
 			if(font)
 				delete font;
 				font = 0;
-			printf("Assets: Failed to load %s\n", path.c_str());
+			LOG("Assets: Failed to load %s\n", path.c_str());
 		}
-		printf("Assets: Loaded %s\n", path.c_str());
+		LOG("Assets: Loaded %s\n", path.c_str());
 		return font;
 	}
 
@@ -202,10 +203,11 @@ namespace Assets
 			outfile.write((char*)font->pixels, blocksize);
 			outfile.close();
 
+			LOG("Assets: Saved font");
 		}
 		catch (...)
 		{
-			printf("Assets: Failed to save %s", font->name.c_str());
+			LOG("Assets: Failed to save %s", font->name.c_str());
 		}
 	}
 	// -------------------------- Impl -----------------------
@@ -227,7 +229,7 @@ namespace Assets
 				return;
 			}
 		}	
-		printf("Assets: Failed to unload (%s)\n", name.c_str());
+		LOG("Assets: Failed to unload (%s)\n", name.c_str());
 	}
 
 	Asset* LoadImpl(const std::type_info& type, const std::string& name)
@@ -236,21 +238,21 @@ namespace Assets
 		
 		if(path.size() == 0)
 		{
-			printf("Assets: %s Does not exist\n", name.c_str());
+			LOG("Assets: %s Does not exist\n", name.c_str());
 			return 0;
 		}
 
 		Table<Asset*>::iterator it = s_assets.find(name);		
 		if (it != s_assets.end()) 									
 		{						
-			printf("Assets: Retrieved %s\n", path.c_str());
+			LOG("Assets: Retrieved %s\n", path.c_str());
 
 			Asset * asset = it->second;					
 			asset->refcounter += 1;								
 			return asset;									
 		}			
 		//asset to filename 
-		printf("Assets: Loading %s\n", path.c_str());
+		LOG("Assets: Loading %s\n", path.c_str());
 		Asset * asset =0 ;
 	
 		if(type ==  typeid(Graphics::Map))
@@ -269,7 +271,7 @@ namespace Assets
 	}
 	void SaveAsImpl(const Asset* asset, const std::type_info& type, const std::string& path)
 	{
-		printf("Assets: Saving %s\n",path.c_str());
+		LOG("Assets: Saving %s\n",path.c_str());
 
 		if(type ==  typeid(Graphics::Map))
 			SaveMap(dynamic_cast<const Graphics::Map*>(asset),  path );
@@ -286,7 +288,7 @@ namespace Assets
 		std::string path = FindAssetPath(type, name);
 		if(path.size() == 0)
 		{
-			//printf("Assets: Failed to Save %s! Could not find asset path \n",name.c_str());
+			LOG("Assets: Failed to find asset falling back on %s\n", asset->filepath.c_str());
 			path = asset->filepath;
 		}
 		SaveAsImpl(asset, type, path);

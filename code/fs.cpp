@@ -75,7 +75,7 @@ namespace FS
 			int status = mkdir(mountPoint);
 			if ( status == -1 )
 			{
-				printf( "Failed to create user space! Check app privileges" );
+				LOG( "Failed to create user space! Check app privileges" );
 				exit( -1 );
 			}
 		}
@@ -85,7 +85,7 @@ namespace FS
 			int status = mkdir(root.c_str());
 			if ( status == -1 )
 			{
-				printf( "Failed to create user root! Check app privileges" );
+				LOG( "Failed to create user root! Check app privileges" );
 				exit( -1 );
 			}
 		}
@@ -193,11 +193,11 @@ namespace FS
 
 		} else if (ENOENT == errno) 
 		{
-			printf("FS: %s does not exist", fullpath.c_str());
+			LOG("FS: %s does not exist", fullpath.c_str());
 		} else 
 		{
 		    /* opendir() failed for some other reason. */
-			printf("FS: %s failed to open", fullpath.c_str());
+			LOG("FS: %s failed to open", fullpath.c_str());
 		}
 #endif
 	}
