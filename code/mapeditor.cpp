@@ -27,19 +27,22 @@ void MapEditor::onEnter()
 	Engine::GetSize(w,h);
 	//load empty	tilesets.
 	//TODO load these from sprite assets	
-	for(int y = TILE_H; y < h; y+=SPRITE_H)
-		for(int x = TILE_W; x < w; x+=SPRITE_W)
+
+	int tile =0 ;
+	for(int y = SPRITE_H; y < h; y+=SPRITE_H*2)
+		for(int x = SPRITE_W; x < w; x+=SPRITE_W*2)
 		{	
-			Sprite * sprite = new Sprite( 1, TILE_W, TILE_H );
+			Sprite * sprite = new Sprite( tile, SPRITE_W, SPRITE_H );
 			sprite->sheet = m_mapName;
 			sprite->x = x;
 			sprite->y = y;
 			sprite->reload();
 			m_sprites.push_back(sprite);
+			if(++tile >= SPRITE_COUNT) tile=0;
 		}
+
 	LOG( "\nLoaded %u\n", m_sprites.size() );
 	m_map = Assets::Load<Map>(m_mapName);
-	LOG( "\nFound map %d\n", m_map);
 	
 	//TODO - text edit to set tileset
 
@@ -63,8 +66,7 @@ void MapEditor::onExit()
 void MapEditor::onTick()
 {
 	Engine::ClearScreen(EDITOR_COLOR);
-	if(m_map)
-		m_map->draw();
+	//if(m_map)m_map->draw();
 
 	for(Sprite * sprite : m_sprites )
 		sprite->draw();
