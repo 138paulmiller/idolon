@@ -66,18 +66,20 @@ namespace Graphics
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
     //width and height is number of tiles
-    Map::Map(const std::string & name, int w, int h, int tw, int th)
+    Map::Map(const std::string & name, int w, int h, int tilew, int tileh)
         :Asset(name), 
         w(w), h(h), 
-        tw(tw), th(th), 
+        tilew(tilew), tileh(tileh),
+        worldw(w * tilew), worldh(h * tileh), 
         m_tilesetcache(0),
-        texture(Engine::CreateTexture(w*tw, h*th, TEXTURE_TARGET)),
+        texture(Engine::CreateTexture(worldw, worldh, TEXTURE_TARGET)),
         tiles(new char[w * h]),
         //by default look for sheet with same name
         sheet(name)
 
     {
-        view = {0,0,w,h};
+        memset(tiles, 0, w * h );
+        view = { 0, 0, SCREEN_W, SCREEN_H };
     }
 
     Map::~Map()
@@ -89,27 +91,26 @@ namespace Graphics
     {
         m_tilesetcache = Assets::Load<Tileset>(sheet);
         update({0,0,w,h}); 
+
     }
     //rect is in tile space
     void Map::update(const Rect & rect )
     {
         if(!m_tilesetcache) return;
-
         for(int y = rect.y; y < (rect.y+rect.h); y++)
             for(int x = rect.x; x < (rect.x+rect.w); x++)
             {
                 const int tile = tiles[ y * w + x]; 
-                const Rect & src = m_tilesetcache->tile(tile, tw, th);
-                const Rect & dest = { x*tw, y*th, tw, th };
-                Engine::Blit(m_tilesetcache->texture, texture, src, dest);
+                const Rect & src = m_tilesetcache->tile(tile, tilew, tileh);
+                const Rect & dest = { x*tilew, y*tileh, tilew, tileh };
+                Engine::Blit(m_tilesetcache->texture, texture, src, dest);                
             }
     }
 
 
     void Map::draw()
     {
-        if(!m_tilesetcache) return;
-        Engine::DrawTexture( m_tilesetcache->texture, view, { 0,0,tw*w, tw*h } );
+        Engine::DrawTexture( texture, view, { 0,0, SCREEN_W, SCREEN_H } );
 
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////

@@ -108,9 +108,9 @@ namespace Assets
 			//TODO - verify endian-ness!
 			int blocksize =  map->w * map->h;
 			outfile << map->w << ' ' << map->h << ' ';
-			outfile << map->tw << ' ' << map->th << ' ';
+			outfile << map->tilew << ' ' << map->tileh << ' ';
 			outfile << blocksize;
-			outfile.write(map->tiles, blocksize);
+			outfile.write((char * )map->tiles, blocksize);
 			outfile.close();
 			LOG("Assets: Saved map\n");
 
@@ -142,10 +142,9 @@ namespace Assets
 
 			map = new Graphics::Map(name, w, h, tw, th);
 			map->sheet = sheet;
-			map->reload();
 			//uncompress bytes into pixels data
 			memcpy(map->tiles, tiledata, w * h);
-			map->update();
+			map->reload();
 			delete[] tiledata;
 
 		}

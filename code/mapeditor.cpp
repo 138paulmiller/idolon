@@ -34,8 +34,8 @@ void MapEditor::onEnter()
 		{	
 			Sprite * sprite = new Sprite( tile, SPRITE_W, SPRITE_H );
 			sprite->sheet = m_mapName;
-			sprite->x = x;
-			sprite->y = y;
+			sprite->x = x * WINDOW_SCALE;
+			sprite->y = y * WINDOW_SCALE;
 			sprite->reload();
 			m_sprites.push_back(sprite);
 			if(++tile >= SPRITE_COUNT) tile=0;
@@ -66,10 +66,10 @@ void MapEditor::onExit()
 void MapEditor::onTick()
 {
 	Engine::ClearScreen(EDITOR_COLOR);
-	//if(m_map)m_map->draw();
+	
+	if(m_map)m_map->draw();
 
-	for(Sprite * sprite : m_sprites )
-		sprite->draw();
+	for(Sprite * sprite : m_sprites )	sprite->draw();
 	
 }
 
@@ -102,9 +102,48 @@ void MapEditor::onKey( Key key, bool isDown )
 					tile = sprite->tile++;
 				}
 			break;
+			case KEY_d:
+				printf("Modifying!!!\n");
+				for(int y = 0; y < m_map->h; y++)
+					for(int x = 0; x < m_map->w; x++)
+					{
+						const int i = y * m_map->w + x;
+						m_map->tiles[i] = i % TILE_COUNT;
+					}
+				m_map->reload();
+			break;
 		}
 		LOG( "\nTile Index %d\n", tile );
 	}
+	switch(key)
+	{
+	case KEY_UP:
+		m_map->view.y-=WINDOW_SCALE;
+	break;
+
+	case KEY_DOWN:
+		m_map->view.y+=WINDOW_SCALE;
+	break;
+
+	case KEY_LEFT:
+		m_map->view.x-=WINDOW_SCALE;
+	break;
+
+	case KEY_RIGHT:
+		m_map->view.x+=WINDOW_SCALE;
+	break;
+	}
+
+	if(m_map->view.x < 0) 
+		m_map->view.x = 0;
+	else if(m_map->view.x > m_map->worldw) 
+		m_map->view.x = m_map->worldw;
+	
+	if(m_map->view.y < 0) 
+		m_map->view.y = 0;
+	else if(m_map->view.y > m_map->worldh) 
+		m_map->view.y = m_map->worldh;
+	printf("%d %d %d %d\n", m_map->view.x, m_map->view.y, m_map->worldw, m_map->worldh);
 }
 
 

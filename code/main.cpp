@@ -29,33 +29,7 @@ static const CommandTable & g_cmds =
 	{ 	
 		{ "help", "[action]" },
 		PrintHelp
-	},
-	{
-		{ "debug", "debug commands here" },
-		[](Args args)
-		{ 
-			printf("Modyfying %s\n", args[0].c_str());
-
-			Assets::ClearPaths();
-			Assets::AddPath(FS::Cwd());
-			const std::string& name = FS::BaseName(args[0]);
-			Graphics::Map * map = Assets::Load<Graphics::Map>(name);
-			printf("REturned!!!\n");
-			if(!map)
-			{
-				printf("Failed to load\n");
-				return;
-			}
-			for(int y = 0; y < map->h; y++)
-				for(int x = 0; x < map->w; x++)
-				{
-					const int i = y * map->w + x;
-					map->tiles[i] = i % TILE_COUNT;
-				}
-			map->reload();
-		} 
-	},
-	
+	},	
 	{
 		{ "exit", "shutdown system" },
 		[](Args args)

@@ -380,7 +380,7 @@ namespace Engine
         CHECK_TEXTURE(srcTextureId )
         CHECK_TEXTURE(destTextureId )
         const SDL_Rect & srcrect = { src.x, src.y, src.w, src.h };
-        const SDL_Rect& destrect = { dest.x, dest.y,dest.w,dest.h};
+        const SDL_Rect & destrect = { dest.x, dest.y,dest.w,dest.h};
         SDL_SetRenderTarget(s_renderer, s_textures[destTextureId] );
         SDL_RenderCopy( s_renderer, s_textures[srcTextureId], &srcrect, &destrect );        
     }

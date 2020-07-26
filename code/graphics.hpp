@@ -38,7 +38,7 @@ namespace Graphics
     {
     public:
         //width and height is number of tiles
-        Map(const std::string & name, int w, int h, int tw, int th);
+        Map(const std::string & name, int w, int h, int tilew, int tileh);
         ~Map();
         
         void update(const Rect & rect = { 0, 0, 0, 0 } ); 
@@ -48,7 +48,7 @@ namespace Graphics
         std::string sheet;
         //viewport
         Rect view;
-        const int w,h, tw, th;
+        const int w,h, tilew, tileh, worldw, worldh;
         char * const tiles;
      private:
         Tileset * m_tilesetcache;
