@@ -25,5 +25,6 @@ private:
 	Graphics::Map * m_map;
 	//DEBUG
 	std::vector<Graphics::Sprite*> m_sprites;
+	int m_scrollSpeed;
 
 };

@@ -1,6 +1,8 @@
 #pragma once
 #include "core.hpp"
 
+
+//Create virtual drives. Map sys/ to systems dir and ~/ to home
 namespace FS
 {
 	//file to remove

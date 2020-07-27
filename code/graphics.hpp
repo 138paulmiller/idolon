@@ -46,6 +46,8 @@ namespace Graphics
         void draw();
         //pixel space
         void setView(int x, int y, int w, int h);
+        const Rect & getView();
+        void zoom(const float delta);
         void scroll(int dx, int dy);
 
         std::string sheet;

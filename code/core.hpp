@@ -153,6 +153,7 @@ enum Key
 	KEY_TILDA = '~',
 	//non-symbol related
 	KEY_SHIFT = KEY_TILDA + 1,
+	KEY_ALT,
 	KEY_UP,
 	KEY_DOWN,
 	KEY_LEFT,

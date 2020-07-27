@@ -91,9 +91,28 @@ namespace Graphics
     {
         m_view = { x,y,w,h };
     }
+    const Rect & Map::getView()
+    {
+        return m_view;
+    }
+
+    void Map::zoom(const float delta)
+    {
+        int neww = m_view.w * delta;
+        int newh = m_view.h * delta;
+        int dw = m_view.w - neww;
+        int dh = m_view.h - newh;
+        
+        m_view.w = neww;
+        m_view.h = newh;
+
+        m_view.x += dw * m_view.w;
+        m_view.y += dh * m_view.h;         
+    }
 
     void Map::scroll( int dx, int dy )
     {
+        LOG("Scroll %d %d\n", dx, dy);
         m_view.x += dx ;
         m_view.y += dy ;
     	
@@ -130,19 +149,19 @@ namespace Graphics
 
     void Map::draw()
     {
-        const Rect& bounds = { 0,0, SCREEN_W,SCREEN_H };
         if(!m_tilesetcache) return;
-        //for(int y = 0; y < h; y++)
-        //    for(int x = 0; x < w; x++)
-        //    {
-        //        const int tile = tiles[ y * w + x]; 
-        //        const Rect & src = m_tilesetcache->tile(tile, tilew, tileh);
-        //        Rect dest = { x*tilew, y*tileh, tilew, tileh };
-        //        dest.x -= m_view.x;
-        //        dest.y -= m_view.y;
-        //        if(dest.intersects(bounds) )
-        //            Engine::DrawTexture( m_tilesetcache->texture, src, dest );
-        //    }
+        // const Rect& bounds = { 0,0, SCREEN_W,SCREEN_H };
+        // for(int y = 0; y < h; y++)
+        //     for(int x = 0; x < w; x++)
+        //     {
+        //         const int tile = tiles[ y * w + x]; 
+        //         const Rect & src = m_tilesetcache->tile(tile, tilew, tileh);
+        //         Rect dest = { x*tilew, y*tileh, tilew, tileh };
+        //         dest.x -= m_view.x;
+        //         dest.y -= m_view.y;
+        //         if(dest.intersects(bounds) )
+        //             Engine::DrawTexture( m_tilesetcache->texture, src, dest );
+        //     }
         Engine::DrawTexture( m_texture, m_view, { 0,0, SCREEN_W, SCREEN_H} );
 
     }

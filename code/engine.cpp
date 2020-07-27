@@ -481,6 +481,8 @@ namespace Engine
 	    case SDLK_BACKSPACE : return KEY_BACKSPACE;
         case SDLK_RSHIFT : 
         case SDLK_LSHIFT : return KEY_SHIFT;
+        case SDLK_RALT   :
+        case SDLK_LALT   : return KEY_ALT;
 	    case SDLK_TAB    : return KEY_TAB;
 	    case SDLK_SPACE  : return KEY_SPACE;
         case SDLK_QUOTE  : return cap ? KEY_QUOTEDBL  : KEY_QUOTE;

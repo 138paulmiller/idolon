@@ -22,23 +22,23 @@ MapEditor::MapEditor()
 
 void MapEditor::onEnter()
 {
+	m_scrollSpeed = 1;
 	LOG("Entering map editor ... \n");
 	int w,h;
 	Engine::GetSize(w,h);
 	//load empty	tilesets.
 	//TODO load these from sprite assets	
 
-	int tile =0 ;
+	int tile =8 ;
 	for(int y = SPRITE_H; y < h; y+=SPRITE_H*2)
 		for(int x = SPRITE_W; x < w; x+=SPRITE_W*2)
 		{	
-			Sprite * sprite = new Sprite( tile, SPRITE_W, SPRITE_H );
+			Sprite * sprite = new Sprite( 8, SPRITE_W, SPRITE_H );
 			sprite->sheet = m_mapName;
-			sprite->x = x * WINDOW_SCALE;
-			sprite->y = y * WINDOW_SCALE;
+			sprite->x = x;
+			sprite->y = y;
 			sprite->reload();
 			m_sprites.push_back(sprite);
-			if(++tile >= SPRITE_COUNT) tile=0;
 		}
 
 	LOG( "\nLoaded %u\n", m_sprites.size() );
@@ -77,12 +77,15 @@ void MapEditor::onTick()
 //
 void MapEditor::onKey( Key key, bool isDown )
 {
+	static int s_alt = KEY_UNKNOWN;
 	int tile = 0;
 	static bool released = true;
 	if ( !isDown )
 	{
 		released = true;
+
 		return;
+		if(key == KEY_ALT) s_alt = false;
 	}
 	if ( released )
 	{
@@ -103,7 +106,6 @@ void MapEditor::onKey( Key key, bool isDown )
 				}
 			break;
 			case KEY_d:
-				printf("Modifying!!!\n");
 				for(int y = 0; y < m_map->h; y++)
 					for(int x = 0; x < m_map->w; x++)
 					{
@@ -113,25 +115,46 @@ void MapEditor::onKey( Key key, bool isDown )
 				m_map->reload();
 			break;
 		}
-		LOG( "\nTile Index %d\n", tile );
 	}
-	switch(key)
+	if(key == KEY_ALT)
 	{
-	case KEY_UP:
-		m_map->scroll( 0, -1 );
-	break;
+		s_alt = true;
 
-	case KEY_DOWN:
-		m_map->scroll( 0, 1 );
-	break;
+	}	
+	else 
+	{
 
-	case KEY_LEFT:
-		m_map->scroll( -1, 0 );
-	break;
+		switch(key)
+		{
+		case KEY_UP:
+			m_map->scroll( 0, -m_scrollSpeed );
+		break;
 
-	case KEY_RIGHT:
-		m_map->scroll( 1, 0 );
-	break;
+		case KEY_DOWN:
+			m_map->scroll( 0, m_scrollSpeed );
+		break;
+
+		case KEY_LEFT:
+			m_map->scroll( -m_scrollSpeed, 0 );
+		break;
+
+		case KEY_RIGHT:
+			m_map->scroll( m_scrollSpeed, 0 );
+		break;
+
+		// case KEY_x:
+		// 	//zoom in
+		// 	m_map->zoom(0.5);
+		// 	m_scrollSpeed += 1;
+		// break;
+
+		// case KEY_z:
+		// 	if(m_scrollSpeed <= 1)break;
+		// 	//zoom in
+		// 	m_map->zoom(1.5);
+		// 	m_scrollSpeed -= 1;
+		// break;
+		}
 	}
 
 }

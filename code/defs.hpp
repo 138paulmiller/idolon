@@ -20,8 +20,8 @@
 #define TILE_H 8
 #define TILE_COUNT (TILESET_W/TILE_W * TILESET_H/TILE_H) 
 
-#define MAP_W 16
-#define MAP_H 16
+#define MAP_W 128
+#define MAP_H 128
 
 
 //Default Tileset sizes
