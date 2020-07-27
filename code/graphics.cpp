@@ -87,11 +87,14 @@ namespace Graphics
     Map::~Map()
     {
         delete tiles;
+        Engine::DestroyTexture( m_texture );
+
     }
 
     void Map::setView( int x, int y, int w, int h )
     {
         m_view = { x,y,w,h };
+
     }
     const Rect & Map::getView()
     {
@@ -114,7 +117,6 @@ namespace Graphics
             m_view.h = TILE_H;
         else if(m_view.h > SCREEN_H) 
             m_view.h = SCREEN_H;
-        LOG("%d %d %d %d\n", m_view.x, m_view.y, m_view.w, m_view.h);
     }
 
     void Map::scroll( int dx, int dy )

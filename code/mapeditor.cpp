@@ -22,6 +22,7 @@ MapEditor::MapEditor()
 
 void MapEditor::onEnter()
 {
+	float zoom = 1/2.0f;
 	m_scrollSpeed = 1;
 	LOG("Entering map editor ... \n");
 	int w,h;
@@ -29,21 +30,25 @@ void MapEditor::onEnter()
 	//load empty	tilesets.
 	//TODO load these from sprite assets	
 
+//	m_map->zoom(zoom);
+	m_map = Assets::Load<Map>(m_mapName);
+	LOG( "\nLoaded %u\n", m_sprites.size() );
+
 	int tile =8 ;
-	for(int y = SPRITE_H; y < h; y+=SPRITE_H)
-		for(int x = SPRITE_W; x < w; x+=SPRITE_W)
+	for(int y = SPRITE_H; y < h; y+=SPRITE_H*2)
+		for(int x = SPRITE_W; x < w; x+=SPRITE_W*2)
 		{	
 			Sprite * sprite = new Sprite( 8 );
-			sprite->sheet = m_mapName;
+			sprite->sheet = m_map->sheet;
 			sprite->x = x;
 			sprite->y = y;
+			//sprite->w *= zoom;
+			//sprite->h *= zoom;
 			sprite->reload();
 			m_sprites.push_back(sprite);
 		}
 
-	LOG( "\nLoaded %u\n", m_sprites.size() );
-	m_map = Assets::Load<Map>(m_mapName);
-	
+
 	//TODO - text edit to set tileset
 
 	Editor::onEnter();
@@ -151,11 +156,13 @@ void MapEditor::onKey( Key key, bool isDown )
 		case KEY_x:
 			//zoom in
 			m_map->zoom(1/2.f);
+
 		break;
 
 		case KEY_z:
 			//zoom in
 			m_map->zoom(2);
+
 		break;
 		}
 	}
