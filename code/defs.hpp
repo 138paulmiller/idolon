@@ -4,7 +4,7 @@
 #define VERSION_MINOR 0
 #define SYSTEM_NAME "idolon"
 
-#define WINDOW_SCALE 2.5
+#define WINDOW_SCALE 2
 //in virtual pixel space. not window size
 #define SCREEN_W 256
 #define SCREEN_H 256
@@ -20,8 +20,8 @@
 #define TILE_H 8
 #define TILE_COUNT (TILESET_W/TILE_W * TILESET_H/TILE_H) 
 
-#define MAP_W 64
-#define MAP_H 64
+#define MAP_W 16
+#define MAP_H 16
 
 
 //Default Tileset sizes

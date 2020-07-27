@@ -8,29 +8,29 @@
 
 namespace Graphics
 {
-    
 
-    Tileset::Tileset(const std::string& name, int w, int h)
-        :Asset(name), w(w), h(h),
-        pixels(new Color[(int)(w * h)]),
-        texture(Engine::CreateTexture(w, h))
+
+    Tileset::Tileset( const std::string& name, int w, int h )
+        :Asset( name ), w( w ), h( h ),
+        pixels( new Color[( int ) ( w * h )] ),
+        texture( Engine::CreateTexture( w, h ) )
     {
-        memset(pixels, 255, w * h * sizeof(Color));
+        memset( pixels, 255, w * h * sizeof( Color ) );
         update();
     }
     Tileset::~Tileset()
     {
         delete[]pixels;
-        Engine::DestroyTexture(texture);
+        Engine::DestroyTexture( texture );
     }
 
-    void Tileset::update(const Rect & rect )
+    void Tileset::update( const Rect& rect )
     {
-        ASSERT(rect.x >= 0 && rect.w+rect.x <= w 
-            && rect.y >= 0 && rect.h+rect.y <= h,
+        ASSERT( rect.x >= 0 && rect.w + rect.x <= w
+            && rect.y >= 0 && rect.h + rect.y <= h,
             "Engine: Invalid rect" );
 
-        if( rect.w == 0 || rect.h == 0 )
+        if ( rect.w == 0 || rect.h == 0 )
         {
             Engine::UpdateTexture( texture, pixels, w, { 0,0,w,h } );
             //Color * data = Engine::LockTexture( texture, { 0,0,w,h } );
@@ -43,43 +43,43 @@ namespace Graphics
             //for(int y = 0; y < rect.h; y++)
             //    for(int x = 0; x < rect.w; x++)
             //        data[y * w  + x] = pixels[(rect.y+y) * w  + rect.x + x];
-        }   
+        }
         //Engine::UnlockTexture(texture);
 
     }
     int Tileset::id( const Rect& tile ) const
     {
-        const int tw = w/tile.w;
+        const int tw = w / tile.w;
         const int tx = tile.x / tile.w;
         const int ty = tile.y / tile.h;
-        return ty * tw + tx;     
+        return ty * tw + tx;
     }
 
     Rect Tileset::tile( int index, int tw, int th ) const
     {
-        const int x = ( index % (w/tw) ) * tw;
-        const int y = ( index / (w/tw) ) * th;
+        const int x = ( index % ( w / tw ) ) * tw;
+        const int y = ( index / ( w / tw ) ) * th;
         return { x,y, tw, th };
     }
-   
+
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
     //width and height is number of tiles
-    Map::Map(const std::string & name, int w, int h, int tilew, int tileh)
-        :Asset(name), 
-        w(w), h(h), 
-        tilew(tilew), tileh(tileh),
-        worldw(w * tilew), worldh(h * tileh), 
-        m_tilesetcache(0),
-        texture(Engine::CreateTexture(worldw, worldh, TEXTURE_TARGET)),
-        tiles(new char[w * h]),
+    Map::Map( const std::string& name, int w, int h, int tilew, int tileh )
+        :Asset( name ),
+        w( w ), h( h ),
+        tilew( tilew ), tileh( tileh ),
+        worldw( w* tilew ), worldh( h* tileh ),
+        m_tilesetcache( 0 ),
+        m_texture( Engine::CreateTexture( worldw, worldh, TEXTURE_TARGET ) ),
+        tiles( new char[(uint8_t)w * h] ),
         //by default look for sheet with same name
-        sheet(name)
+        sheet( name )
 
     {
-        memset(tiles, 0, w * h );
-        view = { 0, 0, SCREEN_W, SCREEN_H };
+        memset( tiles, 0, (int)(w * h) );
+        setView( 0, 0, worldw, worldh);
     }
 
     Map::~Map()
@@ -87,6 +87,26 @@ namespace Graphics
         delete tiles;
     }
 
+    void Map::setView( int x, int y, int w, int h )
+    {
+        m_view = { x,y,w,h };
+    }
+
+    void Map::scroll( int dx, int dy )
+    {
+        m_view.x += dx ;
+        m_view.y += dy ;
+    	
+        if(m_view.x < 0) 
+		    m_view.x = 0;
+	    else if(m_view.x+m_view.w > worldw) 
+		    m_view.x = worldw;
+	    if(m_view.y < 0) 
+		    m_view.y = 0;
+	    else if(m_view.y+m_view.h > worldh) 
+		    m_view.y = worldh;
+	
+    }
     void Map::reload()
     {
         m_tilesetcache = Assets::Load<Tileset>(sheet);
@@ -103,20 +123,35 @@ namespace Graphics
                 const int tile = tiles[ y * w + x]; 
                 const Rect & src = m_tilesetcache->tile(tile, tilew, tileh);
                 const Rect & dest = { x*tilew, y*tileh, tilew, tileh };
-                Engine::Blit(m_tilesetcache->texture, texture, src, dest);                
+                Engine::Blit(m_tilesetcache->texture, m_texture, src, dest);                
             }
     }
 
 
     void Map::draw()
     {
-        Engine::DrawTexture( texture, view, { 0,0, SCREEN_W, SCREEN_H } );
+        const Rect& bounds = { 0,0, SCREEN_W,SCREEN_H };
+        if(!m_tilesetcache) return;
+        //for(int y = 0; y < h; y++)
+        //    for(int x = 0; x < w; x++)
+        //    {
+        //        const int tile = tiles[ y * w + x]; 
+        //        const Rect & src = m_tilesetcache->tile(tile, tilew, tileh);
+        //        Rect dest = { x*tilew, y*tileh, tilew, tileh };
+        //        dest.x -= m_view.x;
+        //        dest.y -= m_view.y;
+        //        if(dest.intersects(bounds) )
+        //            Engine::DrawTexture( m_tilesetcache->texture, src, dest );
+        //    }
+        Engine::DrawTexture( m_texture, m_view, { 0,0, SCREEN_W, SCREEN_H} );
 
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
     Sprite::Sprite(int tileId, int w, int h)
-        :x(0), y(0), w(w), h(h), sheet(""), tile(tileId)
+        :x(0), y(0), w(w), h(h), 
+        sheet(""), tile(tileId), 
+        m_tilesetcache(0)
     {
 
     }

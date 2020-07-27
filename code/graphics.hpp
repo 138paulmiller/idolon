@@ -44,16 +44,19 @@ namespace Graphics
         void update(const Rect & rect = { 0, 0, 0, 0 } ); 
         void reload();
         void draw();
+        //pixel space
+        void setView(int x, int y, int w, int h);
+        void scroll(int dx, int dy);
 
         std::string sheet;
-        //viewport
-        Rect view;
         const int w,h, tilew, tileh, worldw, worldh;
         char * const tiles;
      private:
         Tileset * m_tilesetcache;
         //TODO - split map into multiple subtextures. Each streamed in on demand. "Super maps"
-        const int texture; 
+        const int m_texture; 
+        //viewport
+        Rect m_view;
 
     };
     /*--------------------------- Font ------------------------------------
