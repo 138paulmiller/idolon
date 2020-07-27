@@ -260,22 +260,21 @@ void NewAsset(const Args& args)
 	const std::string& name = args[1];
 	if(asset == "tileset")
 	{
-		Graphics::Tileset * sheet = new Graphics::Tileset(name, TILESET_W, TILESET_H);
+		Graphics::Tileset * sheet = new Graphics::Tileset(name);
 		Assets::SaveAs(sheet, UserAssetPath<Graphics::Tileset>(name));
 	}
 	else if(asset == "map")
 	{
-		Graphics::Map* map= new Graphics::Map(name, MAP_W, MAP_H, TILE_W, TILE_W);
+		Graphics::Map* map= new Graphics::Map(name);
 		Assets::SaveAs(map, UserAssetPath<Graphics::Map>(name));
 
 	}
 	else if(asset == "font")
 	{
 		//8x8 chars. 18 x 6  
-		int w = 18 * 8;
-		int h =  6 * 8;
-		char start = ' ';
-		Graphics::Font* font= new Graphics::Font(name, w, h, TILE_W, TILE_W, start);
+		const int w = 18 * 8;
+		const int h =  6 * 8;
+		Graphics::Font* font= new Graphics::Font(name, w, h);
 		Assets::SaveAs(font, UserAssetPath<Graphics::Font>(name));
 	}
 }

@@ -64,22 +64,24 @@ namespace Graphics
 
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
-
+    /*
+    Split map into 128x128 textures. Render these to the screen
+    */
     //width and height is number of tiles
     Map::Map( const std::string& name, int w, int h, int tilew, int tileh )
         :Asset( name ),
         w( w ), h( h ),
         tilew( tilew ), tileh( tileh ),
-        worldw( w* tilew ), worldh( h* tileh ),
+        worldw( w * tilew ), worldh( h * tileh ),
         m_tilesetcache( 0 ),
         m_texture( Engine::CreateTexture( worldw, worldh, TEXTURE_TARGET ) ),
-        tiles( new char[(uint8_t)w * h] ),
+        tiles( new char[w * h] ),
         //by default look for sheet with same name
         sheet( name )
 
     {
         memset( tiles, 0, (int)(w * h) );
-        setView( 0, 0, worldw, worldh);
+        setView( 0, 0, SCREEN_W, SCREEN_H);
     }
 
     Map::~Map()
@@ -96,34 +98,40 @@ namespace Graphics
         return m_view;
     }
 
-    void Map::zoom(const float delta)
+    void Map::zoom(float delta)
     {
-        int neww = m_view.w * delta;
-        int newh = m_view.h * delta;
-        int dw = m_view.w - neww;
-        int dh = m_view.h - newh;
-        
-        m_view.w = neww;
-        m_view.h = newh;
 
-        m_view.x += dw * m_view.w;
-        m_view.y += dh * m_view.h;         
+        m_view.w *= delta;
+        m_view.h *= delta;
+
+
+        if(m_view.w < TILE_W) 
+            m_view.w = TILE_W;
+        else if(m_view.w > SCREEN_W) 
+            m_view.w = SCREEN_W;
+
+        if(m_view.h < TILE_H) 
+            m_view.h = TILE_H;
+        else if(m_view.h > SCREEN_H) 
+            m_view.h = SCREEN_H;
+        LOG("%d %d %d %d\n", m_view.x, m_view.y, m_view.w, m_view.h);
     }
 
     void Map::scroll( int dx, int dy )
     {
-        LOG("Scroll %d %d\n", dx, dy);
-        m_view.x += dx ;
-        m_view.y += dy ;
+
+        m_view.x += dx;
+        m_view.y += dy;
     	
         if(m_view.x < 0) 
 		    m_view.x = 0;
 	    else if(m_view.x+m_view.w > worldw) 
-		    m_view.x = worldw;
-	    if(m_view.y < 0) 
+		    m_view.x = worldw-m_view.w;
+	    
+        if(m_view.y < 0) 
 		    m_view.y = 0;
 	    else if(m_view.y+m_view.h > worldh) 
-		    m_view.y = worldh;
+		    m_view.y = worldh-m_view.h;
 	
     }
     void Map::reload()
@@ -135,6 +143,8 @@ namespace Graphics
     //rect is in tile space
     void Map::update(const Rect & rect )
     {
+        Engine::ClearTexture(m_texture, {0,0,0,0});
+
         if(!m_tilesetcache) return;
         for(int y = rect.y; y < (rect.y+rect.h); y++)
             for(int x = rect.x; x < (rect.x+rect.w); x++)
@@ -150,19 +160,7 @@ namespace Graphics
     void Map::draw()
     {
         if(!m_tilesetcache) return;
-        // const Rect& bounds = { 0,0, SCREEN_W,SCREEN_H };
-        // for(int y = 0; y < h; y++)
-        //     for(int x = 0; x < w; x++)
-        //     {
-        //         const int tile = tiles[ y * w + x]; 
-        //         const Rect & src = m_tilesetcache->tile(tile, tilew, tileh);
-        //         Rect dest = { x*tilew, y*tileh, tilew, tileh };
-        //         dest.x -= m_view.x;
-        //         dest.y -= m_view.y;
-        //         if(dest.intersects(bounds) )
-        //             Engine::DrawTexture( m_tilesetcache->texture, src, dest );
-        //     }
-        Engine::DrawTexture( m_texture, m_view, { 0,0, SCREEN_W, SCREEN_H} );
+        Engine::DrawTexture( m_texture, m_view, { 0,0, SCREEN_W,SCREEN_H } );
 
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////

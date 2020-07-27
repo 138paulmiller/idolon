@@ -30,10 +30,10 @@ void MapEditor::onEnter()
 	//TODO load these from sprite assets	
 
 	int tile =8 ;
-	for(int y = SPRITE_H; y < h; y+=SPRITE_H*2)
-		for(int x = SPRITE_W; x < w; x+=SPRITE_W*2)
+	for(int y = SPRITE_H; y < h; y+=SPRITE_H)
+		for(int x = SPRITE_W; x < w; x+=SPRITE_W)
 		{	
-			Sprite * sprite = new Sprite( 8, SPRITE_W, SPRITE_H );
+			Sprite * sprite = new Sprite( 8 );
 			sprite->sheet = m_mapName;
 			sprite->x = x;
 			sprite->y = y;
@@ -65,11 +65,17 @@ void MapEditor::onExit()
 
 void MapEditor::onTick()
 {
+	//Engine::SetDrawBlendMode(BLEND_MULTIPLY);
 	Engine::ClearScreen(EDITOR_COLOR);
-	
-	if(m_map)m_map->draw();
+	if(m_map)
+	{
+		m_map->draw();
+	}
 
-	for(Sprite * sprite : m_sprites )	sprite->draw();
+	for(Sprite * sprite : m_sprites )	
+	{
+		sprite->draw();
+	}	
 	
 }
 
@@ -123,7 +129,7 @@ void MapEditor::onKey( Key key, bool isDown )
 	}	
 	else 
 	{
-
+		m_scrollSpeed  =10;
 		switch(key)
 		{
 		case KEY_UP:
@@ -142,18 +148,15 @@ void MapEditor::onKey( Key key, bool isDown )
 			m_map->scroll( m_scrollSpeed, 0 );
 		break;
 
-		// case KEY_x:
-		// 	//zoom in
-		// 	m_map->zoom(0.5);
-		// 	m_scrollSpeed += 1;
-		// break;
+		case KEY_x:
+			//zoom in
+			m_map->zoom(1/2.f);
+		break;
 
-		// case KEY_z:
-		// 	if(m_scrollSpeed <= 1)break;
-		// 	//zoom in
-		// 	m_map->zoom(1.5);
-		// 	m_scrollSpeed -= 1;
-		// break;
+		case KEY_z:
+			//zoom in
+			m_map->zoom(2);
+		break;
 		}
 	}
 

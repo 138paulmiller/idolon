@@ -63,12 +63,12 @@ namespace Engine
     void Startup(int w, int h, float scale)
     {
         s_echo = false;
-        s_windowScale = 1.0/scale;
+        s_windowScale = scale;
         s_ue.s_isRunning = SDL_Init(SDL_INIT_EVERYTHING) == 0;
         
         
-        s_windowW = (int)( w / s_windowScale);
-        s_windowH = (int)( h / s_windowScale);
+        s_windowW = (int)( w * s_windowScale);
+        s_windowH = (int)( h * s_windowScale);
         char title[24];
         snprintf( title,24, "%s v%d.%d", SYSTEM_NAME, VERSION_MAJOR, VERSION_MINOR );
 
@@ -235,8 +235,8 @@ namespace Engine
     }  
     void Resize(int w, int h)
     {
-        int sw = (int)(w / s_windowScale);
-        int sh = (int)(h / s_windowScale);
+        int sw = (int)(w * s_windowScale);
+        int sh = (int)(h * s_windowScale);
         SDL_SetWindowSize(s_window, sw, sh);
         SDL_GetWindowSize(s_window, &s_windowW, &s_windowH);
         if (s_target)
@@ -435,8 +435,8 @@ namespace Engine
 
     void GetMousePosition(int& x, int& y)
     {
-        x = s_ue.mousex * s_windowScale;
-        y = s_ue.mousey * s_windowScale;
+        x = s_ue.mousex / s_windowScale;
+        y = s_ue.mousey / s_windowScale;
         int sx = s_alignX ;
         int sy = s_alignY ;
         x = (int)(( x / sx)* sx);
@@ -454,8 +454,8 @@ namespace Engine
     
     void GetSize(int & w, int & h)
     {
-        w = (int)(s_windowW * s_windowScale);
-        h = (int)(s_windowH * s_windowScale);
+        w = (int)(s_windowW / s_windowScale);
+        h = (int)(s_windowH / s_windowScale);
     }
 
     uint32_t GetTime()

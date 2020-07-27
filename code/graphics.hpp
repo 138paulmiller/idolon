@@ -13,7 +13,7 @@ namespace Graphics
         friend class Sprite;
     public:
         
-        Tileset(const std::string& name, int w, int h);
+        Tileset(const std::string& name, int w=TILESET_W, int h=TILESET_H);
         ~Tileset();
         
         //call sparingly . if no rect, will update entire. push data to gpu
@@ -38,7 +38,7 @@ namespace Graphics
     {
     public:
         //width and height is number of tiles
-        Map(const std::string & name, int w, int h, int tilew, int tileh);
+        Map(const std::string & name, int w=MAP_W, int h=MAP_H, int tilew=TILE_W, int tileh=TILE_H);
         ~Map();
         
         void update(const Rect & rect = { 0, 0, 0, 0 } ); 
@@ -47,7 +47,7 @@ namespace Graphics
         //pixel space
         void setView(int x, int y, int w, int h);
         const Rect & getView();
-        void zoom(const float delta);
+        void zoom(float delta);
         void scroll(int dx, int dy);
 
         std::string sheet;
@@ -67,7 +67,7 @@ namespace Graphics
     class Font : public Tileset
     {
     public:
-        Font(const std::string& name, int w, int h, int charW, int charH, char start);
+        Font(const std::string& name, int w, int h, int charW = TILE_W, int charH = TILE_H, char start = ' ');
         //src is textbox in character units
         void blit(int destTexture, const std::string & text, const Rect & dest);
 
@@ -83,7 +83,7 @@ namespace Graphics
     class Sprite
     {
     public:
-        Sprite(int tile, int w, int h);
+        Sprite(int tile, int w = SPRITE_W, int h = SPRITE_H);
         void reload();
         void draw();
         //tile index
