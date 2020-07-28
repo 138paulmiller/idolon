@@ -22,7 +22,6 @@ MapEditor::MapEditor()
 
 void MapEditor::onEnter()
 {
-	float zoom = 1/2.0f;
 	m_scrollSpeed = 1;
 	LOG("Entering map editor ... \n");
 	int w,h;
@@ -39,11 +38,9 @@ void MapEditor::onEnter()
 		for(int x = SPRITE_W; x < w; x+=SPRITE_W*2)
 		{	
 			Sprite * sprite = new Sprite( 8 );
-			sprite->sheet = m_map->sheet;
+			sprite->tileset = m_map->sheet;
 			sprite->x = x;
 			sprite->y = y;
-			//sprite->w *= zoom;
-			//sprite->h *= zoom;
 			sprite->reload();
 			m_sprites.push_back(sprite);
 		}
@@ -71,66 +68,64 @@ void MapEditor::onExit()
 void MapEditor::onTick()
 {
 	//Engine::SetDrawBlendMode(BLEND_MULTIPLY);
+	const Rect& view = m_map->getView();
+	int mx, my;
+	Engine::GetMousePosition(mx, my);
+
+	const int tilew = ( m_map->tilew/ m_map->scale() ) ;
+	const int tileh = ( m_map->tileh/ m_map->scale() ) ;
+
+	const int tilex = (  view.x + mx )/tilew;
+	const int tiley = (  view.y + my )/tileh;
+	
+	//origin point
+	const int tiledx = tilex - ( view.x )/tilew;
+	const int tiledy = tiley - ( view.y )/tileh;
+	
+//
 	Engine::ClearScreen(EDITOR_COLOR);
 	if(m_map)
 	{
 		m_map->draw();
 	}
-
 	for(Sprite * sprite : m_sprites )	
 	{
 		sprite->draw();
 	}	
-	
+	if ( Engine::GetMouseButtonState( MOUSEBUTTON_LEFT ) == BUTTON_UP )
+	{
+		const Rect& border = {
+			tiledx * tilew,
+			tiledy * tileh,
+			tilew, tileh,
+  	};
+	//
+	Engine::DrawRect(BORDER_COLOR, border, false);
+
+	}
 }
 
 
 //
 void MapEditor::onKey( Key key, bool isDown )
 {
+	const Rect& view = m_map->getView();
+	int mx, my;
+	Engine::GetMousePosition(mx, my);
+	//offset in world
+	const int pixelx = view.x + ( mx - view.x )  ;
+	const int pixely = view.y + ( my - view.y ) ;
+
 	static int s_alt = KEY_UNKNOWN;
 	int tile = 0;
-	static bool released = true;
 	if ( !isDown )
 	{
-		released = true;
-
-		return;
 		if(key == KEY_ALT) s_alt = false;
-	}
-	if ( released )
-	{
-		released = false;
-		switch ( key )
-		{
-			case KEY_z:
-				for ( Sprite* sprite : m_sprites )
-				{
-					tile = sprite->tile--;
-				}
-			break;
-		
-			case KEY_x:
-				for ( Sprite* sprite : m_sprites )
-				{
-					tile = sprite->tile++;
-				}
-			break;
-			case KEY_d:
-				for(int y = 0; y < m_map->h; y++)
-					for(int x = 0; x < m_map->w; x++)
-					{
-						const int i = y * m_map->w + x;
-						m_map->tiles[i] = i % TILE_COUNT; //( ( x % 2 ) && ( y % 2 ) ) | ( !( x % 2 ) && ( y + 1 % 2 ) );
-					}
-				m_map->reload();
-			break;
-		}
+		return;
 	}
 	if(key == KEY_ALT)
 	{
 		s_alt = true;
-
 	}	
 	else 
 	{
@@ -155,16 +150,19 @@ void MapEditor::onKey( Key key, bool isDown )
 
 		case KEY_x:
 			//zoom in
-			m_map->zoom(1/2.f);
+			m_map->zoomTo(1.f/2, pixelx , pixely);
+			m_map->update();
 
 		break;
 
 		case KEY_z:
 			//zoom in
-			m_map->zoom(2);
+			m_map->zoomTo(2.f, pixelx, pixely);
+			m_map->update();
 
 		break;
 		}
+		printf( "Zoome %f\n", m_map->scale());
 	}
 
 }

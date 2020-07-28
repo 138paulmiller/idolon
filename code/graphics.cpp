@@ -77,7 +77,8 @@ namespace Graphics
         m_texture( Engine::CreateTexture( worldw, worldh, TEXTURE_TARGET ) ),
         tiles( new char[w * h] ),
         //by default look for sheet with same name
-        sheet( name )
+        sheet( name ),
+        m_scale(1.0)
 
     {
         memset( tiles, 0, (int)(w * h) );
@@ -86,27 +87,51 @@ namespace Graphics
 
     Map::~Map()
     {
-        delete tiles;
         Engine::DestroyTexture( m_texture );
+        delete tiles;
 
     }
 
     void Map::setView( int x, int y, int w, int h )
     {
         m_view = { x,y,w,h };
-
     }
+
+
     const Rect & Map::getView()
     {
         return m_view;
     }
-
-    void Map::zoom(float delta)
+    float Map::scale()
     {
+        return m_scale;
+    }
+    void Map::zoomTo(float scale, int x, int y)
+    {
+        //delta
+        scale *= m_scale ;
+        if ( scale > 1 ) 
+        {
+            scale = 1;
+            return;
+        }
+        else if ( scale < 0.125f ) 
+        {
+            scale = 0.125f;
+            return;
+        }
+        float delta =  m_scale - scale;
+        m_scale = scale;
 
-        m_view.w *= delta;
-        m_view.h *= delta;
+        int px = m_view.x;
+        int py = m_view.y;
 
+        m_view.x = (delta * x ) ;
+        m_view.y = (delta * y ) ;
+
+
+        m_view.w = SCREEN_W * m_scale;
+        m_view.h = SCREEN_H * m_scale;
 
         if(m_view.w < TILE_W) 
             m_view.w = TILE_W;
@@ -117,13 +142,15 @@ namespace Graphics
             m_view.h = TILE_H;
         else if(m_view.h > SCREEN_H) 
             m_view.h = SCREEN_H;
+    
+        scroll( m_view.x - px, m_view.y - py );
     }
 
     void Map::scroll( int dx, int dy )
     {
 
-        m_view.x += dx;
-        m_view.y += dy;
+        m_view.x += dx * m_scale;
+        m_view.y += dy * m_scale;
     	
         if(m_view.x < 0) 
 		    m_view.x = 0;
@@ -145,11 +172,12 @@ namespace Graphics
     //rect is in tile space
     void Map::update(const Rect & rect )
     {
-        Engine::ClearTexture(m_texture, {0,0,0,0});
-
         if(!m_tilesetcache) return;
-        for(int y = rect.y; y < (rect.y+rect.h); y++)
-            for(int x = rect.x; x < (rect.x+rect.w); x++)
+        const Rect& region = { rect.x, rect.y, rect.w == 0 ? w : rect.w, rect.h == 0 ? h : rect.h };
+        Engine::ClearTexture( m_texture, { 0,0,0,0 });
+
+        for(int y = region.y; y < (region.y+region.h); y++)
+            for(int x = region.x; x < (region.x+region.w); x++)
             {
                 const int tile = tiles[ y * w + x]; 
                 const Rect & src = m_tilesetcache->tile(tile, tilew, tileh);
@@ -169,14 +197,14 @@ namespace Graphics
 
     Sprite::Sprite(int tileId, int w, int h)
         :x(0), y(0), w(w), h(h), 
-        sheet(""), tile(tileId), 
+        tileset(""), tile(tileId), 
         m_tilesetcache(0)
     {
 
     }
      void Sprite::reload()
     {
-        m_tilesetcache = Assets::Load<Tileset>(sheet);
+        m_tilesetcache = Assets::Load<Tileset>(tileset);
     }
 
     void Sprite::draw()
@@ -197,7 +225,6 @@ namespace Graphics
 
     void Font::blit(int destTexture, const std::string & text, const Rect & dest)
     {
-
         int c, sx,sy;
         const int srcW = w / charW;  
         const int destW = dest.w / charW;     

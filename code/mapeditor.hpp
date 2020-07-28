@@ -18,6 +18,7 @@ public:
 	
 	//
 	void setMap( const std::string& name );
+
 private:
 	//by default are all empty
 	std::string m_mapName;

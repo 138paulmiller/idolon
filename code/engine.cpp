@@ -277,8 +277,8 @@ namespace Engine
     {  
         CHECK_TEXTURE(textureId )
         SDL_Texture* texture = s_textures[textureId];
-        SDL_DestroyTexture(texture);
         s_textures[textureId] = 0;
+        SDL_DestroyTexture(texture);
     }
     void ClearScreen(const Color& color)
     {
@@ -386,12 +386,11 @@ namespace Engine
     }
     void MultiplyTexture(int textureId, const Color & color)
     {
-        
+
         CHECK_TEXTURE(textureId )
         SDL_Texture * texture = s_textures[textureId];
         SDL_SetTextureColorMod(texture, color.r, color.g, color.b);
-        SDL_SetTextureAlphaMod(texture, color.a);
-        
+        SDL_SetTextureAlphaMod(texture, color.a);        
     }
     
     void DrawTexture(int textureId, const Rect & src, const Rect & dest)

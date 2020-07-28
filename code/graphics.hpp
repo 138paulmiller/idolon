@@ -47,9 +47,10 @@ namespace Graphics
         //pixel space
         void setView(int x, int y, int w, int h);
         const Rect & getView();
-        void zoom(float delta);
+        float scale( );
+        void zoomTo( float scale, int x, int y );
         void scroll(int dx, int dy);
-
+        
         std::string sheet;
         const int w,h, tilew, tileh, worldw, worldh;
         char * const tiles;
@@ -59,7 +60,7 @@ namespace Graphics
         const int m_texture; 
         //viewport
         Rect m_view;
-
+        float m_scale;
     };
     /*--------------------------- Font ------------------------------------
         font is essentially just a tile set, where each character in the alphabet is just a tile
@@ -90,7 +91,7 @@ namespace Graphics
         int tile ;
         int x,y;
         int w,h;
-        std::string sheet;
+        std::string tileset;
 
     private:
         Tileset * m_tilesetcache;

@@ -127,6 +127,9 @@
     <ClInclude Include="..\code\defs.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\code\game.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\code\bindings.inl">
