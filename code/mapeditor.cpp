@@ -67,40 +67,45 @@ void MapEditor::onExit()
 
 void MapEditor::onTick()
 {
+	const float scale  =m_map->scale();
 	//Engine::SetDrawBlendMode(BLEND_MULTIPLY);
 	const Rect& view = m_map->getView();
 	int mx, my;
 	Engine::GetMousePosition(mx, my);
-
-	const int tilew = ( m_map->tilew/ m_map->scale() ) ;
-	const int tileh = ( m_map->tileh/ m_map->scale() ) ;
-
-	const int tilex = (  view.x + mx )/tilew;
-	const int tiley = (  view.y + my )/tileh;
+	// mx/=scale;
+	// my/=scale;
 	
-	//origin point
-	const int tiledx = tilex - ( view.x )/tilew;
-	const int tiledy = tiley - ( view.y )/tileh;
-	
+	const int tilew =  m_map->tilew/scale;
+	const int tileh =  m_map->tileh/scale;
+
+	const int tilex =  view.x/scale + mx;
+	const int tiley =  view.y/scale + my;
+
+	const int bx = (int)tilex/tilew*tilew - view.x/scale;
+	const int by = (int)tiley/tileh*tileh - view.y/scale;
 //
 	Engine::ClearScreen(EDITOR_COLOR);
 	if(m_map)
 	{
 		m_map->draw();
 	}
+
 	for(Sprite * sprite : m_sprites )	
 	{
 		sprite->draw();
 	}	
+	
 	if ( Engine::GetMouseButtonState( MOUSEBUTTON_LEFT ) == BUTTON_UP )
 	{
-		const Rect& border = {
-			tiledx * tilew,
-			tiledy * tileh,
-			tilew, tileh,
-  	};
-	//
-	Engine::DrawRect(BORDER_COLOR, border, false);
+		const Rect& border = 
+		{ 
+			(int)(bx),
+			(int)(by),
+			(int)(tilew), 
+			(int)(tileh) 
+		};
+		//
+		Engine::DrawRect(BORDER_COLOR, border, false);
 
 	}
 }
@@ -162,7 +167,6 @@ void MapEditor::onKey( Key key, bool isDown )
 
 		break;
 		}
-		printf( "Zoome %f\n", m_map->scale());
 	}
 
 }
