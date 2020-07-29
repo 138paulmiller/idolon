@@ -13,7 +13,7 @@ namespace
 		{ TILE_W,   TILE_H },
 		{ SPRITE_W, SPRITE_W }
 	};
-}
+} // namespace
 using namespace Graphics;
 using namespace UI;
 
@@ -45,15 +45,16 @@ void TilesetEditor::onEnter()
 
 	const int x = w - 16 - 8;
 	const int y = 8 * 2;
-	m_colorPicker = new ColorPicker(x,y);
-	m_sheetPicker = new TilePicker( m_tileset );
+	m_colorpicker = new ColorPicker(x,y);
+	m_tilepicker = new TilePicker();
+	m_tilepicker->reload(m_tilesetName);
 
 	const int idLen  = 3;
 	const int tileidX =  w - m_charW * 3;
-	const int tilesetY =  m_sheetPicker->rect().y - m_charH;
+	const int tilesetY =  m_tilepicker->rect().y - m_charH;
 	m_tileIdBox = new TextButton("00", tileidX, tilesetY, idLen , 1);
 
-	m_sheetPicker->resizeCursor( s_canvasSizes[0][0], s_canvasSizes[0][1] );
+	m_tilepicker->resizeCursor( s_canvasSizes[0][0], s_canvasSizes[0][1] );
 
 	m_toolbar = new Toolbar(this, 0, tilesetY);
 
@@ -79,8 +80,8 @@ void TilesetEditor::onEnter()
 	//first add toolbat	
 	//add the ui widgets
 	App::addWidget( m_toolbar );
-	App::addWidget( m_sheetPicker );
-	App::addWidget( m_colorPicker );
+	App::addWidget( m_tilepicker );
+	App::addWidget( m_colorpicker );
 	App::addWidget( m_tileIdBox );
 
 	//choose pixel tool on start
@@ -99,7 +100,7 @@ void TilesetEditor::onExit()
 {	//allow for reloading data
 	Assets::Unload<Tileset>(m_tilesetName );
 	m_tilesetName = "";
-	//remove all ui Widgets/buttons
+	//remove all ui Widgets/buttons. do not manually delete
 	App::clear();
 	for(Color * colors : m_revisionData)
 	{
@@ -125,10 +126,10 @@ void TilesetEditor::onTick()
 	//update 
 	int mx, my;
 	Engine::GetMousePosition(mx, my);
-	const Color &color = m_colorPicker->color();
+	const Color &color = m_colorpicker->color();
 	
 	//tile position in sheet
-	const Rect& tileSrc = m_sheetPicker->selection();
+	const Rect& tileSrc = m_tilepicker->selection();
 	//if using smal tile size. make pixels larger! 
 	
 	const float scale = ( TILE_SIZE_MAX / tileSrc.w ) * m_tileScale;
@@ -216,11 +217,11 @@ void TilesetEditor::onTick()
 								m_tileset->pixels[sy * m_tileset->w + sx] = CLEAR;
 						}
 				}
-				m_tileset->update(m_sheetPicker->selection());
+				m_tileset->update(m_tilepicker->selection());
 				break;
 			case TOOL_PIXEL:
 				m_tileset->pixels[sheety * m_tileset->w + sheetx] = color;
-				m_tileset->update(m_sheetPicker->selection());
+				m_tileset->update(m_tilepicker->selection());
 				break;
 			case TOOL_LINE:
 				//set shape end (x,y)
@@ -271,7 +272,7 @@ void TilesetEditor::onTick()
 	}	
 
 	//draw box
-	const int id = m_sheetPicker->selectionIndex();
+	const int id = m_tilepicker->selectionIndex();
 	char idText[]  = "00";
 	snprintf(idText, 3, "%02d", id);
 	m_tileIdBox->setText(idText);
@@ -295,8 +296,8 @@ void TilesetEditor::onTick()
 
 void TilesetEditor::drawOverlay(int tilex, int tiley, const Rect & dest)
 {
-	const Color &color = m_colorPicker->color();
-	const Rect & overlaySrc = { 0, 0, m_sheetPicker->selection().w, m_sheetPicker->selection().h }; 	
+	const Color &color = m_colorpicker->color();
+	const Rect & overlaySrc = { 0, 0, m_tilepicker->selection().w, m_tilepicker->selection().h }; 	
 	//not valid
 	if(tilex < 0  || tilex >= overlaySrc.w || tiley < 0  || tiley >= overlaySrc.h)
 		return;
@@ -359,22 +360,22 @@ void TilesetEditor::onKey(Key key, bool isDown)
 		switch(key)
 		{
 			case KEY_UP:
-				m_sheetPicker->moveCursor(0, -1);
+				m_tilepicker->moveCursor(0, -1);
 				break;
 			case KEY_DOWN:
-				m_sheetPicker->moveCursor(0, 1);
+				m_tilepicker->moveCursor(0, 1);
 				break;
 			case KEY_RIGHT:
-				m_sheetPicker->moveCursor(1, 0);
+				m_tilepicker->moveCursor(1, 0);
 				break;
 			case KEY_LEFT:
-				m_sheetPicker->moveCursor(-1, 0);
+				m_tilepicker->moveCursor(-1, 0);
 				break;
 			case KEY_1:
-				m_sheetPicker->resizeCursor( s_canvasSizes[0][0], s_canvasSizes[0][1] );
+				m_tilepicker->resizeCursor( s_canvasSizes[0][0], s_canvasSizes[0][1] );
 				break;
 			case KEY_2:
-				m_sheetPicker->resizeCursor( s_canvasSizes[1][0], s_canvasSizes[1][1] );
+				m_tilepicker->resizeCursor( s_canvasSizes[1][0], s_canvasSizes[1][1] );
 				break;
 			case KEY_z:
 				if(m_tool == TOOL_ERASE)
@@ -389,7 +390,7 @@ void TilesetEditor::onKey(Key key, bool isDown)
 			case KEY_x:
 				if(m_tool == TOOL_ERASE)
 				{
-					if(m_shapeRect.w < m_sheetPicker->selection().w)
+					if(m_shapeRect.w < m_tilepicker->selection().w)
 					{
 						m_shapeRect.w++;
 						m_shapeRect.h++;
@@ -412,7 +413,7 @@ void TilesetEditor::setTileset(const std::string& name)
 
 void TilesetEditor::commit()
 {	
-	const Rect & selection = m_sheetPicker->selection();
+	const Rect & selection = m_tilepicker->selection();
 	m_tileset->update(selection);
 	
 	int size = m_tileset->w * m_tileset->h;
@@ -460,7 +461,7 @@ void TilesetEditor::commit()
 
 void TilesetEditor::undo()
 { 	
-	const Rect & selection = m_sheetPicker->selection();
+	const Rect & selection = m_tilepicker->selection();
 	/*TODO
 	auto it = m_revisions.find(sheetIndex);
 	if(it == m_revisions.end())
@@ -492,7 +493,7 @@ void TilesetEditor::undo()
 
 void TilesetEditor::redo()
 {
-	const Rect & selection = m_sheetPicker->selection();
+	const Rect & selection = m_tilepicker->selection();
 /*TODO 
 	auto it = m_revisions.find(sheetIndex);
 	if(it == m_revisions.end())

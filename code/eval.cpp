@@ -80,7 +80,7 @@ namespace
 	    return PyModule_Create(&s_pymodule);
 	}
 
-}
+} // namespace
 
 
 
@@ -209,4 +209,4 @@ namespace Eval
 	    }
 		return 1;
 	}
-}
+} // namespace Eval

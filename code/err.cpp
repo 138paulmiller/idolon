@@ -56,7 +56,7 @@ namespace Err
     }
 #endif //__unix__         
 
-}
+} // namespace Err
 
 #undef RESET
 #undef RED

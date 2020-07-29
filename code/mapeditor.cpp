@@ -37,7 +37,7 @@ void MapEditor::onEnter()
 		for(int x = SPRITE_W; x < w; x+=SPRITE_W*2)
 		{	
 			Sprite * sprite = new Sprite( 8 );
-			sprite->tileset = m_map->sheet;
+			sprite->tileset = m_map->tileset;
 			sprite->x = x;
 			sprite->y = y;
 			sprite->reload();
@@ -47,18 +47,26 @@ void MapEditor::onEnter()
 
 	//TODO - text edit to set tileset
 
+	m_tilepicker = new UI::TilePicker();
+	m_tilepicker->reload(m_map->tileset);
+	
+	App::addWidget(m_tilepicker);
 	Editor::onEnter();
 }
 
 void MapEditor::onExit()
 {	
+	
 	for(Sprite * sprite : m_sprites )
 		delete sprite;
+	
 	m_sprites.clear();
+	
 	Assets::Unload<Map>(m_mapName);
-
+	//delete widgets
 	App::clear();
 	Editor::onExit();
+
 	LOG("Extited map editor\n");
 }
 
@@ -119,9 +127,6 @@ void MapEditor::onTick()
 	};
 	//move cursor to ui element ? 
 	Engine::DrawRect(BORDER_COLOR, cursor, false);
-
-
-
 
 
 }

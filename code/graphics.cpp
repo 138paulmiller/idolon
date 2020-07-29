@@ -77,7 +77,7 @@ namespace Graphics
         m_texture( Engine::CreateTexture( worldw, worldh, TEXTURE_TARGET ) ),
         tiles( new char[w * h] ),
         //by default look for sheet with same name
-        sheet( name ),
+        tileset( name ),
         m_scale(1.0)
 
     {
@@ -87,6 +87,9 @@ namespace Graphics
 
     Map::~Map()
     {
+        if(m_tilesetcache)
+            Assets::Unload<Tileset>(m_tilesetcache->name);
+
         Engine::DestroyTexture( m_texture );
         delete tiles;
 
@@ -165,7 +168,11 @@ namespace Graphics
     }
     void Map::reload()
     {
-        m_tilesetcache = Assets::Load<Tileset>(sheet);
+
+        if(m_tilesetcache)
+            Assets::Unload<Tileset>(m_tilesetcache->name);
+
+        m_tilesetcache = Assets::Load<Tileset>(tileset);
         update({0,0,w,h}); 
 
     }
@@ -202,8 +209,16 @@ namespace Graphics
     {
 
     }
+    Sprite::~Sprite()
+    {
+        if(m_tilesetcache)
+            Assets::Unload<Tileset>(m_tilesetcache->name);
+    }
+
      void Sprite::reload()
     {
+        if(m_tilesetcache)
+            Assets::Unload<Tileset>(m_tilesetcache->name);
         m_tilesetcache = Assets::Load<Tileset>(tileset);
     }
 
@@ -221,7 +236,7 @@ namespace Graphics
          charW(charW), charH(charH), 
          start(start)
     { 
-    }    
+    }
 
     void Font::blit(int destTexture, const std::string & text, const Rect & dest)
     {
@@ -282,11 +297,15 @@ namespace Graphics
         fillColor({0,0,0,0}),
         visible(true),
         borderX(0),
-        borderY(0)
+        borderY(0),
+        m_fontcache(0)
     {
     }
     TextBox::~TextBox()
     {
+        if(m_fontcache)
+            Assets::Unload<Font>(m_fontcache->name);
+
         Engine::DestroyTexture(m_texture);
     }
 
@@ -313,7 +332,11 @@ namespace Graphics
     }
     void TextBox::reload()
     {
+
+        if(m_fontcache)
+            Assets::Unload<Font>(m_fontcache->name);
         m_fontcache = Assets::Load<Font>(font);
+
         if(!m_fontcache) return;
         //only do if texture w/h changes
         if(m_texture) Engine::DestroyTexture(m_texture);

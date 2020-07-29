@@ -51,7 +51,7 @@ namespace Graphics
         void zoomTo( float scale, int x, int y );
         void scroll(int dx, int dy);
         
-        std::string sheet;
+        std::string tileset;
         const int w,h, tilew, tileh, worldw, worldh;
         char * const tiles;
      private:
@@ -85,6 +85,7 @@ namespace Graphics
     {
     public:
         Sprite(int tile, int w = SPRITE_W, int h = SPRITE_H);
+        ~Sprite();
         void reload();
         void draw();
         //tile index

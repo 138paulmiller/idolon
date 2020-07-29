@@ -104,7 +104,7 @@ namespace Assets
 			std::fstream outfile;
 			outfile.open(path, std::fstream::out);
 			outfile << map->name << std::endl;
-			outfile << map->sheet << std::endl;
+			outfile << map->tileset << std::endl;
 			//TODO - verify endian-ness!
 			int blocksize =  map->w * map->h;
 			outfile << map->w << ' ' << map->h << ' ';
@@ -127,9 +127,9 @@ namespace Assets
 		{
 			std::fstream infile;
 			infile.open(path, std::fstream::in);
-			std::string name, sheet;
+			std::string name, tileset;
 			std::getline( infile, name ); 
-			std::getline( infile, sheet ); 
+			std::getline( infile, tileset ); 
 			int w,h, tw, th;
 			infile >> w >> h >> tw >> th;
 
@@ -141,7 +141,7 @@ namespace Assets
 			infile.close();
 
 			map = new Graphics::Map(name, w, h, tw, th);
-			map->sheet = sheet;
+			map->tileset = tileset;
 			//uncompress bytes into pixels data
 			memcpy(map->tiles, tiledata, w * h);
 			map->reload();

@@ -411,14 +411,17 @@ namespace UI
 	}
 	
 	//////////////////////////////////////////////////////////////////////////////////
-	TilePicker::TilePicker(const Graphics::Tileset * sheet)
-		:m_scale(2)
+	TilePicker::TilePicker()
+		:
+		m_scale(2),
+		m_tileset(0)
 	{
-		setTileset(sheet);
 	}
 
 	TilePicker::~TilePicker()
 	{
+		if(m_tileset)
+			Assets::Unload<Graphics::Tileset>(m_tileset->name);
 	}
 
 	const Rect & TilePicker::rect()
@@ -476,10 +479,15 @@ namespace UI
 			}
 		}
 	}
-	void TilePicker::setTileset(const Graphics::Tileset * sheet)
+	void TilePicker::reload(const std::string & tileset)
 	{
-		if ( !sheet ) return;
-		m_tileset = sheet;
+		if(m_tileset)
+			Assets::Unload<Graphics::Tileset>(m_tileset->name);
+
+		m_tileset = Assets::Load<Graphics::Tileset>(tileset);
+		
+		if ( !m_tileset ) return;
+
 		int w, h;
 		Engine::GetSize(w, h);
 		

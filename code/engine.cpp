@@ -76,7 +76,7 @@ namespace Engine
         s_renderer = SDL_CreateRenderer(s_window, -1, RENDERER_FLAGS);
         s_target = CreateTexture( w, h, TEXTURE_TARGET);
 
-        s_ue.s_isRunning == s_ue.s_isRunning && s_window && s_renderer;
+        s_ue.s_isRunning = (s_ue.s_isRunning && (s_window && s_renderer));
         s_frame = 0;
         s_startTime = GetTime();
         s_nextFrameTime = s_startTime + FPS_CAP;
@@ -98,7 +98,7 @@ namespace Engine
     {
         s_echo = on;
         if (!on)
-            s_echocb = 0;
+            s_echo = 0;
     }
     //only use in edit/debug mode
     void SetKeyHandler(std::function<void(Key, bool)> cb)

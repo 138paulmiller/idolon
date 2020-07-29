@@ -206,13 +206,14 @@ namespace UI
 	class TilePicker : public Widget
 	{
 	public:
-		TilePicker(const Graphics::Tileset * sheet);
+		TilePicker();
 		~TilePicker();
 
 		const Rect & rect();
 		void onUpdate();
 		void onDraw();
-		void setTileset(const Graphics::Tileset * sheet);
+		
+		void reload(const std::string & tileset);
 		//get tile/frame relative to given sheet
 		Rect selection();
 		int selectionIndex();

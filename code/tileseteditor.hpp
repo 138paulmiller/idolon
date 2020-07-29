@@ -34,8 +34,8 @@ private:
 	void drawOverlay(int tilex, int tiley, const Rect & dest);
 	
 
-	UI::TilePicker * m_sheetPicker;
-	UI::ColorPicker * m_colorPicker;
+	UI::TilePicker * m_tilepicker;
+	UI::ColorPicker * m_colorpicker;
 	UI::Toolbar * m_toolbar;
 	UI::TextButton * m_tileIdBox;
 	

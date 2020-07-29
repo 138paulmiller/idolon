@@ -14,7 +14,7 @@ namespace
 	//system are for default system data
 	std::string s_sysPath ;
 	std::string s_sysAssetPath;
-}
+} // namespace
 
 namespace Sys
 {
@@ -133,4 +133,4 @@ print("Mouse:%s" % (mouse))
 		return s_context;
 	}
 
-}
+} // namespace Sys

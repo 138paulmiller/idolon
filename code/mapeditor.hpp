@@ -19,11 +19,13 @@ public:
 	//
 	void setMap( const std::string& name );
 
+	
 private:
 	//by default are all empty
 	std::string m_mapName;
 	//map contains ref to tilesheet
 	Graphics::Map * m_map;
+	UI::TilePicker * m_tilepicker;
 	//DEBUG
 	std::vector<Graphics::Sprite*> m_sprites;
 
@@ -31,6 +33,6 @@ private:
 	int m_prevmx,m_prevmy;
 
 	bool m_shift = false;
-
+	//load 4 tiles ! 
 
 };
