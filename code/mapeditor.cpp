@@ -22,7 +22,6 @@ MapEditor::MapEditor()
 
 void MapEditor::onEnter()
 {
-	m_scrollSpeed = 1;
 	LOG("Entering map editor ... \n");
 	int w,h;
 	Engine::GetSize(w,h);
@@ -72,18 +71,26 @@ void MapEditor::onTick()
 	const Rect& view = m_map->getView();
 	int mx, my;
 	Engine::GetMousePosition(mx, my);
-	// mx/=scale;
-	// my/=scale;
-	
-	const int tilew =  m_map->tilew/scale;
-	const int tileh =  m_map->tileh/scale;
 
-	const int tilex =  view.x/scale + mx;
-	const int tiley =  view.y/scale + my;
 
-	const int bx = (int)tilex/tilew*tilew - view.x/scale;
-	const int by = (int)tiley/tileh*tileh - view.y/scale;
-//
+	MouseButton btn = m_shift ? MOUSEBUTTON_LEFT : MOUSEBUTTON_RIGHT;
+
+	//scroll if necessary
+	if ( Engine::GetMouseButtonState( btn ) == BUTTON_DOWN )
+	{
+		m_prevmx = mx;
+		m_prevmy = my;
+	}
+	else if ( Engine::GetMouseButtonState( btn ) == BUTTON_HOLD )
+	{
+		const int dx = m_prevmx - mx;
+		const int dy = m_prevmy - my;
+		m_map->scroll(dx, dy);
+		m_prevmx = mx;
+		m_prevmy = my;
+
+	}
+
 	Engine::ClearScreen(EDITOR_COLOR);
 	if(m_map)
 	{
@@ -94,20 +101,29 @@ void MapEditor::onTick()
 	{
 		sprite->draw();
 	}	
-	
-	if ( Engine::GetMouseButtonState( MOUSEBUTTON_LEFT ) == BUTTON_UP )
-	{
-		const Rect& border = 
-		{ 
-			(int)(bx),
-			(int)(by),
-			(int)(tilew), 
-			(int)(tileh) 
-		};
-		//
-		Engine::DrawRect(BORDER_COLOR, border, false);
+	// Draw cursor
+	const int tilew =  m_map->tilew/scale;
+	const int tileh =  m_map->tileh/scale;
 
-	}
+	const int tilex =  view.x/scale + mx;
+	const int tiley =  view.y/scale + my;
+
+	const int bx = (int)tilex/tilew*tilew - view.x/scale;
+	const int by = (int)tiley/tileh*tileh - view.y/scale;
+	const Rect& cursor = 
+	{ 
+		(int)(bx),
+		(int)(by),
+		(int)(tilew), 
+		(int)(tileh) 
+	};
+	//move cursor to ui element ? 
+	Engine::DrawRect(BORDER_COLOR, cursor, false);
+
+
+
+
+
 }
 
 
@@ -121,52 +137,33 @@ void MapEditor::onKey( Key key, bool isDown )
 	const int pixelx = view.x + ( mx - view.x )  ;
 	const int pixely = view.y + ( my - view.y ) ;
 
-	static int s_alt = KEY_UNKNOWN;
 	int tile = 0;
+	printf("Key %d Alt : %d\n", key, KEY_ALT);
+	if(key == KEY_SHIFT) 
+	{  
+		m_shift = isDown;
+		return;
+	}	
+
 	if ( !isDown )
 	{
-		if(key == KEY_ALT) s_alt = false;
 		return;
 	}
-	if(key == KEY_ALT)
+	switch(key)
 	{
-		s_alt = true;
-	}	
-	else 
-	{
-		m_scrollSpeed  =10;
-		switch(key)
-		{
-		case KEY_UP:
-			m_map->scroll( 0, -m_scrollSpeed );
-		break;
 
-		case KEY_DOWN:
-			m_map->scroll( 0, m_scrollSpeed );
-		break;
+	case KEY_x:
+		//zoom in
+		m_map->zoomTo(1.f/2, pixelx , pixely);
+		m_map->update();
 
-		case KEY_LEFT:
-			m_map->scroll( -m_scrollSpeed, 0 );
-		break;
+	break;
 
-		case KEY_RIGHT:
-			m_map->scroll( m_scrollSpeed, 0 );
-		break;
-
-		case KEY_x:
-			//zoom in
-			m_map->zoomTo(1.f/2, pixelx , pixely);
-			m_map->update();
-
-		break;
-
-		case KEY_z:
-			//zoom in
-			m_map->zoomTo(2.f, pixelx, pixely);
-			m_map->update();
-
-		break;
-		}
+	case KEY_z:
+		//zoom in
+		m_map->zoomTo(2.f, pixelx, pixely);
+		m_map->update();
+	break;
 	}
 
 }

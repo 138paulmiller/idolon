@@ -26,6 +26,11 @@ private:
 	Graphics::Map * m_map;
 	//DEBUG
 	std::vector<Graphics::Sprite*> m_sprites;
-	int m_scrollSpeed;
+
+	//previous mouse xy
+	int m_prevmx,m_prevmy;
+
+	bool m_shift = false;
+
 
 };
