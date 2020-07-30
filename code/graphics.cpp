@@ -71,18 +71,21 @@ namespace Graphics
     Map::Map( const std::string& name, int w, int h, int tilew, int tileh )
         :Asset( name ),
         w( w ), h( h ),
+        m_scale(1.0),
         tilew( tilew ), tileh( tileh ),
         worldw( w * tilew ), worldh( h * tileh ),
         m_tilesetcache( 0 ),
         m_texture( Engine::CreateTexture( worldw, worldh, TEXTURE_TARGET ) ),
         tiles( new char[w * h] ),
         //by default look for sheet with same name
-        tileset( name ),
-        m_scale(1.0)
+        tileset( name )
 
     {
         memset( tiles, 0, (int)(w * h) );
-        setView( 0, 0, SCREEN_W, SCREEN_H);
+        int screenw, screenh;
+        Engine::GetSize(w,h);
+        view = { 0, 0, screenw, screenh };
+        rect = { 0, 0, screenw, screenh };
     }
 
     Map::~Map()
@@ -95,20 +98,11 @@ namespace Graphics
 
     }
 
-    void Map::setView( int x, int y, int w, int h )
-    {
-        m_view = { x,y,w,h };
-    }
-
-
-    const Rect & Map::getView()
-    {
-        return m_view;
-    }
     float Map::scale()
     {
         return m_scale;
     }
+
     void Map::zoomTo(float scale, int x, int y)
     {
         //delta
@@ -126,44 +120,44 @@ namespace Graphics
         float delta =  m_scale - scale;
         m_scale = scale;
 
-        int px = m_view.x;
-        int py = m_view.y;
+        int px = view.x;
+        int py = view.y;
 
-        m_view.x = (delta * x ) ;
-        m_view.y = (delta * y ) ;
+        view.x = (delta * x ) ;
+        view.y = (delta * y ) ;
 
 
-        m_view.w = SCREEN_W * m_scale;
-        m_view.h = SCREEN_H * m_scale;
+        view.w = rect.w * m_scale;
+        view.h = rect.h * m_scale;
 
-        if(m_view.w < TILE_W) 
-            m_view.w = TILE_W;
-        else if(m_view.w > SCREEN_W) 
-            m_view.w = SCREEN_W;
+        if(view.w < TILE_W) 
+            view.w = TILE_W;
+        else if(view.w > rect.w) 
+            view.w = rect.w;
 
-        if(m_view.h < TILE_H) 
-            m_view.h = TILE_H;
-        else if(m_view.h > SCREEN_H) 
-            m_view.h = SCREEN_H;
+        if(view.h < TILE_H) 
+            view.h = TILE_H;
+        else if(view.h > rect.h) 
+            view.h = rect.h;
     
-        scroll( m_view.x - px, m_view.y - py );
+        scroll( view.x - px, view.y - py );
     }
 
     void Map::scroll( int dx, int dy )
     {
 
-        m_view.x += dx * m_scale;
-        m_view.y += dy * m_scale;
+        view.x += dx * m_scale;
+        view.y += dy * m_scale;
     	
-        if(m_view.x < 0) 
-		    m_view.x = 0;
-	    else if(m_view.x+m_view.w > worldw) 
-		    m_view.x = worldw-m_view.w;
+        if(view.x < 0) 
+		    view.x = 0;
+	    else if(view.x+view.w > worldw) 
+		    view.x = worldw-view.w;
 	    
-        if(m_view.y < 0) 
-		    m_view.y = 0;
-	    else if(m_view.y+m_view.h > worldh) 
-		    m_view.y = worldh-m_view.h;
+        if(view.y < 0) 
+		    view.y = 0;
+	    else if(view.y+view.h > worldh) 
+		    view.y = worldh-view.h;
 	
     }
     void Map::reload()
@@ -197,7 +191,8 @@ namespace Graphics
     void Map::draw()
     {
         if(!m_tilesetcache) return;
-        Engine::DrawTexture( m_texture, m_view, { 0,0, SCREEN_W,SCREEN_H } );
+
+        Engine::DrawTexture( m_texture, view, rect );
 
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////

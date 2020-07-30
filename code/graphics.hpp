@@ -44,22 +44,24 @@ namespace Graphics
         void update(const Rect & rect = { 0, 0, 0, 0 } ); 
         void reload();
         void draw();
-        //pixel space
-        void setView(int x, int y, int w, int h);
-        const Rect & getView();
         float scale( );
         void zoomTo( float scale, int x, int y );
         void scroll(int dx, int dy);
         
         std::string tileset;
+        //width and height is in tiles
         const int w,h, tilew, tileh, worldw, worldh;
         char * const tiles;
+        //The view is viewport into the map texture
+        Rect view;
+        //xy is screen space position of map. 
+        Rect rect;
+
      private:
         Tileset * m_tilesetcache;
         //TODO - split map into multiple subtextures. Each streamed in on demand. "Super maps"
         const int m_texture; 
         //viewport
-        Rect m_view;
         float m_scale;
     };
     /*--------------------------- Font ------------------------------------

@@ -25,31 +25,39 @@ void MapEditor::onEnter()
 	LOG("Entering map editor ... \n");
 	int w,h;
 	Engine::GetSize(w,h);
-	//load empty	tilesets.
-	//TODO load these from sprite assets	
 
-//	m_map->zoom(zoom);
+
+	m_tilepicker = new UI::TilePicker();
+
 	m_map = Assets::Load<Map>(m_mapName);
-	LOG( "\nLoaded %u\n", m_sprites.size() );
+	m_tilepicker->reload(m_map->tileset);
 
-	int tile =8 ;
-	for(int y = SPRITE_H; y < h; y+=SPRITE_H*2)
+	
+	const int maph = h - m_tilepicker->rect().h - TILE_H;
+	printf("%d %d %d %d \n", m_tilepicker->rect().x,m_tilepicker->rect().y, m_tilepicker->rect().w, m_tilepicker->rect().h);
+	m_map->rect = { 0, TILE_H, w, maph };
+	//reset view
+   	m_map->zoomTo(1.0, 0, 0 );
+
+	const int spriteId =8 ;
+	for(int y = SPRITE_H; y < m_map->rect.h; y+=SPRITE_H*2)
+	{
+
 		for(int x = SPRITE_W; x < w; x+=SPRITE_W*2)
 		{	
-			Sprite * sprite = new Sprite( 8 );
+			Sprite * sprite = new Sprite( spriteId );
 			sprite->tileset = m_map->tileset;
 			sprite->x = x;
 			sprite->y = y;
 			sprite->reload();
 			m_sprites.push_back(sprite);
 		}
+	}
 
 
 	//TODO - text edit to set tileset
 
-	m_tilepicker = new UI::TilePicker();
-	m_tilepicker->reload(m_map->tileset);
-	
+
 	App::addWidget(m_tilepicker);
 	Editor::onEnter();
 }
@@ -74,9 +82,6 @@ void MapEditor::onExit()
 
 void MapEditor::onTick()
 {
-	const float scale  =m_map->scale();
-	//Engine::SetDrawBlendMode(BLEND_MULTIPLY);
-	const Rect& view = m_map->getView();
 	int mx, my;
 	Engine::GetMousePosition(mx, my);
 
@@ -109,25 +114,7 @@ void MapEditor::onTick()
 	{
 		sprite->draw();
 	}	
-	// Draw cursor
-	const int tilew =  m_map->tilew/scale;
-	const int tileh =  m_map->tileh/scale;
-
-	const int tilex =  view.x/scale + mx;
-	const int tiley =  view.y/scale + my;
-
-	const int bx = (int)tilex/tilew*tilew - view.x/scale;
-	const int by = (int)tiley/tileh*tileh - view.y/scale;
-	const Rect& cursor = 
-	{ 
-		(int)(bx),
-		(int)(by),
-		(int)(tilew), 
-		(int)(tileh) 
-	};
-	//move cursor to ui element ? 
-	Engine::DrawRect(BORDER_COLOR, cursor, false);
-
+	drawCursor(mx, my);
 
 }
 
@@ -135,7 +122,7 @@ void MapEditor::onTick()
 //
 void MapEditor::onKey( Key key, bool isDown )
 {
-	const Rect& view = m_map->getView();
+	const Rect& view = m_map->view;
 	int mx, my;
 	Engine::GetMousePosition(mx, my);
 	//offset in world
@@ -194,4 +181,30 @@ void MapEditor::save()
 void MapEditor::setMap( const std::string& name )
 {
 	m_mapName = name;
+}
+
+void MapEditor::drawCursor(int x, int y)
+{
+	const float scale  =m_map->scale();
+	//Engine::SetDrawBlendMode(BLEND_MULTIPLY);
+	const Rect& view = m_map->view;
+	const Rect& rect = m_map->rect;
+	if( (x < rect.x || x > rect.x + rect.w)
+	  ||(y < rect.y || y > rect.y + rect.h)) return;
+	//screen space tile width/height
+	const int tilew = m_map->tilew/scale;
+	const int tileh = m_map->tileh/scale;
+
+	const int tilex =  view.x/scale + x - rect.x;
+	const int tiley =  view.y/scale + y - rect.y;
+
+	int screenx = tilex/tilew*tilew - view.x/scale + rect.x;
+	int screeny = tiley/tileh*tileh - view.y/scale + rect.y;
+
+
+
+	const Rect& cursor = {  screenx, screeny, tilew,  tileh };
+	
+
+	Engine::DrawRect(BORDER_COLOR, cursor, false);
 }

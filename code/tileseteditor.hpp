@@ -2,7 +2,7 @@
 #include "sys.hpp"
 #include "editor.hpp"
 
-
+//TileTools
 enum ToolMode : char
 {
 	//the correspond to tool bar order!. can be used by APP to get widget

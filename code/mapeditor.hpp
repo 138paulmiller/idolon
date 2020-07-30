@@ -2,7 +2,17 @@
 #include "sys.hpp"
 #include "editor.hpp"
 
-#include <vector>
+//MapTools
+enum MapToolMode : char
+{
+	//the correspond to tool bar order!. can be used by APP to get widget
+	MAP_TOOL_PIXEL = 0,
+	MAP_TOOL_FILL,
+	MAP_TOOL_LINE,
+	MAP_TOOL_ERASE,
+	MAP_TOOL_COUNT,
+};
+
 class  MapEditor : public Editor 
 {
 public:
@@ -21,6 +31,10 @@ public:
 
 	
 private:
+	//"highlights cursor"
+	//x y in pixel space
+	void drawCursor(int x, int y);
+
 	//by default are all empty
 	std::string m_mapName;
 	//map contains ref to tilesheet
