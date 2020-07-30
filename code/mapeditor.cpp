@@ -197,6 +197,7 @@ void MapEditor::drawCursor(int x, int y)
 
 	const int tilex =  view.x/scale + x - rect.x;
 	const int tiley =  view.y/scale + y - rect.y;
+	//todo cache this. on select update the tile!
 
 	int screenx = tilex/tilew*tilew - view.x/scale + rect.x;
 	int screeny = tiley/tileh*tileh - view.y/scale + rect.y;
