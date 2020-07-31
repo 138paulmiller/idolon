@@ -48,8 +48,10 @@ namespace Graphics
         void zoomTo( float scale, int x, int y );
         void scroll(int dx, int dy);
         //get tile rect at x y 
-        Rect tile(int x, int y);
-
+        Rect tile(int scrx, int scry);
+        //tile xy in map space from screen space
+        bool getTileXY(int scrx, int scry, int & tilex, int & tiley);
+        void clear();
         std::string tileset;
         //width and height is in tiles
         const int w,h, tilew, tileh, worldw, worldh;

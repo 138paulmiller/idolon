@@ -84,7 +84,7 @@ namespace Graphics
     {
         memset( tiles, 0, (int)(w * h) );
         int screenw, screenh;
-        Engine::GetSize(w,h);
+        Engine::GetSize(screenw,screenh);
         view = { 0, 0, screenw, screenh };
         rect = { 0, 0, screenw, screenh };
     }
@@ -176,7 +176,7 @@ namespace Graphics
     {
         if(!m_tilesetcache) return;
         const Rect& region = { rect.x, rect.y, rect.w == 0 ? w : rect.w, rect.h == 0 ? h : rect.h };
-        Engine::ClearTexture( m_texture, { 0,0,0,0 });
+
 
         for(int y = region.y; y < (region.y+region.h); y++)
             for(int x = region.x; x < (region.x+region.w); x++)
@@ -188,7 +188,10 @@ namespace Graphics
             }
     }
 
-
+    void Map::clear()
+    {
+        Engine::ClearTexture( m_texture, { 0,0,0,0});
+    }
     void Map::draw()
     {
         if(!m_tilesetcache) return;
@@ -197,25 +200,34 @@ namespace Graphics
 
     }
 
-    Rect Map::tile(int x, int y)
+    Rect Map::tile(int scrx, int scry)
     {
-        if( (x < rect.x || x > rect.x + rect.w)
-          ||(y < rect.y || y > rect.y + rect.h))
+        if ( ( scrx < rect.x || scrx > rect.x + rect.w )
+            || ( scry < rect.y || scry > rect.y + rect.h ) )
             return {-1, -1, -1, -1} ;
+         //tile xy in screen space 
+        int tilex =  view.x/m_scale + scrx - rect.x;
+        int tiley =  view.y/m_scale + scry - rect.y;
+
         //screen space tile width/height
         const int scrTW = tilew/m_scale;
         const int scrTH = tileh/m_scale;
+        int alignscrx = tilex/scrTW*scrTW - view.x/m_scale + rect.x;
+        int alignscry = tiley/scrTH*scrTH - view.y/m_scale + rect.y;
 
-        const int tileX =  view.x/m_scale + x - rect.x;
-        const int tileY =  view.y/m_scale + y - rect.y;
-        //todo cache this. on select update the tile!
+        return {  alignscrx, alignscry, scrTW,  scrTH };
+    }
+    bool Map::getTileXY( int scrx, int scry, int& tilex, int& tiley )
+    {
+        if ( ( scrx < rect.x || scrx > rect.x + rect.w )
+            || ( scry < rect.y || scry > rect.y + rect.h ) )
+            return false;
+     
+        const int scrTH = tileh/m_scale;
+        tilex =  ( view.x/m_scale + scrx - rect.x )/ tilew/m_scale ;
+        tiley =  ( view.y/m_scale + scry - rect.y )/ tileh/m_scale ;
 
-        int scrX = tileX/scrTW*scrTW - view.x/m_scale + rect.x;
-        int scrY = tileY/scrTH*scrTH - view.y/m_scale + rect.y;
-
-        return {  scrX, scrY, scrTW,  scrTH };
-
-    
+        return true;
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////
 

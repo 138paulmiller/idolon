@@ -113,8 +113,7 @@ void MapEditor::onTick()
 		{	
 			const Rect& cursor = m_map->tile( m_tooldata.mx, m_tooldata.my );
 			if(cursor.w != -1)
-			{
-				
+			{	
 				Engine::DrawTexture(m_tileset->texture, tileSrc, cursor);
 				Engine::DrawRect(BORDER_COLOR, cursor, false);
 			}	
@@ -151,24 +150,30 @@ bool MapEditor::handleScroll()
 
 void MapEditor::handleTool()
 {
+	
 	const Rect & tileSrc = m_tilepicker->selection();
-	//scroll if necessary
-	if ( Engine::GetMouseButtonState( MOUSEBUTTON_LEFT )  == BUTTON_DOWN )
+	const int tileId = m_tilepicker->selectionIndex();
+	//if pixel tool
+	switch(m_tool)
 	{
-		//if pixel tool
-		switch(m_tool)
-		{
-			case MAP_TOOL_PIXEL:
-			{	
-				const Rect& cursor = m_map->tile( m_tooldata.mx, m_tooldata.my );
-				if(cursor.w != -1)
-				{
-					
-				}	
-			}
-			break;
-		}
+		case MAP_TOOL_PIXEL:
+		{	
+			if (( Engine::GetMouseButtonState( MOUSEBUTTON_LEFT ) == BUTTON_DOWN )
+				|| ( Engine::GetMouseButtonState( MOUSEBUTTON_LEFT ) == BUTTON_HOLD ))
+			{
 
+				const Rect& cursor = m_map->tile( m_tooldata.mx, m_tooldata.my );
+				if ( cursor.w != -1 )
+				{
+					//set tile
+					int tilex, tiley;
+					m_map->getTileXY( cursor.x, cursor.y, tilex, tiley );
+					m_map->tiles[tiley * m_map->w + tilex] = tileId;
+					m_map->update( { tilex, tiley, 1, 1 } );
+				}
+			}
+		}
+		break;
 	}
 }
 
