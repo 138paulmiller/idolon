@@ -20,9 +20,9 @@ namespace Graphics
         void update(const Rect & rect = { 0, 0, 0, 0 } ); 
         //given tile rect get index
         int id( const Rect & tile) const;
-
         //get tile rect of size tx x th 
         Rect tile( int tileId, int tw, int th ) const;
+
         Color * const pixels;
         const int w, h;
         const int texture;
@@ -47,7 +47,9 @@ namespace Graphics
         float scale( );
         void zoomTo( float scale, int x, int y );
         void scroll(int dx, int dy);
-        
+        //get tile rect at x y 
+        Rect tile(int x, int y);
+
         std::string tileset;
         //width and height is in tiles
         const int w,h, tilew, tileh, worldw, worldh;

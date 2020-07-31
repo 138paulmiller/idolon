@@ -7,9 +7,13 @@ bool Rect::intersects(const Rect & other) const
 	return x < other.x+other.w && x+w > other.x 
 		&& y < other.y+other.h && y+h > other.y;
 }
+
 Color::Color( uint8 a, uint8 r, uint8 g, uint8 b )
  : a(a), r(r), g(g),b(b)
-{}
+{
+
+}
+
 bool Color::operator!=(const Color & c) const
 {
 	return !(c == *this);

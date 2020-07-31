@@ -1,5 +1,4 @@
 #include "pch.hpp"
-
 #include "context.hpp"
 
 Context::Context( uint8 appCount )

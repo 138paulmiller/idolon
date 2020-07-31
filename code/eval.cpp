@@ -6,6 +6,46 @@
 #define PY_SSIZE_T_CLEAN
 #undef _DEBUG
 #include <Python.h>
+//map form filename to module
+namespace 
+{
+
+	std::unordered_map<std::string, PyObject* > s_fileToModule;
+	std::unordered_map<std::string, PyObject* > s_funcs;
+
+	#include "bindings.inl"
+	/*
+	const char * name, //name of the method
+	PyCFunction method //pointer to the C implementation PyObject* name(PyObject *self, PyObject *args)
+	int flags          //flag bits indicating how the call should be constructed
+	const char * doc   //points to the contents of the docstring
+	*/
+	PyMethodDef s_pymethods[] =
+	{
+		PYTHON_BINDINGS
+	    {0, 0, 0, 0}
+	};
+
+	PyModuleDef s_pymodule = 
+	{
+	    PyModuleDef_HEAD_INIT, 
+		SYSTEM_NAME,     						/* m_name */
+		"API to the " SYSTEM_NAME " system ",  	/* m_doc */
+		-1,                  	/* m_size */
+		s_pymethods,    		/* m_methods */
+		NULL,                	/* m_reload */
+		NULL,                	/* m_traverse */
+		NULL,                	/* m_clear */
+		NULL,                	/* m_free */
+	};
+
+	PyObject* InitModule(void)
+	{
+	    return PyModule_Create(&s_pymodule);
+	}
+
+}
+
 
 /*
 	TODO 
@@ -40,49 +80,6 @@ TypedArg::TypedArg( char* s )
 {
 	value.s = s;
 }
-
-namespace 
-{
-
-	//map form filename to module
-	
-	std::unordered_map<std::string, PyObject* > s_fileToModule;
-	std::unordered_map<std::string, PyObject* > s_funcs;
-
-	#include "bindings.inl"
-	/*
-	const char * name, //name of the method
-	PyCFunction method //pointer to the C implementation PyObject* name(PyObject *self, PyObject *args)
-	int flags          //flag bits indicating how the call should be constructed
-	const char * doc   //points to the contents of the docstring
-	*/
-	static PyMethodDef s_pymethods[] =
-	{
-		PYTHON_BINDINGS
-	    {0, 0, 0, 0}
-	};
-
-	static PyModuleDef s_pymodule = 
-	{
-	    PyModuleDef_HEAD_INIT, 
-		SYSTEM_NAME,     						/* m_name */
-		"API to the " SYSTEM_NAME " system ",  	/* m_doc */
-		-1,                  	/* m_size */
-		s_pymethods,    		/* m_methods */
-		NULL,                	/* m_reload */
-		NULL,                	/* m_traverse */
-		NULL,                	/* m_clear */
-		NULL,                	/* m_free */
-	};
-
-	static PyObject* InitModule(void)
-	{
-	    return PyModule_Create(&s_pymodule);
-	}
-
-} // namespace
-
-
 
 namespace Eval
 {

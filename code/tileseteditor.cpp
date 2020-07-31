@@ -6,6 +6,9 @@
 #define TILE_SIZE_COUNT 4
 #define TILE_SIZE_MAX 16
 
+using namespace Graphics;
+using namespace UI;
+
 namespace 
 {
 	const int s_canvasSizes[TILE_SIZE_COUNT][2] = 
@@ -14,8 +17,6 @@ namespace
 		{ SPRITE_W, SPRITE_W }
 	};
 } // namespace
-using namespace Graphics;
-using namespace UI;
 
 
 TilesetEditor::TilesetEditor()
@@ -59,20 +60,20 @@ void TilesetEditor::onEnter()
 	m_toolbar = new Toolbar(this, 0, tilesetY);
 
 	m_toolbar->add("PIXEL", [&](){
-		m_tool = TOOL_PIXEL;                     
+		m_tool = TILE_TOOL_PIXEL;                     
 	});
 	
 	m_toolbar->add("FILL", [&](){
-		m_tool = TOOL_FILL;             
+		m_tool = TILE_TOOL_FILL;             
 	});
 
 	m_toolbar->add("LINE", [&](){
-		m_tool = TOOL_LINE;
+		m_tool = TILE_TOOL_LINE;
 		m_shapeRect = { -1, -1, -1, -1 };
 	});
 
 	m_toolbar->add("ERASE", [&](){
-		m_tool = TOOL_ERASE;
+		m_tool = TILE_TOOL_ERASE;
 		m_shapeRect = { -1, -1, 1, 1 };
 
 	});
@@ -85,7 +86,7 @@ void TilesetEditor::onEnter()
 	App::addWidget( m_tileIdBox );
 
 	//choose pixel tool on start
-	m_toolbar->get(TOOL_PIXEL)->click();
+	m_toolbar->get(TILE_TOOL_PIXEL)->click();
 	
 
 	if ( m_tileset )
@@ -150,7 +151,7 @@ void TilesetEditor::onTick()
 	{
 		switch ( m_tool )
 		{
-		case TOOL_LINE:	
+		case TILE_TOOL_LINE:	
 
 			//invalidate
 			if (Engine::GetMouseButtonState(MOUSEBUTTON_LEFT) == BUTTON_UP)
@@ -171,21 +172,21 @@ void TilesetEditor::onTick()
 		{
 			switch(m_tool)
 			{
-			case TOOL_FILL:
+			case TILE_TOOL_FILL:
 				FloodFill(m_tileset->pixels, m_tileset->w, tileSrc, color, sheetx, sheety);
 				commit();
 				break;
-			case TOOL_ERASE:
+			case TILE_TOOL_ERASE:
 				m_shapeRect.x = tilex;
 				m_shapeRect.y = tiley;
 				m_tileset->pixels[sheety * m_tileset->w + sheetx] = CLEAR;
 				m_tileset->update(tileSrc);
 				break;
-			case TOOL_PIXEL:
+			case TILE_TOOL_PIXEL:
 				m_tileset->pixels[sheety * m_tileset->w + sheetx] = color;
 				m_tileset->update(tileSrc);
 				break;
-			case TOOL_LINE:
+			case TILE_TOOL_LINE:
 				//set shape origin (x,y) and dest
 				m_shapeRect.x = tilex;
 				m_shapeRect.y = tiley;
@@ -201,7 +202,7 @@ void TilesetEditor::onTick()
 		{
 			switch ( m_tool )
 			{
-			case TOOL_ERASE:
+			case TILE_TOOL_ERASE:
 
 				m_shapeRect.x = tilex;
 				m_shapeRect.y = tiley;
@@ -219,11 +220,11 @@ void TilesetEditor::onTick()
 				}
 				m_tileset->update(m_tilepicker->selection());
 				break;
-			case TOOL_PIXEL:
+			case TILE_TOOL_PIXEL:
 				m_tileset->pixels[sheety * m_tileset->w + sheetx] = color;
 				m_tileset->update(m_tilepicker->selection());
 				break;
-			case TOOL_LINE:
+			case TILE_TOOL_LINE:
 				//set shape end (x,y)
 				m_shapeRect.w = tilex;
 				m_shapeRect.h = tiley;
@@ -239,15 +240,15 @@ void TilesetEditor::onTick()
 				//commit shape 
 				switch(m_tool)
 				{
-				case TOOL_ERASE:
+				case TILE_TOOL_ERASE:
 					m_shapeRect.x = tilex;
 					m_shapeRect.y = tiley;
 					commit();
 					break;
-				case TOOL_PIXEL:
+				case TILE_TOOL_PIXEL:
 					commit();
 					break;
-				case TOOL_LINE:
+				case TILE_TOOL_LINE:
 				{
 					//if valid
 					if ( m_shapeRect.x == -1 ) break;
@@ -313,7 +314,7 @@ void TilesetEditor::drawOverlay(int tilex, int tiley, const Rect & dest)
 	memset(m_overlay->pixels, 0,  overlaySrc.w * overlaySrc.h * sizeof(Color));
 	switch(m_tool)
 	{
-	case TOOL_LINE:
+	case TILE_TOOL_LINE:
 		//if not selected
 		if ( m_shapeRect.x == -1 )
 		{
@@ -329,7 +330,7 @@ void TilesetEditor::drawOverlay(int tilex, int tiley, const Rect & dest)
 			LineBresenham(m_overlay->pixels, m_overlay->w, x1, y1, x2, y2, color);
 		}
 		break;
-	case TOOL_ERASE:
+	case TILE_TOOL_ERASE:
 		for(int y = tiley; y < tiley + m_shapeRect.h; y++)
 		{
 			if(y < m_overlay->h)
@@ -378,7 +379,7 @@ void TilesetEditor::onKey(Key key, bool isDown)
 				m_tilepicker->resizeCursor( s_canvasSizes[1][0], s_canvasSizes[1][1] );
 				break;
 			case KEY_z:
-				if(m_tool == TOOL_ERASE)
+				if(m_tool == TILE_TOOL_ERASE)
 				{
 					if(m_shapeRect.w > 1 )
 					{
@@ -388,7 +389,7 @@ void TilesetEditor::onKey(Key key, bool isDown)
 				}
 				break;
 			case KEY_x:
-				if(m_tool == TOOL_ERASE)
+				if(m_tool == TILE_TOOL_ERASE)
 				{
 					if(m_shapeRect.w < m_tilepicker->selection().w)
 					{

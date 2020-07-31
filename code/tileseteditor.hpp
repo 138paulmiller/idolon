@@ -3,14 +3,14 @@
 #include "editor.hpp"
 
 //TileTools
-enum ToolMode : char
+enum TileToolMode : char
 {
 	//the correspond to tool bar order!. can be used by APP to get widget
-	TOOL_PIXEL = 0,
-	TOOL_FILL,
-	TOOL_LINE,
-	TOOL_ERASE,
-	TOOL_COUNT,
+	TILE_TOOL_PIXEL = 0,
+	TILE_TOOL_FILL,
+	TILE_TOOL_LINE,
+	TILE_TOOL_ERASE,
+	TILE_TOOL_COUNT,
 };
 
 class  TilesetEditor : public Editor 
@@ -44,7 +44,7 @@ private:
 	const int m_tileScale = 8;
 	
 	bool m_usingTool;
-	ToolMode m_tool;
+	TileToolMode m_tool;
 	//shape is data used by the current tool. for line xy = x1y1 wh = x2y2
 	Rect m_shapeRect;
 	//used to render the potential modifications 

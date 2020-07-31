@@ -11,6 +11,7 @@ Editor::Editor(uint8 support)
 {
 	m_menu = -1;
 }
+
 void Editor::redo()  
 {
 	LOG( "Editor: Redo unimplemented" );
@@ -32,6 +33,7 @@ bool Editor::supports(AppSupport support)
 {
 	return (m_support >> support) & 1U; 
 }
+
 void Editor::onExit()
 {
 	if(m_menu != -1) 

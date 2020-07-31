@@ -27,11 +27,10 @@
 #define MAX_PATH 260
 
 #endif
-
-namespace
+namespace 
 {
-	static std::string s_cwd = "";
-} // namespace
+	std::string s_cwd = "";
+}
 
 void ReplaceAll(std::string& str, const std::string& from, const std::string& to) 
 {

@@ -24,7 +24,9 @@ namespace
 } // namespace
 
 Asset::Asset(const std::string& name) :name(name)
-{}
+{
+	
+}
 	
 
 namespace Assets

@@ -13,6 +13,14 @@ enum MapToolMode : char
 	MAP_TOOL_COUNT,
 };
 
+struct ToolData
+{
+	//mouse xy
+	int mx, my;
+	//size 
+	int w, h;  
+};
+
 class  MapEditor : public Editor 
 {
 public:
@@ -32,13 +40,14 @@ public:
 	
 private:
 	//"highlights cursor"
-	//x y in pixel space
-	void drawCursor(int x, int y);
-
+	//x y in pixel space. aligned to tiles
+	bool handleScroll();
+	void handleTool();
 	//by default are all empty
-	std::string m_mapName;
+	std::string m_mapName, m_tilesetName;
 	//map contains ref to tilesheet
 	Graphics::Map * m_map;
+	Graphics::Tileset * m_tileset;
 	UI::TilePicker * m_tilepicker;
 	//DEBUG
 	std::vector<Graphics::Sprite*> m_sprites;
@@ -48,5 +57,8 @@ private:
 
 	bool m_shift = false;
 	//load 4 tiles ! 
+	MapToolMode m_tool;
+	//rect used by tool
+	ToolData m_tooldata;
 
 };

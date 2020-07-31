@@ -9,18 +9,19 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
+
 #define WINDOW_X SDL_WINDOWPOS_UNDEFINED
 #define WINDOW_Y SDL_WINDOWPOS_UNDEFINED
 #define WINDOW_FLAGS SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN
 #define RENDERER_FLAGS SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED
-#define FPS_STAT_RATE  5.f 
+
 
 #define CHECK_TEXTURE(texId) ASSERT(texId >= 0 && texId < s_textures.size() && s_textures[texId], "Engine::Blit: Texture does not exist");
 
 
 namespace
 {
-      static struct UserEvent
+    struct UserEvent
     {
 
         bool s_isRunning;
@@ -34,25 +35,25 @@ namespace
     } s_ue;
 
  
-    static bool s_echo;
-    static std::function<void(Key, bool)> s_echocb;
+    bool s_echo;
+    std::function<void(Key, bool)> s_echocb;
     //when this key is hit, input handling enters "echo" mode. forwards all key input
-    static SDL_Window* s_window;
-    static SDL_Renderer* s_renderer;
-    static Color s_clearColor = BLACK;
+    SDL_Window* s_window;
+    SDL_Renderer* s_renderer;
+    Color s_clearColor = BLACK;
     //create layers. blit to layer. priority
     //Create internal texture system. All textures are managed by the engine system
-    static int s_target; //used to upsample to display to acheive pixelated effect
-    static int s_bound; //texture currently bound render target
-    static int s_windowW, s_windowH;
-    static float s_windowScale;
-    static int s_alignX = 1, s_alignY = 1;
+    int s_target; //used to upsample to display to acheive pixelated effect
+    int s_bound; //texture currently bound render target
+    int s_windowW, s_windowH;
+    float s_windowScale;
+    int s_alignX = 1, s_alignY = 1;
     
 
-    static std::vector<SDL_Texture* > s_textures;
-    static uint32_t s_fpsStartTime, s_nextFrameTime, s_frameStartTime, s_startTime, s_frame = 0;
-    static float s_fps = 0;
-    static uint32_t s_deltaMs;
+    std::vector<SDL_Texture* > s_textures;
+    uint32_t s_fpsStartTime, s_nextFrameTime, s_frameStartTime, s_startTime, s_frame = 0;
+    float s_fps = 0;
+    uint32_t s_deltaMs;
 
 } // namespace
 

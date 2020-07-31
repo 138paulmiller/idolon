@@ -18,6 +18,7 @@ namespace Graphics
         memset( pixels, 255, w * h * sizeof( Color ) );
         update();
     }
+
     Tileset::~Tileset()
     {
         delete[]pixels;
@@ -194,6 +195,27 @@ namespace Graphics
 
         Engine::DrawTexture( m_texture, view, rect );
 
+    }
+
+    Rect Map::tile(int x, int y)
+    {
+        if( (x < rect.x || x > rect.x + rect.w)
+          ||(y < rect.y || y > rect.y + rect.h))
+            return {-1, -1, -1, -1} ;
+        //screen space tile width/height
+        const int scrTW = tilew/m_scale;
+        const int scrTH = tileh/m_scale;
+
+        const int tileX =  view.x/m_scale + x - rect.x;
+        const int tileY =  view.y/m_scale + y - rect.y;
+        //todo cache this. on select update the tile!
+
+        int scrX = tileX/scrTW*scrTW - view.x/m_scale + rect.x;
+        int scrY = tileY/scrTH*scrTH - view.y/m_scale + rect.y;
+
+        return {  scrX, scrY, scrTW,  scrTH };
+
+    
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
