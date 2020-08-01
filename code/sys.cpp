@@ -5,6 +5,9 @@
 #include "mapeditor.hpp"
 #include "tileseteditor.hpp"
 
+
+
+//TODO handle all exceptions here. Close down, or restart system if necessary. Worst case shutdown, then startup system.
 namespace
 {
 	Shell  * s_shell;

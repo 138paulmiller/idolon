@@ -398,17 +398,9 @@ namespace Engine
     {
         Blit(textureId, s_target, src,  dest);
     }
-
-    void DrawLine(const Color& color, int x1, int y1, int x2, int y2)
+    void DrawTextureRect(int srcTexture,const Color& color, const Rect& rect, bool filled)
     {
-        SDL_SetRenderTarget(s_renderer, s_textures[s_target]);
-        SDL_SetRenderDrawColor(s_renderer, color.r, color.g, color.b, color.a);
-        SDL_RenderDrawLine(s_renderer, x1, y1, x2, y2);
-    }
-
-    void DrawRect(const Color& color, const Rect & rect, bool filled)
-    {
-        SDL_SetRenderTarget(s_renderer, s_textures[s_target]);
+        SDL_SetRenderTarget(s_renderer, s_textures[srcTexture]);
         SDL_SetRenderDrawColor(s_renderer, color.r, color.g, color.b, color.a);
         SDL_Rect sdlrect = { rect.x, rect.y,rect.w,rect.h };
         if (filled)
@@ -419,6 +411,18 @@ namespace Engine
             //there is currently a bug in sdl draw rect that misses the bottom-right most pixel
             SDL_RenderDrawPoint(s_renderer, rect.x+rect.w-1,rect.y+rect.h-1);
         }
+    }
+
+    void DrawLine(const Color& color, int x1, int y1, int x2, int y2)
+    {
+        SDL_SetRenderTarget(s_renderer, s_textures[s_target]);
+        SDL_SetRenderDrawColor(s_renderer, color.r, color.g, color.b, color.a);
+        SDL_RenderDrawLine(s_renderer, x1, y1, x2, y2);
+    }
+
+    void DrawRect(const Color& color, const Rect & rect, bool filled)
+    {
+        DrawTextureRect(s_target, color, rect, filled);
     }
 
     // ----------- Getters . Should Inline these with externs! ---------------------------

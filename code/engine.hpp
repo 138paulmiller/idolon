@@ -64,6 +64,7 @@ namespace Engine
 
 
     //Copy data from one texture to another    
+    void DrawTextureRect(int srcTexture,const Color& color, const Rect& rect, bool filled);
     void Blit(int srcTexture, int destTexture, const Rect & src, const Rect & dest);
     void DrawTexture(int textureId, const Rect & src, const Rect & dest);
     void DrawLine(const Color& color, int x1, int y1, int x2, int y2);

@@ -183,7 +183,11 @@ namespace Graphics
                 const int tile = tiles[ y * w + x]; 
                 const Rect & src = m_tilesetcache->tile(tile, tilew, tileh);
                 const Rect & dest = { x*tilew, y*tileh, tilew, tileh };
-                Engine::Blit(m_tilesetcache->texture, m_texture, src, dest);                
+                //clear portion 
+                Engine::DrawTextureRect(m_texture, {0,0,0,0}, dest, true);
+
+                Engine::Blit(m_tilesetcache->texture, m_texture, src, dest);   
+
             }
     }
 
