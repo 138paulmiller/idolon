@@ -72,16 +72,15 @@ namespace Graphics
     Map::Map( const std::string& name, int w, int h, int tilew, int tileh )
         :Asset( name ),
         w( w ), h( h ),
-        m_scale(1.0),
         tilew( tilew ), tileh( tileh ),
         worldw( w * tilew ), worldh( h * tileh ),
         m_tilesetcache( 0 ),
         m_texture( Engine::CreateTexture( worldw, worldh, TEXTURE_TARGET ) ),
-        tiles( new char[w * h] ),
-        //by default look for sheet with same name
-        tileset( name )
+        tiles( new char[w * h] )
 
     {
+        m_scale = 1.0;
+        tileset = name; 
         memset( tiles, 0, (int)(w * h) );
         int screenw, screenh;
         Engine::GetSize(screenw,screenh);

@@ -219,6 +219,9 @@ namespace UI
 		int selectionIndex();
 		void moveCursor(int dx, int dy);
 		void resizeCursor(int w, int h);
+
+		const Graphics::Tileset * tileset() const { return m_tileset; } 
+
 	private:
 		const Graphics::Tileset * m_tileset;
 		Rect m_cursor;

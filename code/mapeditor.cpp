@@ -22,23 +22,60 @@ void MapEditor::onEnter()
 	LOG("Entering map editor ... \n");
 	int w,h;
 	Engine::GetSize(w,h);
+	int charH = Sys::GetShell()->getFont()->charH;
 
 
 	m_tilepicker = new UI::TilePicker();
 	//by default
 	m_tilesetName = m_mapName;
 	m_map = Assets::Load<Graphics::Map>(m_mapName);
-	m_tilepicker->reload(m_map->tileset);
+	//
 
+	setTileset( 0, m_tilesetName );
 
-	m_tileset = Assets::Load<Graphics::Tileset>(m_map->tileset);
 	
-	const int maph = h - m_tilepicker->rect().h - TILE_H;
-	printf("%d %d %d %d \n", m_tilepicker->rect().x,m_tilepicker->rect().y, m_tilepicker->rect().w, m_tilepicker->rect().h);
+	const int toolY = h - (m_tilepicker->rect().h + charH);
+	const int maph = toolY - TILE_H;
+
 	m_map->rect = { 0, TILE_H, w, maph };
 	//reset view
    	m_map->zoomTo(1.0, 0, 0 );
 
+	//TODO - text edit to set tileset
+	m_tooldata = {0,0, m_map->tilew, m_map->tileh};
+	m_tool = MAP_TOOL_PIXEL;
+
+
+	m_toolbar = new UI::Toolbar(this, 0, toolY);
+
+	m_toolbar->add("PIXEL", [&](){
+		m_tool = MAP_TOOL_PIXEL;                     
+	});
+	
+	m_toolbar->add("FILL", [&](){
+		m_tool = MAP_TOOL_FILL;             
+	});
+
+	m_toolbar->add("LINE", [&](){
+		m_tool = MAP_TOOL_LINE;
+		m_tooldata = { -1, -1, -1, -1 };
+	});
+
+	m_toolbar->add("ERASE", [&](){
+		m_tool = MAP_TOOL_ERASE;
+		m_tooldata = { -1, -1, 1, 1 };
+
+	});
+
+	//first add toolbat	
+	//add the ui widgets
+	App::addWidget( m_toolbar );
+
+	App::addWidget(m_tilepicker);
+	Editor::onEnter();
+
+
+/////////////// DEbug //////////////////////////
 	const int spriteId =8 ;
 	for(int y = SPRITE_H; y < m_map->rect.h; y+=SPRITE_H*2)
 	{
@@ -46,21 +83,14 @@ void MapEditor::onEnter()
 		for(int x = SPRITE_W; x < w; x+=SPRITE_W*2)
 		{	
 			Graphics::Sprite * sprite = new Graphics::Sprite( spriteId );
-			sprite->tileset = m_map->tileset;
+			sprite->tileset = m_tilesetName;
 			sprite->x = x;
 			sprite->y = y;
 			sprite->reload();
 			m_sprites.push_back(sprite);
 		}
 	}
-
-
-	//TODO - text edit to set tileset
-	m_tooldata = {0,0, m_map->tilew, m_map->tileh};
-	m_tool = MAP_TOOL_PIXEL;
-
-	App::addWidget(m_tilepicker);
-	Editor::onEnter();
+///////////////////////////////////////////////////
 }
 
 void MapEditor::onExit()
@@ -71,7 +101,6 @@ void MapEditor::onExit()
 	
 	m_sprites.clear();
 	
-	Assets::Unload<Graphics::Tileset>(m_mapName);
 	Assets::Unload<Graphics::Map>(m_mapName);
 	//delete widgets
 	App::clear();
@@ -114,7 +143,7 @@ void MapEditor::onTick()
 			const Rect& cursor = m_map->tile( m_tooldata.mx, m_tooldata.my );
 			if(cursor.w != -1)
 			{	
-				Engine::DrawTexture(m_tileset->texture, tileSrc, cursor);
+				Engine::DrawTexture(m_tilepicker->tileset()->texture, tileSrc, cursor);
 				Engine::DrawRect(BORDER_COLOR, cursor, false);
 			}	
 		}
@@ -239,4 +268,11 @@ void MapEditor::save()
 void MapEditor::setMap( const std::string& name )
 {
 	m_mapName = name;
+}	//
+
+void MapEditor::setTileset( int layer, const std::string& tileset )
+{
+	m_tilepicker->reload(tileset);
+	m_map->tileset = tileset;
+	m_map->reload();
 }

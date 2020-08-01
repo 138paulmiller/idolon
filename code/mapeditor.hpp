@@ -1,7 +1,9 @@
 #pragma once
 #include "sys.hpp"
 #include "editor.hpp"
-
+/*
+	TODO - Show hide tile editor and toolbar
+*/
 //MapTools
 enum MapToolMode : char
 {
@@ -36,8 +38,12 @@ public:
 	
 	//
 	void setMap( const std::string& name );
+	//
+	void setTileset( int layer, const std::string& tileset );
 
-	
+	//toolbar and tilepicker
+	void hideWorkspace() ;
+
 private:
 	//"highlights cursor"
 	//x y in pixel space. aligned to tiles
@@ -47,8 +53,9 @@ private:
 	std::string m_mapName, m_tilesetName;
 	//map contains ref to tilesheet
 	Graphics::Map * m_map;
-	Graphics::Tileset * m_tileset;
 	UI::TilePicker * m_tilepicker;
+	UI::Toolbar * m_toolbar;
+
 	//DEBUG
 	std::vector<Graphics::Sprite*> m_sprites;
 

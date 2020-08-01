@@ -34,12 +34,18 @@ namespace Assets
 	std::string GetAssetTypeExtImpl(const std::type_info& type)
 	{
 		if(type ==  typeid(Graphics::Map))
+		{
 			return ".map";
+		}
 		if(type ==  typeid(Graphics::Tileset))
-			return ".tls";
+		{
+			return".tls";
+		}	
 		if(type ==  typeid(Graphics::Font))
+		{
 			return ".fnt";
-		return "";
+		}
+		return ".raw";
 	}
 
 	bool FileExists(const std::string & filepath)
@@ -50,10 +56,9 @@ namespace Assets
 
 	std::string FindAssetPath(const std::type_info& type, const std::string & name)
 	{
-		std::string path ;
 		for(const std::string & dirpath : s_assetdirs)
 		{
-			path = FS::Append(dirpath, name) + GetAssetTypeExtImpl(type);
+			const std::string & path = FS::Append(dirpath, name) + GetAssetTypeExtImpl(type);
 			if(FileExists(path))
 			{
 				return path;
@@ -282,10 +287,9 @@ namespace Assets
 	{
 		std::string path =  FindAssetPath(type, name);
 
-		LOG("Assets: Unloading %s\n", path.c_str());
 		Table<Asset*>::iterator it = s_assets.find(path);		
 		if (it != s_assets.end()) 									
-		{														
+		{			
 			Asset * asset = it->second;	
 			if(asset)
 			{
@@ -294,11 +298,11 @@ namespace Assets
 				{
 					delete asset;
 					s_assets.erase(path);
+					LOG("Assets: Unloaded %s\n", path.c_str());
 				}
 				return;
 			}
 		}	
-		LOG("Assets: Failed to unload %s\n", name.c_str());
 	}
 
 	Asset* LoadImpl(const std::type_info& type, const std::string& name)
@@ -309,7 +313,7 @@ namespace Assets
 		
 		if(path.size() == 0)
 		{
-			LOG("Assets: Could not find %s\n", name.c_str());
+			LOG("Assets: Could not find %s %s\n", type.name(), name.c_str());
 			return 0;
 		}
 

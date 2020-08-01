@@ -6,9 +6,6 @@
 #define TILE_SIZE_COUNT 4
 #define TILE_SIZE_MAX 16
 
-using namespace Graphics;
-using namespace UI;
-
 namespace 
 {
 	const int s_canvasSizes[TILE_SIZE_COUNT][2] = 
@@ -46,18 +43,18 @@ void TilesetEditor::onEnter()
 
 	const int x = w - 16 - 8;
 	const int y = 8 * 2;
-	m_colorpicker = new ColorPicker(x,y);
-	m_tilepicker = new TilePicker();
+	m_colorpicker = new UI::ColorPicker(x,y);
+	m_tilepicker = new UI::TilePicker();
 	m_tilepicker->reload(m_tilesetName);
 
 	const int idLen  = 3;
 	const int tileidX =  w - m_charW * 3;
 	const int tilesetY =  m_tilepicker->rect().y - m_charH;
-	m_tileIdBox = new TextButton("00", tileidX, tilesetY, idLen , 1);
+	m_tileIdBox = new UI::TextButton("00", tileidX, tilesetY, idLen , 1);
 
 	m_tilepicker->resizeCursor( s_canvasSizes[0][0], s_canvasSizes[0][1] );
 
-	m_toolbar = new Toolbar(this, 0, tilesetY);
+	m_toolbar = new UI::Toolbar(this, 0, tilesetY);
 
 	m_toolbar->add("PIXEL", [&](){
 		m_tool = TILE_TOOL_PIXEL;                     
@@ -99,7 +96,7 @@ void TilesetEditor::onEnter()
 
 void TilesetEditor::onExit()
 {	//allow for reloading data
-	Assets::Unload<Tileset>(m_tilesetName );
+	Assets::Unload<Graphics::Tileset>(m_tilesetName );
 	m_tilesetName = "";
 	//remove all ui Widgets/buttons. do not manually delete
 	App::clear();

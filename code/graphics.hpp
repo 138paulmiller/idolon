@@ -31,8 +31,7 @@ namespace Graphics
 
 
     /*--------------------------- Map ------------------------------------
-        contains a list of references to some sprites and their positions
-        on load. must override saved sprite positions
+        TODO - add tileset layers. each map have 3 ? + UI ? 
     */
     class Map : public Asset
     {
