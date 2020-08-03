@@ -21,6 +21,9 @@ struct ToolData
 {
 	//mouse xy
 	int mx, my;
+	
+	//line xy
+	int x1, y1, x2, y2;
 	//size 
 	int w, h;  
 };
@@ -41,10 +44,12 @@ public:
 	//
 	void setMap( const std::string& name );
 	//
-	void setTileset(const std::string& tileset );
+	void setTileset(int index, const std::string& tileset );
 
-	//toolbar and tilepicker
+	//toolbar and tilepicker. resize map
 	void hideWorkspace() ;
+
+	void drawOverlay() ;
 
 private:
 	//loaded tilesets. map can only use one tileset at a time
@@ -72,5 +77,7 @@ private:
 	MapToolMode m_tool;
 	//rect used by tool
 	ToolData m_tooldata;
-
+	//used to render the potential modifications 
+	//use a map ? copy indices over for floodfill
+	Graphics::Tileset * m_overlay;
 };

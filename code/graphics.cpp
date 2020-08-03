@@ -27,9 +27,9 @@ namespace Graphics
 
     void Tileset::update( const Rect& rect )
     {
-        ASSERT( rect.x >= 0 && rect.w + rect.x <= w
-            && rect.y >= 0 && rect.h + rect.y <= h,
-            "Engine: Invalid rect" );
+        if (!( rect.x >= 0 && rect.w + rect.x <= w
+            && rect.y >= 0 && rect.h + rect.y <= h))
+            return;
 
         if ( rect.w == 0 || rect.h == 0 )
         {
@@ -74,13 +74,17 @@ namespace Graphics
         w( w ), h( h ),
         tilew( tilew ), tileh( tileh ),
         worldw( w * tilew ), worldh( h * tileh ),
-        m_tilesetcache( 0 ),
         m_texture( Engine::CreateTexture( worldw, worldh, TEXTURE_TARGET ) ),
         tiles( new char[w * h] )
 
     {
         m_scale = 1.0;
-        tileset = name; 
+        for ( int i = 0; i < TILESET_COUNT; i++ )
+        {
+            tilesets[i] = "";
+            m_tilesetscache[i] = 0;
+        }
+        tilesets[0] = name; 
         memset( tiles, 0, (int)(w * h) );
         int screenw, screenh;
         Engine::GetSize(screenw,screenh);
@@ -90,8 +94,11 @@ namespace Graphics
 
     Map::~Map()
     {
-        if(m_tilesetcache)
-            Assets::Unload<Tileset>(m_tilesetcache->name);
+        for ( int i = 0; i < TILESET_COUNT; i++ )
+        {
+            if(m_tilesetscache[i] && tilesets[i] != "")
+                Assets::Unload<Tileset>(m_tilesetscache[i]->name);
+        }
 
         Engine::DestroyTexture( m_texture );
         delete tiles;
@@ -162,31 +169,47 @@ namespace Graphics
     }
     void Map::reload()
     {
-
-        if(m_tilesetcache)
-            Assets::Unload<Tileset>(m_tilesetcache->name);
-
-        m_tilesetcache = Assets::Load<Tileset>(tileset);
+        for ( int i = 0; i < TILESET_COUNT; i++ )
+        {
+            if(m_tilesetscache[i] && tilesets[i] != "")
+                Assets::Unload<Tileset>(m_tilesetscache[i]->name);
+            m_tilesetscache[i] = Assets::Load<Tileset>(tilesets[i]);
+        }
         update({0,0,w,h}); 
 
     }
     //rect is in tile space
     void Map::update(const Rect & rect )
     {
-        if(!m_tilesetcache) return;
         const Rect& region = { rect.x, rect.y, rect.w == 0 ? w : rect.w, rect.h == 0 ? h : rect.h };
-
 
         for(int y = region.y; y < (region.y+region.h); y++)
             for(int x = region.x; x < (region.x+region.w); x++)
             {
-                const int tile = tiles[ y * w + x]; 
-                const Rect & src = m_tilesetcache->tile(tile, tilew, tileh);
+                char tile = tiles[ y * w + x];
+                const int tilesetIndex = tile / TILE_COUNT;
+                tile = tile - tilesetIndex * TILE_COUNT;
+
+                if(tile < TILE_CLEAR || tile >= TILESET_COUNT) 
+                    return;
+
+                Tileset* tileset = m_tilesetscache[tilesetIndex];
+
+                if(!tileset) 
+                    return;
+
                 const Rect & dest = { x*tilew, y*tileh, tilew, tileh };
                 //clear portion 
-                Engine::DrawTextureRect(m_texture, {0,0,0,0}, dest, true);
-
-                Engine::Blit(m_tilesetcache->texture, m_texture, src, dest);   
+                if ( tile == TILE_CLEAR )
+                {
+                    Engine::DrawTextureRect(m_texture, {0,0,0,0}, dest, true);
+                }
+                else
+                { 
+                    const Rect& src = tileset->tile( tile, tilew, tileh );
+                    Engine::DrawTextureRect(m_texture, {0,0,0,0}, dest, true);
+                    Engine::Blit( tileset->texture, m_texture, src, dest );
+                }
 
             }
     }
@@ -197,10 +220,7 @@ namespace Graphics
     }
     void Map::draw()
     {
-        if(!m_tilesetcache) return;
-
         Engine::DrawTexture( m_texture, view, rect );
-
     }
 
     Rect Map::tile(int scrx, int scry)

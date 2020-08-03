@@ -51,7 +51,10 @@ namespace Graphics
         //tile xy in map space from screen space
         bool getTileXY(int scrx, int scry, int & tilex, int & tiley);
         void clear();
-        std::string tileset;
+
+        //can use 4 tilesets. 
+        //tileset index =  index / TILE_COUNT
+        std::string tilesets[TILESET_COUNT];
         //width and height is in tiles
         const int w,h, tilew, tileh, worldw, worldh;
 
@@ -62,26 +65,14 @@ namespace Graphics
         Rect rect;
 
      private:
-        Tileset * m_tilesetcache;
+        Tileset * m_tilesetscache[TILESET_COUNT];
         //TODO - split map into multiple subtextures. Each streamed in on demand. "Super maps"
         const int m_texture; 
         //viewport
         float m_scale;
 
     };
-    /*--------------------------- Font ------------------------------------
-        font is essentially just a tile set, where each character in the alphabet is just a tile
-    */
-    class Font : public Tileset
-    {
-    public:
-        Font(const std::string& name, int w, int h, int charW = TILE_W, int charH = TILE_H, char start = ' ');
-        //src is textbox in character units
-        void blit(int destTexture, const std::string & text, const Rect & dest);
 
-        const int charW,charH;
-        const char start;
-    };
 
     // ------------ Drawables. These are runtime. Not serialized assets  ------------
 
@@ -105,7 +96,19 @@ namespace Graphics
         Tileset * m_tilesetcache;
     };
   
+    /*--------------------------- Font ------------------------------------
+        font is essentially just a tile set, where each character in the alphabet is just a tile
+    */
+    class Font : public Tileset
+    {
+    public:
+        Font(const std::string& name, int w, int h, int charW = TILE_W, int charH = TILE_H, char start = ' ');
+        //src is textbox in character units
+        void blit(int destTexture, const std::string & text, const Rect & dest);
 
+        const int charW,charH;
+        const char start;
+    };
     /*--------------------------- Textbox ------------------------------------
         TODO Create a texture that is sizeof(boxtexture)/fontw
             this contains the colors. then perform additive blending

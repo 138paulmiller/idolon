@@ -112,7 +112,10 @@ namespace Assets
 			std::fstream outfile;
 			outfile.open(path, std::fstream::out);
 			outfile << map->name << std::endl;
-			outfile << map->tileset << std::endl;
+			for(int i = 0 ; i < TILESET_COUNT; i++ )
+			{
+				outfile << map->tilesets[i] << std::endl;
+			}
 			//TODO - verify endian-ness!
 			int blocksize =  map->w * map->h;
 			outfile << map->w << ' ' << map->h << ' ';
@@ -135,9 +138,13 @@ namespace Assets
 		{
 			std::fstream infile;
 			infile.open(path, std::fstream::in);
-			std::string name, tileset;
+			std::string name;
+			std::string tilesets[TILESET_COUNT];
 			std::getline( infile, name, '\n' ); 
-			std::getline( infile, tileset, '\n' ); 
+			for ( int i = 0; i < TILESET_COUNT; i++ )
+			{
+				std::getline( infile, tilesets[i], '\n' ); 
+			}
 			int w,h, tw, th;
 			infile >> w >> h >> tw >> th;
 
@@ -149,7 +156,10 @@ namespace Assets
 			infile.close();
 
 			map = new Graphics::Map(name, w, h, tw, th);
-			map->tileset = tileset;
+			for ( int i = 0; i < TILESET_COUNT; i++ )
+			{
+				map->tilesets[i] = tilesets[i];
+			}
 			//uncompress bytes into pixels data
 			memcpy(map->tiles, tiledata, w * h);
 			map->reload();
@@ -160,7 +170,7 @@ namespace Assets
 		{
 			if(map)
 				delete map;
-				map = 0;
+			map = 0;
 			LOG("Asset:Failed to load %s\n", path.c_str());
 		}
 		return map;

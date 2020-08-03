@@ -27,14 +27,7 @@ struct Color
     bool operator!=(const Color & c) const;
 };
 
-#define BLACK Palette[0]
-#define WHITE Palette[1]
-#define CLEAR Color()
-#define HIGHLIGHT Color( 255 / 2, 250, 250, 250 )
-#define CURSOR_COLOR Palette[25]
-#define BORDER_COLOR WHITE
-//editor "background" color. This color should not be selectable
-#define EDITOR_COLOR Palette[17]
+
 
 //Clear color
 extern const Color Palette[];

@@ -29,10 +29,8 @@ void MapEditor::onEnter()
 	m_tilepicker = new UI::TilePicker();
 	m_map = Assets::Load<Graphics::Map>(m_mapName);
 	//TODO - create combox box to select tilesets  
-	setTileset( m_mapName );	//by default
+	setTileset( 0, m_mapName );	//by default
 
-
-	
 	const int toolY = h - (m_tilepicker->rect().h + charH);
 	const int maph = toolY - TILE_H;
 
@@ -44,6 +42,8 @@ void MapEditor::onEnter()
 	m_tooldata = {0,0, m_map->tilew, m_map->tileh};
 	m_tool = MAP_TOOL_PIXEL;
 
+	m_overlay = new Graphics::Tileset("TilesetEditor_Overlay", m_map->rect.w, m_map->rect.h);
+	
 
 	m_toolbar = new UI::Toolbar(this, 0, toolY);
 
@@ -55,15 +55,9 @@ void MapEditor::onEnter()
 		m_tool = MAP_TOOL_FILL;             
 	});
 
-	m_toolbar->add("LINE", [&](){
-		m_tool = MAP_TOOL_LINE;
-		m_tooldata = { -1, -1, -1, -1 };
-	});
-
 	m_toolbar->add("ERASE", [&](){
 		m_tool = MAP_TOOL_ERASE;
-		m_tooldata = { -1, -1, 1, 1 };
-
+		m_tooldata = { -1, -1, -1, -1, -1 ,-1 };
 	});
 
 	//first add toolbat	
@@ -78,11 +72,10 @@ void MapEditor::onEnter()
 	const int spriteId =8 ;
 	for(int y = SPRITE_H; y < m_map->rect.h; y+=SPRITE_H*2)
 	{
-
 		for(int x = SPRITE_W; x < w; x+=SPRITE_W*2)
 		{	
 			Graphics::Sprite * sprite = new Graphics::Sprite( spriteId );
-			sprite->tileset = m_map->tileset;
+			sprite->tileset = m_map->tilesets[0];
 			sprite->x = x;
 			sprite->y = y;
 			sprite->reload();
@@ -94,7 +87,9 @@ void MapEditor::onEnter()
 
 void MapEditor::onExit()
 {	
-	
+	delete m_overlay;
+	m_overlay = 0;
+
 	for(Graphics::Sprite * sprite : m_sprites )
 		delete sprite;
 	
@@ -132,23 +127,7 @@ void MapEditor::onTick()
 	// 	sprite->draw();
 	// }	
 
-	//draw tool
-	switch(m_tool)
-	{
-		case MAP_TOOL_PIXEL:
-		{	
-			const Rect& cursor = m_map->tile( m_tooldata.mx, m_tooldata.my );
-			if(cursor.w != -1)
-			{	
-				const Rect & src = m_tilepicker->selection();
-				const int texture = m_tilepicker->tileset()->texture;
-				Engine::DrawTexture(texture, src, cursor);
-				Engine::DrawRect(BORDER_COLOR, cursor, false);
-			}	
-		}
-		break;
-	}
-	
+	drawOverlay();
 
 }
 
@@ -176,34 +155,7 @@ bool MapEditor::handleScroll()
 	return false;
 }
 
-void MapEditor::handleTool()
-{
-	
-	const Rect & tileSrc = m_tilepicker->selection();
-	const int tileId = m_tilepicker->selectionIndex();
-	//if pixel tool
-	switch(m_tool)
-	{
-		case MAP_TOOL_PIXEL:
-		{	
-			if (( Engine::GetMouseButtonState( MOUSEBUTTON_LEFT ) == BUTTON_DOWN )
-				|| ( Engine::GetMouseButtonState( MOUSEBUTTON_LEFT ) == BUTTON_HOLD ))
-			{
 
-				const Rect& cursor = m_map->tile( m_tooldata.mx, m_tooldata.my );
-				if ( cursor.w != -1 )
-				{
-					//set tile
-					int tilex, tiley;
-					m_map->getTileXY( cursor.x, cursor.y, tilex, tiley );
-					m_map->tiles[tiley * m_map->w + tilex] = tileId;
-					m_map->update( { tilex, tiley, 1, 1 } );
-				}
-			}
-		}
-		break;
-	}
-}
 
 //
 void MapEditor::onKey( Key key, bool isDown )
@@ -230,20 +182,119 @@ void MapEditor::onKey( Key key, bool isDown )
 	switch(key)
 	{
 
-	case KEY_x:
-		//zoom in
-		m_map->zoomTo(1.f/2, pixelx , pixely);
-		m_map->update();
+		case KEY_MINUS:
+			//zoom in
+			m_map->zoomTo(1.f/2, pixelx , pixely);
+			m_map->update();
 
-	break;
+		break;
 
-	case KEY_z:
-		//zoom in
-		m_map->zoomTo(2.f, pixelx, pixely);
-		m_map->update();
-	break;
+		case KEY_EQUALS:
+			//zoom in
+			m_map->zoomTo(2.f, pixelx, pixely);
+			m_map->update();
+		break;
+		case KEY_x:
+			if(m_tool == MAP_TOOL_ERASE)
+			{
+				if(m_tooldata.w > 1 )
+				{
+					m_tooldata.w--;
+					m_tooldata.h--;
+				}
+			}
+		break;
+		case KEY_z:
+			if(m_tool == MAP_TOOL_ERASE)
+			{
+				if(m_tooldata.w < m_map->rect.w)
+				{
+					m_tooldata.w++;
+					m_tooldata.h++;
+				}
+			}
+		break;
 	}
 
+}
+
+void MapEditor::handleTool()
+{
+	
+	const Rect & tileSrc = m_tilepicker->selection();
+	const int tileId = m_tilepicker->selectionIndex();
+	//if pixel tool
+	switch(m_tool)
+	{
+		case MAP_TOOL_PIXEL:
+			if (( Engine::GetMouseButtonState( MOUSEBUTTON_LEFT ) == BUTTON_DOWN )
+				|| ( Engine::GetMouseButtonState( MOUSEBUTTON_LEFT ) == BUTTON_HOLD ))
+			{
+				const Rect& cursor = m_map->tile( m_tooldata.mx, m_tooldata.my );
+				if ( cursor.w != -1 )
+				{
+					//set tile
+					int tilex, tiley;
+					m_map->getTileXY( cursor.x, cursor.y, tilex, tiley );
+					m_map->tiles[tiley * m_map->w + tilex] = tileId;
+					m_map->update( { tilex, tiley, 1, 1 } );
+				}
+			}
+		break;
+		case MAP_TOOL_ERASE:
+			if (( Engine::GetMouseButtonState( MOUSEBUTTON_LEFT ) == BUTTON_DOWN )
+				|| ( Engine::GetMouseButtonState( MOUSEBUTTON_LEFT ) == BUTTON_HOLD ))
+			{
+				const Rect& cursor = m_map->tile( m_tooldata.mx, m_tooldata.my );
+				if ( cursor.w != -1 )
+				{
+					//set tile
+					int tilex, tiley;
+					m_map->getTileXY( cursor.x, cursor.y, tilex, tiley );
+					m_map->tiles[tiley * m_map->w + tilex] = TILE_CLEAR;
+					m_map->update( { tilex, tiley, 1, 1 } );
+				}
+			}
+		break;
+
+	}
+}
+
+void MapEditor::drawOverlay()
+{
+	if ( !m_map || !m_overlay ) return;
+
+	//draw overlaw
+	//tile in map texture		
+	memset(m_overlay->pixels, 0,  m_overlay->w * m_overlay->h * sizeof(Color));
+
+	const Rect& tile = m_map->tile( m_tooldata.mx, m_tooldata.my );
+	switch(m_tool)
+	{
+		case MAP_TOOL_PIXEL:
+			if(tile.w != -1)
+			{	
+				const Rect & src = m_tilepicker->selection();
+				const int texture = m_tilepicker->tileset()->texture;
+				Engine::Blit(texture, m_overlay->texture, src, tile);
+				Engine::DrawTextureRect( m_overlay->texture, BORDER_COLOR, tile, false);
+				m_overlay->update(tile);
+			}	
+		break;
+		case MAP_TOOL_ERASE:
+		{
+			if(tile.w != -1)
+			{	
+				const Rect & src = m_tilepicker->selection();
+				const int texture = m_tilepicker->tileset()->texture;
+				Engine::DrawTextureRect( m_overlay->texture, HIGHLIGHT, tile, true);
+				Engine::DrawTextureRect( m_overlay->texture, BORDER_COLOR, tile, false);
+				m_overlay->update(tile);
+			}	
+		}
+	}
+	m_overlay->update();
+	Engine::DrawTexture( m_overlay->texture, { 0,0,m_overlay->w, m_overlay->h }, m_map->rect );
 }
 
 
@@ -268,10 +319,10 @@ void MapEditor::setMap( const std::string& name )
 	m_mapName = name;
 }	//
 
-void MapEditor::setTileset( const std::string& tileset )
+void MapEditor::setTileset(int index,  const std::string& tileset )
 {
 
 	m_tilepicker->reload(tileset);
-	m_map->tileset = tileset;
+	m_map->tilesets[index] = tileset;
 	m_map->reload();
 }

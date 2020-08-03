@@ -305,7 +305,7 @@ void TilesetEditor::drawOverlay(int tilex, int tiley, const Rect & dest)
 	{
 		if(m_overlay == 0)
 			delete m_overlay;
-		m_overlay = new Graphics::Tileset("TilesetEditor_Overlay", overlaySrc.w, overlaySrc.h);
+		m_overlay = new Graphics::Tileset("MapEditor_Overlay", overlaySrc.w, overlaySrc.h);
 	}
 
 	memset(m_overlay->pixels, 0,  overlaySrc.w * overlaySrc.h * sizeof(Color));

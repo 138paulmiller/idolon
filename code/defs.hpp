@@ -22,6 +22,11 @@
 
 #define MAP_W 128
 #define MAP_H 128
+//if tile index is -1, then will be clear
+#define TILE_CLEAR -1
+
+//Max number of tilesets per map
+#define TILESET_COUNT 4
 
 
 //Default Tileset sizes
@@ -35,5 +40,11 @@
 #define DEFAULT_ANIMATION "default"
 #define FPS_STAT_RATE  5.f 
 
-//Game details
-#define TILESET_COUNT 4
+#define BLACK Palette[0]
+#define WHITE Palette[1]
+#define CLEAR Color()
+#define HIGHLIGHT Color( 255 / 2, 250, 250, 250 )
+#define CURSOR_COLOR Palette[25]
+#define BORDER_COLOR WHITE
+//editor "background" color. This color should not be selectable
+#define EDITOR_COLOR Palette[17]
