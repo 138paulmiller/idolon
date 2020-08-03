@@ -54,6 +54,7 @@ namespace Graphics
         std::string tileset;
         //width and height is in tiles
         const int w,h, tilew, tileh, worldw, worldh;
+
         char * const tiles;
         //The view is viewport into the map texture
         Rect view;
@@ -66,6 +67,7 @@ namespace Graphics
         const int m_texture; 
         //viewport
         float m_scale;
+
     };
     /*--------------------------- Font ------------------------------------
         font is essentially just a tile set, where each character in the alphabet is just a tile

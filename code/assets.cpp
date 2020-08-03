@@ -56,9 +56,10 @@ namespace Assets
 
 	std::string FindAssetPath(const std::type_info& type, const std::string & name)
 	{
+		std::string n = name;
 		for(const std::string & dirpath : s_assetdirs)
 		{
-			const std::string & path = FS::Append(dirpath, name) + GetAssetTypeExtImpl(type);
+			const std::string & path = FS::Append(dirpath, n) + GetAssetTypeExtImpl(type);
 			if(FileExists(path))
 			{
 				return path;
@@ -135,8 +136,8 @@ namespace Assets
 			std::fstream infile;
 			infile.open(path, std::fstream::in);
 			std::string name, tileset;
-			std::getline( infile, name ); 
-			std::getline( infile, tileset ); 
+			std::getline( infile, name, '\n' ); 
+			std::getline( infile, tileset, '\n' ); 
 			int w,h, tw, th;
 			infile >> w >> h >> tw >> th;
 
@@ -173,7 +174,7 @@ namespace Assets
 			std::fstream infile;
 			infile.open(path, std::fstream::in);
 			std::string name;
-			std::getline( infile, name ); 
+			std::getline( infile, name, '\n' ); 
 			int w,h;
 			infile >> w >> h;
 
@@ -229,7 +230,7 @@ namespace Assets
 			std::fstream infile;
 			infile.open(path, std::fstream::in);
 			std::string name;
-			std::getline( infile, name ); 
+			std::getline( infile, name, '\n' ); 
 			int w,h, cw, ch, start, blocksize;
 			infile >> w >> h >> cw >> ch >> start >> blocksize ;
 			//TODO - verify endian-ness!
@@ -359,6 +360,11 @@ namespace Assets
 	}
 	void SaveImpl(const Asset* asset, const std::type_info& type, const std::string& name)
 	{
+
+	std::string n = name;
+	printf("SET TILSEST %s \n", n.c_str());
+	FS::ReplaceAll(n, "\r", "");
+
 		//asset to filename 
 		std::string path = FindAssetPath(type, name);
 		if(path.size() == 0)

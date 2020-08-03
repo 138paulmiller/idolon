@@ -48,6 +48,17 @@ struct Rect
 	bool intersects(const Rect & other) const;
 };
 
+//Each layer is a tileset in memory
+enum Layer
+{
+	//In Draw Order
+	LAYER_BG=0, //background layer
+	LAYER_SP, //sprite layer
+	LAYER_FG, //foregroud layer
+	LAYER_UI, //user-interface layer
+	LAYER_COUNT
+};
+
 //note : order matches sdl2 keycodes
 enum Key
 {

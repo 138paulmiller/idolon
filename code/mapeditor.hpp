@@ -3,6 +3,8 @@
 #include "editor.hpp"
 /*
 	TODO - Show hide tile editor and toolbar
+	add collision shapes with ids. 
+
 */
 //MapTools
 enum MapToolMode : char
@@ -39,18 +41,21 @@ public:
 	//
 	void setMap( const std::string& name );
 	//
-	void setTileset( int layer, const std::string& tileset );
+	void setTileset(const std::string& tileset );
 
 	//toolbar and tilepicker
 	void hideWorkspace() ;
 
 private:
+	//loaded tilesets. map can only use one tileset at a time
+
 	//"highlights cursor"
 	//x y in pixel space. aligned to tiles
 	bool handleScroll();
 	void handleTool();
 	//by default are all empty
-	std::string m_mapName, m_tilesetName;
+	std::string m_mapName;
+	
 	//map contains ref to tilesheet
 	Graphics::Map * m_map;
 	UI::TilePicker * m_tilepicker;

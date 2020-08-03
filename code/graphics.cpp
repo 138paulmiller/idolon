@@ -353,6 +353,7 @@ namespace Graphics
         Engine::ClearTexture(m_texture, fillColor);
         m_fontcache->blit(m_texture, text, { borderX, borderY , w, h });
         for(int y =0 ; y < m_fontcache->h; y++ )
+        {   
             for(int x =0 ; x < m_fontcache->w; x++ )
             {
                 //color only text 
@@ -360,6 +361,7 @@ namespace Graphics
                 if(color == fillColor)
                     color = textColor;
             }
+        }
 
     }
     void TextBox::reload()

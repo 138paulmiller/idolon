@@ -1,10 +1,12 @@
+#pragma once 
+
 #include "pch.hpp"
-#include "tools.hpp"
 
 #include <queue>
 #include <cmath>
 
-void LineBresenham(Color *colors, int stride, int x1, int y1, int x2, int y2, const Color & color)
+template<typename Data>
+void LineBresenham(Data *data, int stride, int x1, int y1, int x2, int y2, const Data & target)
 {
     // bresenham line
 	int steep = abs( y2 - y1 ) > abs( x2 - x1 );
@@ -41,9 +43,9 @@ void LineBresenham(Color *colors, int stride, int x1, int y1, int x2, int y2, co
 
     for (; x <= x2; x++) {
 		if (steep) 
-			colors[x * stride + y] = color;
+			data[x * stride + y] = target;
 		else 
-			colors[y * stride + x] = color;
+			data[y * stride + x] = target;
 		
 		if (((e + dy) << 1) < dx) 
 			e = e + dy;
@@ -54,17 +56,18 @@ void LineBresenham(Color *colors, int stride, int x1, int y1, int x2, int y2, co
     }
 }
 
-void FloodFill(Color * colors, int stride, const Rect & region, const Color & newColor, int x, int y )
+template<typename Data>
+void FloodFill(Data * data, int stride, const Rect & region, const Data & target, int x, int y )
 {
 	struct Cell
 	{
 		int x;
 		int y;
 	};
-	Color oldColor = colors[y * stride + x]; 
-	if(oldColor == newColor) return;
+	Color old = data[y * stride + x]; 
+	if(old == target) return;
 
-	colors[y * stride + x] = newColor;
+	data[y * stride + x] = target;
 	
 	//x y in region space
 	std::queue<Cell> queue;
@@ -90,15 +93,15 @@ void FloodFill(Color * colors, int stride, const Rect & region, const Color & ne
 		for(int i = 0; i < 4; i++)
 		{
 			Cell n =neighbors[i];
-			Color & ncolor = colors[n.y * stride + n.x];
+			Data & newcolor = data[n.y * stride + n.x];
 			if(n.x >= region.x 
 			&& n.y >= region.y 
 			&& n.x <= region.x + region.w-1 
 			&& n.y <= region.y + region.h-1 
-			&& (ncolor == oldColor)
+			&& (newcolor == old)
 			)
 			{
-				colors[n.y * stride + n.x] = newColor; 
+				data[n.y * stride + n.x] = target; 
 				queue.push(n);
 			}
 		}

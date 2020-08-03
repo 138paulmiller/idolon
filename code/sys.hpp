@@ -7,7 +7,7 @@
 #include "shell.hpp"
 #include "engine.hpp"
 #include "editor.hpp"
-#include "tools.hpp"
+#include "algo.hpp"
 #include "assets.hpp"
 #include "commands.hpp"
 #include "graphics.hpp"

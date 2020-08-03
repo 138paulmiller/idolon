@@ -34,3 +34,6 @@
 
 #define DEFAULT_ANIMATION "default"
 #define FPS_STAT_RATE  5.f 
+
+//Game details
+#define TILESET_COUNT 4

@@ -1,6 +1,6 @@
 #include "pch.hpp"
+
 #include "mapeditor.hpp"
-#include <iostream>
 
 
 /*
@@ -15,7 +15,8 @@ MapEditor::MapEditor()
 		SUPPORT( APP_UNDO ) |
 		SUPPORT( APP_REDO )  
 	)
-{}
+{
+}
 
 void MapEditor::onEnter()
 {
@@ -26,12 +27,10 @@ void MapEditor::onEnter()
 
 
 	m_tilepicker = new UI::TilePicker();
-	//by default
-	m_tilesetName = m_mapName;
 	m_map = Assets::Load<Graphics::Map>(m_mapName);
-	//
+	//TODO - create combox box to select tilesets  
+	setTileset( m_mapName );	//by default
 
-	setTileset( 0, m_tilesetName );
 
 	
 	const int toolY = h - (m_tilepicker->rect().h + charH);
@@ -83,7 +82,7 @@ void MapEditor::onEnter()
 		for(int x = SPRITE_W; x < w; x+=SPRITE_W*2)
 		{	
 			Graphics::Sprite * sprite = new Graphics::Sprite( spriteId );
-			sprite->tileset = m_tilesetName;
+			sprite->tileset = m_map->tileset;
 			sprite->x = x;
 			sprite->y = y;
 			sprite->reload();
@@ -113,12 +112,10 @@ void MapEditor::onExit()
 
 void MapEditor::onTick()
 {
-	const Rect & tileSrc = m_tilepicker->selection();
-
 	Engine::GetMousePosition(m_tooldata.mx, m_tooldata.my);
 
 	//if not scrolling, must be tool
-	if( ! handleScroll())
+	if( ! handleScroll() )
 	{
 		handleTool();
 	}
@@ -130,10 +127,10 @@ void MapEditor::onTick()
 		m_map->draw();
 	}
 
-	for(Graphics::Sprite * sprite : m_sprites )	
-	{
-		sprite->draw();
-	}	
+	// for(Graphics::Sprite * sprite : m_sprites )	
+	// {
+	// 	sprite->draw();
+	// }	
 
 	//draw tool
 	switch(m_tool)
@@ -143,7 +140,9 @@ void MapEditor::onTick()
 			const Rect& cursor = m_map->tile( m_tooldata.mx, m_tooldata.my );
 			if(cursor.w != -1)
 			{	
-				Engine::DrawTexture(m_tilepicker->tileset()->texture, tileSrc, cursor);
+				const Rect & src = m_tilepicker->selection();
+				const int texture = m_tilepicker->tileset()->texture;
+				Engine::DrawTexture(texture, src, cursor);
 				Engine::DrawRect(BORDER_COLOR, cursor, false);
 			}	
 		}
@@ -261,7 +260,6 @@ void MapEditor::save()
 {
 	if(!m_map) return;
 
-	m_map->update();
 	Assets::Save(m_map);
 }
 
@@ -270,8 +268,9 @@ void MapEditor::setMap( const std::string& name )
 	m_mapName = name;
 }	//
 
-void MapEditor::setTileset( int layer, const std::string& tileset )
+void MapEditor::setTileset( const std::string& tileset )
 {
+
 	m_tilepicker->reload(tileset);
 	m_map->tileset = tileset;
 	m_map->reload();

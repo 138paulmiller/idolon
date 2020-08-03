@@ -5,6 +5,7 @@
 //Create virtual drives. Map sys/ to systems dir and ~/ to home
 namespace FS
 {
+	void ReplaceAll(std::string& str, const std::string& from, const std::string& to) ;
 	//file to remove
 	bool Move(const std::string& path, const std::string& newPath);
 	bool Remove(const std::string& path);

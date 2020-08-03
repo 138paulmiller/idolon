@@ -1,21 +1,34 @@
 #pragma once
 #include "sys.hpp"
 
-//Each layer is a tileset in memory
-enum Layer
-{
-	//In Draw Order
-	LAYER_BG=0, //background layer
-	LAYER_SP, //sprite layer
-	LAYER_FG, //foregroud layer
-	LAYER_UI, //user-interface layer
-};
 
 //This should be the primary Python API
 namespace  Game
 {
 	class Cartridge
 	{
+		char ** tilesets;
+		int tilesetCount;
+		std::string & code;
+	};
+
+
+	/*
+	Memory layout
+	Tileset (4096 bytes)
+	
+	0x00000 - 0x03FFF : Tileset 0	
+	0x04000 - 0x07FFF : Tileset 1	
+	0x08000 - 0x0BFFF : Tileset 2	
+	0x0C000 - 0x0FFFF : Tileset 3
+	
+	*/
+
+	//create a swap function that loads from cartridge into CPU.
+	// the tileset index is specified in the map section of the cartridge, so when loading a map, also load the tileset index
+	class CPU
+	{
+		char * tilesets[LAYER_COUNT];
 	};
 
 	void Startup(const std::string & cartpath);
