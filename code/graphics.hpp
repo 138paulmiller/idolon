@@ -46,7 +46,7 @@ namespace Graphics
         float scale( );
         void zoomTo( float scale, int x, int y );
         void scroll(int dx, int dy);
-        //get tile rect at x y 
+        //get screenspace tile rect at x y 
         Rect tile(int scrx, int scry);
         //tile xy in map space from screen space
         bool getTileXY(int scrx, int scry, int & tilex, int & tiley);

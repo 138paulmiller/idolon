@@ -124,15 +124,9 @@ namespace Graphics
             scale = 0.125f;
             return;
         }
-        float delta =  m_scale - scale;
         m_scale = scale;
-
-        int px = view.x;
-        int py = view.y;
-
-        view.x = (delta * x ) ;
-        view.y = (delta * y ) ;
-
+        
+        scroll( x - view.x, y - view.y );
 
         view.w = rect.w * m_scale;
         view.h = rect.h * m_scale;
@@ -147,7 +141,6 @@ namespace Graphics
         else if(view.h > rect.h) 
             view.h = rect.h;
     
-        scroll( view.x - px, view.y - py );
     }
 
     void Map::scroll( int dx, int dy )
@@ -229,14 +222,14 @@ namespace Graphics
             || ( scry < rect.y || scry > rect.y + rect.h ) )
             return {-1, -1, -1, -1} ;
          //tile xy in screen space 
-        int tilex =  view.x/m_scale + scrx - rect.x;
-        int tiley =  view.y/m_scale + scry - rect.y;
-
+        int tilex;
+        int tiley;
+        getTileXY(scrx, scry, tilex, tiley );
         //screen space tile width/height
         const int scrTW = tilew/m_scale;
         const int scrTH = tileh/m_scale;
-        int alignscrx = tilex/scrTW*scrTW - view.x/m_scale + rect.x;
-        int alignscry = tiley/scrTH*scrTH - view.y/m_scale + rect.y;
+        const int alignscrx = rect.x+ tilex*scrTW - (view.x/m_scale);
+        const int alignscry = rect.y+ tiley*scrTH - (view.y/m_scale);
 
         return {  alignscrx, alignscry, scrTW,  scrTH };
     }
@@ -247,8 +240,8 @@ namespace Graphics
             return false;
      
         const int scrTH = tileh/m_scale;
-        tilex =  ( view.x/m_scale + scrx - rect.x )/ tilew/m_scale ;
-        tiley =  ( view.y/m_scale + scry - rect.y )/ tileh/m_scale ;
+        tilex =  ( view.x/m_scale + scrx - rect.x )/ (tilew/m_scale) ;
+        tiley =  ( view.y/m_scale + scry - rect.y )/ (tileh/m_scale) ;
 
         return true;
     }

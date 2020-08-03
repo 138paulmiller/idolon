@@ -51,9 +51,9 @@ void MapEditor::onEnter()
 		m_tool = MAP_TOOL_PIXEL;                     
 	});
 	
-	m_toolbar->add("FILL", [&](){
-		m_tool = MAP_TOOL_FILL;             
-	});
+	//m_toolbar->add("FILL", [&](){
+	//	m_tool = MAP_TOOL_FILL;             
+	//});
 
 	m_toolbar->add("ERASE", [&](){
 		m_tool = MAP_TOOL_ERASE;
@@ -267,6 +267,7 @@ void MapEditor::drawOverlay()
 	//draw overlaw
 	//tile in map texture		
 	memset(m_overlay->pixels, 0,  m_overlay->w * m_overlay->h * sizeof(Color));
+	m_overlay->update();
 
 	const Rect& tile = m_map->tile( m_tooldata.mx, m_tooldata.my );
 	switch(m_tool)
@@ -276,8 +277,13 @@ void MapEditor::drawOverlay()
 			{	
 				const Rect & src = m_tilepicker->selection();
 				const int texture = m_tilepicker->tileset()->texture;
-				Engine::Blit(texture, m_overlay->texture, src, tile);
-				Engine::DrawTextureRect( m_overlay->texture, BORDER_COLOR, tile, false);
+				//Engine::Blit(texture, m_overlay->texture, src, tile);
+				//Engine::DrawTextureRect( m_overlay->texture, BORDER_COLOR, tile, false);
+				Engine::DrawTexture(texture, src, tile);
+				Engine::DrawRect(BORDER_COLOR, tile, false);
+				printf( "SCR TILE %d %d %d %d\n", tile.x, tile.y,tile.w, tile.h );
+				printf( "SCALE %f %d\n", m_map->scale() );
+
 				m_overlay->update(tile);
 			}	
 		break;
@@ -293,7 +299,6 @@ void MapEditor::drawOverlay()
 			}	
 		}
 	}
-	m_overlay->update();
 	Engine::DrawTexture( m_overlay->texture, { 0,0,m_overlay->w, m_overlay->h }, m_map->rect );
 }
 
