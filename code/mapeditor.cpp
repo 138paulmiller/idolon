@@ -31,7 +31,7 @@ void MapEditor::onEnter()
 	//TODO - create combox box to select tilesets  
 	setTileset( 0, m_mapName );	//by default
 
-	const int toolY = h - (m_tilepicker->rect().h + charH);
+	const int toolY = h - (m_tilepicker->rect().h + TILE_H);
 	const int maph = toolY - TILE_H;
 
 	m_map->rect = { 0, TILE_H, w, maph };
@@ -235,9 +235,11 @@ void MapEditor::handleTool()
 				{
 					//set tile
 					int tilex, tiley;
-					m_map->getTileXY( cursor.x, cursor.y, tilex, tiley );
-					m_map->tiles[tiley * m_map->w + tilex] = tileId;
-					m_map->update( { tilex, tiley, 1, 1 } );
+					if ( m_map->getTileXY( cursor.x, cursor.y, tilex, tiley ) )
+					{
+						m_map->tiles[tiley * m_map->w + tilex] = tileId;
+						m_map->update( { tilex, tiley, 1, 1 } );
+					}
 				}
 			}
 		break;
@@ -250,9 +252,11 @@ void MapEditor::handleTool()
 				{
 					//set tile
 					int tilex, tiley;
-					m_map->getTileXY( cursor.x, cursor.y, tilex, tiley );
-					m_map->tiles[tiley * m_map->w + tilex] = TILE_CLEAR;
-					m_map->update( { tilex, tiley, 1, 1 } );
+					if ( m_map->getTileXY( cursor.x, cursor.y, tilex, tiley ) )
+					{
+						m_map->tiles[tiley * m_map->w + tilex] = TILE_CLEAR;
+						m_map->update( { tilex, tiley, 1, 1 } );
+					}
 				}
 			}
 		break;
@@ -281,7 +285,12 @@ void MapEditor::drawOverlay()
 				//Engine::DrawTextureRect( m_overlay->texture, BORDER_COLOR, tile, false);
 				Engine::DrawTexture(texture, src, tile);
 				Engine::DrawRect(BORDER_COLOR, tile, false);
-				printf( "SCR TILE %d %d %d %d\n", tile.x, tile.y,tile.w, tile.h );
+				const int tx = tile.x * m_map->scale();
+				const int ty = tile.y * m_map->scale();
+				const int tw = tile.w * m_map->scale();
+				const int th = tile.h * m_map->scale();
+
+				printf( "SCR TILE %d %d %d %d\n", tx,ty,tw, th );
 				printf( "SCALE %f %d\n", m_map->scale() );
 
 				m_overlay->update(tile);

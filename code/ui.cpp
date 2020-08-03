@@ -512,7 +512,7 @@ namespace UI
 		};
 
 		const Rect& src = { 0, 0, m_tileset->w, m_tileset->h };
-		
+		Engine::DrawRect( EDITOR_COLOR, m_box, true);		
 		Engine::DrawTexture( m_tileset->texture, src, m_box);
 
 		Engine::DrawRect(CURSOR_COLOR, worldCursor, false);

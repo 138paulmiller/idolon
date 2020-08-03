@@ -218,30 +218,30 @@ namespace Graphics
 
     Rect Map::tile(int scrx, int scry)
     {
-        if ( ( scrx < rect.x || scrx > rect.x + rect.w )
-            || ( scry < rect.y || scry > rect.y + rect.h ) )
-            return {-1, -1, -1, -1} ;
          //tile xy in screen space 
         int tilex;
         int tiley;
-        getTileXY(scrx, scry, tilex, tiley );
+        if(!getTileXY(scrx, scry, tilex, tiley )) 
+            return {-1, -1, -1, -1} ;
+
         //screen space tile width/height
         const int scrTW = tilew/m_scale;
         const int scrTH = tileh/m_scale;
-        const int alignscrx = rect.x+ tilex*scrTW - (view.x/m_scale);
-        const int alignscry = rect.y+ tiley*scrTH - (view.y/m_scale);
+        const int alignscrx = rect.x + tilex*scrTW - (view.x/m_scale);
+        const int alignscry = rect.y + tiley*scrTH - (view.y/m_scale);
 
         return {  alignscrx, alignscry, scrTW,  scrTH };
     }
     bool Map::getTileXY( int scrx, int scry, int& tilex, int& tiley )
     {
-        if ( ( scrx < rect.x || scrx > rect.x + rect.w )
-            || ( scry < rect.y || scry > rect.y + rect.h ) )
+        const int scrTW = tilew/m_scale;
+        const int scrTH = tileh/m_scale;
+        if ( ( scrx+scrTW < rect.x || scrx+scrTW > rect.x + rect.w )
+            || ( scry+scrTH < rect.y || scry+scrTH > rect.y + rect.h ) )
             return false;
      
-        const int scrTH = tileh/m_scale;
-        tilex =  ( view.x/m_scale + scrx - rect.x )/ (tilew/m_scale) ;
-        tiley =  ( view.y/m_scale + scry - rect.y )/ (tileh/m_scale) ;
+        tilex =  ( view.x/m_scale + scrx - rect.x )/ scrTW;
+        tiley =  ( view.y/m_scale + scry - rect.y )/ scrTH;
 
         return true;
     }
