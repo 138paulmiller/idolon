@@ -141,9 +141,13 @@ namespace Assets
 			std::string name;
 			std::string tilesets[TILESET_COUNT];
 			std::getline( infile, name, '\n' ); 
+			FS::ReplaceAll(name, "\r", "");
+
 			for ( int i = 0; i < TILESET_COUNT; i++ )
 			{
 				std::getline( infile, tilesets[i], '\n' ); 
+				FS::ReplaceAll(tilesets[i], "\r", "");
+
 			}
 			int w,h, tw, th;
 			infile >> w >> h >> tw >> th;
@@ -185,6 +189,8 @@ namespace Assets
 			infile.open(path, std::fstream::in);
 			std::string name;
 			std::getline( infile, name, '\n' ); 
+			FS::ReplaceAll(name, "\r", "");
+
 			int w,h;
 			infile >> w >> h;
 
@@ -241,6 +247,8 @@ namespace Assets
 			infile.open(path, std::fstream::in);
 			std::string name;
 			std::getline( infile, name, '\n' ); 
+			FS::ReplaceAll(name, "\r", "");
+
 			int w,h, cw, ch, start, blocksize;
 			infile >> w >> h >> cw >> ch >> start >> blocksize ;
 			//TODO - verify endian-ness!
@@ -371,15 +379,12 @@ namespace Assets
 	void SaveImpl(const Asset* asset, const std::type_info& type, const std::string& name)
 	{
 
-	std::string n = name;
-	printf("SET TILSEST %s \n", n.c_str());
-	FS::ReplaceAll(n, "\r", "");
-
+		std::string n = name;
 		//asset to filename 
 		std::string path = FindAssetPath(type, name);
 		if(path.size() == 0)
 		{
-			LOG("Assets: Failed to find asset falling back on %s\n", asset->filepath.c_str());
+			LOG("Assets: Failed to find file for asset (%s) falling back on %s\n", name.c_str(), asset->filepath.c_str());
 			path = asset->filepath;
 		}
 		SaveAsImpl(asset, type, path);

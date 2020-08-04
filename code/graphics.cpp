@@ -346,6 +346,7 @@ namespace Graphics
         m_fontcache(0)
     {
     }
+  
     TextBox::~TextBox()
     {
         if(m_fontcache)

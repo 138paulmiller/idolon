@@ -31,6 +31,7 @@ void MapEditor::onEnter()
 	//TODO - create combox box to select tilesets  
 	setTileset( 0, m_mapName );	//by default
 
+
 	const int toolY = h - (m_tilepicker->rect().h + TILE_H);
 	const int maph = toolY - TILE_H;
 
@@ -69,19 +70,19 @@ void MapEditor::onEnter()
 
 
 /////////////// DEbug //////////////////////////
-	const int spriteId =8 ;
-	for(int y = SPRITE_H; y < m_map->rect.h; y+=SPRITE_H*2)
-	{
-		for(int x = SPRITE_W; x < w; x+=SPRITE_W*2)
-		{	
-			Graphics::Sprite * sprite = new Graphics::Sprite( spriteId );
-			sprite->tileset = m_map->tilesets[0];
-			sprite->x = x;
-			sprite->y = y;
-			sprite->reload();
-			m_sprites.push_back(sprite);
-		}
-	}
+	// const int spriteId =8 ;
+	// for(int y = SPRITE_H; y < m_map->rect.h; y+=SPRITE_H*2)
+	// {
+	// 	for(int x = SPRITE_W; x < w; x+=SPRITE_W*2)
+	// 	{	
+	// 		Graphics::Sprite * sprite = new Graphics::Sprite( spriteId );
+	// 		sprite->tileset = m_map->tilesets[0];
+	// 		sprite->x = x;
+	// 		sprite->y = y;
+	// 		sprite->reload();
+	// 		m_sprites.push_back(sprite);
+	// 	}
+	// }
 ///////////////////////////////////////////////////
 }
 
@@ -167,8 +168,7 @@ void MapEditor::onKey( Key key, bool isDown )
 	const int pixelx = view.x + ( mx - view.x )  ;
 	const int pixely = view.y + ( my - view.y ) ;
 
-	int tile = 0;
-	printf("Key %d Alt : %d\n", key, KEY_ALT);
+
 	if(key == KEY_SHIFT) 
 	{  
 		m_shift = isDown;
@@ -290,9 +290,6 @@ void MapEditor::drawOverlay()
 				const int tw = tile.w * m_map->scale();
 				const int th = tile.h * m_map->scale();
 
-				printf( "SCR TILE %d %d %d %d\n", tx,ty,tw, th );
-				printf( "SCALE %f %d\n", m_map->scale() );
-
 				m_overlay->update(tile);
 			}	
 		break;
@@ -335,8 +332,9 @@ void MapEditor::setMap( const std::string& name )
 
 void MapEditor::setTileset(int index,  const std::string& tileset )
 {
-
+	
 	m_tilepicker->reload(tileset);
 	m_map->tilesets[index] = tileset;
 	m_map->reload();
+
 }
