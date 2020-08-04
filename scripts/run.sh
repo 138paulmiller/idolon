@@ -1,1 +1,1 @@
-make all && ./idolon 
+./idolon 
