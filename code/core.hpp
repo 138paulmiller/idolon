@@ -52,6 +52,8 @@ enum Layer
 	LAYER_COUNT
 };
 
+
+
 //note : order matches sdl2 keycodes
 enum Key
 {

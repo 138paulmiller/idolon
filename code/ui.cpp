@@ -5,9 +5,9 @@
 #include "engine.hpp"
 
 #define DEFAULT_COLOR_TEXT WHITE
-#define DEFAULT_COLOR_FILL  Palette[25]
+#define DEFAULT_COLOR_FILL  BLACK
 #define DEFAULT_COLOR_CLICK Palette[26] 
-#define DEFAULT_COLOR_HOVER BLACK
+#define DEFAULT_COLOR_HOVER Palette[25]
 
 
 namespace UI
@@ -23,6 +23,8 @@ namespace UI
 	void Button::onClick()
 	{
 		m_isDown = true;
+		m_isHover = false;
+
 		m_isDirty = true;
 	}
 	
@@ -44,20 +46,29 @@ namespace UI
 	}
 	void Button::onUpdate() 
 	{
-		if ( !m_isDirty ) return;
+		if(	!m_isDirty) return;
 		if ( m_isDown )
+		{
 			m_color = clickColor;
+		}
 		else if(m_isHover)
+		{
 			m_color = hoverColor;
+		}
 		else
+		{
 			m_color = fillColor;
+		}
 
 		m_isDirty = false;
 	}
 	void Button::onHover()
 	{
-		m_isHover = true;
-		m_isDirty = true;
+		if(!m_isHover)
+		{
+			m_isHover = true;
+			m_isDirty = true;
+		}
 	}
 	void Button::reset()
 	{
@@ -80,7 +91,8 @@ namespace UI
 	//////////////////////////////////////////////////////////////////////////////////
 	
 	App::App()
-	{}
+	{
+	}
 
 	App::~App()
 	{
@@ -116,11 +128,12 @@ namespace UI
 	
 	void App::update()
 	{
+
 		for(Widget * widget : m_widgets)
 		{
-			if(widget)
-				widget->onUpdate();
+			if(widget) widget->onUpdate();
 		}
+
 		for(Button * button : m_buttons)
 		{
 			if(button)
@@ -131,8 +144,7 @@ namespace UI
 				Engine::GetMousePosition(mx, my);
 				if(button->rect().intersects({mx, my, 1,1}))
 				{
-					if( Engine::GetMouseButtonState(MouseButton::MOUSEBUTTON_LEFT) 
-						== BUTTON_DOWN)
+					if( Engine::GetMouseButtonState(MouseButton::MOUSEBUTTON_LEFT) == BUTTON_DOWN)
 					{
 						button->click();
 					}	
@@ -219,9 +231,9 @@ namespace UI
 	{
 
 		textColor  = DEFAULT_COLOR_TEXT ;
-		hoverColor = DEFAULT_COLOR_FILL ;		
+		hoverColor = DEFAULT_COLOR_HOVER ;		
 		clickColor = DEFAULT_COLOR_CLICK;
-		fillColor  = DEFAULT_COLOR_HOVER;
+		fillColor  = DEFAULT_COLOR_FILL;
 		sticky = false;
 		m_textbox = new Graphics::TextBox(tw, th, text);
 		m_textbox->x = x;
@@ -269,15 +281,18 @@ namespace UI
 
 	}
 
+
+/*-------------------------------------- Toolbar -----------------------------------
+*/
 	Toolbar::Toolbar( App* parent, int x, int y )
 		:m_parent(parent), 
 		m_x(x),m_y(y),
 		m_count(0), m_xoff(0)
 	{
 		textColor  = DEFAULT_COLOR_TEXT ;
-		hoverColor = DEFAULT_COLOR_FILL ;		
+		hoverColor = DEFAULT_COLOR_HOVER ;		
 		clickColor = DEFAULT_COLOR_CLICK;
-		fillColor  = DEFAULT_COLOR_HOVER;
+		fillColor  = DEFAULT_COLOR_FILL;
 		font = DEFAULT_FONT;
 	}
 	
@@ -332,7 +347,53 @@ namespace UI
 	}
 	void Toolbar::onDraw()
 	{}
+
+	
+//----------------------------- Input -----------------------------------------------
+	TextInput::TextInput(const std::string & text, int x, int y, int tw, int th )
+		:TextButton(text, x, y, tw, th)
 		
+	{
+		this->text = text;
+		auto handleKey = [this](Key key, bool isDown)
+		{
+			if(!isDown) return;
+
+			switch(key)
+			{
+				case  KEY_RETURN:
+					Engine::PopKeyHandler();
+					cbAccept();
+					this->reset();
+				break;
+				case KEY_BACKSPACE:
+					this->text.pop_back();
+					this->setText(this->text);
+				break;
+				default:
+				if(key <= KEY_TILDA)
+				{
+					if(key >= KEY_TAB)
+					{
+						this->text.push_back((char)key);
+						this->setText(this->text);
+					}
+				}
+				break;
+			}
+		};
+
+		this->cbClick = [this, handleKey]()
+		{
+			Engine::PushKeyHandler(handleKey);
+		};
+		this->sticky = true;
+	}	
+
+	TextInput::~TextInput()
+	{
+	}
+
 	//////////////////////////////////////////////////////////////////////////////////
 	ColorPicker::ColorPicker(int x, int y)
 	{

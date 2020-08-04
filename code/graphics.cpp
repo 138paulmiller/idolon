@@ -234,12 +234,12 @@ namespace Graphics
     }
     bool Map::getTileXY( int scrx, int scry, int& tilex, int& tiley )
     {
-        const int scrTW = tilew/m_scale;
-        const int scrTH = tileh/m_scale;
-        if ( ( scrx+scrTW < rect.x || scrx+scrTW > rect.x + rect.w )
-            || ( scry+scrTH < rect.y || scry+scrTH > rect.y + rect.h ) )
+        if ( ( scrx < rect.x || scrx > rect.x + rect.w )
+            || ( scry < rect.y || scry > rect.y + rect.h ) )
             return false;
      
+        const int scrTW = tilew/m_scale;
+        const int scrTH = tileh/m_scale;
         tilex =  ( view.x/m_scale + scrx - rect.x )/ scrTW;
         tiley =  ( view.y/m_scale + scry - rect.y )/ scrTH;
 

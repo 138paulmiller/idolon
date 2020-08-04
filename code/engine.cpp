@@ -2,6 +2,7 @@
 
 #include "core.hpp"
 #include "engine.hpp"
+#include <stack>
 
 #define SDL_MAIN_HANDLED
 #include <SDL2/SDL.h>
@@ -35,8 +36,8 @@ namespace
     } s_ue;
 
  
-    bool s_echo;
-    std::function<void(Key, bool)> s_echocb;
+    bool s_echo; 
+    std::stack<  KeyHandler > s_keyhandlers;
     //when this key is hit, input handling enters "echo" mode. forwards all key input
     SDL_Window* s_window;
     SDL_Renderer* s_renderer;
@@ -101,10 +102,15 @@ namespace Engine
         if (!on)
             s_echo = 0;
     }
-    //only use in edit/debug mode
-    void SetKeyHandler(std::function<void(Key, bool)> cb)
+    void PushKeyHandler(std::function<void(Key, bool)> cb)
     {
-        s_echocb = cb;
+        s_keyhandlers.push( cb );
+
+    }
+
+    void PopKeyHandler()
+    {
+        s_keyhandlers.pop( );
     }
     void AlignMouse(int x, int y)
     {
@@ -132,9 +138,10 @@ namespace Engine
             {
                 Key sym = GetKeyFromKeyCode(event.key.keysym.sym, event.key.keysym.mod & KMOD_SHIFT);
                 if (sym == KEY_UNKNOWN) break;
-                if( s_echo && s_echocb)
+                const KeyHandler & cb = s_keyhandlers.top();
+                if( s_echo && cb)
                 {
-                    s_echocb(Key(sym), false);
+                    cb(Key(sym), false);
                 }
                 s_ue.keymap[sym] = BUTTON_UP;
             }
@@ -143,9 +150,10 @@ namespace Engine
             {
                 Key sym = GetKeyFromKeyCode(event.key.keysym.sym, event.key.keysym.mod & KMOD_SHIFT);
                 if (sym == KEY_UNKNOWN) break;
-                if( s_echo && s_echocb)
+                const KeyHandler & cb = s_keyhandlers.top();
+                if( s_echo && cb)
                 {
-                    s_echocb(Key(sym), true);
+                    cb(Key(sym), true);
                 }
                 ButtonState & state = s_ue.keymap[sym];
                 if (state == BUTTON_DOWN || state == BUTTON_HOLD)

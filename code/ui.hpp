@@ -1,6 +1,7 @@
 #pragma once
 #include "core.hpp"
 
+
 //Classes that can be used by UI "pages"
 namespace Graphics 
 {
@@ -15,9 +16,9 @@ enum AppCode
 	APP_CODE_CONTINUE = 0, 
 	APP_CODE_EXIT, 		//exit app
 	APP_CODE_SHUTDOWN, 	//shutdown system
-	// ? 
 	//APP_PAUSE,
 };
+
 
 #define SUPPORT(support) (1u << support)
 
@@ -123,8 +124,8 @@ namespace UI
 	public:
 		TextButton(const std::string & text, int x, int y, int tw, int th);
 		~TextButton();
-		void onUpdate() ;
-		void onDraw() ;
+		void onUpdate() override ;
+		void onDraw() override;
 		//if font is changed reload
 		void setFont(const std::string & font) ;
 		void setText(const std::string & text) ;
@@ -147,8 +148,8 @@ namespace UI
 		void  remove(int id);
 		Button *  get(int id);
 		
-		void onUpdate();
-		void onDraw() ;
+		void onUpdate() override;
+		void onDraw() override;
 		
 		Color textColor;
 		Color hoverColor;
@@ -168,12 +169,22 @@ namespace UI
 
 	//////////////////////////////////////////////////////////////////////////////////
 	/*
-		TODO Create Value Input Selector
-			- Returns path to selected file
+		Color Selector
+			- Renders the sheet at the top-right of the screen.
 
 	*/
 
-	//////////////////////////////////////////////////////////////////////////////////
+	class TextInput : public TextButton
+	{
+	public:
+		TextInput(const std::string & text, int x, int y, int tw, int th);
+		~TextInput();
+
+		std::string text ;
+		std::function<void()> cbAccept ;
+	private:
+	};
+		//////////////////////////////////////////////////////////////////////////////////
 	/*
 		Color Selector
 			- Renders the sheet at the top-right of the screen.
@@ -186,8 +197,8 @@ namespace UI
 		ColorPicker(int x, int y);
 		~ColorPicker();
 
-		void onUpdate();
-		void onDraw();
+		void onUpdate() override;
+		void onDraw() override;
 
 		Color color();
 	private:
@@ -210,7 +221,7 @@ namespace UI
 		~TilePicker();
 
 		const Rect & rect();
-		void onUpdate();
+		void onUpdate() override;
 		void onDraw();
 		
 		void reload(const std::string & tileset);

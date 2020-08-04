@@ -41,7 +41,7 @@ namespace Sys
 		s_context->create(APP_MAP_EDITOR, new MapEditor());
 	
 		Engine::SetKeyEcho(true);
-		Engine::SetKeyHandler(
+		Engine::PushKeyHandler(
 			[&](Key key, bool isDown) 
 			{
 				if(isDown && key == KEY_ESCAPE)

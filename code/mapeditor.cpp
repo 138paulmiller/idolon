@@ -24,18 +24,18 @@ void MapEditor::onEnter()
 	int w,h;
 	Engine::GetSize(w,h);
 	int charH = Sys::GetShell()->getFont()->charH;
+	int charW = Sys::GetShell()->getFont()->charW;
 
 
 	m_tilepicker = new UI::TilePicker();
 	m_map = Assets::Load<Graphics::Map>(m_mapName);
 	//TODO - create combox box to select tilesets  
-	setTileset( 0, m_mapName );	//by default
-
+	const std::string tilesetName = m_mapName;
+	setTileset( 0, tilesetName );	//by default
 
 	const int toolY = h - (m_tilepicker->rect().h + TILE_H);
-	const int maph = toolY - TILE_H;
 
-	m_map->rect = { 0, TILE_H, w, maph };
+	m_map->rect = { 0, TILE_H, w, toolY - TILE_H };
 	//reset view
    	m_map->zoomTo(1.0, 0, 0 );
 
@@ -44,8 +44,6 @@ void MapEditor::onEnter()
 	m_tool = MAP_TOOL_PIXEL;
 
 	m_overlay = new Graphics::Tileset("TilesetEditor_Overlay", m_map->rect.w, m_map->rect.h);
-	
-
 	m_toolbar = new UI::Toolbar(this, 0, toolY);
 
 	m_toolbar->add("PIXEL", [&](){
@@ -61,11 +59,23 @@ void MapEditor::onEnter()
 		m_tooldata = { -1, -1, -1, -1, -1 ,-1 };
 	});
 
+	const int tw = 12;
+	m_tilesetInput = new UI::TextInput(tilesetName, w - tw*charW, toolY, tw, 1);
+
+	m_tilesetInput->cbAccept = [this]()
+	{
+		this->setTileset(0, m_tilesetInput->text);
+	};
+
 	//first add toolbat	
 	//add the ui widgets
 	App::addWidget( m_toolbar );
 
 	App::addWidget(m_tilepicker);
+	App::addButton( m_tilesetInput );
+
+	m_toolbar->get(MAP_TOOL_PIXEL)->click();
+
 	Editor::onEnter();
 
 
@@ -332,7 +342,6 @@ void MapEditor::setMap( const std::string& name )
 
 void MapEditor::setTileset(int index,  const std::string& tileset )
 {
-	
 	m_tilepicker->reload(tileset);
 	m_map->tilesets[index] = tileset;
 	m_map->reload();

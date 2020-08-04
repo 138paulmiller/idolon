@@ -332,7 +332,7 @@ namespace Assets
 		
 		if(path.size() == 0)
 		{
-			LOG("Assets: Could not find %s %s\n", type.name(), name.c_str());
+			LOG("Assets: Could not find %s\n", name.c_str());
 			return 0;
 		}
 

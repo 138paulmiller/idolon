@@ -61,6 +61,7 @@ private:
 	//by default are all empty
 	std::string m_mapName;
 	
+	UI::TextInput * m_tilesetInput;
 	//map contains ref to tilesheet
 	Graphics::Map * m_map;
 	UI::TilePicker * m_tilepicker;
@@ -80,4 +81,5 @@ private:
 	//used to render the potential modifications 
 	//use a map ? copy indices over for floodfill
 	Graphics::Tileset * m_overlay;
+
 };

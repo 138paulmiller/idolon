@@ -39,6 +39,8 @@ enum TextureMode
 };
 
 
+using KeyHandler = std::function<void(Key, bool)>;
+
 namespace Engine
 {
     void Startup(int w, int h, float scale= 1);
@@ -46,7 +48,9 @@ namespace Engine
     void Shutdown();
     void SetKeyEcho(bool on);
     //only use in edit/debug mode
-    void SetKeyHandler(std::function<void(Key, bool)> cb);
+    void PushKeyHandler(KeyHandler cb);
+    void PopKeyHandler();
+
     void AlignMouse(int x, int y);
 
     // Texture 
