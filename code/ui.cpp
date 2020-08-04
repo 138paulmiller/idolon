@@ -280,7 +280,7 @@ namespace UI
 		m_textbox->refresh();	
 
 	}
-
+	
 
 /*-------------------------------------- Toolbar -----------------------------------
 */
@@ -361,10 +361,18 @@ namespace UI
 
 			switch(key)
 			{
+				case  KEY_ESCAPE:
+					this->text = this->m_textprev;
+					this->setText(this->text);
+
+					Engine::PopKeyHandler();
+					this->reset();
+				break;
+				case  KEY_TAB:
 				case  KEY_RETURN:
 					Engine::PopKeyHandler();
-					cbAccept();
 					this->reset();
+					cbAccept();
 				break;
 				case KEY_BACKSPACE:
 					this->text.pop_back();
@@ -373,7 +381,7 @@ namespace UI
 				default:
 				if(key <= KEY_TILDA)
 				{
-					if(key >= KEY_TAB)
+					if(key >= KEY_SPACE)
 					{
 						this->text.push_back((char)key);
 						this->setText(this->text);
@@ -386,6 +394,9 @@ namespace UI
 		this->cbClick = [this, handleKey]()
 		{
 			Engine::PushKeyHandler(handleKey);
+			m_timer = 0.0;
+			m_cursorVisible = true;
+			m_textprev = this->text;
 		};
 		this->sticky = true;
 	}	
@@ -393,7 +404,29 @@ namespace UI
 	TextInput::~TextInput()
 	{
 	}
+			//draw cursor
+	void TextInput::onDraw() 
+	{
+		TextButton::onDraw();
+		if ( this->isDown() )
+		{
+			m_timer += Engine::GetTimeDeltaMs()/1000.0f;
+			if (m_timer > 1.0/CURSOR_FLICKER_RATE  ) 
+			{
+				m_cursorVisible = !m_cursorVisible;
+				m_timer = 0.0;
+			}
+			if( m_cursorVisible )
+			{
+				const int cw = m_textbox->getFont()->charW;
+				const int ch = m_textbox->getFont()->charH;
+				const int cx = this->m_rect.x + this->text.size() * cw + m_textbox->borderX;
+				const int cy = this->m_rect.y + m_textbox->borderY;
 
+				Engine::DrawRect( WHITE, {cx,cy,cw,ch}, true );
+			}
+		}
+	}
 	//////////////////////////////////////////////////////////////////////////////////
 	ColorPicker::ColorPicker(int x, int y)
 	{
@@ -492,6 +525,7 @@ namespace UI
 
 	int TilePicker::selectionIndex()
 	{
+		if ( !m_tileset ) return -1;
 		return m_tileset->id(m_cursor);
 	}
 

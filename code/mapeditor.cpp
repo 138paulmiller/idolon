@@ -276,7 +276,8 @@ void MapEditor::handleTool()
 
 void MapEditor::drawOverlay()
 {
-	if ( !m_map || !m_overlay ) return;
+	//if no tileset
+	if ( !m_map || !m_overlay || !m_tilepicker->tileset()) return;
 
 	//draw overlaw
 	//tile in map texture		
@@ -342,6 +343,7 @@ void MapEditor::setMap( const std::string& name )
 
 void MapEditor::setTileset(int index,  const std::string& tileset )
 {
+	//tileset must exist
 	m_tilepicker->reload(tileset);
 	m_map->tilesets[index] = tileset;
 	m_map->reload();

@@ -188,12 +188,9 @@ namespace Graphics
 
                 Tileset* tileset = m_tilesetscache[tilesetIndex];
 
-                if(!tileset) 
-                    return;
-
                 const Rect & dest = { x*tilew, y*tileh, tilew, tileh };
-                //clear portion 
-                if ( tile == TILE_CLEAR )
+                //clear portion if clear color or null tileset
+                if (tileset == 0 || tile == TILE_CLEAR )
                 {
                     Engine::DrawTextureRect(m_texture, {0,0,0,0}, dest, true);
                 }
@@ -360,6 +357,10 @@ namespace Graphics
         if (!visible) return;
         if(!m_fontcache) return;   
         Engine::DrawTexture(m_texture, {0,0,w,h}, {x,y,w,h});
+    }
+    const Font *TextBox::getFont() 
+    { 
+        return m_fontcache; 
     }
 
     void TextBox::refresh()

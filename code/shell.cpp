@@ -176,7 +176,7 @@ void Shell::onKey(Key key, bool isDown)
 void Shell::onTick()
 {
 	m_timer += Engine::GetTimeDeltaMs()/1000.0f;
-	if (m_timer > 1.0/cursorFlickRate) 
+	if (m_timer > 1.0/CURSOR_FLICKER_RATE  ) 
 	{
 		m_cursor->visible = !m_cursor->visible;
 		m_timer = 0;

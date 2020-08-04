@@ -124,6 +124,7 @@ namespace Graphics
         //update font and refresh
         void reload();
         void draw();
+        const Font *getFont();
         
         Color textColor;
         Color fillColor;

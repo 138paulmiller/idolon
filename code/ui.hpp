@@ -132,7 +132,7 @@ namespace UI
 		
 		Color textColor;
 		
-	private:
+	protected:
 		Graphics::TextBox * m_textbox; 
 	};
 	//////////////////////////////////////////////////////////////////////////////////
@@ -182,7 +182,13 @@ namespace UI
 
 		std::string text ;
 		std::function<void()> cbAccept ;
+		//draw cursor
+		void onDraw() override;
 	private:
+		std::string m_textprev ;
+
+		float m_timer;
+		bool m_cursorVisible;
 	};
 		//////////////////////////////////////////////////////////////////////////////////
 	/*

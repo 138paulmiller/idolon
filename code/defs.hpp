@@ -48,3 +48,5 @@
 #define BORDER_COLOR WHITE
 //editor "background" color. This color should not be selectable
 #define EDITOR_COLOR Palette[17]
+
+#define CURSOR_FLICKER_RATE  3

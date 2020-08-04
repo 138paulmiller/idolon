@@ -32,7 +32,6 @@ private:
 	int m_charW, m_charH;
 	int m_w, m_h;
 
-	const int cursorFlickRate = 3;
 	//when tab is pressed, ls fills this if empty, else goes to next option
 	//if shift, goes to prev on enter this is cleared
 	int m_option;
