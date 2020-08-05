@@ -6,15 +6,6 @@
 #define TILE_SIZE_COUNT 4
 #define TILE_SIZE_MAX 16
 
-namespace 
-{
-	const int s_canvasSizes[TILE_SIZE_COUNT][2] = 
-	{
-		{ TILE_W,   TILE_H },
-		{ SPRITE_W, SPRITE_W }
-	};
-} // namespace
-
 
 TilesetEditor::TilesetEditor()
 	:Editor(
@@ -51,8 +42,6 @@ void TilesetEditor::onEnter()
 	const int tileidX =  w - m_charW * 3;
 	const int tilesetY =  m_tilepicker->rect().y - m_charH;
 	m_tileIdBox = new UI::TextButton("00", tileidX, tilesetY, idLen , 1);
-
-	m_tilepicker->resizeCursor( s_canvasSizes[0][0], s_canvasSizes[0][1] );
 
 	m_toolbar = new UI::Toolbar(this, 0, tilesetY);
 
@@ -357,24 +346,6 @@ void TilesetEditor::onKey(Key key, bool isDown)
 	{
 		switch(key)
 		{
-			case KEY_UP:
-				m_tilepicker->moveCursor(0, -1);
-				break;
-			case KEY_DOWN:
-				m_tilepicker->moveCursor(0, 1);
-				break;
-			case KEY_RIGHT:
-				m_tilepicker->moveCursor(1, 0);
-				break;
-			case KEY_LEFT:
-				m_tilepicker->moveCursor(-1, 0);
-				break;
-			case KEY_1:
-				m_tilepicker->resizeCursor( s_canvasSizes[0][0], s_canvasSizes[0][1] );
-				break;
-			case KEY_2:
-				m_tilepicker->resizeCursor( s_canvasSizes[1][0], s_canvasSizes[1][1] );
-				break;
 			case KEY_z:
 				if(m_tool == TILE_TOOL_ERASE)
 				{
@@ -396,6 +367,7 @@ void TilesetEditor::onKey(Key key, bool isDown)
 				}
 				break;
 			default:
+				m_tilepicker->handleKey(key, isDown);
 				break;
 		}
 	}

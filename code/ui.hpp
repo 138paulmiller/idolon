@@ -234,8 +234,10 @@ namespace UI
 		//get tile/frame relative to given sheet
 		Rect selection();
 		int selectionIndex();
+		int indexOf(const Rect & tile);
 		void moveCursor(int dx, int dy);
 		void resizeCursor(int w, int h);
+		void handleKey(Key key, bool isDown);
 
 		const Graphics::Tileset * tileset() const { return m_tileset; } 
 
@@ -247,6 +249,8 @@ namespace UI
 		Rect m_box;
 		const int m_scale;
 		int m_aspect;
+
+		static const int m_selectionSizes[2][2];
 	};
 
 

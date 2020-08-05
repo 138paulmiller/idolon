@@ -505,11 +505,18 @@ namespace UI
 	}
 	
 	//////////////////////////////////////////////////////////////////////////////////
+	const int TilePicker::m_selectionSizes[2][2] = 
+	{
+		{ TILE_W,   TILE_H },
+		{ SPRITE_W, SPRITE_W }
+	};
+
 	TilePicker::TilePicker()
 		:
 		m_scale(2),
 		m_tileset(0)
 	{
+		resizeCursor(m_selectionSizes[0][0], m_selectionSizes[0][0]);
 	}
 
 	TilePicker::~TilePicker()
@@ -525,7 +532,8 @@ namespace UI
 
 	int TilePicker::selectionIndex()
 	{
-		if ( !m_tileset ) return -1;
+		if ( !m_tileset ) 
+			return -1;
 		return m_tileset->id(m_cursor);
 	}
 
@@ -612,6 +620,34 @@ namespace UI
 
 		Engine::DrawRect(CURSOR_COLOR, worldCursor, false);
 
+	}
+
+	void TilePicker::handleKey(Key key, bool isDown)
+	{
+		if(!isDown) 
+			return;
+		
+		switch(key)
+		{
+			case KEY_UP:
+				moveCursor(0, -1);
+				break;
+			case KEY_DOWN:
+				moveCursor(0, 1);
+				break;
+			case KEY_RIGHT:
+				moveCursor(1, 0);
+				break;
+			case KEY_LEFT:
+				moveCursor(-1, 0);
+				break;
+			case KEY_1:
+				resizeCursor( m_selectionSizes[0][0], m_selectionSizes[0][1] );
+				break;
+			case KEY_2:
+				resizeCursor( m_selectionSizes[1][0], m_selectionSizes[1][1] );
+				break;
+		}
 	}
 
 } // namespace UI

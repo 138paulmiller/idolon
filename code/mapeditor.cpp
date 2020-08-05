@@ -224,15 +224,19 @@ void MapEditor::onKey( Key key, bool isDown )
 				}
 			}
 		break;
+		default:
+			m_tilepicker->handleKey(key, isDown);
+		break;
 	}
 
 }
 
 void MapEditor::handleTool()
 {
-	
-	const Rect & tileSrc = m_tilepicker->selection();
+	if(!m_map ) return;
+	const Rect & selection = m_tilepicker->selection();
 	const int tileId = m_tilepicker->selectionIndex();
+	const Graphics::Tileset * tileset = m_tilepicker->tileset();
 	//if pixel tool
 	switch(m_tool)
 	{
@@ -245,11 +249,22 @@ void MapEditor::handleTool()
 				{
 					//set tile
 					int tilex, tiley;
-					if ( m_map->getTileXY( cursor.x, cursor.y, tilex, tiley ) )
+					const int tilew = m_map->tilew, tileh = m_map->tileh;
+					
+					for(int dx = 0; dx < selection.w; dx+=tilew)
 					{
-						m_map->tiles[tiley * m_map->w + tilex] = tileId;
-						m_map->update( { tilex, tiley, 1, 1 } );
+						for(int dy = 0; dy < selection.h; dy+=tileh)
+						{	
+							if ( m_map->getTileXY( cursor.x+dx, cursor.y+dy, tilex, tiley ) )
+							{
+								const int id = tileset->id({ selection.x + dx, selection.y + dy, tilew, tileh });
+								m_map->tiles[tiley * m_map->w + tilex] = id;
+								printf("TILE %d %d ID : %d \n", tilex, tiley, id);
+								m_map->update( { tilex, tiley, 1, 1 } );
+							}
+						}
 					}
+					//
 				}
 			}
 		break;
@@ -292,15 +307,15 @@ void MapEditor::drawOverlay()
 			{	
 				const Rect & src = m_tilepicker->selection();
 				const int texture = m_tilepicker->tileset()->texture;
-				//Engine::Blit(texture, m_overlay->texture, src, tile);
-				//Engine::DrawTextureRect( m_overlay->texture, BORDER_COLOR, tile, false);
-				Engine::DrawTexture(texture, src, tile);
-				Engine::DrawRect(BORDER_COLOR, tile, false);
-				const int tx = tile.x * m_map->scale();
-				const int ty = tile.y * m_map->scale();
-				const int tw = tile.w * m_map->scale();
-				const int th = tile.h * m_map->scale();
-
+				const Rect dest = 
+				{ 
+					(int)(tile.x * m_map->scale()), 
+					(int)(tile.y * m_map->scale()), 
+					(int)(src.w * m_map->scale()), 
+					(int)(src.h * m_map->scale())
+				};
+				Engine::DrawTexture(texture, src, dest);
+				Engine::DrawRect(BORDER_COLOR, dest, false);
 				m_overlay->update(tile);
 			}	
 		break;
@@ -308,8 +323,6 @@ void MapEditor::drawOverlay()
 		{
 			if(tile.w != -1)
 			{	
-				const Rect & src = m_tilepicker->selection();
-				const int texture = m_tilepicker->tileset()->texture;
 				Engine::DrawTextureRect( m_overlay->texture, HIGHLIGHT, tile, true);
 				Engine::DrawTextureRect( m_overlay->texture, BORDER_COLOR, tile, false);
 				m_overlay->update(tile);

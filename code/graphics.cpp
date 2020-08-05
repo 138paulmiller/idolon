@@ -180,12 +180,10 @@ namespace Graphics
             for(int x = region.x; x < (region.x+region.w); x++)
             {
                 char tile = tiles[ y * w + x];
-                const int tilesetIndex = tile / TILE_COUNT;
+                const int tilesetIndex = floor(tile / TILE_COUNT);
                 tile = tile - tilesetIndex * TILE_COUNT;
-
-                if(tile < TILE_CLEAR || tile >= TILESET_COUNT) 
+                if(tile >= TILE_COUNT) 
                     return;
-
                 Tileset* tileset = m_tilesetscache[tilesetIndex];
 
                 const Rect & dest = { x*tilew, y*tileh, tilew, tileh };
