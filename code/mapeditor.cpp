@@ -26,12 +26,10 @@ void MapEditor::onEnter()
 	int charH = Sys::GetShell()->getFont()->charH;
 	int charW = Sys::GetShell()->getFont()->charW;
 
-
-	m_tilepicker = new UI::TilePicker();
+	m_tilesetSelection = 0;
 	m_map = Assets::Load<Graphics::Map>(m_mapName);
-	//TODO - create combox box to select tilesets  
-	const std::string tilesetName = m_mapName;
-	setTileset( 0, tilesetName );	//by default
+	m_tilepicker = new UI::TilePicker();
+	m_tilepicker->reload(m_map->tilesets[m_tilesetSelection]);
 
 	const int toolY = h - (m_tilepicker->rect().h + TILE_H);
 
@@ -43,42 +41,55 @@ void MapEditor::onEnter()
 	m_tooldata = {0,0, m_map->tilew, m_map->tileh};
 	m_tool = MAP_TOOL_PIXEL;
 
-	m_overlay = new Graphics::Tileset("TilesetEditor_Overlay", m_map->rect.w, m_map->rect.h);
+	m_overlay = new Graphics::Tileset("MapEditor_Overlay", m_map->rect.w, m_map->rect.h);
 	m_toolbar = new UI::Toolbar(this, 0, toolY);
 
 	m_toolbar->add("PIXEL", [&](){
 		m_tool = MAP_TOOL_PIXEL;                     
 	});
 	
-	//m_toolbar->add("FILL", [&](){
-	//	m_tool = MAP_TOOL_FILL;             
-	//});
+	m_toolbar->add("FILL", [&](){
+		m_tool = MAP_TOOL_FILL;             
+	});
 
 	m_toolbar->add("ERASE", [&](){
 		m_tool = MAP_TOOL_ERASE;
 		m_tooldata = { -1, -1, -1, -1, -1 ,-1 };
 	});
 
-	const int tw = 12;
-	m_tilesetInput = new UI::TextInput(tilesetName, w - tw*charW, toolY, tw, 1);
+	int tw = w - 16* charW;
+	m_tilesetSelectToolbar = new UI::Toolbar(this, tw, toolY);
+	const int border = 2;
+	for(size_t i = 0; i < TILESET_COUNT; i++)
+	{
+		m_tilesetSelectToolbar->add(std::to_string(i), [&, i](){
+			printf("USING %d\n", m_tilesetSelection);
+			this->useTileset( (m_tilesetSelection = i) );
+		}, false);
+		tw+=(charW+border*2); //left and right border
+	}	
+
+	//add two buttons
+	m_tilesetInput = new UI::TextInput(m_map->tilesets[0], tw, toolY, tw, 1);
 
 	m_tilesetInput->cbAccept = [this]()
 	{
-		this->setTileset(0, m_tilesetInput->text);
+		this->setTileset(m_tilesetSelection, m_tilesetInput->text);
 	};
 
 	//first add toolbat	
 	//add the ui widgets
+
 	App::addWidget( m_toolbar );
-
 	App::addWidget(m_tilepicker);
+	App::addWidget( m_tilesetSelectToolbar );
 	App::addButton( m_tilesetInput );
-
-	m_toolbar->get(MAP_TOOL_PIXEL)->click();
 
 	Editor::onEnter();
 
-
+	//select pixel and first tileset by default
+	m_toolbar->get(MAP_TOOL_PIXEL)->click();		
+	m_tilesetInput->cbAccept();
 /////////////// DEbug //////////////////////////
 	// const int spriteId =8 ;
 	// for(int y = SPRITE_H; y < m_map->rect.h; y+=SPRITE_H*2)
@@ -235,7 +246,6 @@ void MapEditor::handleTool()
 {
 	if(!m_map ) return;
 	const Rect & selection = m_tilepicker->selection();
-	const int tileId = m_tilepicker->selectionIndex();
 	const Graphics::Tileset * tileset = m_tilepicker->tileset();
 	//if pixel tool
 	switch(m_tool)
@@ -259,7 +269,6 @@ void MapEditor::handleTool()
 							{
 								const int id = tileset->id({ selection.x + dx, selection.y + dy, tilew, tileh });
 								m_map->tiles[tiley * m_map->w + tilex] = id;
-								printf("TILE %d %d ID : %d \n", tilex, tiley, id);
 								m_map->update( { tilex, tiley, 1, 1 } );
 							}
 						}
@@ -361,4 +370,11 @@ void MapEditor::setTileset(int index,  const std::string& tileset )
 	m_map->tilesets[index] = tileset;
 	m_map->reload();
 
+}
+
+void MapEditor::useTileset(int index )
+{
+	m_tilesetInput->text =m_map->tilesets[index]; 
+	m_tilesetInput->onUpdate();
+	m_tilepicker->reload(m_tilesetInput->text);
 }

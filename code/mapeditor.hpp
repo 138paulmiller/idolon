@@ -46,6 +46,8 @@ public:
 	//
 	void setTileset(int index, const std::string& tileset );
 
+	void useTileset(int index );
+
 	//toolbar and tilepicker. resize map
 	void hideWorkspace() ;
 
@@ -66,6 +68,9 @@ private:
 	Graphics::Map * m_map;
 	UI::TilePicker * m_tilepicker;
 	UI::Toolbar * m_toolbar;
+	//
+	UI::Toolbar * m_tilesetSelectToolbar;
+	int m_tilesetSelection;
 
 	//DEBUG
 	std::vector<Graphics::Sprite*> m_sprites;

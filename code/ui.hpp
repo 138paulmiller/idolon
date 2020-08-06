@@ -124,8 +124,8 @@ namespace UI
 	public:
 		TextButton(const std::string & text, int x, int y, int tw, int th);
 		~TextButton();
-		void onUpdate() override ;
-		void onDraw() override;
+		virtual void onUpdate() override ;
+		virtual void onDraw() override;
 		//if font is changed reload
 		void setFont(const std::string & font) ;
 		void setText(const std::string & text) ;
@@ -135,6 +135,30 @@ namespace UI
 	protected:
 		Graphics::TextBox * m_textbox; 
 	};
+	//////////////////////////////////////////////////////////////////////////////////
+	/*
+		Input
+
+	*/
+
+	class TextInput : public TextButton
+	{
+	public:
+		TextInput(const std::string & text, int x, int y, int tw, int th);
+		~TextInput();
+
+		std::string text ;
+		std::function<void()> cbAccept ;
+		//draw cursor
+		void onDraw() override;
+
+	private:
+		std::string m_textprev ;
+
+		float m_timer;
+		bool m_cursorVisible;
+	};
+
 	//////////////////////////////////////////////////////////////////////////////////
 	//TODO - text input. button on click goes into edit mode. captures key input then releases on enter or click  
 
@@ -168,29 +192,6 @@ namespace UI
 	};
 
 	//////////////////////////////////////////////////////////////////////////////////
-	/*
-		Color Selector
-			- Renders the sheet at the top-right of the screen.
-
-	*/
-
-	class TextInput : public TextButton
-	{
-	public:
-		TextInput(const std::string & text, int x, int y, int tw, int th);
-		~TextInput();
-
-		std::string text ;
-		std::function<void()> cbAccept ;
-		//draw cursor
-		void onDraw() override;
-	private:
-		std::string m_textprev ;
-
-		float m_timer;
-		bool m_cursorVisible;
-	};
-		//////////////////////////////////////////////////////////////////////////////////
 	/*
 		Color Selector
 			- Renders the sheet at the top-right of the screen.

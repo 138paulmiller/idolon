@@ -280,76 +280,7 @@ namespace UI
 		m_textbox->refresh();	
 
 	}
-	
-
-/*-------------------------------------- Toolbar -----------------------------------
-*/
-	Toolbar::Toolbar( App* parent, int x, int y )
-		:m_parent(parent), 
-		m_x(x),m_y(y),
-		m_count(0), m_xoff(0)
-	{
-		textColor  = DEFAULT_COLOR_TEXT ;
-		hoverColor = DEFAULT_COLOR_HOVER ;		
-		clickColor = DEFAULT_COLOR_CLICK;
-		fillColor  = DEFAULT_COLOR_FILL;
-		font = DEFAULT_FONT;
-	}
-	
-	Toolbar::~Toolbar()
-	{
-		for ( int id : m_buttonIds )
-			m_parent->removeButton( id );
-	}
-
-	int  Toolbar::add(const std::string & text, std::function<void()> click, bool sticky )
-	{
-		m_count++;
-		TextButton * textbutton = new TextButton(text, m_xoff, m_y, text.size(), 1);
-		m_xoff += textbutton->rect().w;
-		
-		int buttonId = m_parent->addButton( textbutton );
-		textbutton->textColor  = textColor ;
-		textbutton->hoverColor = hoverColor;
-		textbutton->clickColor = clickColor;
-		textbutton->fillColor  = fillColor ;
-		textbutton->sticky = sticky ;
-		textbutton->setFont(font);
-		//perhaps avoidable
-		textbutton->cbClick = [this, buttonId, click] () 
-		{ 
-			//unclick all others
-			for ( int i = 0; i < m_buttonIds.size(); i++ )
-			{
-				int id = m_buttonIds[i];
-				if(id != buttonId && m_parent->getButton(id)->isDown())  
-					m_parent->getButton(i)->reset();		
-			}
-			click();
-		} ;
-		m_buttonIds.push_back(buttonId);
-		return m_buttonIds.size()-1;
-	}
-
-	void  Toolbar::remove(int id)
-	{
-		m_parent->removeButton(m_buttonIds[id]);
-	}
-
-	Button *  Toolbar::get(int id)
-	{
-		ASSERT(id >= 0 && id < m_buttonIds.size(), "Toolbar Invalid Id");
-		return m_parent->getButton(m_buttonIds[id]);
-	}
-
-	void Toolbar::onUpdate()
-	{
-	}
-	void Toolbar::onDraw()
-	{}
-
-	
-//----------------------------- Input -----------------------------------------------
+	//----------------------------- Input -----------------------------------------------
 	TextInput::TextInput(const std::string & text, int x, int y, int tw, int th )
 		:TextButton(text, x, y, tw, th)
 		
@@ -427,7 +358,77 @@ namespace UI
 			}
 		}
 	}
+
+
+/*-------------------------------------- Toolbar -----------------------------------
+*/
+	Toolbar::Toolbar( App* parent, int x, int y )
+		:m_parent(parent), 
+		m_x(x),m_y(y),
+		m_count(0), m_xoff(0)
+	{
+		textColor  = DEFAULT_COLOR_TEXT ;
+		hoverColor = DEFAULT_COLOR_HOVER ;		
+		clickColor = DEFAULT_COLOR_CLICK;
+		fillColor  = DEFAULT_COLOR_FILL;
+		font = DEFAULT_FONT;
+	}
+	
+	Toolbar::~Toolbar()
+	{
+		for ( int id : m_buttonIds )
+			m_parent->removeButton( id );
+	}
+
+	int  Toolbar::add(const std::string & text, std::function<void()> click, bool sticky )
+	{
+		m_count++;
+		TextButton * textbutton = new TextButton(text, m_x+m_xoff, m_y, text.size(), 1);
+		m_xoff += textbutton->rect().w;
+		
+		int buttonId = m_parent->addButton( textbutton );
+		textbutton->textColor  = textColor ;
+		textbutton->hoverColor = hoverColor;
+		textbutton->clickColor = clickColor;
+		textbutton->fillColor  = fillColor ;
+		textbutton->sticky = sticky ;
+		textbutton->setFont(font);
+		//perhaps avoidable
+		textbutton->cbClick = [this, buttonId, click] () 
+		{ 
+			//unclick all others
+			for ( int i = 0; i < m_buttonIds.size(); i++ )
+			{
+				int id = m_buttonIds[i];
+				if(id != buttonId && m_parent->getButton(id)->isDown())  
+					m_parent->getButton(i)->reset();		
+			}
+			click();
+		} ;
+		m_buttonIds.push_back(buttonId);
+		return m_buttonIds.size()-1;
+	}
+
+	void  Toolbar::remove(int id)
+	{
+		m_parent->removeButton(m_buttonIds[id]);
+	}
+
+	Button *  Toolbar::get(int id)
+	{
+		ASSERT(id >= 0 && id < m_buttonIds.size(), "Toolbar Invalid Id");
+		return m_parent->getButton(m_buttonIds[id]);
+	}
+
+	void Toolbar::onUpdate()
+	{
+	}
+	void Toolbar::onDraw()
+	{}
+
+	
 	//////////////////////////////////////////////////////////////////////////////////
+
 	ColorPicker::ColorPicker(int x, int y)
 	{
 		static int colorPickerId = 0;

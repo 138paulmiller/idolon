@@ -16,7 +16,7 @@ bool operator==(const CommandDesc& lhs, const CommandDesc& rhs)
 	return lhs.name == rhs.name;
 }
 
-std::size_t CommandDescHash::operator()(const CommandDesc& desc) const
+std::size_t CommandDesc::Hash::operator()(const CommandDesc& desc) const
 {
 	return std::hash<std::string>()(desc.name);
 }
