@@ -1,6 +1,9 @@
 # idolon
 A fantasy system.  
 
+## Game API
+
+
 ### Development
 -----
 1. Download the source using git
@@ -20,3 +23,5 @@ A fantasy system.
 -----
 v0.0
 ![](./data/gifs/v0_tileset_edit_demo_0.gif)
+![](./data/screenshots/v0.0_mapeditor.png)
+![](./data/screenshots/v0.0_console.png)
