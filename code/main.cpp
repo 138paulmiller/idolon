@@ -173,7 +173,7 @@ std::string SystemAssetPath(const std::string & name )
 template <typename Type>
 std::string UserAssetPath(const std::string & name )
 {
-	return FS::Cwd() + (name + Assets::GetAssetTypeExt<Type>());
+	return FS::Cwd() + "/" + (name + Assets::GetAssetTypeExt<Type>());
 }
 
 void PrintHelp(const Args& args)
