@@ -202,7 +202,6 @@ void MapEditor::onKey( Key key, bool isDown )
 	}
 	switch(key)
 	{
-
 		case KEY_MINUS:
 			//zoom in
 			m_map->zoomTo(1.f/2, pixelx , pixely);
@@ -260,14 +259,21 @@ void MapEditor::handleTool()
 					//set tile
 					int tilex, tiley;
 					const int tilew = m_map->tilew, tileh = m_map->tileh;
-					
+
+					//for each tile in selection
 					for(int dx = 0; dx < selection.w; dx+=tilew)
 					{
 						for(int dy = 0; dy < selection.h; dy+=tileh)
 						{	
-							if ( m_map->getTileXY( cursor.x+dx, cursor.y+dy, tilex, tiley ) )
+							const int mapx = cursor.x+dx/m_map->scale();
+							const int mapy = cursor.y+dy/m_map->scale();
+							if ( m_map->getTileXY( mapx, mapy, tilex, tiley ) )
 							{
-								const int id = tileset->id({ selection.x + dx, selection.y + dy, tilew, tileh });
+								const int id = tileset->id({ 
+										selection.x + dx, selection.y + dy, 
+										m_map->tilew, m_map->tileh 
+								});
+
 								m_map->tiles[tiley * m_map->w + tilex] = id;
 								m_map->update( { tilex, tiley, 1, 1 } );
 							}
@@ -318,10 +324,10 @@ void MapEditor::drawOverlay()
 				const int texture = m_tilepicker->tileset()->texture;
 				const Rect dest = 
 				{ 
-					(int)(tile.x * m_map->scale()), 
-					(int)(tile.y * m_map->scale()), 
-					(int)(src.w * m_map->scale()), 
-					(int)(src.h * m_map->scale())
+					(int)(tile.x), 
+					(int)(tile.y), 
+					(int)(src.w / m_map->scale()), 
+					(int)(src.h / m_map->scale())
 				};
 				Engine::DrawTexture(texture, src, dest);
 				Engine::DrawRect(BORDER_COLOR, dest, false);
