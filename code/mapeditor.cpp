@@ -1,6 +1,7 @@
-#include "pch.hpp"
+
 
 #include "mapeditor.hpp"
+#include "sys.hpp"
 
 
 /*
@@ -23,8 +24,11 @@ void MapEditor::onEnter()
 	LOG("Entering map editor ... \n");
 	int w,h;
 	Engine::GetSize(w,h);
-	int charH = Sys::GetShell()->getFont()->charH;
-	int charW = Sys::GetShell()->getFont()->charW;
+
+	const std::string &fontName = DEFAULT_FONT;
+	Graphics::Font * font = Assets::Load<Graphics::Font>(DEFAULT_FONT);
+	const int charW = font->charW;
+	const int charH = font->charH;
 
 	m_tilesetSelection = 0;
 	m_map = Assets::Load<Graphics::Map>(m_mapName);
@@ -43,6 +47,7 @@ void MapEditor::onEnter()
 
 	m_overlay = new Graphics::Tileset("MapEditor_Overlay", m_map->rect.w, m_map->rect.h);
 	m_toolbar = new UI::Toolbar(this, 0, toolY);
+	m_toolbar->font = fontName;
 
 	m_toolbar->add("PIXEL", [&](){
 		m_tool = MAP_TOOL_PIXEL;                     
@@ -59,18 +64,18 @@ void MapEditor::onEnter()
 
 	int tw = w - 16* charW;
 	m_tilesetSelectToolbar = new UI::Toolbar(this, tw, toolY);
+	m_toolbar->font = fontName;
+
 	const int border = 2;
 	for(size_t i = 0; i < TILESET_COUNT; i++)
 	{
 		m_tilesetSelectToolbar->add(std::to_string(i), [&, i](){
-			printf("USING %d\n", m_tilesetSelection);
 			this->useTileset( (m_tilesetSelection = i) );
 		}, false);
 		tw+=(charW+border*2); //left and right border
 	}	
-
 	//add two buttons
-	m_tilesetInput = new UI::TextInput(m_map->tilesets[0], tw, toolY, tw, 1);
+	m_tilesetInput = new UI::TextInput(m_map->tilesets[0], tw, toolY, tw, 1, fontName);
 
 	m_tilesetInput->cbAccept = [this]()
 	{

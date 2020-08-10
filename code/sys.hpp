@@ -3,14 +3,10 @@
 	This is the primary interace to the system. All apps should 
 
 */
-#include "fs.hpp"
-#include "shell.hpp"
-#include "engine.hpp"
-#include "editor.hpp"
+#include "config.hpp"
 #include "algo.hpp"
-#include "assets.hpp"
-#include "commands.hpp"
-#include "graphics.hpp"
+#include "shell.hpp"
+#include "ui/api.hpp"
 
 enum : uint8
 {
@@ -29,4 +25,9 @@ namespace Sys
 	const std::string& AssetPath();
 	Shell* GetShell();
 	Context* GetContext();
+
+	//Actions
+	void RunTilesetEditor(const std::string & tilesetName);
+	void RunMapEditor(const std::string & mapName);
+
 }

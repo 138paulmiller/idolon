@@ -1,6 +1,5 @@
 #pragma once
-#include "sys.hpp"
-#include "editor.hpp"
+#include "ui/api.hpp"
 
 //TileTools
 enum TileToolMode : char

@@ -1,7 +1,8 @@
 #pragma once
 
-#include "ui.hpp"
-#include "commands.hpp"
+#include "ui/api.hpp"
+#include "config.hpp"
+
 
 class Shell : public UI::App 
 {

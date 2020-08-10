@@ -1,4 +1,5 @@
-#include "pch.hpp"
+
+#include "sys.hpp"
 #include "tileseteditor.hpp"
 #include <iostream>
 
@@ -25,9 +26,11 @@ void TilesetEditor::onEnter()
 	m_revision = -1;
 	m_tileset = Assets::Load<Graphics::Tileset>(m_tilesetName);
 	
-	
-	m_charW = Sys::GetShell()->getFont()->charW;
-	m_charH = Sys::GetShell()->getFont()->charH;
+
+	const std::string &fontName = DEFAULT_FONT;
+	Graphics::Font * font = Assets::Load<Graphics::Font>(DEFAULT_FONT);
+	m_charW = font->charW;
+	m_charH = font->charH;
 
 	int w, h;
 	Engine::GetSize(w, h);
@@ -41,10 +44,11 @@ void TilesetEditor::onEnter()
 	const int idLen  = 3;
 	const int tileidX =  w - m_charW * 3;
 	const int tilesetY =  m_tilepicker->rect().y - m_charH;
-	m_tileIdBox = new UI::TextButton("00", tileidX, tilesetY, idLen , 1);
+	m_tileIdBox = new UI::TextButton("00", tileidX, tilesetY, idLen , 1, fontName );
 
 	m_toolbar = new UI::Toolbar(this, 0, tilesetY);
-
+	m_toolbar->font = fontName; 
+	
 	m_toolbar->add("PIXEL", [&](){
 		m_tool = TILE_TOOL_PIXEL;                     
 	});
@@ -159,7 +163,7 @@ void TilesetEditor::onTick()
 			switch(m_tool)
 			{
 			case TILE_TOOL_FILL:
-				FloodFill(m_tileset->pixels, m_tileset->w, tileSrc, color, sheetx, sheety);
+				FloodFill( m_tileset->pixels, m_tileset->w, { tileSrc.x, tileSrc.y, tileSrc.w, tileSrc.h }, color, sheetx, sheety );
 				commit();
 				break;
 			case TILE_TOOL_ERASE:

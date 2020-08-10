@@ -1,7 +1,5 @@
 #pragma once 
 
-#include "pch.hpp"
-
 #include <queue>
 #include <cmath>
 
@@ -56,15 +54,23 @@ void LineBresenham(Data *data, int stride, int x1, int y1, int x2, int y2, const
     }
 }
 
+struct Bounds
+{
+	int x;
+	int y;
+	int w;
+	int h;
+};
+
 template<typename Data>
-void FloodFill(Data * data, int stride, const Rect & region, const Data & target, int x, int y )
+void FloodFill(Data * data, int stride, const Bounds & region, const Data & target, int x, int y )
 {
 	struct Cell
 	{
 		int x;
 		int y;
 	};
-	Color old = data[y * stride + x]; 
+	Data old = data[y * stride + x]; 
 	if(old == target) return;
 
 	data[y * stride + x] = target;

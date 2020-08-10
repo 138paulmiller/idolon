@@ -1,7 +1,6 @@
-#include "pch.hpp"
 
-#include "mapeditor.hpp"
-#include "tileseteditor.hpp"
+
+#include "sys.hpp"
 
 void PrintHelp(const Args& args);
 void ImportAsset(const Args& args);
@@ -9,13 +8,13 @@ void NewAsset(const Args& args);
 void EditAsset(const Args& args);
 
 
-#define SysLog(msg) Sys::GetShell()->log(msg);
+#define SHELL_LOG(msg) Sys::GetShell()->log(msg);
 
 
 //TODO - handle error more elegantly. Throw exception with msg ? Log mesage to shell ? with usage. 
-#define ARG_NONEMPTY(args) if(args.size() <= 0  ) { SysLog("Missing arguments"); return; }
-#define ARG_RANGE(args, min, max) if(args.size() < min || args.size() > max ) { SysLog("Incorrect argument range"); return; }
-#define ARG_COUNT(args, i) if(args.size() != i ){ SysLog("Incorrect number of arguments"); return; }
+#define ARG_NONEMPTY(args) if(args.size() <= 0  ) { SHELL_LOG("Missing arguments"); return; }
+#define ARG_RANGE(args, min, max) if(args.size() < min || args.size() > max ) { SHELL_LOG("Incorrect argument range"); return; }
+#define ARG_COUNT(args, i) if(args.size() != i ){ SHELL_LOG("Incorrect number of arguments"); return; }
 
 /*
 	load <game>.game
@@ -75,7 +74,7 @@ static const CommandTable & g_cmds =
 				FS::Ls(files);
 			
 			for (const std::string& file : files)
-				SysLog(file);
+				SHELL_LOG(file);
 		} 
 	},
 	{
@@ -84,14 +83,14 @@ static const CommandTable & g_cmds =
 		{ 
 			ARG_COUNT(args, 1); // 	
 			if (!FS::Cd(args[0]))
-				SysLog("Directory does not exist");
+				SHELL_LOG("Directory does not exist");
 		} 
 	},
 	{
 		{ "cwd", "print current path"}, 
 		[](Args args)
 		{ 
-			SysLog(FS::Cwd());
+			SHELL_LOG(FS::Cwd());
 		} 
 	},
 	{
@@ -100,7 +99,7 @@ static const CommandTable & g_cmds =
 		{ 
 			ARG_COUNT(args, 1); // 	
 			if (!FS::MkDir(args[0]))
-				SysLog("Could not create directory");
+				SHELL_LOG("Could not create directory");
 		} 
 	},
 	{
@@ -109,7 +108,7 @@ static const CommandTable & g_cmds =
 		{ 
 			ARG_COUNT(args, 1); // 	
 			if (!FS::Remove(args[0]))
-				SysLog("Failed to remove path");
+				SHELL_LOG("Failed to remove path");
 		} 
 	},
 	{
@@ -119,7 +118,7 @@ static const CommandTable & g_cmds =
 			ARG_COUNT(args, 2); // 
 			
 			if (!FS::Move(args[0], args[1]))
-				SysLog("Failed to move");
+				SHELL_LOG("Failed to move");
 		} 
 	},
 	//if running game, add all sub-directories as search dir for assets
@@ -185,7 +184,7 @@ void PrintHelp(const Args& args)
 	else 
 		HelpAll(g_cmds, out);
 	Sys::GetShell()->clear();
-	SysLog(out);
+	SHELL_LOG(out);
 }
 
 // -------------- Convert raw to asset ------------------------
@@ -281,7 +280,6 @@ void NewAsset(const Args& args)
 
 void EditAsset(const Args& args)
 {			
-	
 	//edit <asset>   
 	ARG_COUNT(args, 1);
 	//clear previous asset paths
@@ -293,19 +291,15 @@ void EditAsset(const Args& args)
 	const std::string& name = FS::BaseName(args[0]);
 	if(ext == Assets::GetAssetTypeExt<Graphics::Tileset>())
 	{
-		Sys::GetContext()->app<TilesetEditor>(APP_TILESET_EDITOR)->setTileset(name);
-		Sys::GetContext()->enter(APP_TILESET_EDITOR);
+		Sys::RunTilesetEditor(name);
 	}
 	else if(ext == Assets::GetAssetTypeExt<Graphics::Map>())
 	{
-		Sys::GetContext()->app<MapEditor>(APP_MAP_EDITOR)->setMap(name);
-		Sys::GetContext()->enter(APP_MAP_EDITOR);
+		Sys::RunMapEditor(name);
 	}
 	else if(ext == Assets::GetAssetTypeExt<Graphics::Font>())
 	{
 		//load font as tls
-		//Sys::GetContext()->app<TilesetEditor>(APP_TILESET_EDITOR)->setTileset(name);
-		//Sys::GetContext()->enter(APP_TILESET_EDITOR);
 	}
 }
 

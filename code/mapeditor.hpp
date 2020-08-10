@@ -1,6 +1,5 @@
 #pragma once
-#include "sys.hpp"
-#include "editor.hpp"
+#include "ui/api.hpp"
 /*
 	TODO - Show hide tile editor and toolbar
 	add collision shapes with ids. 

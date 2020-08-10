@@ -1,11 +1,5 @@
-#include "pch.hpp"
 
-#include "fs.hpp"
 #include "shell.hpp"
-#include "engine.hpp"
-#include "assets.hpp"
-#include "graphics.hpp"
-
 #include <sstream>
 
 #define SHELL_PREFIXSIZE sizeof(SHELL_PREFIX)-1
@@ -30,7 +24,7 @@ void Shell::onEnter()
 	m_charW = m_font->charW;
 	m_charH = m_font->charH;
 
-	m_cursor = new Graphics::TextBox(1, 1, " ");
+	m_cursor = new Graphics::TextBox(1, 1, " ", m_fontName);
 	m_cursor->font = m_fontName ;
 	m_cursor->filled = true;
 	m_cursor->fillColor = WHITE ;
@@ -40,12 +34,12 @@ void Shell::onEnter()
 	//space for input line 
 	m_lineH = m_h / m_charH - 1;
 
-	m_input = new Graphics::TextBox(m_lineW, 1, SHELL_PREFIX);
+	m_input = new Graphics::TextBox(m_lineW, 1, SHELL_PREFIX, m_fontName);
 	m_input->font = m_fontName ;    
 	m_input->reload();
 
 	//draw buffer as the entire background. last line is rendered but never filled
-	m_buffer = new Graphics::TextBox(m_lineW, m_lineH+1, "");
+	m_buffer = new Graphics::TextBox(m_lineW, m_lineH+1, "",m_fontName );
 	m_buffer->font = m_fontName ;
 	m_buffer->x = 0;
 	m_buffer->y = 0; 
