@@ -1,5 +1,5 @@
 # idolon
-A fantasy system.  
+An emulator for a nonexistent console  
 
 ## Game API
 
@@ -20,8 +20,7 @@ A fantasy system.
 2. Open the solution using VS2019 `idolon.sln`
 3. To build and run, select *Local Windows Debugger*
 
------
-v0.0
-![](./data/gifs/v0_tileset_edit_demo_0.gif)
-![](./data/screenshots/v0.0_mapeditor.png)
-![](./data/screenshots/v0.0_console.png)
+## Logs 
+
+##### v0.0
+<img src="./data/screenshots/v0.0_mapeditor.png" width="256" height="256"> <img src="./data/gifs/v0_tileset_edit_demo_0.gif" width="256" height="256">
