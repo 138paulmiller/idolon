@@ -1,11 +1,12 @@
 # idolon
-An emulator for a nonexistent console  
+An emulator for a nonexistent system  
 
-## Game API
+### Installation
+
+### Game API
 
 
 ### Development
------
 1. Download the source using git
 `git clone https://github.com/138paulmiller/idolon.git`
 2. Navigate to project root
