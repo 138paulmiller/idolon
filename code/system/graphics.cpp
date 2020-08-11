@@ -5,7 +5,6 @@
 #include "graphics.hpp"
 
 #include <sstream>
-#include <cstring>
 
 namespace Graphics
 {

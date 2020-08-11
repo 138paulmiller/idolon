@@ -3,6 +3,7 @@
 #include "ui/api.hpp"
 #include "config.hpp"
 
+#include <list>
 
 class Shell : public UI::App 
 {

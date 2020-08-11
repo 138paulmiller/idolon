@@ -2,6 +2,7 @@
 
 #include <queue>
 #include <cmath>
+#include <cstdlib>
 
 template<typename Data>
 void LineBresenham(Data *data, int stride, int x1, int y1, int x2, int y2, const Data & target)

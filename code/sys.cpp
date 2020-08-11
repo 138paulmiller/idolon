@@ -46,9 +46,14 @@ namespace Sys
 			[&] ( Key key, bool isDown )
 			{
 				if ( isDown && key == KEY_ESCAPE )
+				{	
+					s_context->app()->signal( APP_CODE_CONTINUE );
 					s_context->exit();
+				}
 				else
+				{
 					s_context->handleKey( key, isDown );
+				}
 			}
 		);
 		//boot into shell
@@ -106,7 +111,8 @@ print("Mouse:%s" % (mouse))
 				Sys::Shutdown();
 				break;
 			case APP_CODE_EXIT:
-				//set current back to conitnue so can reenter
+				//cannot exit shell.
+				//set current back to continue so can reenter
 				s_context->app()->signal( APP_CODE_CONTINUE );
 				s_context->exit();
 				break;
