@@ -1,4 +1,4 @@
-# idolon
+# idolon [WIP]
 An emulator for a nonexistent system  
 
 ### Installation
