@@ -1,12 +1,12 @@
 #pragma once
 
-#include "ui.hpp"
+#include "context.hpp"
 
 /*
 	Primary Editor interface. 
 */
 
-class Editor : public UI::App
+class Editor : public App
 {
 public:
 	Editor(uint8 support = 0);

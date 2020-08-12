@@ -5,7 +5,7 @@
 
 #include <list>
 
-class Shell : public UI::App 
+class Shell : public App 
 {
 public:
 	Shell();

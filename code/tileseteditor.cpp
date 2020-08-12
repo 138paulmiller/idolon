@@ -90,7 +90,6 @@ void TilesetEditor::onEnter()
 void TilesetEditor::onExit()
 {	//allow for reloading data
 	Assets::Unload<Graphics::Tileset>(m_tilesetName );
-	m_tilesetName = "";
 	//remove all ui Widgets/buttons. do not manually delete
 	App::clear();
 	for(Color * colors : m_revisionData)

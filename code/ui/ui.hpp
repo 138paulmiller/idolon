@@ -7,7 +7,8 @@
 #define CURSOR_COLOR Palette[25]
 #define BORDER_COLOR WHITE
 
-//Classes that can be used by UI "pages"
+//Classes that can be used by UI 
+class App;
 namespace Graphics 
 {
 	class Font;
@@ -33,6 +34,7 @@ enum AppSupport
 	APP_UNDO,
 	APP_REDO,
 };
+
 
 
 namespace UI
@@ -83,45 +85,6 @@ namespace UI
 		bool m_isDown;
 	};
 	
-	//////////////////////////////////////////////////////////////////////////////////
-
-	class App
-	{
-	public:
-		App();
-		virtual ~App();
-		virtual void onEnter() = 0;
-		virtual void onExit() = 0;
-		virtual void onTick() = 0;
-		virtual void onKey(Key key, bool isDown) = 0;
-							
-	
-		void signal(AppCode code);
-		AppCode status();
-
-		void update();
-		void draw();
-
-		void clear();
-
-		int addWidget(Widget * widget);
-		int addButton(Button * button);
-	
-		Button * getButton(int idx);
-		Widget * getWidget(int idx);
-
-		int getButtonCount();
-		int getWidgetCount();
-
-		void removeButton(int idx);
-		void removeWidget(int idx);
-	
-	private:
-		AppCode m_status;
-		std::vector<Widget*> m_widgets;
-		std::vector<Button*> m_buttons;
-	};
-
 	
 	//////////////////////////////////////////////////////////////////////////////////
 	class TextButton : public Button
