@@ -5,7 +5,7 @@
 #define PYTHON_BINDINGS \
 	ADD_PYTHON_BINDING(idolon, mouse, "Get mouse object")
 
-
+//----------------------- Add bindings ----------------------------------------------
 DEF_PYTHON_BINDING(idolon, mouse)
 {
 	static int x = 0;

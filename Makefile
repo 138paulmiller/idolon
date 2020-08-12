@@ -4,7 +4,7 @@ CXX = clang++
 PYTHON = python-3.4
 # -H 
 FLAGS =-std=c++14  -O2 -Wall 
-SRC = $(wildcard $(CODE)/*.cpp) $(wildcard $(CODE)/system/*.cpp) $(wildcard $(CODE)/ui/*.cpp) $(wildcard $(CODE)/scripting/*.cpp)
+SRC = $(wildcard $(CODE)/*.cpp) $(wildcard $(CODE)/**/*.cpp) 
 LIB_INC = -I$(CODE)/external $(shell pkg-config $(PYTHON) --cflags)
 LIB = -lm -ldl -lSDL2 $(shell pkg-config $(PYTHON) --libs)
 #PCH = $(CODE)/pch.hpp

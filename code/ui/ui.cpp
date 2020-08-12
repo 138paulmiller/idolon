@@ -161,13 +161,17 @@ namespace UI
 	{	
 		for(Widget * widget : m_widgets)
 		{
-			if(widget)
+			if(widget && !widget->hidden)
+			{
 				widget->onDraw();
+			}
 		}
 		for(Button * button : m_buttons)
 		{
-			if(button)
+			if(button && !button->hidden)
+			{
 				button->onDraw();
+			}	
 		}
 	}
 
@@ -404,6 +408,8 @@ namespace UI
 		} ;
 		m_buttonIds.push_back(buttonId);
 		return m_buttonIds.size()-1;
+		m_prevHidden = hidden;
+
 	}
 
 	void  Toolbar::remove(int id)
@@ -419,6 +425,14 @@ namespace UI
 
 	void Toolbar::onUpdate()
 	{
+		if(	m_prevHidden != hidden)
+		{
+			for(int i = 0; i < m_buttonIds.size(); i++)
+			{
+				get(i)->hidden = hidden;
+			}
+			m_prevHidden = hidden;
+		}
 	}
 	void Toolbar::onDraw()
 	{}

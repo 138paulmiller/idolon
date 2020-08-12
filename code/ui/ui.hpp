@@ -1,6 +1,6 @@
 #pragma once
-#include "../system/api.hpp"
 
+#include "../engine/api.hpp"
 
 //editor "background" color. 
 #define EDITOR_COLOR Palette[17]
@@ -44,6 +44,7 @@ namespace UI
 		virtual ~Widget() = default;
 		virtual void onUpdate() = 0;
 		virtual void onDraw() = 0;
+		bool hidden = false;
 	};
 	
 	//////////////////////////////////////////////////////////////////////////////////
@@ -192,6 +193,8 @@ namespace UI
 		int m_xoff;
 		int m_x, m_y;
 		std::vector<int> m_buttonIds;
+		//if hiden changes
+		bool m_prevHidden;
 
 	};
 

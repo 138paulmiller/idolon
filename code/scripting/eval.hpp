@@ -37,4 +37,6 @@ namespace Eval
 	void Execute(const std::string & code);
 	//game calls update and draw. Uses ret type to parse return
 	bool Call(const std::string & func, const std::vector<TypedArg> & args, TypedArg & ret);
+	void Test();
+	
 }

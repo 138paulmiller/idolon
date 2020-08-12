@@ -14,7 +14,7 @@ namespace
 	std::unordered_map<std::string, PyObject* > s_fileToModule;
 	std::unordered_map<std::string, PyObject* > s_funcs;
 
-	#include "bindings.inl"
+	#include "pybindings.inl"
 	/*
 	const char * name, //name of the method
 	PyCFunction method //pointer to the C implementation PyObject* name(PyObject *self, PyObject *args)
@@ -206,5 +206,25 @@ namespace Eval
 	        return 0;
 	    }
 		return 1;
+	}
+	void Test()
+	{
+		Eval::Execute(
+			R"(
+from time import time,ctime
+
+print('Today is', ctime(time()))
+
+import idolon as I
+
+mouse = I.mouse()
+print("Mouse:%s" % (mouse))
+	   	)" );
+		//import test py functions
+		Eval::Compile( "game" );
+
+		TypedArg ret( ARG_STRING );
+		Eval::Call( "multiply", { 3, 2 }, ret );
+		LOG( "Call returned %s\n", ret.value.s );
 	}
 } // namespace Eval

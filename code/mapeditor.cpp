@@ -34,12 +34,8 @@ void MapEditor::onEnter()
 	m_map = Assets::Load<Graphics::Map>(m_mapName);
 	m_tilepicker = new UI::TilePicker();
 	m_tilepicker->reload(m_map->tilesets[m_tilesetSelection]);
-
+	
 	const int toolY = h - (m_tilepicker->rect().h + TILE_H);
-
-	m_map->rect = { 0, TILE_H, w, toolY - TILE_H };
-	//reset view
-   	m_map->zoomTo(1.0, 0, 0 );
 
 	//TODO - text edit to set tileset
 	m_tooldata = {0,0, m_map->tilew, m_map->tileh};
@@ -52,10 +48,11 @@ void MapEditor::onEnter()
 	m_toolbar->add("PIXEL", [&](){
 		m_tool = MAP_TOOL_PIXEL;                     
 	});
-	
-	m_toolbar->add("FILL", [&](){
-		m_tool = MAP_TOOL_FILL;             
-	});
+	//TODO - fill tiles
+
+	//m_toolbar->add("FILL", [&](){
+	//	m_tool = MAP_TOOL_FILL;             
+	//});
 
 	m_toolbar->add("ERASE", [&](){
 		m_tool = MAP_TOOL_ERASE;
@@ -69,14 +66,17 @@ void MapEditor::onEnter()
 	const int border = 2;
 	for(size_t i = 0; i < TILESET_COUNT; i++)
 	{
-		m_tilesetSelectToolbar->add(std::to_string(i), [&, i](){
-			this->useTileset( (m_tilesetSelection = i) );
-		}, false);
+		m_tilesetSelectToolbar->add(
+			std::to_string(i), 
+			[&, i](){
+				this->useTileset( (m_tilesetSelection = i) );
+			}, 
+			false
+		);
 		tw+=(charW+border*2); //left and right border
 	}	
 	//add two buttons
 	m_tilesetInput = new UI::TextInput(m_map->tilesets[0], tw, toolY, tw, 1, fontName);
-
 	m_tilesetInput->cbAccept = [this]()
 	{
 		this->setTileset(m_tilesetSelection, m_tilesetInput->text);
@@ -95,6 +95,9 @@ void MapEditor::onEnter()
 	//select pixel and first tileset by default
 	m_toolbar->get(MAP_TOOL_PIXEL)->click();		
 	m_tilesetInput->cbAccept();
+
+	showWorkspace();
+
 /////////////// DEbug //////////////////////////
 	// const int spriteId =8 ;
 	// for(int y = SPRITE_H; y < m_map->rect.h; y+=SPRITE_H*2)
@@ -153,8 +156,10 @@ void MapEditor::onTick()
 	// {
 	// 	sprite->draw();
 	// }	
-
-	drawOverlay();
+	if(!m_workspaceHidden)
+	{
+		drawOverlay();
+	}
 
 }
 
@@ -207,14 +212,14 @@ void MapEditor::onKey( Key key, bool isDown )
 	}
 	switch(key)
 	{
-		case KEY_MINUS:
+		case KEY_a:
 			//zoom in
 			m_map->zoomTo(1.f/2, pixelx , pixely);
 			m_map->update();
 
 		break;
 
-		case KEY_EQUALS:
+		case KEY_s:
 			//zoom in
 			m_map->zoomTo(2.f, pixelx, pixely);
 			m_map->update();
@@ -238,6 +243,12 @@ void MapEditor::onKey( Key key, bool isDown )
 					m_tooldata.h++;
 				}
 			}
+		break;
+		case KEY_h:
+			if(m_workspaceHidden)
+				showWorkspace();
+			else
+				hideWorkspace();
 		break;
 		default:
 			m_tilepicker->handleKey(key, isDown);
@@ -385,7 +396,39 @@ void MapEditor::setTileset(int index,  const std::string& tileset )
 
 void MapEditor::useTileset(int index )
 {
-	m_tilesetInput->text =m_map->tilesets[index]; 
-	m_tilesetInput->onUpdate();
+	printf("Using %d %s\n",index, m_map->tilesets[index].c_str());
+	m_tilesetInput->setText( m_map->tilesets[index]); 
 	m_tilepicker->reload(m_tilesetInput->text);
+}
+
+//toolbar and tilepicker. resize map
+void MapEditor::hideWorkspace() 
+{
+	int w,h;
+	Engine::GetSize(w,h);
+	m_workspaceHidden = true;
+	m_map->rect = { 0, TILE_H, w, h };
+	//reset view
+   	m_map->zoomTo(1.0, 0, 0 );
+   	m_tilepicker->hidden = true;
+   	m_toolbar->hidden = true;
+	m_tilesetInput->hidden = true;
+	m_tilesetSelectToolbar->hidden = true;
+}
+
+void MapEditor::showWorkspace()
+{
+	int w,h;
+	Engine::GetSize(w,h);
+	m_workspaceHidden = false;
+	const int toolY = h - (m_tilepicker->rect().h + TILE_H);
+
+	m_map->rect = { 0, TILE_H, w, toolY - TILE_H };
+   	m_map->zoomTo(1.0, 0, 0 );
+
+   	m_tilepicker->hidden = false;
+   	m_toolbar->hidden = false;
+	m_tilesetInput->hidden = false;
+	m_tilesetSelectToolbar->hidden = false;
+
 }

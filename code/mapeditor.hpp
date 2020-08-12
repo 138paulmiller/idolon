@@ -49,6 +49,7 @@ public:
 
 	//toolbar and tilepicker. resize map
 	void hideWorkspace() ;
+	void showWorkspace() ;
 
 	void drawOverlay() ;
 
@@ -78,6 +79,7 @@ private:
 	int m_prevmx,m_prevmy;
 
 	bool m_shift = false;
+	bool m_workspaceHidden = false;
 	//load 4 tiles ! 
 	MapToolMode m_tool;
 	//rect used by tool
