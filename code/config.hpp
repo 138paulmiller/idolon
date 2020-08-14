@@ -12,3 +12,5 @@
 #define SHELL_PREFIX ">"
 #define DEFAULT_FONT "default"
 #define FPS_STAT_RATE  5.f 
+#define GAME_API_UPDATE "update"
+#define GAME_API_INIT "draw"

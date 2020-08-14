@@ -33,7 +33,7 @@ namespace  Game
 		char * m_data;
 	};
 
-	void Startup(const std::string & cartpath);
+	void Startup(const std::string & gameName);
 	GameState Run();
 	void Shutdown();
 

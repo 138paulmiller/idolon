@@ -1,5 +1,4 @@
 #include "game.hpp"
-
 namespace 
 {
 
@@ -48,8 +47,9 @@ namespace Game
 
 	}	
 
-	void Startup(const std::string & cartpath)
+	void Startup(const std::string & gameName)
 	{
+		//load cart asset 
 		s_sm = new SpriteManager();
 		s_spritesheet = "";
 		
@@ -58,6 +58,10 @@ namespace Game
 			s_mapsEnabled[i] = 0;
 			s_maps[i] = 0;
 		}
+		//load cart
+		const std::string sourcefile = ""; 
+		//compile game code
+//		Eval::Compile(sourcefile);
 
 	}
 
@@ -66,6 +70,7 @@ namespace Game
 	{
 		//handle collisions. dispatch events
 		//update game state 
+		//handle return state RUN, EXIT, PAUSE
 		//clear screen, draw map, draw sprites, draw ui
 		for(int i = 0 ; i < LAYER_COUNT; i++)
 		{
@@ -73,6 +78,7 @@ namespace Game
 				s_maps[i]->draw();
 		}
 		s_sm->draw();
+		
 		return GAME_RUNNING;
 	}
 

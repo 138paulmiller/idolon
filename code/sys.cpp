@@ -86,7 +86,7 @@ namespace Sys
 		exit( 1 );
 	}
 
-	void RunEditor()
+	static void EditorStep()
 	{
 		//run editor context
 		switch ( Sys::GetContext()->run() )
@@ -106,6 +106,18 @@ namespace Sys
 
 	}
 
+
+	static void GameStep()
+	{
+		TypedArg ret;
+		Eval::Call(GAME_API_UPDATE, {}, ret);
+		s_gamestate = Game::Run(); 
+		if(s_gamestate == GAME_OFF)
+		{
+			Game::Shutdown();
+		}
+	}
+
 	int Run()
 	{
 		Eval::Test();
@@ -116,10 +128,10 @@ namespace Sys
 			{
 				case GAME_OFF: 
 				case GAME_PAUSED: 
-					RunEditor();
+					EditorStep();
 				break;
 				case GAME_RUNNING:
-					Game::Run(); 
+					GameStep();
 				break;
 			}
 
@@ -171,6 +183,9 @@ namespace Sys
 	}
 	void RunGame(const std::string & gameName)
 	{
-		ASSERT(0, "Not implemented");
+		TypedArg ret;
+		Eval::Call(GAME_API_UPDATE, {}, ret);
+
+		Game::Startup(gameName);
 	}
 } // namespace Sys

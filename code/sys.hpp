@@ -29,5 +29,6 @@ namespace Sys
 	//Actions
 	void RunTilesetEditor(const std::string & tilesetName);
 	void RunMapEditor(const std::string & mapName);
+	void RunGame(const std::string & gameName);
 
 }
