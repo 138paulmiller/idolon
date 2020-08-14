@@ -13,7 +13,14 @@ namespace
 				delete sprite;
 			}
 			sprites.clear();
+		}
 
+		void draw()
+		{
+			for(Graphics::Sprite * sprite : sprites)
+			{
+				sprite->draw();
+			}
 		}
 
 		std::vector<Graphics::Sprite*> sprites;
@@ -52,6 +59,21 @@ namespace Game
 			s_maps[i] = 0;
 		}
 
+	}
+
+	//Step the game
+	GameState Run()
+	{
+		//handle collisions. dispatch events
+		//update game state 
+		//clear screen, draw map, draw sprites, draw ui
+		for(int i = 0 ; i < LAYER_COUNT; i++)
+		{
+			if( s_mapsEnabled[i])
+				s_maps[i]->draw();
+		}
+		s_sm->draw();
+		return GAME_RUNNING;
 	}
 
 	void Shutdown()
@@ -131,6 +153,4 @@ namespace Game
 	{
 		s_spritesheet = tileset;
 	}
-
-
 }

@@ -196,7 +196,8 @@ namespace UI
 	TextInput::~TextInput()
 	{
 	}
-			//draw cursor
+	
+	//draw cursor
 	void TextInput::onDraw() 
 	{
 		TextButton::onDraw();

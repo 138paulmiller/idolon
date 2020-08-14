@@ -2,6 +2,13 @@
 #include "sys.hpp"
 
 
+enum GameState : uint8  
+{
+	GAME_OFF,
+	GAME_PAUSED,
+	GAME_RUNNING,
+};
+
 //This should be the primary Python API
 namespace  Game
 {
@@ -27,6 +34,7 @@ namespace  Game
 	};
 
 	void Startup(const std::string & cartpath);
+	GameState Run();
 	void Shutdown();
 
 	//load map into layer. unloads previous
@@ -40,6 +48,7 @@ namespace  Game
 	//despawn sprite
 	void Despawn(int spriteId);
 	Graphics::Sprite * GetSprite(int spriteId);
+	void UseSpriteSheet(const std::string & tileset);
 
 
 	

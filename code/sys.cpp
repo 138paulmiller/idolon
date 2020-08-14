@@ -2,6 +2,7 @@
 
 #include "sys.hpp"
 #include "ui/api.hpp"
+#include "game.hpp"
 #include "scripting/eval.hpp"
 #include "tileseteditor.hpp"
 #include "mapeditor.hpp"
@@ -17,6 +18,7 @@ namespace
 	std::string s_sysPath ;
 	std::string s_sysAssetPath;
 
+	GameState s_gamestate;
 
 } // namespace
 
@@ -25,6 +27,7 @@ namespace Sys
 
 	void Startup( const CommandTable &cmds )
 	{
+		s_gamestate = GAME_OFF;
 		s_context = new Context( APP_COUNT );
 
 		//default config
@@ -83,36 +86,52 @@ namespace Sys
 		exit( 1 );
 	}
 
+	void RunEditor()
+	{
+		//run editor context
+		switch ( Sys::GetContext()->run() )
+		{
+		case APP_CODE_CONTINUE:
+			break;
+		case APP_CODE_SHUTDOWN:
+			Sys::Shutdown();
+			break;
+		case APP_CODE_EXIT:
+			//cannot exit shell.
+			//set current back to continue so can reenter
+			s_context->app()->signal( APP_CODE_CONTINUE );
+			s_context->exit();
+			break;
+		}
+
+	}
+
 	int Run()
 	{
 		Eval::Test();
 
 		while ( Engine::Run() )
 		{
-			switch ( Sys::GetContext()->run() )
+			switch(s_gamestate)
 			{
-			case APP_CODE_CONTINUE:
+				case GAME_OFF: 
+				case GAME_PAUSED: 
+					RunEditor();
 				break;
-			case APP_CODE_SHUTDOWN:
-				Sys::Shutdown();
+				case GAME_RUNNING:
+					Game::Run(); 
 				break;
-			case APP_CODE_EXIT:
-				//cannot exit shell.
-				//set current back to continue so can reenter
-				s_context->app()->signal( APP_CODE_CONTINUE );
-				s_context->exit();
-				break;
-			}
-			//stat fps 
-			static float timer = 0;
-			timer += Engine::GetTimeDeltaMs()/1000.0f;
-			//every 1 seconds
-			if (timer > FPS_STAT_RATE) 
-			{
-				printf("FPS:%.2f\n", Engine::GetFPS());
-				timer = 0.f;
 			}
 
+		}
+		//stat fps 
+		static float timer = 0;
+		timer += Engine::GetTimeDeltaMs()/1000.0f;
+		//every 1 seconds
+		if (timer > FPS_STAT_RATE) 
+		{
+			printf("FPS:%.2f\n", Engine::GetFPS());
+			timer = 0.f;
 		}
 		//
 		Shutdown();

@@ -397,7 +397,8 @@ void MapEditor::setTileset(int index,  const std::string& tileset )
 void MapEditor::useTileset(int index )
 {
 	const std::string tilesetName = m_map->tilesets[index];
-	printf("Using %d %s\n",index, tilesetName.c_str());
+
+	m_tilesetInput->text =tilesetName;	
 	m_tilesetInput->setText(tilesetName ); 
 	m_tilepicker->reload( tilesetName );
 }
