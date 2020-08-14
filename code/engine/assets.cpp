@@ -111,7 +111,7 @@ namespace Assets
 			std::fstream outfile;
 			outfile.open(path, std::fstream::out);
 			outfile << map->name << std::endl;
-			for(int i = 0 ; i < TILESET_COUNT; i++ )
+			for(int i = 0 ; i < TILESETS_PER_MAP; i++ )
 			{
 				outfile << map->tilesets[i] << std::endl;
 			}
@@ -138,11 +138,11 @@ namespace Assets
 			std::fstream infile;
 			infile.open(path, std::fstream::in);
 			std::string name;
-			std::string tilesets[TILESET_COUNT];
+			std::string tilesets[TILESETS_PER_MAP];
 			std::getline( infile, name, '\n' ); 
 			FS::ReplaceAll(name, "\r", "");
 
-			for ( int i = 0; i < TILESET_COUNT; i++ )
+			for ( int i = 0; i < TILESETS_PER_MAP; i++ )
 			{
 				std::getline( infile, tilesets[i], '\n' ); 
 				FS::ReplaceAll(tilesets[i], "\r", "");
@@ -159,7 +159,7 @@ namespace Assets
 			infile.close();
 
 			map = new Graphics::Map(name, w, h, tw, th);
-			for ( int i = 0; i < TILESET_COUNT; i++ )
+			for ( int i = 0; i < TILESETS_PER_MAP; i++ )
 			{
 				map->tilesets[i] = tilesets[i];
 			}

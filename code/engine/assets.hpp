@@ -9,6 +9,8 @@ namespace Graphics
 	class Tileset;
 	class Font;
 }
+
+//TODO Movet his to asset module. Graphics should not subclass Asset but rather create FontAsset, GameAsset etc. 
 /*
 	All assets must define a constructor with const std::string & name as a param and as a const, public, attrib. 
 	

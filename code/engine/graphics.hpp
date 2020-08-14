@@ -19,7 +19,7 @@
 #define TILE_CLEAR -1
 
 //Max number of tilesets per map
-#define TILESET_COUNT 4
+#define TILESETS_PER_MAP 2
 //Default Tileset sizes
 #define SPRITE_W 16
 #define SPRITE_H 16
@@ -79,7 +79,7 @@ namespace Graphics
 
         //can use 4 tilesets. 
         //tileset index =  index / TILE_COUNT
-        std::string tilesets[TILESET_COUNT];
+        std::string tilesets[TILESETS_PER_MAP];
         //width and height is in tiles
         const int w,h, tilew, tileh, worldw, worldh;
 
@@ -90,7 +90,7 @@ namespace Graphics
         Rect rect;
 
      private:
-        Tileset * m_tilesetscache[TILESET_COUNT];
+        Tileset * m_tilesetscache[TILESETS_PER_MAP];
         //TODO - split map into multiple subtextures. Each streamed in on demand. "Super maps"
         const int m_texture; 
         //viewport

@@ -64,7 +64,7 @@ void MapEditor::onEnter()
 	m_toolbar->font = fontName;
 
 	const int border = 2;
-	for(size_t i = 0; i < TILESET_COUNT; i++)
+	for(size_t i = 0; i < TILESETS_PER_MAP; i++)
 	{
 		m_tilesetSelectToolbar->add(
 			std::to_string(i), 
@@ -196,8 +196,8 @@ void MapEditor::onKey( Key key, bool isDown )
 	int mx, my;
 	Engine::GetMousePosition(mx, my);
 	//offset in world
-	const int pixelx = view.x + ( mx - view.x )  ;
-	const int pixely = view.y + ( my - view.y ) ;
+	const int pixelx = view.x + mx*m_map->scale() ;
+	const int pixely = view.y + my*m_map->scale() ;
 
 
 	if(key == KEY_SHIFT) 
@@ -396,9 +396,10 @@ void MapEditor::setTileset(int index,  const std::string& tileset )
 
 void MapEditor::useTileset(int index )
 {
-	printf("Using %d %s\n",index, m_map->tilesets[index].c_str());
-	m_tilesetInput->setText( m_map->tilesets[index]); 
-	m_tilepicker->reload(m_tilesetInput->text);
+	const std::string tilesetName = m_map->tilesets[index];
+	printf("Using %d %s\n",index, tilesetName.c_str());
+	m_tilesetInput->setText(tilesetName ); 
+	m_tilepicker->reload( tilesetName );
 }
 
 //toolbar and tilepicker. resize map

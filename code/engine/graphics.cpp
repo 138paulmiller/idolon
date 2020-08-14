@@ -79,7 +79,7 @@ namespace Graphics
 
     {
         m_scale = 1.0;
-        for ( int i = 0; i < TILESET_COUNT; i++ )
+        for ( int i = 0; i < TILESETS_PER_MAP; i++ )
         {
             tilesets[i] = "";
             m_tilesetscache[i] = 0;
@@ -94,7 +94,7 @@ namespace Graphics
 
     Map::~Map()
     {
-        for ( int i = 0; i < TILESET_COUNT; i++ )
+        for ( int i = 0; i < TILESETS_PER_MAP; i++ )
         {
             if(m_tilesetscache[i] && tilesets[i] != "")
                 Assets::Unload<Tileset>(m_tilesetscache[i]->name);
@@ -162,7 +162,7 @@ namespace Graphics
     }
     void Map::reload()
     {
-        for ( int i = 0; i < TILESET_COUNT; i++ )
+        for ( int i = 0; i < TILESETS_PER_MAP; i++ )
         {
             if(m_tilesetscache[i] && tilesets[i] != "")
                 Assets::Unload<Tileset>(m_tilesetscache[i]->name);

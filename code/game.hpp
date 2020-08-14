@@ -31,14 +31,15 @@ namespace  Game
 
 	//load map into layer. unloads previous
 	void Load(Layer layer, const std::string & mapname);
+	void Unload(Layer layer);
 	void Resize(Layer layer, int x, int y);
 	void Scroll(Layer layer, int x, int y);
 	
-	//Sprite Manager 
-	//spawn sprite at x y
-	Graphics::Sprite * Spawn(int tileid, int x, int y);
+	//Use integer to pass to scrits. large uses large sprite 
+	int Spawn(int tileid, int x, int y, bool isSmall = false);
 	//despawn sprite
-	void Despawn(const Graphics::Sprite * sprite);
+	void Despawn(int spriteId);
+	Graphics::Sprite * GetSprite(int spriteId);
 
 
 	

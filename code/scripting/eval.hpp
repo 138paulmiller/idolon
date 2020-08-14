@@ -32,11 +32,11 @@ namespace Eval
 {
 	void Startup();
 	void Shutdown();
-	//compile game code. cannot redefine functions. all
+	
 	void Compile(const std::string & file);
 	void Execute(const std::string & code);
 	//game calls update and draw. Uses ret type to parse return
 	bool Call(const std::string & func, const std::vector<TypedArg> & args, TypedArg & ret);
 	void Test();
-	
+
 }
