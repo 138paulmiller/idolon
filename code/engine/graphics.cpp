@@ -183,8 +183,7 @@ namespace Graphics
                 std::getline( in, tilesets[i], '\n' ); 
                 FS::ReplaceAll(tilesets[i], "\r", "");
             }
-            int w,h, tw, th;
-            in >> w >> h >> tw >> th;
+            in >> w >> h >> tilew >> tileh;
 
             //TODO - verify endian-ness!
             int blocksize;
@@ -278,29 +277,30 @@ namespace Graphics
 	
     }
 
-    void Map::reset(char * tiles, int w, int h, int tilew, int tileh)
+    void Map::reset(char * newTiles, int newW, int newH, int newTilew, int newTileh)
     {
-        this->w = w;
-        this->h = h;
-        this->tilew = tilew;
-        this->tileh = tileh;
+        w = newW;
+        h = newH;
+        tilew = newTilew;
+        tileh = newTileh;
 
-        this->worldw = w * tilew;
-        this->worldh = h * tileh;
+        worldw = w * tilew;
+        worldh = h * tileh;
 
         if(m_texture != -1)
             Engine::DestroyTexture(m_texture);
         m_texture = Engine::CreateTexture( worldw, worldh, TEXTURE_TARGET );
 
-        if(this->tiles)
-            delete this->tiles;
-        this->tiles = tiles;
+        if(tiles)
+            delete tiles;
+        tiles = newTiles;
 
         m_scale = 1.0;
         int screenw, screenh;
         Engine::GetSize(screenw,screenh);
         view = { 0, 0, screenw, screenh };
         rect = { 0, 0, screenw, screenh };    
+        reload();
     }
     
 
@@ -533,9 +533,7 @@ namespace Graphics
   
     TextBox::~TextBox()
     {
-        if(m_fontcache)
-            Assets::Unload<Font>(m_fontcache->name);
-
+        Assets::Unload<Font>(font);
         Engine::DestroyTexture(m_texture);
     }
 

@@ -61,11 +61,14 @@ namespace UI
 		virtual void onHover();
 
 		void click();
+		//was in focus on first click, next clicked missed button
+		void leave();
 		bool isDown();
 		bool isDirty();
 		virtual void reset();
 		const Rect & rect();
 		
+		std::function<void()> cbLeave;
 		std::function<void()> cbClick;
 		std::function<void()> cbHover;
 		
@@ -76,6 +79,7 @@ namespace UI
 		bool sticky = true;
 		
 	protected: 
+		bool m_prevclick;
 		Rect m_rect;
 		//internal settings
 		Color m_color;

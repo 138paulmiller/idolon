@@ -30,11 +30,13 @@ void MapEditor::onEnter()
 	m_tilepicker = new UI::TilePicker();
 	m_tilepicker->reload(m_map->tilesets[m_tilesetSelection]);
 
+	//use just to get w/h
 	const std::string &fontName = DEFAULT_FONT;
 	Graphics::Font * font = Assets::Load<Graphics::Font>(DEFAULT_FONT);
 	const int charW = font->charW;
 	const int charH = font->charH;
-	
+	Assets::Unload<Graphics::Font>(fontName);
+
 	const int toolY = h - (m_tilepicker->rect().h + TILE_H);
 
 	//TODO - text edit to set tileset
@@ -85,36 +87,17 @@ void MapEditor::onEnter()
 	//add the ui widgets
 
 	App::addWidget( m_toolbar );
-	App::addWidget(m_tilepicker);
+	App::addWidget( m_tilepicker);
 	App::addWidget( m_tilesetSelectToolbar );
 	App::addButton( m_tilesetInput );
-
-
 	Editor::onEnter();
-	LOG("Entered map editor \n");
 
 	//select pixel and first tileset by default
 	m_toolbar->get(MAP_TOOL_PIXEL)->click();		
 	m_tilesetInput->cbAccept();
 
 	showWorkspace();
-	LOG("Added widgets ... \n");
 
-/////////////// DEbug //////////////////////////
-	// const int spriteId =8 ;
-	// for(int y = SPRITE_H; y < m_map->rect.h; y+=SPRITE_H*2)
-	// {
-	// 	for(int x = SPRITE_W; x < w; x+=SPRITE_W*2)
-	// 	{	
-	// 		Graphics::Sprite * sprite = new Graphics::Sprite( spriteId );
-	// 		sprite->tileset = m_map->tilesets[0];
-	// 		sprite->x = x;
-	// 		sprite->y = y;
-	// 		sprite->reload();
-	// 		m_sprites.push_back(sprite);
-	// 	}
-	// }
-///////////////////////////////////////////////////
 }
 
 void MapEditor::onExit()
@@ -122,11 +105,7 @@ void MapEditor::onExit()
 	delete m_overlay;
 	m_overlay = 0;
 
-	for(Graphics::Sprite * sprite : m_sprites )
-		delete sprite;
-	
-	m_sprites.clear();
-	
+
 	Assets::Unload<Graphics::Map>(m_mapName);
 	//delete widgets
 	App::clear();

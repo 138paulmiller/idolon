@@ -70,7 +70,7 @@ namespace Assets
 			const Asset * asset = pair.second;
 			if(asset->refcounter != 0)
 			{
-				LOG("Assets:: Dangling reference to %s", asset->name.c_str() );
+				LOG("Assets:: Dangling reference to %s (%s)\n", asset->name.c_str(), asset->filepath.c_str() );
 			}
 			delete asset;
 		}
@@ -133,7 +133,7 @@ namespace Assets
 				{
 					delete asset;
 					s_assets.erase(path);
-					LOG("Assets: Unloaded %s\n", path.c_str());
+					LOG("Assets: Unloaded %s%s (%s)\n", asset->name.c_str(), GetAssetTypeExtImpl(type), path.c_str());
 				}
 				return;
 			}
@@ -141,9 +141,8 @@ namespace Assets
 	}
 
 	Asset* LoadImpl(const std::type_info& type, const std::string& name)
-	{	
-		//LOG("Assets: loading %s\n", name.c_str());
-		
+	{			
+		if ( name.size() == 0 ) return 0;
 		std::string path =  FindAssetPath(type, name);
 		
 		if(path.size() == 0)
@@ -162,7 +161,7 @@ namespace Assets
 			return asset;									
 		}			
 		//asset to filename 
-		LOG("Assets: %s found at %s\n", name.c_str(), path.c_str());
+		LOG("Assets: Loading %s%s (%s)\n", name.c_str(), GetAssetTypeExtImpl(type), path.c_str());
 		Asset * asset =0 ;
 	
 		try 
@@ -180,23 +179,25 @@ namespace Assets
 
 		if(asset == 0)
 		{
-			LOG("Assets: Failed to load %s\n", path.c_str());
+			LOG("Assets: Failed to load %s%s (%s)\n", name.c_str(), GetAssetTypeExtImpl(type), path.c_str());
 		}
 		else
-		{
-			LOG("Assets: Loaded %s\n", path.c_str());
-		
+		{		
 			s_assets[path] = asset;
-			asset->refcounter += 1;								
+			asset->refcounter += 1;			
+			asset->filepath = path;
 		}
 
 		return asset;
 	}
-	void SaveAsImpl(const Asset* asset, const std::type_info& type, const std::string& path)
+	void SaveAsImpl( Asset* asset, const std::type_info& type, const std::string& path)
 	{
+		if ( !asset ) return;
+		asset->filepath = path;
 		try 
 		{		
-			LOG("Assets: Saving %s\n",path.c_str());
+
+			LOG("Assets: Saving %s%s (%s)\n", asset->name.c_str(), GetAssetTypeExtImpl(type), path.c_str());
 
 			std::ofstream outfile;
 			outfile.open(path);
@@ -208,7 +209,7 @@ namespace Assets
 			LOG("Assets: Failed to open %s for writing\n", path.c_str());
 		}
 	}
-	void SaveImpl(const Asset* asset, const std::type_info& type, const std::string& name)
+	void SaveImpl( Asset* asset, const std::type_info& type, const std::string& name)
 	{
 		std::string n = name;
 		//asset to filename 

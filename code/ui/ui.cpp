@@ -18,6 +18,8 @@ namespace UI
 		m_isDown = false;
 		m_isHover = false;
 		m_isDirty = true;
+		m_prevclick = false;
+
 	}
 	void Button::onClick()
 	{
@@ -80,11 +82,23 @@ namespace UI
 	{
 		return m_rect;
 	}
+	
+	void Button::leave()
+	{
+		if ( m_prevclick )
+		{
+			if(cbLeave)
+				cbLeave();
+			m_prevclick = false;
+		}
+
+	}
 	void Button::click()
 	{
 		onClick();
 		if(cbClick)
 			cbClick();
+		m_prevclick = true;
 	}
 
 	
@@ -154,9 +168,9 @@ namespace UI
 			switch(key)
 			{
 				case  KEY_ESCAPE:
+					//set to previous. no change
 					this->text = this->m_textprev;
 					this->setText(this->text);
-
 					Engine::PopKeyHandler();
 					this->reset();
 				break;
@@ -164,7 +178,7 @@ namespace UI
 				case  KEY_RETURN:
 					Engine::PopKeyHandler();
 					this->reset();
-					cbAccept();
+					this->cbAccept();
 				break;
 				case KEY_BACKSPACE:
 					this->text.pop_back();
@@ -189,6 +203,12 @@ namespace UI
 			m_timer = 0.0;
 			m_cursorVisible = true;
 			m_textprev = this->text;
+		};
+		this->cbLeave = [this]()
+		{
+			Engine::PopKeyHandler();
+			this->reset();
+			this->cbAccept();
 		};
 		this->sticky = true;
 	}	
@@ -238,6 +258,7 @@ namespace UI
 	
 	Toolbar::~Toolbar()
 	{
+
 		for ( int id : m_buttonIds )
 			m_parent->removeButton( id );
 	}
@@ -296,7 +317,8 @@ namespace UI
 		}
 	}
 	void Toolbar::onDraw()
-	{}
+	{
+	}
 
 	
 	//////////////////////////////////////////////////////////////////////////////////

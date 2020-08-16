@@ -40,8 +40,8 @@ namespace Assets
 
 	Asset* LoadImpl(const std::type_info& type, const std::string& name);
 	void UnloadImpl(const std::type_info& type, const std::string& name);
-	void SaveImpl(const Asset* asset, const std::type_info& type, const std::string& name);
-	void SaveAsImpl(const Asset* asset, const std::type_info& type, const std::string& path);
+	void SaveImpl( Asset* asset, const std::type_info& type, const std::string& name);
+	void SaveAsImpl( Asset* asset, const std::type_info& type, const std::string& path);
 	std::string GetAssetTypeExtImpl(const std::type_info& type);
 
 	template <typename Type>

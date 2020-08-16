@@ -88,10 +88,8 @@ void TilesetEditor::onEnter()
 }
 
 void TilesetEditor::onExit()
-{	//allow for reloading data
-	Assets::Unload<Graphics::Tileset>(m_tilesetName );
+{
 	//remove all ui Widgets/buttons. do not manually delete
-	App::clear();
 	for(Color * colors : m_revisionData)
 	{
 		if(colors)
@@ -102,8 +100,10 @@ void TilesetEditor::onExit()
 	delete m_overlay;
 	m_overlay = 0;
 
+	Assets::Unload<Graphics::Tileset>(m_tilesetName );
+	App::clear();
 	Editor::onExit();
-	LOG("Extited sheet editor");
+	LOG("Exited sheet editor");
 
 }
 

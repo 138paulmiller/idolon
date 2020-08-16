@@ -117,14 +117,14 @@ AppCode Context::run( )
 			if(widget) widget->onUpdate();
 		}
 
+		int mx, my;
+		Engine::GetMousePosition(mx, my);
 		for(UI::Button * button : m_buttons)
 		{
 			if(button)
 			{
 				button->onReset();
 
-				int mx, my;
-				Engine::GetMousePosition(mx, my);
 				if(button->rect().intersects({mx, my, 1,1}))
 				{
 					if( Engine::GetMouseButtonState(MouseButton::MOUSEBUTTON_LEFT) == BUTTON_DOWN)
@@ -136,6 +136,13 @@ AppCode Context::run( )
 						if(button->cbHover)
 							button->cbHover();
 						button->onHover();
+					}
+				}
+				else
+				{
+					if ( Engine::GetMouseButtonState( MouseButton::MOUSEBUTTON_LEFT ) == BUTTON_DOWN )
+					{
+						button->leave();
 					}
 				}
 				button->onUpdate();

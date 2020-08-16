@@ -63,9 +63,9 @@ private:
 	//by default are all empty
 	std::string m_mapName;
 	
+	Graphics::Map * m_map;
 	UI::TextInput * m_tilesetInput;
 	//map contains ref to tilesheet
-	Graphics::Map * m_map;
 	UI::TilePicker * m_tilepicker;
 	UI::Toolbar * m_toolbar;
 	//

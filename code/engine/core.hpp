@@ -24,6 +24,7 @@
 //Add Vector / Math classes
 
 typedef unsigned char uint8;
+typedef unsigned int uint;
 
 struct Color
 {

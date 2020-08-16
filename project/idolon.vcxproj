@@ -159,7 +159,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <None Include="..\code\scripting\bindings.inl" />
+    <None Include="..\code\scripting\pybindings.inl" />
     <None Include="..\system\assets\basic.font" />
     <None Include="..\system\assets\default.font" />
     <None Include="..\system\assets\full.font" />
@@ -168,21 +168,23 @@
   <ItemGroup>
     <ClInclude Include="..\code\algo.hpp" />
     <ClInclude Include="..\code\config.hpp" />
+    <ClInclude Include="..\code\editors\api.hpp" />
+    <ClInclude Include="..\code\editors\gameeditor.hpp" />
+    <ClInclude Include="..\code\editors\mapeditor.hpp" />
+    <ClInclude Include="..\code\editors\tileseteditor.hpp" />
+    <ClInclude Include="..\code\emu.hpp" />
+    <ClInclude Include="..\code\engine\assets.hpp" />
+    <ClInclude Include="..\code\engine\core.hpp" />
+    <ClInclude Include="..\code\engine\engine.hpp" />
+    <ClInclude Include="..\code\engine\err.hpp" />
+    <ClInclude Include="..\code\engine\fs.hpp" />
+    <ClInclude Include="..\code\engine\graphics.hpp" />
     <ClInclude Include="..\code\game.hpp" />
-    <ClInclude Include="..\code\shell.hpp" />
-    <ClInclude Include="..\code\sys.hpp" />
-    <ClInclude Include="..\code\mapeditor.hpp" />
     <ClInclude Include="..\code\scripting\api.hpp" />
     <ClInclude Include="..\code\scripting\eval.hpp" />
-    <ClInclude Include="..\code\system\api.hpp" />
-    <ClInclude Include="..\code\system\assets.hpp" />
-    <ClInclude Include="..\code\system\core.hpp" />
-    <ClInclude Include="..\code\system\engine.hpp" />
-    <ClInclude Include="..\code\system\err.hpp" />
-    <ClInclude Include="..\code\system\fs.hpp" />
-    <ClInclude Include="..\code\system\graphics.hpp" />
-    <ClInclude Include="..\code\tests.hpp" />
-    <ClInclude Include="..\code\tileseteditor.hpp" />
+    <ClInclude Include="..\code\engine\api.hpp" />
+    <ClInclude Include="..\code\shell.hpp" />
+    <ClInclude Include="..\code\sys.hpp" />
     <ClInclude Include="..\code\ui\api.hpp" />
     <ClInclude Include="..\code\ui\commands.hpp" />
     <ClInclude Include="..\code\ui\context.hpp" />
@@ -190,18 +192,20 @@
     <ClInclude Include="..\code\ui\ui.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\code\editors\mapeditor.cpp" />
+    <ClCompile Include="..\code\editors\tileseteditor.cpp" />
+    <ClCompile Include="..\code\emu.cpp" />
+    <ClCompile Include="..\code\engine\assets.cpp" />
+    <ClCompile Include="..\code\engine\core.cpp" />
+    <ClCompile Include="..\code\engine\engine.cpp" />
+    <ClCompile Include="..\code\engine\err.cpp" />
+    <ClCompile Include="..\code\engine\fs.cpp" />
+    <ClCompile Include="..\code\engine\graphics.cpp" />
+    <ClCompile Include="..\code\game.cpp" />
+    <ClCompile Include="..\code\main.cpp" />
+    <ClCompile Include="..\code\scripting\eval.cpp" />
     <ClCompile Include="..\code\shell.cpp" />
     <ClCompile Include="..\code\sys.cpp" />
-    <ClCompile Include="..\code\main.cpp" />
-    <ClCompile Include="..\code\mapeditor.cpp" />
-    <ClCompile Include="..\code\scripting\eval.cpp" />
-    <ClCompile Include="..\code\system\assets.cpp" />
-    <ClCompile Include="..\code\system\core.cpp" />
-    <ClCompile Include="..\code\system\engine.cpp" />
-    <ClCompile Include="..\code\system\err.cpp" />
-    <ClCompile Include="..\code\system\fs.cpp" />
-    <ClCompile Include="..\code\system\graphics.cpp" />
-    <ClCompile Include="..\code\tileseteditor.cpp" />
     <ClCompile Include="..\code\ui\commands.cpp" />
     <ClCompile Include="..\code\ui\context.cpp" />
     <ClCompile Include="..\code\ui\editor.cpp" />
