@@ -1,5 +1,5 @@
 
-#include "sys.hpp"
+#include "../sys.hpp"
 #include "tileseteditor.hpp"
 #include <iostream>
 

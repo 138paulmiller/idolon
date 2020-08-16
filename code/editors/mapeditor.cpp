@@ -1,7 +1,7 @@
 
 
 #include "mapeditor.hpp"
-#include "sys.hpp"
+#include "../sys.hpp"
 
 
 /*
@@ -25,15 +25,15 @@ void MapEditor::onEnter()
 	int w,h;
 	Engine::GetSize(w,h);
 
-	const std::string &fontName = DEFAULT_FONT;
-	Graphics::Font * font = Assets::Load<Graphics::Font>(DEFAULT_FONT);
-	const int charW = font->charW;
-	const int charH = font->charH;
-
 	m_tilesetSelection = 0;
 	m_map = Assets::Load<Graphics::Map>(m_mapName);
 	m_tilepicker = new UI::TilePicker();
 	m_tilepicker->reload(m_map->tilesets[m_tilesetSelection]);
+
+	const std::string &fontName = DEFAULT_FONT;
+	Graphics::Font * font = Assets::Load<Graphics::Font>(DEFAULT_FONT);
+	const int charW = font->charW;
+	const int charH = font->charH;
 	
 	const int toolY = h - (m_tilepicker->rect().h + TILE_H);
 
@@ -81,7 +81,6 @@ void MapEditor::onEnter()
 	{
 		this->setTileset(m_tilesetSelection, m_tilesetInput->text);
 	};
-
 	//first add toolbat	
 	//add the ui widgets
 
@@ -90,13 +89,16 @@ void MapEditor::onEnter()
 	App::addWidget( m_tilesetSelectToolbar );
 	App::addButton( m_tilesetInput );
 
+
 	Editor::onEnter();
+	LOG("Entered map editor \n");
 
 	//select pixel and first tileset by default
 	m_toolbar->get(MAP_TOOL_PIXEL)->click();		
 	m_tilesetInput->cbAccept();
 
 	showWorkspace();
+	LOG("Added widgets ... \n");
 
 /////////////// DEbug //////////////////////////
 	// const int spriteId =8 ;

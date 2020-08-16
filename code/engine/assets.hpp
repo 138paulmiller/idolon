@@ -3,12 +3,6 @@
 #include <typeinfo>
 #include <string>
 
-// Impl
-namespace Graphics 
-{
-	class Tileset;
-	class Font;
-}
 
 //TODO Movet his to asset module. Graphics should not subclass Asset but rather create FontAsset, GameAsset etc. 
 /*
@@ -19,13 +13,19 @@ namespace Graphics
 class Asset
 {
 public:
-	Asset(const std::string & name) ;
+	Asset(const std::string & name = "NO_NAME") ;
 	virtual ~Asset() = default;
-	const std::string name;
+
+	virtual bool deserialize( std::istream& in ) = 0 ;
+	virtual void serialize( std::ostream& out ) const = 0;
+
+	std::string name;
 	std::string filepath;
 	int refcounter = 0;
 
 };
+
+
 
 namespace Assets
 {
@@ -37,7 +37,7 @@ namespace Assets
 	void ClearPaths();
 	//update the cache. Do not call each frame.
 	//void Prune();
-	
+
 	Asset* LoadImpl(const std::type_info& type, const std::string& name);
 	void UnloadImpl(const std::type_info& type, const std::string& name);
 	void SaveImpl(const Asset* asset, const std::type_info& type, const std::string& name);
@@ -67,7 +67,6 @@ namespace Assets
 	{
 		return SaveAsImpl(asset, typeid(Type), path);
 	}
-
 
 	template <typename Type>
 	std::string GetAssetTypeExt() 

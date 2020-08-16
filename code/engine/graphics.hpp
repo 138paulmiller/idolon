@@ -30,6 +30,13 @@
 
 namespace Graphics
 {
+    struct Renderable
+    {
+        //TODO - 
+        virtual void update() = 0;
+        virtual void draw() = 0;
+    };
+
     /*--------------------------- Tileset - -----------------------------------
         Represents an image
     */
@@ -37,35 +44,50 @@ namespace Graphics
     {
         friend class Sprite;
     public:
-        
+        Tileset();
         Tileset(const std::string& name, int w=TILESET_W, int h=TILESET_H);
         ~Tileset();
         
-        //call sparingly . if no rect, will update entire. push data to gpu
+        //asset 
+        bool deserialize( std::istream& in ) override;
+        void serialize( std::ostream& out ) const override;
+        //
+        //reset the data         
+        void reset(Color * pixels, int w, int h);
+        //call sparingly . if no rect, will update entire. pushes data to gpu
         void update(const Rect & rect = { 0, 0, 0, 0 } ); 
         //given tile rect get index
         int id( const Rect & tile) const;
         //get tile rect of size tx x th 
         Rect tile( int tileId, int tw, int th ) const;
 
-        Color * const pixels;
-        const int w, h;
-        const int texture;
+        Color * pixels;
+        int w, h;
+        int texture;
     };
 
 
 
-    /*--------------------------- Map ------------------------------------
-        TODO - add tileset layers. each map have 3 ? + UI ? 
+    /*------------------------------------- Map ------------------------------------
+        
     */
     class Map : public Asset
     {
     public:
+        Map();
         //width and height is number of tiles
         Map(const std::string & name, int w=MAP_W, int h=MAP_H, int tilew=TILE_W, int tileh=TILE_H);
         ~Map();
+
+        //asset 
+        bool deserialize( std::istream& in ) override;
+        void serialize( std::ostream& out ) const override;
         
+        //reset the data and reload
+        void reset(char * tiles, int w, int h, int tilew=TILE_W, int tileh=TILE_H); 
+        //update texute with tile data
         void update(const Rect & rect = { 0, 0, 0, 0 } ); 
+        //update tilesheets and update
         void reload();
         void draw();
         float scale( );
@@ -80,28 +102,52 @@ namespace Graphics
         //can use 4 tilesets. 
         //tileset index =  index / TILE_COUNT
         std::string tilesets[TILESETS_PER_MAP];
-        //width and height is in tiles
-        const int w,h, tilew, tileh, worldw, worldh;
 
-        char * const tiles;
         //The view is viewport into the map texture
         Rect view;
         //xy is screen space position of map. 
         Rect rect;
+        
+        //do not modify
+        //width and height is in tiles
+        int w,h, tilew, tileh, worldw, worldh;
+
+        char * tiles;
 
      private:
         Tileset * m_tilesetscache[TILESETS_PER_MAP];
         //TODO - split map into multiple subtextures. Each streamed in on demand. "Super maps"
-        const int m_texture; 
+        int m_texture; 
         //viewport
         float m_scale;
 
     };
 
+      /*--------------------------- Font ------------------------------------
+        font is essentially just a tile set, where each character in the alphabet is just a tile
+    */
+    class Font : public Tileset
+    {
+    public:
+        Font();
+        Font(const std::string& name, int w, int h, int charW = TILE_W, int charH = TILE_H, char start = ' ');
 
-    // ------------ Drawables. These are runtime. Not serialized assets  ------------
+        //asset 
+        bool deserialize( std::istream& in )override ;
+        void serialize( std::ostream& out ) const override ;
+        //
 
-    /*--------------------------- Sprite ------------------------------------
+        //src is textbox in character units
+        void blit(int destTexture, const std::string & text, const Rect & dest);
+
+        //do not modify!s
+        int charW,charH;
+        char start;
+    };
+
+    // ================================== Runtime graphical components ==================================
+
+    /*--------------------------- -------------  Sprite  ------------------------------------
         Describes a sprite. nothing about runtime info. 
     */
     class Sprite
@@ -111,29 +157,18 @@ namespace Graphics
         ~Sprite();
         void reload();
         void draw();
+
         //tile index
         int tile ;
         int x,y;
         int w,h;
         std::string tileset;
+        //TODO add animation info
 
     private:
         Tileset * m_tilesetcache;
     };
-  
-    /*--------------------------- Font ------------------------------------
-        font is essentially just a tile set, where each character in the alphabet is just a tile
-    */
-    class Font : public Tileset
-    {
-    public:
-        Font(const std::string& name, int w, int h, int charW = TILE_W, int charH = TILE_H, char start = ' ');
-        //src is textbox in character units
-        void blit(int destTexture, const std::string & text, const Rect & dest);
 
-        const int charW,charH;
-        const char start;
-    };
     /*--------------------------- Textbox ------------------------------------
         TODO Create a texture that is sizeof(boxtexture)/fontw
             this contains the colors. then perform additive blending
@@ -144,9 +179,10 @@ namespace Graphics
         // tw and th are number of chars
 		TextBox(int tw, int th, const std::string & text, const std::string & font);
         ~TextBox();
-        //update test box
+
+        //clear and redraw texture
         void refresh();
-        //update font and refresh
+        //update font sheet and refresh texture
         void reload();
         void draw();
         const Font *getFont();

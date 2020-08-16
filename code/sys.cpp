@@ -1,11 +1,10 @@
 
 
 #include "sys.hpp"
-#include "ui/api.hpp"
 #include "game.hpp"
-#include "scripting/eval.hpp"
-#include "tileseteditor.hpp"
-#include "mapeditor.hpp"
+#include "ui/api.hpp"
+#include "scripting/api.hpp"
+#include "editors/api.hpp"
 
 //TODO handle all exceptions here. Close down, or restart system if necessary. Worst case shutdown, then startup system.
 namespace

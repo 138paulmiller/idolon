@@ -62,3 +62,10 @@ FS - Should handle paths with directory prefix. Asset loading should omit incomi
 # Optimizations
 
 Sprite batching. Do not bind the tileset before each draw texture!
+
+
+Animation to sprite. Create serializable sprites that can be edited in tileset editor. 
+
+Create game editor. This is used to set the tilesets used, maps used, sprites used. 
+
+MOVE ALL TOOLBARS to Main Editor Toolbar
