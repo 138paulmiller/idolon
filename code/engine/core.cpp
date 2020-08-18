@@ -63,3 +63,5 @@ const Color Palette[32] =
 	{0xff, 0x8a, 0x6f, 0x30},
 };
 const int PaletteCount = 32;
+
+

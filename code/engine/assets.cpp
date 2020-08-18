@@ -1,5 +1,6 @@
 
 #include "api.hpp"
+#include "../scripting/api.hpp"
 
 
 /*TODO 
@@ -7,6 +8,12 @@
 	have save and load as virtual functions for asset type ? 
 
  */
+
+Asset::Asset(const std::string& name) 
+	:name(name)
+{
+}
+
 namespace
 {
 	template<class Type>
@@ -15,23 +22,26 @@ namespace
 
 	std::vector<std::string> s_assetdirs; 
 
+	struct AssetDetails
+	{
+		AssetDetails() = default;
+		std::string ext;
+		std::function<Asset*()> create;
+	};
+	std::unordered_map<const char*, AssetDetails> s_details ; 
+
 } // namespace
 
-Asset::Asset(const std::string& name) 
-	:name(name)
-{
-}
 	
 namespace Assets
 {
 	std::string GetAssetTypeExtImpl(const std::type_info& type)
 	{
-		if(type ==  typeid(Graphics::Map))
-			return ".map";
-		if(type ==  typeid(Graphics::Tileset))
-			return".tls";
-		if(type ==  typeid(Graphics::Font))
-			return ".fnt";
+		const auto it = s_details.find(type.name());
+		if(it != s_details.end())
+		{
+			return s_details[type.name()].ext;
+		}
 		return ".raw";
 	}
 
@@ -58,19 +68,59 @@ namespace Assets
 
 	void Startup(const std::string & dirpath)
 	{
-		LOG("Assets:: Starting up...\n");
+		LOG("Assets: Starting up...\n");
 		s_assetdirs.push_back(dirpath);
+		s_details = {
+			{ 
+				typeid(Graphics::Map).name(), 
+				{ 
+					".map", 
+					[](){
+						return new Graphics::Map(); 
+					} 
+				}
+			},
+			{ 
+				typeid(Graphics::Tileset).name(), 
+				{ 
+					".tls", 
+					[](){
+						return new Graphics::Tileset(); 
+					} 
+				}
+			},
+			{ 
+				typeid(Graphics::Font).name(), 
+				{ 
+					".fnt", 
+					[](){
+						return new Graphics::Font(); 
+					} 
+				}
+			},
+			{ 
+				typeid(Script).name(), 
+				{ 
+					".scr", 
+					[](){
+						return new Script(); 
+					} 
+				}
+			},
+		};
+
 	}
 
 	void Shutdown()
 	{
+		s_details.clear();
 		LOG("Assets:: Shutting down...\n");
 		for(auto & pair : s_assets)
 		{
 			const Asset * asset = pair.second;
 			if(asset->refcounter != 0)
 			{
-				LOG("Assets:: Dangling reference to %s (%s)\n", asset->name.c_str(), asset->filepath.c_str() );
+				LOG("Assets: Dangling reference to %s (%s)\n", asset->name.c_str(), asset->filepath.c_str() );
 			}
 			delete asset;
 		}
@@ -95,14 +145,11 @@ namespace Assets
 	{
 	
 		Asset * asset = 0;
-		if(type ==  typeid(Graphics::Map))
-			asset = new Graphics::Map();
-		else if(type ==  typeid(Graphics::Tileset))
-			asset = new Graphics::Tileset();
-		else if(type ==  typeid(Graphics::Font))
-			asset = new Graphics::Font();
-		else 
+
+		const auto it = s_details.find(type.name());
+		if(it == s_details.end())
 			return 0;
+		asset =  s_details[type.name()].create();
 
 		if( !asset->deserialize(in) )
 		{
@@ -133,7 +180,7 @@ namespace Assets
 				{
 					delete asset;
 					s_assets.erase(path);
-					LOG("Assets: Unloaded %s%s (%s)\n", asset->name.c_str(), GetAssetTypeExtImpl(type), path.c_str());
+					LOG("Assets: Unloaded %s%s (%s)\n", asset->name.c_str(), GetAssetTypeExtImpl(type).c_str(), path.c_str());
 				}
 				return;
 			}
@@ -161,7 +208,7 @@ namespace Assets
 			return asset;									
 		}			
 		//asset to filename 
-		LOG("Assets: Loading %s%s (%s)\n", name.c_str(), GetAssetTypeExtImpl(type), path.c_str());
+		LOG("Assets: Loading %s%s (%s)\n", name.c_str(), GetAssetTypeExtImpl(type).c_str(), path.c_str());
 		Asset * asset =0 ;
 	
 		try 
@@ -179,7 +226,7 @@ namespace Assets
 
 		if(asset == 0)
 		{
-			LOG("Assets: Failed to load %s%s (%s)\n", name.c_str(), GetAssetTypeExtImpl(type), path.c_str());
+			LOG("Assets: Failed to load %s%s (%s)\n", name.c_str(), GetAssetTypeExtImpl(type).c_str(), path.c_str());
 		}
 		else
 		{		
@@ -197,7 +244,7 @@ namespace Assets
 		try 
 		{		
 
-			LOG("Assets: Saving %s%s (%s)\n", asset->name.c_str(), GetAssetTypeExtImpl(type), path.c_str());
+			LOG("Assets: Saving %s%s (%s)\n", asset->name.c_str(), GetAssetTypeExtImpl(type).c_str(), path.c_str());
 
 			std::ofstream outfile;
 			outfile.open(path);

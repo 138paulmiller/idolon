@@ -107,9 +107,15 @@ namespace Game
 //		Eval::Compile(sourcefile);
 
 	}
+	//call script init
+	void Init()
+	{
 
+	}
+	
+	//call update and 
 	//Step the game
-	GameState Run()
+	GameState Update()
 	{
 		//handle collisions. dispatch events
 		//update game state 

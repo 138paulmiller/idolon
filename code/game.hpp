@@ -70,7 +70,13 @@ namespace  Game
 
 
 	void Startup(const std::string & cartpath);
-	GameState Run();
+
+	//call script init
+	void Init();
+	
+	//call update and 
+	GameState Update();
+	
 	void Shutdown();
 
 	//load map into layer. unloads previous

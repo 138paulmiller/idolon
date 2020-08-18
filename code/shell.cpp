@@ -40,7 +40,6 @@ void Shell::onEnter()
 
 	//draw buffer as the entire background. last line is rendered but never filled
 	m_buffer = new Graphics::TextBox(m_lineW, m_lineH+1, "",m_fontName );
-	m_buffer->font = m_fontName ;
 	m_buffer->x = 0;
 	m_buffer->y = 0; 
 	m_buffer->fillColor = BLACK ;       

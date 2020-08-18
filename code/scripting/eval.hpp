@@ -2,6 +2,8 @@
 #include <string>
 #include <vector>
 
+#include "../engine/api.hpp"
+
 /*
 	Code evaluator
 */
@@ -29,16 +31,34 @@ struct TypedArg
 	ArgType type = ARG_NONE;
 };
 
+class Script : public Asset
+{
+public:
+	//
+	Script(const std::string & name="");
+	virtual ~Script() = default;
+	virtual void compile();
+	virtual bool call(const std::string & func, const std::vector<TypedArg> & args, TypedArg & ret ) ;
+	virtual bool deserialize( std::istream& in );
+	virtual void serialize( std::ostream& out ) const;
+
+	std::string code;
+
+};
+
+enum ScriptLanguage
+{
+	SCRIPT_NONE=0, SCRIPT_PYTHON
+};
+
+
 namespace Eval
 {
-	void Startup();
+	void Startup(ScriptLanguage lang = SCRIPT_PYTHON);
 	void Shutdown();
 
-	void Compile(const std::string & file);
 	void Execute(const std::string & code);
-	//game calls update and draw. Uses ret type to parse return
-
-	bool Call(const std::string & func, const std::vector<TypedArg> & args, TypedArg & ret );
-	void Test();
+	//
+	Script * Compile(const std::string & name);
 
 }

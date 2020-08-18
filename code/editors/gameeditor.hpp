@@ -3,6 +3,8 @@
 #include "../game.hpp"
 
 
+//use system to switch contexts 
+
 //This is the main editor. used to switch to set tilesets, and edit scripts
 //Edits the description file
 class  GameEditor : public Editor 

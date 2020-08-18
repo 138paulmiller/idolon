@@ -3,7 +3,6 @@
 #include "sys.hpp"
 #include "game.hpp"
 #include "ui/api.hpp"
-#include "scripting/api.hpp"
 #include "editors/api.hpp"
 
 //TODO handle all exceptions here. Close down, or restart system if necessary. Worst case shutdown, then startup system.
@@ -39,11 +38,11 @@ namespace Sys
 		//add system assets path
 		Assets::Startup( Sys::AssetPath() );
 
-		Eval::Startup();
 
-		s_context->create( APP_SHELL, s_shell = new Shell() );
-		s_context->create( APP_TILESET_EDITOR, new TilesetEditor() );
-		s_context->create( APP_MAP_EDITOR, new MapEditor() );
+		s_context->create( APP_SHELL,          s_shell = new Shell() );
+		s_context->create( APP_TILESET_EDITOR, new TilesetEditor()   );
+		s_context->create( APP_MAP_EDITOR,     new MapEditor()       );
+		s_context->create( APP_SCRIPT_EDITOR,  new ScriptEditor()    );
 
 		Engine::SetKeyEcho( true );
 		Engine::PushKeyHandler(
@@ -65,6 +64,7 @@ namespace Sys
 
 		s_shell->addCommands( cmds );
 
+		Eval::Startup();
 		LOG( "System On!\n" );
 	}
 
@@ -109,18 +109,37 @@ namespace Sys
 	static void GameStep()
 	{
 		TypedArg ret;
-		Eval::Call(GAME_API_UPDATE, {}, ret);
-		s_gamestate = Game::Run(); 
+		s_gamestate = Game::Update(); 
 		if(s_gamestate == GAME_OFF)
 		{
 			Game::Shutdown();
 		}
 	}
+	void Test()
+	{
+		Eval::Execute(
+			R"(
+from time import time,ctime
+
+print('Today is', ctime(time()))
+
+import idolon as I
+
+mouse = I.mouse()
+print("Mouse:%s" % (mouse))
+	   	)" );
+		// //import test py functions
+
+		TypedArg ret( ARG_STRING );
+		PyScript * script = new PyScript("game");
+		script->call( "multiply", { 3, 2 }, ret );
+		LOG( "Call returned %s\n", ret.value.s );
+		delete script;
+	}
 
 	int Run()
 	{
-		Eval::Test();
-
+		Test();
 		while ( Engine::Run() )
 		{
 			switch(s_gamestate)
@@ -180,11 +199,16 @@ namespace Sys
 		s_context->app<MapEditor>(APP_MAP_EDITOR)->setMap(mapName);
 		s_context->enter(APP_MAP_EDITOR);
 	}
+	
+	void RunScriptEditor(const std::string & scriptName)
+	{
+		s_context->app<ScriptEditor>(APP_SCRIPT_EDITOR)->setScript(scriptName);
+		s_context->enter(APP_SCRIPT_EDITOR);
+	}
+
 	void RunGame(const std::string & gameName)
 	{
 		TypedArg ret;
-		Eval::Call(GAME_API_UPDATE, {}, ret);
-
 		Game::Startup(gameName);
 	}
 } // namespace Sys

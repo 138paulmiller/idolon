@@ -1,0 +1,5 @@
+from time import time,ctime
+print('Hello from Script World!\n', ctime(time()))
+import idolon as I
+mouse = I.mouse()
+print("Mouse:%s" % (mouse))

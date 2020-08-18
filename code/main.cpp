@@ -280,6 +280,26 @@ void NewAsset(const Args& args)
 
 void EditAsset(const Args& args)
 {			
+	std::unordered_map<std::string, std::function<void(const std::string&)>> assetToEditorMap = 
+	{
+		{
+			Assets::GetAssetTypeExt<Graphics::Tileset>(),
+			Sys::RunTilesetEditor
+		},
+		{
+			Assets::GetAssetTypeExt<Graphics::Map>(),
+			Sys::RunMapEditor
+		},
+		{
+			Assets::GetAssetTypeExt<Script>(),
+			Sys::RunScriptEditor
+		}
+		//TODO load font as tls
+		//{
+		//	Assets::GetAssetTypeExt<Graphics::Font>(),
+		//	Sys::RunFontEditor
+		//},
+	};
 	//edit <asset>   
 	ARG_COUNT(args, 1);
 	//clear previous asset paths
@@ -289,17 +309,14 @@ void EditAsset(const Args& args)
 	//keep the dot
 	const std::string& ext = "." + FS::FileExt(args[0]);
 	const std::string& name = FS::BaseName(args[0]);
-	if(ext == Assets::GetAssetTypeExt<Graphics::Tileset>())
+	auto it = assetToEditorMap.find(ext);
+	if(it != assetToEditorMap.end())
 	{
-		Sys::RunTilesetEditor(name);
+		it->second(name);
 	}
-	else if(ext == Assets::GetAssetTypeExt<Graphics::Map>())
+	else
 	{
-		Sys::RunMapEditor(name);
-	}
-	else if(ext == Assets::GetAssetTypeExt<Graphics::Font>())
-	{
-		//load font as tls
+		SHELL_LOG("Could not find editor for asset type"  );
 	}
 }
 

@@ -19,6 +19,10 @@
 #include <unordered_map>
 #include <sstream>
 
+
+//todo mov to config
+#define TAB_SIZE 4
+
 #define LOG(...) printf(__VA_ARGS__);
 
 //Add Vector / Math classes
@@ -69,9 +73,8 @@ enum Layer
 };
 
 
-
 //note : order matches sdl2 keycodes
-enum Key
+enum Key 
 {
 	KEY_UNKNOWN = '\0',
 	KEY_RETURN = '\r',
@@ -181,3 +184,8 @@ enum Key
 	KEY_LEFT,
 	KEY_RIGHT
 };
+
+inline bool KeyPrintable(const Key key)
+{
+	return key >= KEY_TAB && key <= KEY_TILDA;
+}

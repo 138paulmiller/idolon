@@ -440,7 +440,8 @@ namespace Graphics
         for(int i = 0; i < text.size(); i++)
         {
             int s =  text[i];
-            if(s == '\n')
+            //handle newlines
+            if(s == '\n' || s == KEY_RETURN)
             {
                 i++;
                 if(i== text.size()) break;
@@ -448,6 +449,10 @@ namespace Graphics
                 s =  text[i];
                 dx = 0;
                 dy++;
+            }
+            else if(s == KEY_TAB)
+            {
+                dx += TAB_SIZE;
             }
             if(dx == destW)
             {
