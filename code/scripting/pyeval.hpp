@@ -16,6 +16,8 @@ public:
 	~PyScript();
 	void compile() override;
 	bool call(const std::string & func, const std::vector<TypedArg> & args, TypedArg & ret ) override;
+
+
 private:
 	PyObject* m_module;
 	std::unordered_map<std::string, PyObject* > m_funcs;

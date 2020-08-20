@@ -10,19 +10,26 @@
 	
 	name is guid
 */
+
 class Asset
 {
 public:
-	Asset(const std::string & name = "NO_NAME") ;
+	Asset(const std::string & name) ;
 	virtual ~Asset() = default;
-
-	virtual bool deserialize( std::istream& in ) = 0 ;
-	virtual void serialize( std::ostream& out ) const = 0;
 
 	std::string name;
 	std::string filepath;
+	//move to 
 	int refcounter = 0;
 
+};
+
+
+class Factory 
+{
+public:
+	virtual Asset * deserialize( std::istream& in ) = 0 ;
+	virtual void serialize( const Asset * asset, std::ostream& out ) const = 0;
 };
 
 
@@ -42,6 +49,8 @@ namespace Assets
 	void UnloadImpl(const std::type_info& type, const std::string& name);
 	void SaveImpl( Asset* asset, const std::type_info& type, const std::string& name);
 	void SaveAsImpl( Asset* asset, const std::type_info& type, const std::string& path);
+
+	bool ChangeNameImpl( const std::type_info& type, const std::string& name, const std::string& newname );
 	std::string GetAssetTypeExtImpl(const std::type_info& type);
 
 	template <typename Type>
@@ -73,5 +82,6 @@ namespace Assets
 	{
 		return GetAssetTypeExtImpl(typeid(Type));
 	}
+
 
 }

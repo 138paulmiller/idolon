@@ -1,4 +1,6 @@
 #include "game.hpp"
+#include "assets/api.hpp"
+
 namespace 
 {
 
@@ -62,7 +64,7 @@ namespace Game
 {
 
 	Cartridge::Cartridge( const std::string & name, const Desc * desc, char * data )
-		: Asset(name)
+		: name(name)
 		, m_desc(desc)
 		, m_data(data)
 	{
@@ -81,9 +83,9 @@ namespace Game
 		iss.str(m_data+offset);
 
 		//load map from cartridge 
-		Graphics::Map * map = new Graphics::Map();
-		map->deserialize(iss);
-
+		MapFactory * factory = new MapFactory();
+		Graphics::Map * map = dynamic_cast<Graphics::Map*>(factory->deserialize(iss));
+		delete factory;
 		return map;
 	}
 

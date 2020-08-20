@@ -3,6 +3,7 @@
 
 #include "../sys.hpp"
 
+#define SCRIPT_PRELUDE '$'
 
 /*
 	TODO 
@@ -38,9 +39,11 @@ TypedArg::TypedArg( char* s )
 	value.s = s;
 }
 
-Script::Script(const std::string & name)
+
+Script::Script( const 	std::string &name )
 	:Asset(name)
-{}
+{
+}
 
 void Script::compile()
 {
@@ -50,35 +53,7 @@ void Script::compile()
 bool Script::call(const std::string & func, const std::vector<TypedArg> & args, TypedArg & ret ) 
 {
 	ASSERT(0, "Script: Language cannot compile! Language does not support it");
-}
-
-bool Script::deserialize( std::istream& in )
-{
-	try
-	{
-		std::getline( in, name, '\n' ); 
-		FS::ReplaceAll(name, "\r", "");
-		int len;
-		in >> len ;
-		char * data = new char[len]; 
-		in.read(data, len);
-		code = std::string(data);
-		delete data;
-		//recompile
-		compile();
-		return true;
-	}
-	catch(...)
-	{
-		LOG("Script : failed to load script %s", name.c_str());
-		return false;
-	}
-}
-
-void Script::serialize( std::ostream& out ) const
-{
-    out << name << std::endl;
-	out << code.size() << code;
+	return 0;
 }
 
 namespace 

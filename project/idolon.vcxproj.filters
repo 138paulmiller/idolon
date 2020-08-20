@@ -23,22 +23,40 @@
     <Filter Include="Source Files\editors">
       <UniqueIdentifier>{20d152f5-7e55-49a2-bd53-95ad93195fad}</UniqueIdentifier>
     </Filter>
+    <Filter Include="System Files\assets\demo">
+      <UniqueIdentifier>{2d5d8863-5e13-475f-82ed-a6f3d1bb15f4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\assets">
+      <UniqueIdentifier>{4efbf390-e071-4418-bfb1-c88c0cc57a85}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\system\test.py">
-      <Filter>System Files</Filter>
-    </None>
-    <None Include="..\system\assets\basic.font">
-      <Filter>System Files\assets</Filter>
-    </None>
-    <None Include="..\system\assets\default.font">
-      <Filter>System Files\assets</Filter>
-    </None>
-    <None Include="..\system\assets\full.font">
-      <Filter>System Files\assets</Filter>
-    </None>
     <None Include="..\code\scripting\pybindings.inl">
       <Filter>Source Files\scripting</Filter>
+    </None>
+    <None Include="..\system\assets\basic.fnt">
+      <Filter>System Files\assets</Filter>
+    </None>
+    <None Include="..\system\assets\default.fnt">
+      <Filter>System Files\assets</Filter>
+    </None>
+    <None Include="..\system\assets\full.fnt">
+      <Filter>System Files\assets</Filter>
+    </None>
+    <None Include="..\system\game.py">
+      <Filter>System Files</Filter>
+    </None>
+    <None Include="..\system\.gitignore">
+      <Filter>System Files</Filter>
+    </None>
+    <None Include="..\system\assets\demo\demo.map">
+      <Filter>System Files\assets\demo</Filter>
+    </None>
+    <None Include="..\system\assets\demo\demo.scr">
+      <Filter>System Files\assets\demo</Filter>
+    </None>
+    <None Include="..\system\assets\demo\demo.tls">
+      <Filter>System Files\assets\demo</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -74,9 +92,6 @@
     </ClInclude>
     <ClInclude Include="..\code\editors\tileseteditor.hpp">
       <Filter>Source Files\editors</Filter>
-    </ClInclude>
-    <ClInclude Include="..\code\engine\assets.hpp">
-      <Filter>Source Files\engine</Filter>
     </ClInclude>
     <ClInclude Include="..\code\engine\core.hpp">
       <Filter>Source Files\engine</Filter>
@@ -114,6 +129,21 @@
     <ClInclude Include="..\code\engine\api.hpp">
       <Filter>Source Files\engine</Filter>
     </ClInclude>
+    <ClInclude Include="..\code\scripting\pyeval.hpp">
+      <Filter>Source Files\scripting</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\editors\scripteditor.hpp">
+      <Filter>Source Files\editors</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\assets\factories.hpp">
+      <Filter>Source Files\assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\assets\assets.hpp">
+      <Filter>Source Files\assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\assets\api.hpp">
+      <Filter>Source Files\assets</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\code\scripting\eval.cpp">
@@ -136,9 +166,6 @@
     </ClCompile>
     <ClCompile Include="..\code\editors\tileseteditor.cpp">
       <Filter>Source Files\editors</Filter>
-    </ClCompile>
-    <ClCompile Include="..\code\engine\assets.cpp">
-      <Filter>Source Files\engine</Filter>
     </ClCompile>
     <ClCompile Include="..\code\engine\core.cpp">
       <Filter>Source Files\engine</Filter>
@@ -169,6 +196,18 @@
     </ClCompile>
     <ClCompile Include="..\code\sys.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\scripting\pyeval.cpp">
+      <Filter>Source Files\scripting</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\editors\scripteditor.cpp">
+      <Filter>Source Files\editors</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\assets\factories.cpp">
+      <Filter>Source Files\assets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\assets\assets.cpp">
+      <Filter>Source Files\assets</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

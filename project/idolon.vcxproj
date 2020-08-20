@@ -160,20 +160,27 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include="..\code\scripting\pybindings.inl" />
-    <None Include="..\system\assets\basic.font" />
-    <None Include="..\system\assets\default.font" />
-    <None Include="..\system\assets\full.font" />
-    <None Include="..\system\test.py" />
+    <None Include="..\system\.gitignore" />
+    <None Include="..\system\assets\basic.fnt" />
+    <None Include="..\system\assets\default.fnt" />
+    <None Include="..\system\assets\demo\demo.map" />
+    <None Include="..\system\assets\demo\demo.scr" />
+    <None Include="..\system\assets\demo\demo.tls" />
+    <None Include="..\system\assets\full.fnt" />
+    <None Include="..\system\game.py" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\code\algo.hpp" />
+    <ClInclude Include="..\code\assets\api.hpp" />
+    <ClInclude Include="..\code\assets\assets.hpp" />
+    <ClInclude Include="..\code\assets\factories.hpp" />
     <ClInclude Include="..\code\config.hpp" />
     <ClInclude Include="..\code\editors\api.hpp" />
     <ClInclude Include="..\code\editors\gameeditor.hpp" />
     <ClInclude Include="..\code\editors\mapeditor.hpp" />
+    <ClInclude Include="..\code\editors\scripteditor.hpp" />
     <ClInclude Include="..\code\editors\tileseteditor.hpp" />
     <ClInclude Include="..\code\emu.hpp" />
-    <ClInclude Include="..\code\engine\assets.hpp" />
     <ClInclude Include="..\code\engine\core.hpp" />
     <ClInclude Include="..\code\engine\engine.hpp" />
     <ClInclude Include="..\code\engine\err.hpp" />
@@ -183,6 +190,7 @@
     <ClInclude Include="..\code\scripting\api.hpp" />
     <ClInclude Include="..\code\scripting\eval.hpp" />
     <ClInclude Include="..\code\engine\api.hpp" />
+    <ClInclude Include="..\code\scripting\pyeval.hpp" />
     <ClInclude Include="..\code\shell.hpp" />
     <ClInclude Include="..\code\sys.hpp" />
     <ClInclude Include="..\code\ui\api.hpp" />
@@ -192,10 +200,12 @@
     <ClInclude Include="..\code\ui\ui.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\code\assets\assets.cpp" />
+    <ClCompile Include="..\code\assets\factories.cpp" />
     <ClCompile Include="..\code\editors\mapeditor.cpp" />
+    <ClCompile Include="..\code\editors\scripteditor.cpp" />
     <ClCompile Include="..\code\editors\tileseteditor.cpp" />
     <ClCompile Include="..\code\emu.cpp" />
-    <ClCompile Include="..\code\engine\assets.cpp" />
     <ClCompile Include="..\code\engine\core.cpp" />
     <ClCompile Include="..\code\engine\engine.cpp" />
     <ClCompile Include="..\code\engine\err.cpp" />
@@ -204,6 +214,7 @@
     <ClCompile Include="..\code\game.cpp" />
     <ClCompile Include="..\code\main.cpp" />
     <ClCompile Include="..\code\scripting\eval.cpp" />
+    <ClCompile Include="..\code\scripting\pyeval.cpp" />
     <ClCompile Include="..\code\shell.cpp" />
     <ClCompile Include="..\code\sys.cpp" />
     <ClCompile Include="..\code\ui\commands.cpp" />

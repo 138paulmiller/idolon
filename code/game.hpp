@@ -49,8 +49,8 @@ namespace  Game
 	};
 
 	//create a mapping from tileset name to cartridge 
-
-	struct Cartridge : Asset 
+	//create cart factory
+	struct Cartridge
 	{ 
 		struct Header
 		{
@@ -64,6 +64,7 @@ namespace  Game
 		Graphics::Map * LoadMap(const std::string & mapname);
 
 	private:
+		std::string name;
 		char * m_data;
 		const Desc * m_desc;
 	};

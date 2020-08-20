@@ -8,6 +8,7 @@
 #include "shell.hpp"
 #include "ui/api.hpp"
 #include "scripting/api.hpp"
+#include "assets/api.hpp"
 
 enum : uint8
 {

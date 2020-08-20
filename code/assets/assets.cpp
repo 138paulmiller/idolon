@@ -1,7 +1,7 @@
 
-#include "api.hpp"
+#include "assets.hpp"
+#include "factories.hpp"
 #include "../scripting/api.hpp"
-
 
 /*TODO 
 	replace fstream with C file
@@ -9,15 +9,15 @@
 
  */
 
-Asset::Asset(const std::string& name) 
+Asset::Asset( const std::string &name )
 	:name(name)
-{
-}
+{}
 
 namespace
 {
 	template<class Type>
 	using Table = std::unordered_map<std::string, Type>;
+
 	Table<Asset*> s_assets;	
 
 	std::vector<std::string> s_assetdirs; 
@@ -26,13 +26,14 @@ namespace
 	{
 		AssetDetails() = default;
 		std::string ext;
-		std::function<Asset*()> create;
+		std::function<Asset*(std::istream & in)> deserialize;
+		std::function<void(const Asset*, std::ostream & out)> serialize;
 	};
 	std::unordered_map<const char*, AssetDetails> s_details ; 
 
 } // namespace
 
-	
+
 namespace Assets
 {
 	std::string GetAssetTypeExtImpl(const std::type_info& type)
@@ -75,8 +76,19 @@ namespace Assets
 				typeid(Graphics::Map).name(), 
 				{ 
 					".map", 
-					[](){
-						return new Graphics::Map(); 
+					//deserialize
+					[](std::istream & in)->Asset*{
+						MapFactory * factory = new MapFactory();
+						Asset * asset =  factory->deserialize( in );
+						delete factory;
+						return asset;
+
+					},
+					//serialize
+					[](const Asset* asset, std::ostream & out){
+						MapFactory* factory = new MapFactory();
+						factory->serialize( asset, out );
+						delete factory;
 					} 
 				}
 			},
@@ -84,8 +96,19 @@ namespace Assets
 				typeid(Graphics::Tileset).name(), 
 				{ 
 					".tls", 
-					[](){
-						return new Graphics::Tileset(); 
+					//deserialize
+					[](std::istream & in)->Asset*{						
+						TilesetFactory * factory = new TilesetFactory();
+						Asset * asset =  factory->deserialize( in );
+						delete factory;
+						return asset;
+
+					},
+					//serialize
+					[](const Asset* asset, std::ostream & out){
+						TilesetFactory* factory = new TilesetFactory();
+						factory->serialize( asset, out );
+						delete factory;
 					} 
 				}
 			},
@@ -93,8 +116,19 @@ namespace Assets
 				typeid(Graphics::Font).name(), 
 				{ 
 					".fnt", 
-					[](){
-						return new Graphics::Font(); 
+
+					//deserialize
+					[](std::istream & in)->Asset*{						
+						FontFactory * factory = new FontFactory();
+						Asset * asset =  factory->deserialize( in );
+						delete factory;
+						return asset;
+					},
+					//serialize
+					[](const Asset* asset, std::ostream & out){
+						FontFactory* factory = new FontFactory();
+						factory->serialize( asset, out );
+						delete factory;
 					} 
 				}
 			},
@@ -102,8 +136,19 @@ namespace Assets
 				typeid(Script).name(), 
 				{ 
 					".scr", 
-					[](){
-						return new Script(); 
+					//deserialize
+					[](std::istream & in)->Asset*{
+						ScriptFactory * factory = new ScriptFactory();
+						Asset * asset =  factory->deserialize( in );
+						delete factory;
+						return asset;
+
+					},
+					//serialize
+					[](const Asset* asset, std::ostream & out){
+						ScriptFactory* factory = new ScriptFactory();
+						factory->serialize( asset, out );
+						delete factory;
 					} 
 				}
 			},
@@ -144,25 +189,18 @@ namespace Assets
 	Asset* DeserializeAsset(const std::type_info& type, std::istream& in )
 	{
 	
-		Asset * asset = 0;
-
 		const auto it = s_details.find(type.name());
 		if(it == s_details.end())
 			return 0;
-		asset =  s_details[type.name()].create();
-
-		if( !asset->deserialize(in) )
-		{
-			delete asset;
-			asset = 0;
-		}
-
-		return asset;
+		return it->second.deserialize(in);
 	}
 
-	void Serialize(const Asset * asset, std::ostream& out )
+	void Serialize(const Asset * asset, const std::type_info& type,  std::ostream& out )
 	{
-		asset->serialize(out);
+		const auto it = s_details.find(type.name());
+		if(it == s_details.end())
+			return;
+		it->second.serialize(asset, out);
 	}	
 	
 	void UnloadImpl(const std::type_info& type, const std::string& name)
@@ -248,7 +286,7 @@ namespace Assets
 
 			std::ofstream outfile;
 			outfile.open(path);
-			Serialize(asset, outfile);
+			Serialize(asset, type, outfile);
 			outfile.close();
 		}
 		catch (...)
@@ -268,5 +306,6 @@ namespace Assets
 		}
 		SaveAsImpl(asset, type, path);
 	}
+
 
 } // namespace Assets

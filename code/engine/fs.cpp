@@ -255,7 +255,15 @@ namespace FS
 	{
 		return FS::FullPath(path1 + "/" + path2);
 	}
-
+	std::string NoExt( const std::string &path )
+	{
+		size_t dot = path.find_last_of(".");
+		if (dot != std::string::npos)
+		{
+			return path.substr(0, dot);
+		}
+		return path;
+	}
 	std::string BaseName(const std::string& path)
 	{
 		std::string pathcpy = path;
@@ -263,11 +271,7 @@ namespace FS
 		if (sep != std::string::npos)
 			pathcpy = pathcpy.substr(sep + 1, pathcpy.size() - sep - 1);
 		size_t dot = pathcpy.find_last_of(".");
-		if (dot != std::string::npos)
-		{
-			return pathcpy.substr(0, dot);
-		}
-		return pathcpy;
+		return NoExt( pathcpy );
 	}
 	std::string FileExt(const std::string& path)
 	{

@@ -3,18 +3,11 @@
 #include "core.hpp"
 #include "engine.hpp"
 #include "graphics.hpp"
-
+#include "../assets/api.hpp"
 
 namespace Graphics
 {
 
-
-    Tileset::Tileset()
-        : w( 0 ), h( 0 )
-        , pixels( 0)
-        , texture( -1 )
-    {
-    }
 
     Tileset::Tileset( const std::string& name, int w, int h )
         : Asset( name )
@@ -32,38 +25,6 @@ namespace Graphics
     {
         delete[]pixels;
         Engine::DestroyTexture( texture );
-    }
-
-    bool Tileset::deserialize(std::istream & in)
-    {
-        try 
-        {
-            std::getline( in, name, '\n' ); 
-            FS::ReplaceAll(name, "\r", "");
-
-            in >> w >> h;
-            int blocksize;
-            in >> blocksize ;
-            char * imagedata = new char[blocksize]; 
-            in.read(imagedata, blocksize);
-            reset( (Color*)imagedata, w , h);
-        }
-        catch (...)
-        {
-            LOG("Assets: Failed to load tileset %s\n", name.c_str());
-            return 0;
-        }
-        return 1;
-    }
-    
-    void Tileset::serialize(std::ostream & out) const 
-    {
-        out << name << std::endl;
-        //TODO - verify endian-ness!
-        int blocksize = sizeof(Color) * w * h;
-        out << w << ' ' << h << ' ' << blocksize;
-        out.write((char*)pixels, blocksize);
-        LOG("Assets: Saved tileset\n");
     }
 
     void Tileset::reset(Color * newpixels, int newW, int newH)
@@ -124,19 +85,7 @@ namespace Graphics
     /*
     TODO - Split map into 128x128 textures. Render these to the screen
     */
-    Map::Map()
-        :m_texture( -1 )
-        ,w( 0 ), h( 0 )
-        ,tilew( 0 ), tileh( 0 )
-        ,tiles( 0 )      
-    {
-        for ( int i = 0; i < TILESETS_PER_MAP; i++ )
-        {
-            tilesets[i] = "";
-            m_tilesetscache[i] = 0;
-        }
 
-    }
 
     //width and height is number of tiles
     Map::Map( const std::string& name, int w, int h, int tilew, int tileh )
@@ -171,54 +120,6 @@ namespace Graphics
 
     }
 
-    bool Map::deserialize( std::istream & in)
-    {
-        try 
-        {
-            std::getline( in, name, '\n' ); 
-            FS::ReplaceAll(name, "\r", "");
-
-            for ( int i = 0; i < TILESETS_PER_MAP; i++ )
-            {
-                std::getline( in, tilesets[i], '\n' ); 
-                FS::ReplaceAll(tilesets[i], "\r", "");
-            }
-            in >> w >> h >> tilew >> tileh;
-
-            //TODO - verify endian-ness!
-            int blocksize;
-            in >> blocksize ;
-            char * tiledata = new char[blocksize]; 
-            in.read(tiledata, blocksize);
-            reset(tiledata, w,h, tilew, tileh);
-
-            LOG("Assets: Loaded map %s\n", name.c_str());
-
-        }
-        catch (...)
-        {
-            LOG("Assets: Failed to load map %s\n", name.c_str());
-            return 0;
-        }
-        return 1;
-    }   
-    
-    void Map::serialize(std::ostream & out) const
-    {
-
-        out << name << std::endl;
-        for(int i = 0 ; i < TILESETS_PER_MAP; i++ )
-        {
-            out << tilesets[i] << std::endl;
-        }
-        //TODO - verify endian-ness!
-        int blocksize =  w * h;
-        out << w << ' ' << h << ' ';
-        out << tilew << ' ' << tileh << ' ';
-        out << blocksize;
-        out.write((char * )tiles, blocksize);
-        LOG("Assets: Saved map\n");
-    }
 
 
     float Map::scale()
@@ -416,11 +317,6 @@ namespace Graphics
 
     ///////////////////////////////////////////////////////////////////////////////
 
-    Font::Font()
-         :start(0), charW(0), charH(0)
-    {
-
-    }
 
     Font::Font(const std::string& name, int w, int h, int charW, int charH, char start)
          :Tileset(name, w, h), 
@@ -476,44 +372,6 @@ namespace Graphics
             Engine::Blit(texture, destTexture, src, pos);
             dx++;
         }
-    }
-    bool Font::deserialize( std::istream& in )
-    {
-        try 
-        {   
-            std::getline( in, this->name, '\n' ); 
-            FS::ReplaceAll(this->name, "\r", "");
-            int w,h, blocksize;
-            int startInt;
-            in >> w >> h >> charW >> charH >> startInt >> blocksize ;
-            //TODO - verify endian-ness!
-            char * imagedata = new char[blocksize]; 
-            in.read(imagedata, blocksize);
-
-            start= startInt;
-            reset((Color*)imagedata, w,h);
-
-        }
-        catch (...)
-        {
-            LOG("Assets: Failed to load font %s\n", name.c_str());
-            return 0;
-        }
-        return 1;
-    }   
-
-    void Font::serialize(std::ostream & out) const 
-    {
-        out << name << std::endl;
-        //TODO - verify endian-ness!
-        const int blocksize = sizeof(Color) * w * h;
-        
-        out << w            << ' ' << h         << ' '; 
-        out << charW        << ' ' << charH     << ' ' ; 
-        out << (int)(start) << ' ' << blocksize ;
-        
-        out.write((char*)pixels, blocksize);
-        LOG("Assets: Saved font\n");
     }
 
 

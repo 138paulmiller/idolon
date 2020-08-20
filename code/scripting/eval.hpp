@@ -31,26 +31,22 @@ struct TypedArg
 	ArgType type = ARG_NONE;
 };
 
-class Script : public Asset
-{
-public:
-	//
-	Script(const std::string & name="");
-	virtual ~Script() = default;
-	virtual void compile();
-	virtual bool call(const std::string & func, const std::vector<TypedArg> & args, TypedArg & ret ) ;
-	virtual bool deserialize( std::istream& in );
-	virtual void serialize( std::ostream& out ) const;
-
-	std::string code;
-
-};
-
 enum ScriptLanguage
 {
 	SCRIPT_NONE=0, SCRIPT_PYTHON
 };
 
+class Script : public Asset
+{
+public:
+	Script( const 	std::string & name );
+	virtual ~Script() = default;
+	virtual void compile();
+	virtual bool call(const std::string & func, const std::vector<TypedArg> & args, TypedArg & ret ) ;
+
+	std::string code;
+	ScriptLanguage lang;
+};
 
 namespace Eval
 {

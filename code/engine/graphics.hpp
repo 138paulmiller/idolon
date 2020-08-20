@@ -1,7 +1,7 @@
 #pragma once
 
 #include "core.hpp"
-#include "assets.hpp"
+#include "../assets/api.hpp"
 
 
 //Default Tileset size
@@ -42,16 +42,10 @@ namespace Graphics
     */
     class Tileset : public Asset
     {
-        friend class Sprite;
     public:
-        Tileset();
         Tileset(const std::string& name, int w=TILESET_W, int h=TILESET_H);
         ~Tileset();
         
-        //asset 
-        bool deserialize( std::istream& in ) override;
-        void serialize( std::ostream& out ) const override;
-        //
         //reset the data         
         void reset(Color * pixels, int w, int h);
         //call sparingly . if no rect, will update entire. pushes data to gpu
@@ -60,6 +54,7 @@ namespace Graphics
         int id( const Rect & tile) const;
         //get tile rect of size tx x th 
         Rect tile( int tileId, int tw, int th ) const;
+
 
         Color * pixels;
         int w, h;
@@ -74,14 +69,9 @@ namespace Graphics
     class Map : public Asset
     {
     public:
-        Map();
         //width and height is number of tiles
         Map(const std::string & name, int w=MAP_W, int h=MAP_H, int tilew=TILE_W, int tileh=TILE_H);
         ~Map();
-
-        //asset 
-        bool deserialize( std::istream& in ) override;
-        void serialize( std::ostream& out ) const override;
         
         //reset the data and reload
         void reset(char * tiles, int w, int h, int tilew=TILE_W, int tileh=TILE_H); 
@@ -113,7 +103,7 @@ namespace Graphics
         int w,h, tilew, tileh, worldw, worldh;
 
         char * tiles;
-
+        
      private:
         Tileset * m_tilesetscache[TILESETS_PER_MAP];
         //TODO - split map into multiple subtextures. Each streamed in on demand. "Super maps"
@@ -129,13 +119,7 @@ namespace Graphics
     class Font : public Tileset
     {
     public:
-        Font();
         Font(const std::string& name, int w, int h, int charW = TILE_W, int charH = TILE_H, char start = ' ');
-
-        //asset 
-        bool deserialize( std::istream& in )override ;
-        void serialize( std::ostream& out ) const override ;
-        //
 
         //src is textbox in character units
         void blit(int destTexture, const std::string & text, const Rect & dest);
@@ -143,6 +127,7 @@ namespace Graphics
         //do not modify!s
         int charW,charH;
         char start;
+        
     };
 
     // ================================== Runtime graphical components ==================================

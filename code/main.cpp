@@ -205,8 +205,8 @@ void ImportAsset(const Args& args)
 		Graphics::Tileset * sheet = new Graphics::Tileset(name, w, h);
 		memcpy(sheet->pixels, pixels, w * h * sizeof(Color));
 		sheet->update();
-		sheet->filepath = SystemAssetPath<Graphics::Tileset>(name);
-		Assets::Save(sheet);
+		const std::string & filepath = SystemAssetPath<Graphics::Tileset>(name);
+		Assets::SaveAs(sheet, filepath );
 
 	}
 	else if(args[0] == "-f" )
@@ -244,9 +244,10 @@ void ImportAsset(const Args& args)
 		Graphics::Font* font = new Graphics::Font( name, fw, fh, cw, ch, start );
 		memcpy(font->pixels, newpixels, fw * fh * sizeof(Color));
 		font->update();
-		font->filepath = SystemAssetPath<Graphics::Font>(name);
-		Assets::Save(font);
-		delete newpixels;
+		const std::string & filepath = SystemAssetPath<Graphics::Font>(name);
+		Assets::SaveAs(font, filepath );
+
+		delete[] newpixels;
 	}
 }
 
@@ -308,7 +309,7 @@ void EditAsset(const Args& args)
 	Assets::AddPath(FS::Cwd());
 	//keep the dot
 	const std::string& ext = "." + FS::FileExt(args[0]);
-	const std::string& name = FS::BaseName(args[0]);
+	const std::string& name = FS::NoExt(args[0]);
 	auto it = assetToEditorMap.find(ext);
 	if(it != assetToEditorMap.end())
 	{

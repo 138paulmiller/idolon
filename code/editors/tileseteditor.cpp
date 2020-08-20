@@ -111,6 +111,7 @@ void TilesetEditor::onExit()
 
 void TilesetEditor::onTick()
 {
+
 	//set pixel tool by default if not set
 	Engine::ClearScreen(EDITOR_COLOR);
 	//update 

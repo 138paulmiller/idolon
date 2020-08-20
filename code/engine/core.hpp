@@ -13,6 +13,7 @@
 #include <string>
 #include <vector>
 #include <functional>
+#include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -29,6 +30,8 @@
 
 typedef unsigned char uint8;
 typedef unsigned int uint;
+
+std::string Trim( const std::string &s );
 
 struct Color
 {

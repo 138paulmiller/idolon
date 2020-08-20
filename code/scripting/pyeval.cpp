@@ -32,8 +32,10 @@ PyScript::~PyScript()
 
 void PyScript::compile()
 {
+	
 	const std::string & file = name;
 	LOG("Compiling %s\n", file.c_str());
+	if ( code.size() == 0 ) return;
 
 	PyObject * modname = PyUnicode_FromString(file.c_str());
 	if ( m_module )
@@ -134,8 +136,6 @@ bool PyScript::call(const std::string & func, const std::vector<TypedArg> & args
     }
 	return 1;
 }
-
-
 
 namespace 
 {

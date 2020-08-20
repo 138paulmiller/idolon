@@ -2,6 +2,13 @@
 #include "core.hpp"
 
 
+std::string Trim(const std::string &s)
+{
+	std::string::const_iterator wsfront=std::find_if_not(s.begin(),s.end(), std::isspace);
+	std::string::const_iterator wsback=std::find_if_not(s.rbegin(),s.rend(), std::isspace).base();
+	return (wsback<=wsfront ? std::string() : std::string(wsfront,wsback));
+}
+
 bool Rect::intersects(const Rect & other) const
 {
 	return x < other.x+other.w && x+w > other.x 
