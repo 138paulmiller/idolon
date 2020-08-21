@@ -4,9 +4,12 @@
 
 std::string Trim(const std::string &s)
 {
-	std::string::const_iterator wsfront=std::find_if_not(s.begin(),s.end(), std::isspace);
-	std::string::const_iterator wsback=std::find_if_not(s.rbegin(),s.rend(), std::isspace).base();
-	return (wsback<=wsfront ? std::string() : std::string(wsfront,wsback));
+	int i = 0,j = s.size(); 
+	while(i < s.size() && std::isspace(s[i]) ) i++;
+	while(j > 0 && std::isspace(s[j-1]) ) j--;
+	if(i == s.size()) i = s.size()-1;
+	if(j == 0) j=0;
+	return s.substr(i,j);
 }
 
 bool Rect::intersects(const Rect & other) const

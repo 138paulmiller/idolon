@@ -185,7 +185,8 @@ void Shell::onTick()
 	//process command at the end of the frame
 	if(m_command.size())
 	{
-		Execute(m_command, m_commands);
+
+		Execute(Trim(m_command), m_commands);
 		m_command = "";
 	}
 }

@@ -216,9 +216,9 @@ namespace Assets
 				asset->refcounter -= 1;							
 				if (asset->refcounter == 0)
 				{
-					delete asset;
-					s_assets.erase(path);
 					LOG("Assets: Unloaded %s%s (%s)\n", asset->name.c_str(), GetAssetTypeExtImpl(type).c_str(), path.c_str());
+					s_assets.erase(path);
+					delete asset;
 				}
 				return;
 			}

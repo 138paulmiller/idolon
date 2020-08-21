@@ -238,9 +238,9 @@ void MapEditor::onKey( Key key, bool isDown )
 
 }
 
-void MapEditor::handleTool()
+bool MapEditor::handleTool()
 {
-	if(!m_map ) return;
+	if(!m_map ) return false;
 	const Rect & selection = m_tilepicker->selection();
 	const Graphics::Tileset * tileset = m_tilepicker->tileset();
 	//if pixel tool
@@ -273,6 +273,7 @@ void MapEditor::handleTool()
 
 								m_map->tiles[tiley * m_map->w + tilex] = id;
 								m_map->update( { tilex, tiley, 1, 1 } );
+								return true;
 							}
 						}
 					}
@@ -293,12 +294,14 @@ void MapEditor::handleTool()
 					{
 						m_map->tiles[tiley * m_map->w + tilex] = TILE_CLEAR;
 						m_map->update( { tilex, tiley, 1, 1 } );
+						return true;
 					}
 				}
 			}
 		break;
 
 	}
+	return false;
 }
 
 void MapEditor::drawOverlay()

@@ -409,7 +409,8 @@ namespace UI
 	TilePicker::TilePicker()
 		:
 		m_scale(2),
-		m_tileset(0)
+		m_tileset(0),
+		m_focus(false)
 	{
 		resizeCursor(m_selectionSizes[0][0], m_selectionSizes[0][0]);
 	}
@@ -461,7 +462,8 @@ namespace UI
 	}
 	void TilePicker::onUpdate()
 	{
-		if (Engine::GetMouseButtonState(MOUSEBUTTON_LEFT) != BUTTON_UP)
+		const int leftbtn =Engine::GetMouseButtonState(MOUSEBUTTON_LEFT); 
+		if ( leftbtn != BUTTON_UP)
 		{
 			int mx, my;
 			Engine::GetMousePosition(mx, my);
@@ -471,9 +473,22 @@ namespace UI
 
 			if(rmx >= 0 && rmx < m_box.w && rmy >= 0 && rmy < m_box.h)
 			{
-				//get x *  y from mouse loca xy
-				m_cursor.x = (rmx / m_cursor.w) * m_cursor.w;
-				m_cursor.y = (rmy / m_cursor.h) * m_cursor.h;
+				if(leftbtn == BUTTON_DOWN)
+				{
+					m_focus = true;
+				}
+				if(m_focus)
+				{
+					//get x *  y from mouse loca xy
+					m_cursor.x = (rmx / m_cursor.w) * m_cursor.w;
+					m_cursor.y = (rmy / m_cursor.h) * m_cursor.h;
+				}
+			}
+			else
+			{
+				//clicked outside
+				if(leftbtn == BUTTON_DOWN)
+					m_focus = false;
 			}
 		}
 	}
@@ -545,5 +560,4 @@ namespace UI
 				break;
 		}
 	}
-
 } // namespace UI

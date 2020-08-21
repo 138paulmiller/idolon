@@ -205,16 +205,17 @@ namespace UI
 
 		const Rect & rect();
 		void onUpdate() override;
-		void onDraw();
+		void onDraw() override;
 		
 		void reload(const std::string & tileset);
 		//get tile/frame relative to given sheet
 		Rect selection();
 		int selectionIndex();
+		//get the id of the tile
 		int indexOf(const Rect & tile);
 		void moveCursor(int dx, int dy);
 		void resizeCursor(int w, int h);
-		void handleKey(Key key, bool isDown);
+		void handleKey(Key key, bool isDown) ;
 
 		const Graphics::Tileset * tileset() const { return m_tileset; } 
 
@@ -226,6 +227,7 @@ namespace UI
 		Rect m_box;
 		const int m_scale;
 		int m_aspect;
+		bool m_focus;
 
 		static const int m_selectionSizes[2][2];
 	};

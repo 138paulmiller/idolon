@@ -59,7 +59,7 @@ private:
 	//"highlights cursor"
 	//x y in pixel space. aligned to tiles
 	bool handleScroll();
-	void handleTool();
+	bool handleTool();
 	//by default are all empty
 	std::string m_mapName;
 	

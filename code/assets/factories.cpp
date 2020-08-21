@@ -112,7 +112,7 @@ void MapFactory::serialize(const Asset * asset, std::ostream & out) const
     out << map->tilew << ' ' << map->tileh << ' ';
     out << blocksize;
     out.write((char * )map->tiles, blocksize);
-    LOG("MapFactory: Saved %s\n",  map->name);
+    LOG("MapFactory: Saved %s\n",  map->name.c_str());
 }
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -161,7 +161,7 @@ void FontFactory::serialize(const Asset * asset, std::ostream & out) const
     out << (int)font->start   << ' ' << blocksize ;
         
     out.write((char*)font->pixels, blocksize);
-    LOG("FontFactory: Saved %s\n",  font->name);
+    LOG("FontFactory: Saved %s\n",  font->name.c_str());
 }
 
 //////////////////////////////////////////////////////////////////////////
