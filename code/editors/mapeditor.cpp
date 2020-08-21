@@ -22,13 +22,16 @@ MapEditor::MapEditor()
 void MapEditor::onEnter()
 {
 	LOG("Entering map editor ... \n");
-	int w,h;
-	Engine::GetSize(w,h);
+	int screenw, screenh;
+	Engine::GetSize(screenw, screenh);
 
 	m_tilesetSelection = 0;
 	m_map = Assets::Load<Graphics::Map>(m_mapName);
+
 	m_tilepicker = new UI::TilePicker();
-	m_tilepicker->reload(m_map->tilesets[m_tilesetSelection]);
+	const std::string &tilesetName = m_map ? m_map->tilesets[0] : "";
+	m_tilepicker->reload( tilesetName );
+
 
 	//use just to get w/h
 	const std::string &fontName = DEFAULT_FONT;
@@ -37,14 +40,15 @@ void MapEditor::onEnter()
 	const int charH = font->charH;
 	Assets::Unload<Graphics::Font>(fontName);
 
-	const int toolY = h - (m_tilepicker->rect().h + TILE_H);
+	const int toolY = screenh - (m_tilepicker->rect().h + TILE_H);
 
-	//TODO - text edit to set tileset
-	m_tooldata = {0,0, m_map->tilew, m_map->tileh};
+	//TODO - default tile w and height
+	m_tooldata = {0,0, TILE_W, TILE_H};
 	m_tool = MAP_TOOL_PIXEL;
 
-	m_overlay = new Graphics::Tileset("MapEditor_Overlay", m_map->rect.w, m_map->rect.h);
-	m_toolbar = new UI::Toolbar(this, 0, toolY);
+	//managed locally. is not added to asset manager
+	m_overlay = new Graphics::Tileset("MapEditor_Overlay", screenw, screenh);
+	m_toolbar = new UI::Toolbar(this, 0, 0);
 	m_toolbar->font = fontName;
 
 	m_toolbar->add("PIXEL", [&](){
@@ -61,7 +65,7 @@ void MapEditor::onEnter()
 		m_tooldata = { -1, -1, -1, -1, -1 ,-1 };
 	});
 
-	int tw = w - 16* charW;
+	int tw = screenw - 16* charW;
 	m_tilesetSelectToolbar = new UI::Toolbar(this, tw, toolY);
 	m_toolbar->font = fontName;
 
@@ -78,7 +82,7 @@ void MapEditor::onEnter()
 		tw+=(charW+border*2); //left and right border
 	}	
 	//add two buttons
-	m_tilesetInput = new UI::TextInput(m_map->tilesets[0], tw, toolY, tw, 1, fontName);
+	m_tilesetInput = new UI::TextInput(tilesetName, tw, toolY, tw, 1, fontName);
 	m_tilesetInput->cbAccept = [this]()
 	{
 		this->setTileset(m_tilesetSelection, m_tilesetInput->text);
@@ -95,8 +99,8 @@ void MapEditor::onEnter()
 	//select pixel and first tileset by default
 	m_toolbar->get(MAP_TOOL_PIXEL)->click();		
 	m_tilesetInput->cbAccept();
-
 	showWorkspace();
+	useTileset( 0 );
 
 }
 
@@ -105,11 +109,11 @@ void MapEditor::onExit()
 	delete m_overlay;
 	m_overlay = 0;
 
-
 	Assets::Unload<Graphics::Map>(m_mapName);
 	//delete widgets
 	App::clear();
 	Editor::onExit();
+
 
 	LOG("Exited map editor\n");
 }
@@ -173,13 +177,16 @@ bool MapEditor::handleScroll()
 //
 void MapEditor::onKey( Key key, bool isDown )
 {
-	const Rect& view = m_map->view;
 	int mx, my;
 	Engine::GetMousePosition(mx, my);
-	//offset in world
-	const int pixelx = view.x + mx*m_map->scale() ;
-	const int pixely = view.y + my*m_map->scale() ;
+	const float scale = m_map ? m_map->scale() : 1.0;
 
+	//offset in world
+	const int offx = m_map ? m_map->view.x : 0.0;
+	const int offy = m_map ? m_map->view.y : 0.0;
+
+	const int pixelx = offx + mx*scale;
+	const int pixely = offy + my*scale;
 
 	if(key == KEY_SHIFT) 
 	{  
@@ -371,18 +378,15 @@ void MapEditor::setMap( const std::string& name )
 
 void MapEditor::setTileset(int index,  const std::string& tileset )
 {
-	//tileset must exist
-	m_tilepicker->reload(tileset);
+	if ( !m_map ) return;
 	m_map->tilesets[index] = tileset;
-	m_map->reload();
-
+	useTileset( index );
 }
 
 void MapEditor::useTileset(int index )
 {
+	if ( !m_map ) return;
 	const std::string tilesetName = m_map->tilesets[index];
-
-	m_tilesetInput->text =tilesetName;	
 	m_tilesetInput->setText(tilesetName ); 
 	m_tilepicker->reload( tilesetName );
 }
@@ -408,9 +412,11 @@ void MapEditor::showWorkspace()
 	Engine::GetSize(w,h);
 	m_workspaceHidden = false;
 	const int toolY = h - (m_tilepicker->rect().h + TILE_H);
-
-	m_map->rect = { 0, TILE_H, w, toolY - TILE_H };
-   	m_map->zoomTo(1.0, 0, 0 );
+	if ( m_map )
+	{
+		m_map->rect = { 0, TILE_H, w, toolY - TILE_H };
+   		m_map->zoomTo(1.0, 0, 0 );
+	}
 
    	m_tilepicker->hidden = false;
    	m_toolbar->hidden = false;

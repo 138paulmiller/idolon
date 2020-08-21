@@ -17,11 +17,14 @@ public:
 	virtual void onEnter();
 	virtual void onExit();
 
-	void reloadMenu();
 	bool supports(AppSupport support);
+	
+	void addTool(const std::string & text, std::function<void()> click, bool sticky );
+
 private:
 	uint8 m_support;
 	int m_menu;
+	int m_toolbar;
 
 };
 

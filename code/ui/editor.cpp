@@ -35,19 +35,32 @@ void Editor::onExit()
 {
 	if(m_menu != -1) 
 		App::removeWidget(m_menu);
+	if ( m_toolbar != -1 )
+		App::removeWidget( m_toolbar );
 }
 
 void Editor::onEnter()
 {
-	if(m_menu != -1) 
-		App::removeWidget(m_menu);
-	
-	UI::Toolbar * menu = new UI::Toolbar(this, 0, 0);
-	menu->font = "full"; //has glyphs
+	if ( m_menu != -1 )
+		App::removeWidget( m_menu );
+
+	const std::string &fontName = "full";
+
+	int screenw, screenh;
+	UI::Toolbar *toolbar = new UI::Toolbar( this, 0, 0 );
+	m_toolbar = App::addWidget( toolbar );
+
+	int screenW, screenH;
+	Engine::GetSize( screenW, screenH );
+	UI::Toolbar *menu = new UI::Toolbar( this, screenW, 0 );
+
+	menu->font = fontName; //has glyphs
+	menu->leftAlign = false;
+
 	
 	m_menu = App::addWidget(menu);
 	//BACK
-	menu->add({27}, [&](){
+	menu->add({'X'}, [&](){
 		App::signal(APP_CODE_EXIT);
 	}, false);
 	//SAVE
@@ -57,6 +70,13 @@ void Editor::onEnter()
 			this->save();
 		}, false);
 	}
+	//REDO
+	if(supports(APP_REDO))
+	{
+		menu->add({19}, [&](){
+			this->redo();
+		}, false);
+	}
 	//UNDO
 	if(supports(APP_UNDO))
 	{	
@@ -64,11 +84,9 @@ void Editor::onEnter()
 			this->undo();
 		}, false);
 	}
-	//REDO
-	if(supports(APP_UNDO))
-	{
-		menu->add({19}, [&](){
-			this->redo();
-		}, false);
-	}
+}
+
+void Editor::addTool( const std::string &text, std::function<void()> click, bool sticky )
+{
+
 }

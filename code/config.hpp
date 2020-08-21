@@ -1,4 +1,6 @@
 #pragma once
+//TODO create settings manager in engine
+
 //Default settings wrap with ifndef to allow config ? 
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 0

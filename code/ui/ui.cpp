@@ -7,7 +7,7 @@
 #define DEFAULT_COLOR_FILL  BLACK
 #define DEFAULT_COLOR_CLICK Palette[26] 
 #define DEFAULT_COLOR_HOVER Palette[25]
-
+#define DEFAULT_TEXT_BORDER 2
 
 namespace UI
 {
@@ -113,7 +113,7 @@ namespace UI
 		m_textbox = new Graphics::TextBox(tw, th, text, font);
 		m_textbox->x = x;
 		m_textbox->y = y;
-		m_textbox->borderX = 2;
+		m_textbox->borderX = DEFAULT_TEXT_BORDER;
 		m_textbox->textColor = textColor;
 		m_textbox->fillColor = fillColor;
 		m_textbox->filled = true;
@@ -133,6 +133,7 @@ namespace UI
 		Button::onUpdate();
 		if ( update )
 		{
+			Button::m_rect = { m_textbox->x, m_textbox->y, m_textbox->w, m_textbox->h };
 			m_textbox->fillColor = Button::m_color;
 			m_textbox->refresh();
 		}
@@ -176,9 +177,7 @@ namespace UI
 				break;
 				case  KEY_TAB:
 				case  KEY_RETURN:
-					Engine::PopKeyHandler();
-					this->reset();
-					this->cbAccept();
+					this->cbLeave();
 				break;
 				case KEY_BACKSPACE:
 					this->text.pop_back();
@@ -203,11 +202,15 @@ namespace UI
 			m_timer = 0.0;
 			m_cursorVisible = true;
 			m_textprev = this->text;
+
 		};
 		this->cbLeave = [this]()
 		{
+			if ( !m_cursorVisible ) return;
 			Engine::PopKeyHandler();
 			this->reset();
+			m_cursorVisible = false;
+
 			this->cbAccept();
 		};
 		this->sticky = true;
@@ -215,6 +218,10 @@ namespace UI
 
 	TextInput::~TextInput()
 	{
+		if ( m_cursorVisible )
+		{
+			Engine::PopKeyHandler();
+		}
 	}
 	
 	//draw cursor
@@ -226,7 +233,6 @@ namespace UI
 			m_timer += Engine::GetTimeDeltaMs()/1000.0f;
 			if (m_timer > 1.0/CURSOR_FLICKER_RATE  ) 
 			{
-				m_cursorVisible = !m_cursorVisible;
 				m_timer = 0.0;
 			}
 			if( m_cursorVisible )
@@ -248,7 +254,9 @@ namespace UI
 		:m_parent(parent), 
 		m_x(x),m_y(y),
 		m_count(0), m_xoff(0),
-		font("default")
+		font("default"),
+		leftAlign(true)
+
 	{
 		textColor = { 255,255,255,255 };
 		hoverColor = DEFAULT_COLOR_HOVER ;		
@@ -265,10 +273,19 @@ namespace UI
 
 	int  Toolbar::add(const std::string & text, std::function<void()> click, bool sticky )
 	{
+		if ( !leftAlign && m_count == 0 )
+		{
+			//if first, must offset x by size of first button
+			TextButton * tmp = new TextButton( text, 0,0, text.size(), 1, font );
+			m_xoff = tmp->rect().w;
+			delete tmp;
+		}
 		m_count++;
-		TextButton * textbutton = new TextButton(text, m_x+m_xoff, m_y, text.size(), 1, font);
-		m_xoff += textbutton->rect().w;
-		
+		const int x = leftAlign ? m_x + m_xoff : m_x - m_xoff;
+
+		TextButton * textbutton = new TextButton( text, x, m_y, text.size(), 1, font );
+		m_xoff += (textbutton->rect().w);
+			
 		int buttonId = m_parent->addButton( textbutton );
 		textbutton->textColor  = textColor ;
 		textbutton->hoverColor = hoverColor;

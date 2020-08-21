@@ -33,6 +33,7 @@ enum AppSupport
 	APP_SAVE = 0, 
 	APP_UNDO,
 	APP_REDO,
+	APP_SUPPORT_COUNT
 };
 
 
@@ -103,7 +104,7 @@ namespace UI
 		void setText(const std::string & text) ;
 		
 		Color textColor;
-		
+
 	protected:
 		Graphics::TextBox * m_textbox; 
 	};
@@ -140,25 +141,27 @@ namespace UI
 		public:
 		Toolbar(App* parent, int x, int y);
 		~Toolbar();
+		void onUpdate() override;
+		void onDraw() override;
+		
 		int  add(const std::string & text, std::function<void()> click, bool sticky = true);
 		void  remove(int id);
 		Button *  get(int id);
-		
-		void onUpdate() override;
-		void onDraw() override;
 		
 		Color textColor;
 		Color hoverColor;
 		Color clickColor;
 		Color fillColor;
 		std::string font;
+		//add buttons from left to right. 
+		bool leftAlign;
 	private:
+		int m_x, m_y;
 		const int border = 1;
 		//non-owning
 		App* m_parent;
 		int m_count;
 		int m_xoff;
-		int m_x, m_y;
 		std::vector<int> m_buttonIds;
 		//if hiden changes
 		bool m_prevHidden;

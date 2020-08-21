@@ -1,4 +1,4 @@
-$ demo python
+$ demo/demo python
 
 from time import time,ctime
 import idolon as I

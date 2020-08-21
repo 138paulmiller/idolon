@@ -148,10 +148,13 @@ namespace Engine
             {
                 Key sym = GetKeyFromKeyCode(event.key.keysym.sym, event.key.keysym.mod & KMOD_SHIFT);
                 if (sym == KEY_UNKNOWN) break;
-                const KeyHandler & cb = s_keyhandlers.top();
-                if( s_echo && cb)
+                if ( s_keyhandlers.size() )
                 {
-                    cb(Key(sym), true);
+                    const KeyHandler & cb = s_keyhandlers.top();
+                    if( s_echo && cb)
+                    {
+                        cb(Key(sym), true);
+                    }
                 }
                 ButtonState & state = s_ue.keymap[sym];
                 if (state == BUTTON_DOWN || state == BUTTON_HOLD)

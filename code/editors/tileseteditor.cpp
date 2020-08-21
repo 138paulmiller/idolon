@@ -123,7 +123,7 @@ void TilesetEditor::onTick()
 	const Rect& tileSrc = m_tilepicker->selection();
 	//if using smal tile size. make pixels larger! 
 	
-	const float scale = ( TILE_SIZE_MAX / tileSrc.w ) * m_tileScale;
+	const float scale = tileSrc.w ? ( TILE_SIZE_MAX / tileSrc.w ) * m_tileScale : m_tileScale;
 	
 	//canvas is the tile drawing region in worldspace 
 	const Rect & canvasRect = { m_charW, m_charH * 2, (int)(tileSrc.w * scale), (int)(tileSrc.h * scale) }; 	
