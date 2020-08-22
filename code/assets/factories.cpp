@@ -185,8 +185,16 @@ Asset * ScriptFactory::deserialize( std::istream& in )
         std::string name;
 		std::string header;
 
-		std::getline( in, header, '\n' ); 
-		FS::ReplaceAll(header, "\r", "");
+		//get the code portion
+		in.seekg (0, in.end);
+        const int len = in.tellg();
+        in.seekg ( 0, in.beg );
+
+        std::getline( in, header ); 
+
+        const int codelen = len - header.size();
+
+        FS::ReplaceAll(header, "\r", "");
 		
 		//expect $ <name> <lang>
 		if ( header.size() < 5 && header[0] == '$'  ) //minimal possible "$ a p"
@@ -197,14 +205,13 @@ Asset * ScriptFactory::deserialize( std::istream& in )
 		else
 		{
 			//parse header
-			int off = 1;
-			
-            header = Trim(header.substr( off ));
+            header = Trim(header.substr( 1 ));
+			int off = 0;
 			name = header.substr( off, header.find_first_of(' ' ) );
 			off += name.size();
-			std::string langstr = header.substr( off );
-
+			std::string langstr = Trim(header.substr( off ));
 			name = Trim(name);
+
             auto it = LangStrToEnum.find( langstr );
 			if ( it == LangStrToEnum.end() )
 			{
@@ -212,14 +219,8 @@ Asset * ScriptFactory::deserialize( std::istream& in )
 				throw;
 			}
 			ScriptLanguage lang = it->second;
-			//get the code portion
-			//get remaining file size 
-			std::streampos pos = in.tellg();
-			in.seekg (pos, in.end);
-			const int len = (in.tellg() - pos);
-			in.seekg (pos );
 		
-			char * codedata = new char[len]; 
+			char * codedata = new char[codelen]; 
 			in.read(codedata, len);
 			
             switch ( lang )
@@ -244,7 +245,12 @@ Asset * ScriptFactory::deserialize( std::istream& in )
             delete script ;
             script = 0;
         }
-	}
+        else
+        {
+            LOG("Script : failed to load script %s\n", script ->filepath.c_str());
+
+        }
+    }
     return script ;
 }
 

@@ -32,44 +32,71 @@ PyScript::~PyScript()
 
 void PyScript::compile()
 {
-	
-	const std::string & file = name;
-	LOG("Compiling %s\n", file.c_str());
+
+	LOG("Compiling %s\n", name.c_str());
 	if ( code.size() == 0 ) return;
 
-	PyObject * modname = PyUnicode_FromString(file.c_str());
+	//temp file 
+	const std::string &modulename = "tempscript";
+	const std::string & tempfilename = FS::Append(FS::Cwd(), modulename + ".py");
+	const std::string & temppath = FS::Append(FS::Cwd(), modulename);
+	const std::string & tempdir  = FS::DirName( temppath);
+
+	std::ofstream tempfile = std::ofstream( temppath );
+	if ( !tempfile.is_open() )
+	{
+        LOG("Eval: Could not create temp file %s\n", temppath.c_str());
+		return;
+	}
+	tempfile << code;
+	tempfile.close();
+
+	//set execute dir
+	const std::string &prelude = "import sys\nsys.path.append('" + tempdir + "')\nprint(sys.path)";
+	PyRun_SimpleString(prelude .c_str());
+
 	if ( m_module )
 	{
 		Py_DECREF(m_module);
 	}
+	PyObject * modname = PyUnicode_FromString(modulename.c_str());
     m_module = PyImport_Import(modname);
+
+	const std::string &postlude = "import sys\nsys.path.pop();";
+	PyRun_SimpleString(postlude .c_str());
+
     if(!m_module)
     {
         PyErr_Print();
-        LOG("Eval: Could not import %s\n", file.c_str());
-        return;	    	
+        LOG("Eval: Could not import %s\n", name.c_str());
     }
-
-	PyObject *const pDict = PyModule_GetDict(m_module); // borrowed
-	// find functions
-	PyObject *key = nullptr, *value = nullptr;
-	for (Py_ssize_t i = 0; PyDict_Next(pDict, &i, &key, &value);) 
+	else
 	{
-		//if function
-		if (PyFunction_Check(value)) 
+		PyObject *const pDict = PyModule_GetDict(m_module); // borrowed
+		// find functions
+		PyObject *key = nullptr, *value = nullptr;
+		for (Py_ssize_t i = 0; PyDict_Next(pDict, &i, &key, &value); i++) 
 		{
-			m_funcs[PyUnicode_AsUTF8(key)] = value;
+			//if function
+			if (PyFunction_Check(value)) 
+			{
+				m_funcs[PyUnicode_AsUTF8(key)] = value;
+			}
+		}
+		Py_DECREF(modname);
+  		if(m_funcs.find(GAME_API_INIT) == m_funcs.end())
+		{
+			LOG("Script: %s is missing init function", name.c_str());
+		}
+		if(m_funcs.find(GAME_API_UPDATE) == m_funcs.end())
+		{
+			LOG("Script: %s is missing update function", name.c_str());
 		}
 	}
-    Py_DECREF(modname);
-  	if(m_funcs.find(GAME_API_INIT) != m_funcs.end())
-	{
-		LOG("Script: %s is missing init function", name.c_str());
-	}
-	if(m_funcs.find(GAME_API_UPDATE) != m_funcs.end())
-	{
-		LOG("Script: %s is missing update function", name.c_str());
-	}
+	
+	//remove all dirs
+	FS::Remove( tempfilename );
+
 }
 
 bool PyScript::call(const std::string & func, const std::vector<TypedArg> & args, TypedArg & ret )

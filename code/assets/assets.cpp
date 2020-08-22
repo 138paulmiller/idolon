@@ -298,11 +298,19 @@ namespace Assets
 	{
 		std::string n = name;
 		//asset to filename 
-		std::string path = FindAssetPath(type, name);
+		std::string path = asset->filepath;
 		if(path.size() == 0)
 		{
-			LOG("Assets: Failed to find file for asset (%s) falling back on %s\n", name.c_str(), asset->filepath.c_str());
-			path = asset->filepath;
+			LOG("Assets: Asset (%s) does not have a filepath. Attempting to find\n", name.c_str() );
+			path = FindAssetPath(type, name);
+			if ( path.size() == 0 )
+			{
+				LOG( "Assets: Failed to find file for asset (%s) attempting to find %s\n", name.c_str(), path.c_str() );
+			}
+			else
+			{
+				asset->filepath = path;
+			}
 		}
 		SaveAsImpl(asset, type, path);
 	}

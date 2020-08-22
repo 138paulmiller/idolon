@@ -16,3 +16,5 @@
 #define FPS_STAT_RATE  5.f 
 #define GAME_API_UPDATE "update"
 #define GAME_API_INIT "init"
+
+#define CACHE_PATH "__cache__"
