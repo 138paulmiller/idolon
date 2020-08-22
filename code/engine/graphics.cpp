@@ -337,19 +337,29 @@ namespace Graphics
         {
             int s =  text[i];
             //handle newlines
-            if(s == '\n' || s == KEY_RETURN)
+            while(s == '\n' || s == KEY_RETURN)
             {
                 i++;
-                if(i== text.size()) break;
+                if ( i == text.size() ) {
+                    s = ' ';
+                }
+                if ( i > text.size() )
+                {
+                    break;
+                }
+                else {
+                    s = text[i];
+                }
                 scrolly++;
-                s =  text[i];
                 dx = 0;
                 dy++;
             }
-            else if(s == KEY_TAB)
+            
+            if(s == KEY_TAB)
             {
                 dx += TAB_SIZE;
             }
+            
             if(dx == destW)
             {
                 dx = 0;

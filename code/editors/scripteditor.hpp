@@ -21,8 +21,9 @@ public:
 	void setScript(const std::string & name);
 
 private:
-	//write code to script
+
 	void commit();
+
 
 	Script * m_script;
 	std::string m_scriptName;
@@ -31,4 +32,9 @@ private:
 	uint m_lineOffset;
 	Graphics::TextBox * m_codeView;
 	bool m_dirty ;
+
+	int m_charW;
+	int m_charH;
+	Graphics::TextBox *m_cursor;
+	float m_timer ;
 };

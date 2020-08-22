@@ -56,13 +56,16 @@ void Editor::onEnter()
 
 	menu->font = fontName; //has glyphs
 	menu->leftAlign = false;
-
 	
 	m_menu = App::addWidget(menu);
 	//BACK
 	menu->add({'X'}, [&](){
 		App::signal(APP_CODE_EXIT);
 	}, false);
+	
+	//get tool bar offset
+	m_menuY = menu->get( 0 )->rect().h + menu->get( 0 )->rect().y;
+
 	//SAVE
 	if(supports(APP_SAVE))
 	{	
