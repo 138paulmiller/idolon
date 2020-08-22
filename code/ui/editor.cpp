@@ -48,16 +48,17 @@ void Editor::onEnter()
 
 	int screenw, screenh;
 	UI::Toolbar *toolbar = new UI::Toolbar( this, 0, 0 );
+	toolbar->font = fontName;
 	m_toolbar = App::addWidget( toolbar );
 
 	int screenW, screenH;
 	Engine::GetSize( screenW, screenH );
 	UI::Toolbar *menu = new UI::Toolbar( this, screenW, 0 );
+	m_menu = App::addWidget(menu);
 
 	menu->font = fontName; //has glyphs
 	menu->leftAlign = false;
 	
-	m_menu = App::addWidget(menu);
 	//BACK
 	menu->add({'X'}, [&](){
 		App::signal(APP_CODE_EXIT);
@@ -89,7 +90,16 @@ void Editor::onEnter()
 	}
 }
 
+void Editor::hideTools( bool hidden )
+{
+	UI::Toolbar * toolbar = dynamic_cast<UI::Toolbar*>(App::getWidget( m_toolbar ));
+	toolbar->hidden = hidden;
+}
+
 void Editor::addTool( const std::string &text, std::function<void()> click, bool sticky )
 {
-
+	UI::Toolbar * toolbar = dynamic_cast<UI::Toolbar*>(App::getWidget( m_toolbar ));
+	toolbar->add( text, click, sticky );	
+	toolbar->get( 0 )->cbClick();
+	
 }

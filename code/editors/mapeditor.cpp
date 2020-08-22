@@ -22,6 +22,8 @@ MapEditor::MapEditor()
 void MapEditor::onEnter()
 {
 	LOG("Entering map editor ... \n");
+	Editor::onEnter();
+	
 	int screenw, screenh;
 	Engine::GetSize(screenw, screenh);
 
@@ -48,10 +50,7 @@ void MapEditor::onEnter()
 
 	//managed locally. is not added to asset manager
 	m_overlay = new Graphics::Tileset("MapEditor_Overlay", screenw, screenh);
-	m_toolbar = new UI::Toolbar(this, 0, 0);
-	m_toolbar->font = fontName;
-
-	m_toolbar->add("PIXEL", [&](){
+	Editor::addTool("PIXEL", [&](){
 		m_tool = MAP_TOOL_PIXEL;                     
 	});
 	//TODO - fill tiles
@@ -60,14 +59,13 @@ void MapEditor::onEnter()
 	//	m_tool = MAP_TOOL_FILL;             
 	//});
 
-	m_toolbar->add("ERASE", [&](){
+	Editor::addTool("ERASE", [&](){
 		m_tool = MAP_TOOL_ERASE;
 		m_tooldata = { -1, -1, -1, -1, -1 ,-1 };
 	});
 
 	int tw = screenw - 16* charW;
 	m_tilesetSelectToolbar = new UI::Toolbar(this, tw, toolY);
-	m_toolbar->font = fontName;
 
 	const int border = 2;
 	for(size_t i = 0; i < TILESETS_PER_MAP; i++)
@@ -90,14 +88,10 @@ void MapEditor::onEnter()
 	//first add toolbat	
 	//add the ui widgets
 
-	App::addWidget( m_toolbar );
 	App::addWidget( m_tilepicker);
 	App::addWidget( m_tilesetSelectToolbar );
 	App::addButton( m_tilesetInput );
-	Editor::onEnter();
-
 	//select pixel and first tileset by default
-	m_toolbar->get(MAP_TOOL_PIXEL)->click();		
 	m_tilesetInput->cbAccept();
 	showWorkspace();
 	useTileset( 0 );
@@ -280,10 +274,10 @@ bool MapEditor::handleTool()
 
 								m_map->tiles[tiley * m_map->w + tilex] = id;
 								m_map->update( { tilex, tiley, 1, 1 } );
-								return true;
 							}
 						}
 					}
+					return true;
 					//
 				}
 			}
@@ -401,9 +395,9 @@ void MapEditor::hideWorkspace()
 	//reset view
    	m_map->zoomTo(1.0, 0, 0 );
    	m_tilepicker->hidden = true;
-   	m_toolbar->hidden = true;
 	m_tilesetInput->hidden = true;
 	m_tilesetSelectToolbar->hidden = true;
+   	hideTools(true);
 }
 
 void MapEditor::showWorkspace()
@@ -419,8 +413,8 @@ void MapEditor::showWorkspace()
 	}
 
    	m_tilepicker->hidden = false;
-   	m_toolbar->hidden = false;
 	m_tilesetInput->hidden = false;
 	m_tilesetSelectToolbar->hidden = false;
+   	hideTools(false);
 
 }

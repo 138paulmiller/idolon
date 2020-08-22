@@ -19,7 +19,8 @@ public:
 
 	bool supports(AppSupport support);
 	
-	void addTool(const std::string & text, std::function<void()> click, bool sticky );
+	void hideTools(bool hidden);
+	void addTool(const std::string & text, std::function<void()> click, bool sticky=true );
 	inline int menuY() { return m_menuY;  }
 
 private:
@@ -28,6 +29,7 @@ private:
 	int m_menuY;
 	int m_menu;
 	int m_toolbar;
+	bool m_resetToolbar;
 
 };
 

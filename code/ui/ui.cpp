@@ -299,9 +299,10 @@ namespace UI
 			//unclick all others
 			for ( int i = 0; i < m_buttonIds.size(); i++ )
 			{
-				int id = m_buttonIds[i];
-				if(id != buttonId && m_parent->getButton(id)->isDown())  
-					m_parent->getButton(i)->reset();		
+				int id = this->m_buttonIds[i];
+				UI::Button *btn = this->m_parent->getButton( id );
+				if(id != buttonId && btn->isDown())  
+					btn->reset();		
 			}
 			click();
 		} ;

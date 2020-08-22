@@ -67,7 +67,6 @@ private:
 	UI::TextInput * m_tilesetInput;
 	//map contains ref to tilesheet
 	UI::TilePicker * m_tilepicker;
-	UI::Toolbar * m_toolbar;
 	//
 	UI::Toolbar * m_tilesetSelectToolbar;
 	int m_tilesetSelection;
