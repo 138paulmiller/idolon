@@ -4,6 +4,7 @@
 
 #include "../sys.hpp"
 
+
 #define PY_SSIZE_T_CLEAN
 #undef _DEBUG
 #include <Python.h>
@@ -39,10 +40,10 @@ void PyScript::compile()
 	//temp file 
 	const std::string &modulename = "tempscript";
 	const std::string & tempfilename = FS::Append(FS::Cwd(), modulename + ".py");
-	const std::string & temppath = FS::Append(FS::Cwd(), modulename);
+	const std::string & temppath = FS::Append(FS::Cwd(), tempfilename);
 	const std::string & tempdir  = FS::DirName( temppath);
 
-	std::ofstream tempfile = std::ofstream( temppath );
+	std::ofstream tempfile( temppath );
 	if ( !tempfile.is_open() )
 	{
         LOG("Eval: Could not create temp file %s\n", temppath.c_str());

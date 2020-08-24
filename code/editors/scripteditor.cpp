@@ -13,7 +13,6 @@ ScriptEditor::ScriptEditor()
 {
 	m_scriptName = "";
 	m_cursorX = m_cursorY = 0;
-	m_lineOffset = 0;
 }
 
 void ScriptEditor::onEnter()
@@ -33,29 +32,25 @@ void ScriptEditor::onEnter()
 	m_charH = font->charH;
 	Assets::Unload<Graphics::Font>(fontname);
 
-	int lineW = w / m_charW;
-	//space for toolbar  
-	int lineH = h / m_charH - 1;
-	m_lines.resize( lineH );
+	//can scroll horiz 
+	const int lineW = w / m_charW * 2;
+	//space for toolbar
+	const int lineH = h / m_charH - 1;
+
 	m_codeView = new Graphics::TextBox(lineW, lineH, "",fontname);
 	m_codeView->x = 0;
 	m_codeView->y = menuY(); 
 	m_codeView->fillColor = BLACK ;       
 	m_codeView->filled = true;
+	m_codeView->text = "";
 	m_codeView->reload();
-
-
-	m_dirty = true;
-	
-	m_script = Assets::Load<Script>(m_scriptName);
-
-	m_timer = 0;
 
 	m_cursor = new Graphics::TextBox(1, 1, " ", fontname);
 	m_cursor->filled = true;
 	m_cursor->fillColor = WHITE ;
 	m_cursor->reload();
 
+	reload();
 
 }
 
@@ -90,21 +85,25 @@ void ScriptEditor::onTick()
 	if(m_dirty)
 	{
 		//copy lines to codeview.
-		int i = 0;
 		m_codeView->text.clear();
-		for(int line = m_lineOffset; line < m_lines.size(); line++)
+		int line = 0;
+		for(int i = m_textOffset; i < m_script->code.size(); i++)
 		{
-			if(i >= m_codeView->th)
+			//if beyond code view 
+			if(line >= m_codeView->th)
 				break;
-
-			m_codeView->text += m_lines[i];
-			i++;
+			const char c = m_script->code[i];
+			if(c == '\n')
+			{
+				line++;
+			}
+			m_codeView->text += c;
 		}
 		m_codeView->refresh();
 		m_dirty = false;
 	}
-	m_cursor->x = m_codeView->x + m_cursorX * m_charW;	
-	m_cursor->y = m_codeView->y + m_cursorY * m_charH;	
+	m_cursor->x = m_codeView->x + ( m_cursorX - m_offsetX ) * m_charW;	
+	m_cursor->y = m_codeView->y + ( m_cursorY - m_offsetY ) * m_charH;	
 	
 	m_codeView->draw();
 	m_cursor->draw();
@@ -117,51 +116,130 @@ void ScriptEditor::onKey(Key key, bool isDown)
 	{
 		switch(key)
 		{
+			case KEY_UP:
+				scrollTextBy(0, -1);
+				break;
+			case KEY_DOWN:
+				scrollTextBy(0, 1);
+				break;
+			case KEY_LEFT:
+				scrollTextBy(-1, 0);
+				break;
+			case KEY_RIGHT:
+				scrollTextBy(1, 0);
+				break;
 			case KEY_RETURN:
-				m_lines[m_cursorY] += "\n";
-				m_cursorY++;
-				m_cursorX = 0;
-				if(m_cursorY >= m_codeView->th)
-				{
-					m_cursorY--;
-					m_lineOffset++;
-				}
+				if (m_cursorPos == m_script->code.size()) 
+					m_script->code += '\n';
+				else
+					m_script->code.insert(m_cursorPos, 1, '\n');
 				m_dirty = true;
-			break;
+				m_cursorX = 0;
+				scrollTextBy(0, 1);
+				break;
 			case KEY_TAB:
 			default:
 				if(KeyPrintable(key))
 				{
-					std::string & line =m_lines[m_cursorY]; 
 					//TODO allow horizontal scrolling
 					if(m_cursorX < m_codeView->tw-1)
 					{
-						if (m_cursorX == line.size()) 
-							line += key;
+						if (m_cursorPos == m_script->code.size()) 
+							m_script->code += key;
 						else
-							line.insert(m_cursorX, 1, key);
-						m_cursorX++;
+							m_script->code.insert(m_cursorPos, 1, key);
+						scrollTextBy(1, 0);
 					}
 					m_dirty = true;
 				}
 			break;
 			case KEY_BACKSPACE:
-			{
-				std::string & line =m_lines[m_cursorY]; 
-				//do not remove \n
-				if (line.size() > 1)
-				{
-					if(m_cursorX > 1)
-						m_cursorX--;
-					if (m_cursorX>= line.size()-1)
-						line.pop_back();
-					else
-						line.erase(m_cursorX, 1);
-				}
-				m_dirty = true;
 
-			}
+				if (m_cursorPos > 0)
+				{
+					scrollTextBy(-1, 0);	
+					if(m_cursorPos == m_script->code.size() )
+						m_script->code.pop_back();
+					else
+						m_script->code.erase(m_cursorPos, 1);
+
+					m_dirty = true;
+				} 
+
 			break;
+		}
+	}
+}
+
+void ScriptEditor::reload()
+{
+	Assets::Unload<Script>(m_scriptName);
+	m_script = Assets::Load<Script>(m_scriptName);
+
+	m_dirty = true;
+	
+	m_timer = 0;
+	m_offsetY = m_offsetX = 0;
+	m_cursorPos = m_textOffset = 0;
+
+}
+
+
+void ScriptEditor::scrollTextBy(int dx, int dy)
+{
+	m_dirty = true;
+	m_cursorX+=dx;
+	m_cursorY+=dy;
+
+	if(m_cursorX < 0)
+	{
+		m_cursorY--;
+		//go to end of line
+		m_cursorX = -1;
+	}
+	else if(m_cursorX >= m_codeView->tw)
+	{
+		m_offsetX++;
+	}
+	if(m_cursorY < 0)
+	{
+		m_cursorY = 0;
+	}
+	else if(m_cursorY >= m_codeView->th)
+	{
+		m_offsetY++;
+	}
+
+	//set text offset
+	int row = 0, col = 0;
+	for(m_cursorPos = 0; m_cursorPos < m_script->code.size(); m_cursorPos++)
+	{
+		if(row == m_cursorY)
+		{
+			//go to end
+			if(m_cursorX == -1)
+			{
+				m_cursorX = 0;
+				while(m_cursorPos < m_script->code.size() && m_script->code[m_cursorPos] != '\n' )
+				{
+					m_cursorPos++;
+					m_cursorX++;
+				}
+				break;
+			} 
+			else if(col == m_cursorX)
+			{
+				break;
+			}
+		}
+		if(m_script->code[m_cursorPos] == '\n' )
+		{
+			row++;
+			col = 0;
+		}
+		else
+		{
+			col++;
 		}
 	}
 }
