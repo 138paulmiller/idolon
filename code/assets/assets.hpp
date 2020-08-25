@@ -24,15 +24,12 @@ public:
 
 };
 
-
 class Factory 
 {
 public:
 	virtual Asset * deserialize( std::istream& in ) = 0 ;
 	virtual void serialize( const Asset * asset, std::ostream& out ) const = 0;
 };
-
-
 
 namespace Assets
 {

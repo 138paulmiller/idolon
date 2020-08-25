@@ -36,10 +36,9 @@ void PyScript::compile()
 
 	LOG("Compiling %s\n", name.c_str());
 	if ( code.size() == 0 ) return;
-
 	//temp file 
 	const std::string &modulename = "tempscript";
-	const std::string & tempfilename = FS::Append(FS::Cwd(), modulename + ".py");
+	const std::string & tempfilename = modulename + ".py";
 	const std::string & temppath = FS::Append(FS::Cwd(), tempfilename);
 	const std::string & tempdir  = FS::DirName( temppath);
 
@@ -53,13 +52,15 @@ void PyScript::compile()
 	tempfile.close();
 
 	//set execute dir
-	const std::string &prelude = "import sys\nsys.path.append('" + tempdir + "')\nprint(sys.path)";
+	const std::string &prelude = "import sys\nsys.path.append('" + tempdir + "')\n";
 	PyRun_SimpleString(prelude .c_str());
 
+	m_funcs.clear();
 	if ( m_module )
 	{
 		Py_DECREF(m_module);
 	}
+	
 	PyObject * modname = PyUnicode_FromString(modulename.c_str());
     m_module = PyImport_Import(modname);
 
@@ -85,13 +86,15 @@ void PyScript::compile()
 			}
 		}
 		Py_DECREF(modname);
+
   		if(m_funcs.find(GAME_API_INIT) == m_funcs.end())
 		{
-			LOG("Script: %s is missing init function", name.c_str());
+			LOG("Script: %s %s() is missing!\n", name.c_str(), GAME_API_INIT);
 		}
+		
 		if(m_funcs.find(GAME_API_UPDATE) == m_funcs.end())
 		{
-			LOG("Script: %s is missing update function", name.c_str());
+			LOG("Script:%s %s() is missing!\n", name.c_str(), GAME_API_UPDATE );
 		}
 	}
 	

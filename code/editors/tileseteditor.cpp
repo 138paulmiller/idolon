@@ -20,6 +20,8 @@ void TilesetEditor::onEnter()
 {
 
 	LOG("Entering sheet editor ... ");
+	Editor::onEnter();
+
 	m_usingTool = 0;
 	m_tileset = 0;
 	m_overlay = 0;
@@ -45,24 +47,21 @@ void TilesetEditor::onEnter()
 	const int tileidX =  w - m_charW * 3;
 	const int tilesetY =  m_tilepicker->rect().y - m_charH;
 	m_tileIdBox = new UI::TextButton("00", tileidX, tilesetY, idLen , 1, fontName );
-
-	m_toolbar = new UI::Toolbar(this, 0, tilesetY);
-	m_toolbar->font = fontName; 
 	
-	m_toolbar->add("PIXEL", [&](){
+	addTool("PIXEL", [&](){
 		m_tool = TILE_TOOL_PIXEL;                     
 	});
 	
-	m_toolbar->add("FILL", [&](){
+	addTool("FILL", [&](){
 		m_tool = TILE_TOOL_FILL;             
 	});
 
-	m_toolbar->add("LINE", [&](){
+	addTool("LINE", [&](){
 		m_tool = TILE_TOOL_LINE;
 		m_shapeRect = { -1, -1, -1, -1 };
 	});
 
-	m_toolbar->add("ERASE", [&](){
+	addTool("ERASE", [&](){
 		m_tool = TILE_TOOL_ERASE;
 		m_shapeRect = { -1, -1, 1, 1 };
 
@@ -70,21 +69,18 @@ void TilesetEditor::onEnter()
 
 	//first add toolbat	
 	//add the ui widgets
-	App::addWidget( m_toolbar );
 	App::addWidget( m_tilepicker );
 	App::addWidget( m_colorpicker );
 	App::addWidget( m_tileIdBox );
 
 	//choose pixel tool on start
-	m_toolbar->get(TILE_TOOL_PIXEL)->click();
-	
+	m_tool = TILE_TOOL_PIXEL;                     
 
 	if ( m_tileset )
 	{
 		m_tileset->update();
 		commit();
 	}
-	Editor::onEnter();
 }
 
 void TilesetEditor::onExit()

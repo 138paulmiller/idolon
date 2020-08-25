@@ -22,12 +22,11 @@ public:
 
 private:
 	//draw line numbers
+	void updateTextOffset();
 
 	void scrollTextBy( int dx, int dy);
 	void reload();
-	//commit code changes to the script
-	void commit();
-	//code is offloaded into an array of strings. on commit the script cdoe is copied back over and recompiled
+
 	Script * m_script;
 	std::string m_scriptName;
 	int m_cursorX, m_cursorY;
@@ -40,4 +39,5 @@ private:
 	int m_charH;
 	Graphics::TextBox *m_cursor;
 	float m_timer ;
+
 };

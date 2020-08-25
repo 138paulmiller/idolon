@@ -221,6 +221,7 @@ Asset * ScriptFactory::deserialize( std::istream& in )
 			ScriptLanguage lang = it->second;
 		
 			char * codedata = new char[codelen]; 
+            memset(codedata, 0, codelen);
 			in.read(codedata, len);
 			
             switch ( lang )

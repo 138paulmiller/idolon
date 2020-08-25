@@ -35,10 +35,10 @@ void ScriptEditor::onEnter()
 	//can scroll horiz 
 	const int lineW = w / m_charW * 2;
 	//space for toolbar
-	const int lineH = h / m_charH - 1;
+	const int lineH = h / m_charH;
 
 	m_codeView = new Graphics::TextBox(lineW, lineH, "",fontname);
-	m_codeView->x = 0;
+	m_codeView->x = m_charW;
 	m_codeView->y = menuY(); 
 	m_codeView->fillColor = BLACK ;       
 	m_codeView->filled = true;
@@ -51,6 +51,11 @@ void ScriptEditor::onEnter()
 	m_cursor->reload();
 
 	reload();
+
+	addTool("RUN", [&](){
+		m_script->compile();
+		Eval::Execute(m_script->code);
+	}, false);
 
 }
 
@@ -75,6 +80,19 @@ void ScriptEditor::onExit()
 void ScriptEditor::onTick()
 {
 	Engine::ClearScreen(EDITOR_COLOR);
+
+	int mx, my;
+	Engine::GetMousePosition(mx, my);
+	if ( Engine::GetMouseButtonState(MOUSEBUTTON_LEFT)== BUTTON_DOWN)
+	{
+		m_cursorX = (mx - m_codeView->x) / m_charW ;
+		m_cursorY = (my - m_codeView->y) / m_charH ;
+		updateTextOffset();
+	printf("CURSOR : %d ", m_cursorPos);
+				
+	}
+	//else if ( Engine::GetMouseButtonState(MOUSEBUTTON_LEFT)== BUTTON_HOLD)
+	//highlight text 
 
 	m_timer += Engine::GetTimeDeltaMs()/1000.0f;
 	if (m_timer > 1.0/CURSOR_FLICKER_RATE  ) 
@@ -154,7 +172,7 @@ void ScriptEditor::onKey(Key key, bool isDown)
 				}
 			break;
 			case KEY_BACKSPACE:
-
+				printf("CURSOR : %d ", m_cursorPos);
 				if (m_cursorPos > 0)
 				{
 					scrollTextBy(-1, 0);	
@@ -187,7 +205,6 @@ void ScriptEditor::reload()
 
 void ScriptEditor::scrollTextBy(int dx, int dy)
 {
-	m_dirty = true;
 	m_cursorX+=dx;
 	m_cursorY+=dy;
 
@@ -209,6 +226,12 @@ void ScriptEditor::scrollTextBy(int dx, int dy)
 	{
 		m_offsetY++;
 	}
+	updateTextOffset();
+}
+
+void ScriptEditor::updateTextOffset()
+{
+	m_dirty = true;
 
 	//set text offset
 	int row = 0, col = 0;
@@ -225,23 +248,30 @@ void ScriptEditor::scrollTextBy(int dx, int dy)
 					m_cursorPos++;
 					m_cursorX++;
 				}
-				break;
 			} 
-			else if(col == m_cursorX)
+			else 
 			{
+				col = m_cursorX;
+				m_cursorX = 0;
+				//get as close to cursor X as possible
+				while(m_cursorPos < m_script->code.size() 
+					&& m_cursorX < col 
+					&& m_script->code[m_cursorPos] != '\n' )
+				{
+					m_cursorPos++;
+					m_cursorX++;
+				}
 				break;
 			}
+			break;
 		}
 		if(m_script->code[m_cursorPos] == '\n' )
 		{
 			row++;
 			col = 0;
 		}
-		else
-		{
-			col++;
-		}
 	}
+
 }
 
 void ScriptEditor::undo()
@@ -250,11 +280,12 @@ void ScriptEditor::undo()
 
 void ScriptEditor::redo()
 {
-
+	//todo revision stack!
 }
 
 void ScriptEditor::save()
 {
+	Assets::Save<Script>(m_script);
 }
 
 void ScriptEditor::setScript(const std::string & name)

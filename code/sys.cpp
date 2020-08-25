@@ -115,31 +115,9 @@ namespace Sys
 			Game::Shutdown();
 		}
 	}
-	void Test()
-	{
-		Eval::Execute(
-			R"(
-from time import time,ctime
-
-print('Today is', ctime(time()))
-
-import idolon as I
-
-mouse = I.mouse()
-print("Mouse:%s" % (mouse))
-	   	)" );
-		// //import test py functions
-
-		TypedArg ret( ARG_STRING );
-		PyScript * script = new PyScript("game");
-		script->call( "multiply", { 3, 2 }, ret );
-		LOG( "Call returned %s\n", ret.value.s );
-		delete script;
-	}
 
 	int Run()
 	{
-		Test();
 		while ( Engine::Run() )
 		{
 			switch(s_gamestate)
