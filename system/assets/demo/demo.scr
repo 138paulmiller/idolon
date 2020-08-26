@@ -3,8 +3,6 @@ $ demo/demo python
 from time import time,ctime
 import idolon as I
 
-print('Hello from Python!\n', ctime(time()))
-mouse = I.mouse()
-
-print("Mouse:%s" % (mouse))
+print('Today is:', ctime(time()))
+print("Mouse:" % I.mx(), I.my())
 

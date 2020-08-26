@@ -177,12 +177,11 @@ namespace
 	int flags          //flag bits indicating how the call should be constructed
 	const char * doc   //points to the contents of the docstring
 	*/
-	PyMethodDef s_pymethods[] =
-	{
+	PyMethodDef s_pymethods[]
+	{	
 		PYTHON_BINDINGS
-	    {0, 0, 0, 0}
+		{0,0,0,0}
 	};
-
 	PyModuleDef s_pymodule = 
 	{
 	    PyModuleDef_HEAD_INIT, 

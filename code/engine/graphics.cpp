@@ -8,6 +8,9 @@
 namespace Graphics
 {
 
+/*--------------------------------------------------------------------------------------
+    Tileset
+*/
 
     Tileset::Tileset( const std::string& name, int w, int h )
         : Asset( name )
@@ -81,11 +84,10 @@ namespace Graphics
         return { x,y, tw, th };
     }
 
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    /*
+/*--------------------------------------------------------------------------------------
+    Map 
     TODO - Split map into 128x128 textures. Render these to the screen
-    */
-
+*/
 
     //width and height is number of tiles
     Map::Map( const std::string& name, int w, int h, int tilew, int tileh )
@@ -285,8 +287,10 @@ namespace Graphics
 
         return true;
     }
-//====================================================================================================//
 
+/*--------------------------------------------------------------------------------------
+    Sprite 
+*/
 
     Sprite::Sprite(int tileId, int w, int h)
         :x(0), y(0), w(w), h(h), 
@@ -315,7 +319,9 @@ namespace Graphics
         Engine::DrawTexture( m_tilesetcache->texture, src, { x,y,w,h } );
     }
 
-    ///////////////////////////////////////////////////////////////////////////////
+/*--------------------------------------------------------------------------------------
+    Font 
+*/
 
 
     Font::Font(const std::string& name, int w, int h, int charW, int charH, char start)
@@ -385,7 +391,9 @@ namespace Graphics
     }
 
 
-    ///////////////////////////////////////////////////////////////////////////////
+/*--------------------------------------------------------------------------------------
+    TextBox 
+*/
     
     TextBox::TextBox(int tw, int th, const std::string & text, const std::string & font)
         :text(text),
@@ -400,7 +408,8 @@ namespace Graphics
         visible(true),
         borderX(0),
         borderY(0),
-        m_fontcache(0)
+        m_fontcache(0),
+        view{0,0,0,0}
     {
     }
   
@@ -414,7 +423,9 @@ namespace Graphics
     {
         if (!visible) return;
         if(!m_fontcache) return;   
-        Engine::DrawTexture(m_texture, {0,0,w,h}, {x,y,w,h});
+        if(filled)
+            Engine::DrawRect(fillColor, {x,y,w,h}, true);
+        Engine::DrawTexture(m_texture, view, {x,y,w,h});
     }
     const Font *TextBox::getFont() 
     { 
@@ -423,18 +434,9 @@ namespace Graphics
 
     void TextBox::refresh()
     {
-        Engine::ClearTexture(m_texture, fillColor);
+        Engine::ClearTexture(m_texture, {0,0,0,0});
         m_fontcache->blit(m_texture, text, { borderX, borderY , w, h });
-        for(int y =0 ; y < m_fontcache->h; y++ )
-        {   
-            for(int x =0 ; x < m_fontcache->w; x++ )
-            {
-                //color only text 
-                Color & color = m_fontcache->pixels[y * m_fontcache->w + x];
-                if(color == fillColor)
-                    color = textColor;
-            }
-        }
+        Engine::MultiplyTexture(m_texture, textColor);
 
     }
     void TextBox::reload()
@@ -449,9 +451,9 @@ namespace Graphics
         if(m_texture) Engine::DestroyTexture(m_texture);
         w = tw * m_fontcache->charW + borderX*2;
         h = th * m_fontcache->charH + borderY*2;
+        view = {0, 0, w, h};
+
         m_texture = Engine::CreateTexture(w, h, TEXTURE_TARGET);
-        if(!filled)
-            Engine::SetTextureBlendMode(m_texture, BLEND_ADD);
         refresh();
     }
 } // namespace Graphics

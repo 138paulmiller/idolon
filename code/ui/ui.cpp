@@ -2,16 +2,15 @@
 
 #include "ui.hpp"
 #include "context.hpp"
-
-#define DEFAULT_COLOR_TEXT WHITE
-#define DEFAULT_COLOR_FILL  BLACK
-#define DEFAULT_COLOR_CLICK Palette[26] 
-#define DEFAULT_COLOR_HOVER Palette[25]
-#define DEFAULT_TEXT_BORDER 2
+#include "../config.hpp"
 
 namespace UI
 {
-	//////////////////////////////////////////////////////////////////////////////////
+
+/*--------------------------------------------------------------------------------------
+    Button
+*/
+
 	Button::Button()
 	:m_rect{0,0,0,0}
 	{
@@ -102,7 +101,10 @@ namespace UI
 	}
 
 	
-	//////////////////////////////////////////////////////////////////////////////////
+
+/*--------------------------------------------------------------------------------------
+    TextButton
+*/
 	TextButton::TextButton(const std::string & text, int x, int y, int tw, int th, const std::string & font)
 	{
 		textColor  = DEFAULT_COLOR_TEXT ;
@@ -156,7 +158,13 @@ namespace UI
 		m_textbox->refresh();	
 
 	}
-	//----------------------------- Input -----------------------------------------------
+
+
+
+
+/*--------------------------------------------------------------------------------------
+    TextInput
+*/
 	TextInput::TextInput(const std::string & text, int x, int y, int tw, int th, const std::string & font )
 		:TextButton(text, x, y, tw, th, font)
 		
@@ -248,7 +256,8 @@ namespace UI
 	}
 
 
-/*-------------------------------------- Toolbar -----------------------------------
+/*--------------------------------------------------------------------------------------
+	 Toolbar
 */
 	Toolbar::Toolbar( App* parent, int x, int y )
 		:m_parent(parent), 
@@ -339,7 +348,9 @@ namespace UI
 	}
 
 	
-	//////////////////////////////////////////////////////////////////////////////////
+/*--------------------------------------------------------------------------------------
+	 ColorPicker
+*/
 
 	ColorPicker::ColorPicker(int x, int y)
 	{
@@ -417,7 +428,12 @@ namespace UI
 		return Palette[w * y + x];
 	}
 	
-	//////////////////////////////////////////////////////////////////////////////////
+
+
+	
+/*--------------------------------------------------------------------------------------
+	 TilePicker
+*/
 	const int TilePicker::m_selectionSizes[2][2] = 
 	{
 		{ TILE_W,   TILE_H },

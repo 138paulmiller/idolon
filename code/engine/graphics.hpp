@@ -181,7 +181,8 @@ namespace Graphics
         int w,h;
         int tw,th;
         int borderX, borderY;
-
+        Rect view;
+        
         bool filled; 
         bool visible;
 

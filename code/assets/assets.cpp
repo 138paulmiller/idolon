@@ -1,6 +1,7 @@
 
 #include "assets.hpp"
 #include "factories.hpp"
+#include "../config.hpp"
 #include "../scripting/api.hpp"
 
 /*TODO 
@@ -12,7 +13,7 @@
 Asset::Asset( const std::string &name )
 	:name(name)
 {
-	
+
 }
 
 namespace
@@ -45,7 +46,7 @@ namespace Assets
 		{
 			return s_details[type.name()].ext;
 		}
-		return ".raw";
+		return DEFAULT_RAW_EXT;
 	}
 
 	bool FileExists(const std::string & filepath)
@@ -77,7 +78,7 @@ namespace Assets
 			{ 
 				typeid(Graphics::Map).name(), 
 				{ 
-					".map", 
+					DEFAULT_MAP_EXT, 
 					//deserialize
 					[](std::istream & in)->Asset*{
 						MapFactory * factory = new MapFactory();
@@ -97,7 +98,7 @@ namespace Assets
 			{ 
 				typeid(Graphics::Tileset).name(), 
 				{ 
-					".tls", 
+					DEFAULT_TILESET_EXT, 
 					//deserialize
 					[](std::istream & in)->Asset*{						
 						TilesetFactory * factory = new TilesetFactory();
@@ -117,8 +118,7 @@ namespace Assets
 			{ 
 				typeid(Graphics::Font).name(), 
 				{ 
-					".fnt", 
-
+					DEFAULT_FONT_EXT, 
 					//deserialize
 					[](std::istream & in)->Asset*{						
 						FontFactory * factory = new FontFactory();
@@ -137,7 +137,7 @@ namespace Assets
 			{ 
 				typeid(Script).name(), 
 				{ 
-					".scr", 
+					DEFAULT_SCRIPT_EXT, 
 					//deserialize
 					[](std::istream & in)->Asset*{
 						ScriptFactory * factory = new ScriptFactory();

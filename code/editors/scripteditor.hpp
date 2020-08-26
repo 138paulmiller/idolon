@@ -31,8 +31,7 @@ private:
 	std::string m_scriptName;
 	int m_cursorX, m_cursorY;
 	uint m_cursorPos, m_textOffset;
-	uint m_offsetX, m_offsetY;
-	Graphics::TextBox * m_codeView;
+	Graphics::TextBox * m_codeBox;
 	bool m_dirty ;
 
 	int m_charW;

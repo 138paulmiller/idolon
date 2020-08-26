@@ -17,4 +17,17 @@
 #define GAME_API_UPDATE "update"
 #define GAME_API_INIT "init"
 
+
+#define DEFAULT_COLOR_TEXT  WHITE
+#define DEFAULT_COLOR_FILL  BLACK
+#define DEFAULT_COLOR_CLICK Palette[26] 
+#define DEFAULT_COLOR_HOVER Palette[25]
+#define DEFAULT_TEXT_BORDER 2
+
+#define DEFAULT_FONT_EXT ".fnt"
+#define DEFAULT_MAP_EXT ".map" 
+#define DEFAULT_TILESET_EXT ".tls"
+#define DEFAULT_SCRIPT_EXT ".scr"
+#define DEFAULT_RAW_EXT  ".raw"
+
 #define CACHE_PATH "__cache__"

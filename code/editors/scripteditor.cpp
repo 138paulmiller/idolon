@@ -37,13 +37,15 @@ void ScriptEditor::onEnter()
 	//space for toolbar
 	const int lineH = h / m_charH;
 
-	m_codeView = new Graphics::TextBox(lineW, lineH, "",fontname);
-	m_codeView->x = m_charW;
-	m_codeView->y = menuY(); 
-	m_codeView->fillColor = BLACK ;       
-	m_codeView->filled = true;
-	m_codeView->text = "";
-	m_codeView->reload();
+//create highlight box
+	m_codeBox = new Graphics::TextBox(lineW, lineH, "",fontname);
+	m_codeBox->x = m_charW;
+	m_codeBox->y = menuY(); 
+	m_codeBox->textColor = WHITE;
+	m_codeBox->fillColor = BLACK;       
+	m_codeBox->filled = false;
+	m_codeBox->text = "";
+	m_codeBox->reload();
 
 	m_cursor = new Graphics::TextBox(1, 1, " ", fontname);
 	m_cursor->filled = true;
@@ -64,7 +66,7 @@ void ScriptEditor::onExit()
 	Assets::Unload<Script>(m_scriptName);
 	m_script =  0;
 
-	delete m_codeView;
+	delete m_codeBox;
 	App::clear();
 	Editor::onExit();
 	LOG("Exited script editor");
@@ -85,11 +87,15 @@ void ScriptEditor::onTick()
 	Engine::GetMousePosition(mx, my);
 	if ( Engine::GetMouseButtonState(MOUSEBUTTON_LEFT)== BUTTON_DOWN)
 	{
-		m_cursorX = (mx - m_codeView->x) / m_charW ;
-		m_cursorY = (my - m_codeView->y) / m_charH ;
-		updateTextOffset();
-	printf("CURSOR : %d ", m_cursorPos);
-				
+		//relative to textbox
+		const int tx = mx - m_codeBox->x;
+		const int ty = my - m_codeBox->y;
+		if(tx >= 0 && ty >= 0 )
+		{
+			m_cursorX = tx / m_charW ;
+			m_cursorY = ty / m_charH ;
+			updateTextOffset();				
+		}
 	}
 	//else if ( Engine::GetMouseButtonState(MOUSEBUTTON_LEFT)== BUTTON_HOLD)
 	//highlight text 
@@ -103,27 +109,27 @@ void ScriptEditor::onTick()
 	if(m_dirty)
 	{
 		//copy lines to codeview.
-		m_codeView->text.clear();
+		m_codeBox->text.clear();
 		int line = 0;
 		for(int i = m_textOffset; i < m_script->code.size(); i++)
 		{
 			//if beyond code view 
-			if(line >= m_codeView->th)
+			if(line >= m_codeBox->th)
 				break;
 			const char c = m_script->code[i];
 			if(c == '\n')
 			{
 				line++;
 			}
-			m_codeView->text += c;
+			m_codeBox->text += c;
 		}
-		m_codeView->refresh();
+		m_codeBox->refresh();
 		m_dirty = false;
 	}
-	m_cursor->x = m_codeView->x + ( m_cursorX - m_offsetX ) * m_charW;	
-	m_cursor->y = m_codeView->y + ( m_cursorY - m_offsetY ) * m_charH;	
+	m_cursor->x = m_codeBox->x + ( m_cursorX - m_codeBox->view.x ) * m_charW;	
+	m_cursor->y = m_codeBox->y + ( m_cursorY - m_codeBox->view.y ) * m_charH;	
 	
-	m_codeView->draw();
+	m_codeBox->draw();
 	m_cursor->draw();
 }
 
@@ -160,7 +166,7 @@ void ScriptEditor::onKey(Key key, bool isDown)
 				if(KeyPrintable(key))
 				{
 					//TODO allow horizontal scrolling
-					if(m_cursorX < m_codeView->tw-1)
+					if(m_cursorX < m_codeBox->tw-1)
 					{
 						if (m_cursorPos == m_script->code.size()) 
 							m_script->code += key;
@@ -172,7 +178,6 @@ void ScriptEditor::onKey(Key key, bool isDown)
 				}
 			break;
 			case KEY_BACKSPACE:
-				printf("CURSOR : %d ", m_cursorPos);
 				if (m_cursorPos > 0)
 				{
 					scrollTextBy(-1, 0);	
@@ -197,7 +202,7 @@ void ScriptEditor::reload()
 	m_dirty = true;
 	
 	m_timer = 0;
-	m_offsetY = m_offsetX = 0;
+	m_codeBox->view.x = m_codeBox->view.y = 0;
 	m_cursorPos = m_textOffset = 0;
 
 }
@@ -214,18 +219,15 @@ void ScriptEditor::scrollTextBy(int dx, int dy)
 		//go to end of line
 		m_cursorX = -1;
 	}
-	else if(m_cursorX >= m_codeView->tw)
-	{
-		m_offsetX++;
-	}
+	
 	if(m_cursorY < 0)
 	{
 		m_cursorY = 0;
 	}
-	else if(m_cursorY >= m_codeView->th)
-	{
-		m_offsetY++;
-	}
+	
+	m_codeBox->view.x = Max(0, m_cursorX - m_codeBox->tw);
+	m_codeBox->view.y = Max(0, m_cursorY - m_codeBox->th);
+	printf("%d %d ", m_codeBox->view.x, m_codeBox->view.y); 
 	updateTextOffset();
 }
 
@@ -234,41 +236,31 @@ void ScriptEditor::updateTextOffset()
 	m_dirty = true;
 
 	//set text offset
-	int row = 0, col = 0;
+	int cx = m_cursorX;
+	int cy = m_cursorY;
+	m_cursorX = 0;
+	m_cursorY = 0;
+	
 	for(m_cursorPos = 0; m_cursorPos < m_script->code.size(); m_cursorPos++)
 	{
-		if(row == m_cursorY)
+		if(m_cursorY == cy)
 		{
-			//go to end
-			if(m_cursorX == -1)
+
+			//get as close to cursor X as possible
+			while(m_cursorPos < m_script->code.size() 
+				&& (cx == -1 || m_cursorX < cx )
+				&& m_script->code[m_cursorPos] != '\n' )
 			{
-				m_cursorX = 0;
-				while(m_cursorPos < m_script->code.size() && m_script->code[m_cursorPos] != '\n' )
-				{
-					m_cursorPos++;
-					m_cursorX++;
-				}
-			} 
-			else 
-			{
-				col = m_cursorX;
-				m_cursorX = 0;
-				//get as close to cursor X as possible
-				while(m_cursorPos < m_script->code.size() 
-					&& m_cursorX < col 
-					&& m_script->code[m_cursorPos] != '\n' )
-				{
-					m_cursorPos++;
-					m_cursorX++;
-				}
-				break;
+				m_cursorPos++;
+				m_cursorX++;
 			}
 			break;
 		}
+		m_cursorX++;
 		if(m_script->code[m_cursorPos] == '\n' )
 		{
-			row++;
-			col = 0;
+			m_cursorY++;
+			m_cursorX = 0;
 		}
 	}
 
