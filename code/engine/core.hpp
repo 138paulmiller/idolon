@@ -32,7 +32,7 @@ typedef unsigned int uint;
 
 
 //Add Vector / Math classes
-#define Max( x, y ) (((x) > (y)) ? x : y);
+#define Max( x, y ) (((x) > (y)) ? x : y)
 
 std::string Trim( const std::string &s );
 

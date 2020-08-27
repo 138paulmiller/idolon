@@ -230,9 +230,8 @@ Asset * ScriptFactory::deserialize( std::istream& in )
                 script  = new PyScript( name );
                 break;
             }
-
-			script ->code = std::string(codedata);
-			script ->compile();
+            script->lang = lang;
+			script->code = std::string(codedata);
 			
             delete[] codedata;
 
@@ -242,13 +241,13 @@ Asset * ScriptFactory::deserialize( std::istream& in )
 	{
         if ( script )
         {
-		    LOG("Script : failed to load script %s\n", script ->filepath.c_str());
+		    LOG("Script : failed to load script %s\n", script->filepath.c_str());
             delete script ;
             script = 0;
         }
         else
         {
-            LOG("Script : failed to load script %s\n", script ->filepath.c_str());
+            LOG("Script : failed to load script %s\n", script->filepath.c_str());
 
         }
     }
@@ -257,6 +256,7 @@ Asset * ScriptFactory::deserialize( std::istream& in )
 
 void ScriptFactory::serialize( const Asset * asset, std::ostream& out ) const
 {
+
     const Script* script = dynamic_cast< const Script* >( asset );
 
     ASSERT( script , "ScriptFactory: Asset not loaded" );

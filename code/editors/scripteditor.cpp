@@ -33,12 +33,12 @@ void ScriptEditor::onEnter()
 	Assets::Unload<Graphics::Font>(fontname);
 
 	//can scroll horiz 
-	const int lineW = w / m_charW * 2;
+	m_lineW = w / m_charW;
 	//space for toolbar
-	const int lineH = h / m_charH;
+	m_lineH = h / m_charH;
 
-//create highlight box
-	m_codeBox = new Graphics::TextBox(lineW, lineH, "",fontname);
+	//create highlight box
+	m_codeBox = new Graphics::TextBox(m_lineW * 2, m_lineH, "",fontname);
 	m_codeBox->x = m_charW;
 	m_codeBox->y = menuY(); 
 	m_codeBox->textColor = WHITE;
@@ -46,6 +46,9 @@ void ScriptEditor::onEnter()
 	m_codeBox->filled = false;
 	m_codeBox->text = "";
 	m_codeBox->reload();
+
+	//only draw text that fits within screen
+	m_codeBox->w = m_codeBox->view.w = w; 
 
 	m_cursor = new Graphics::TextBox(1, 1, " ", fontname);
 	m_cursor->filled = true;
@@ -126,8 +129,8 @@ void ScriptEditor::onTick()
 		m_codeBox->refresh();
 		m_dirty = false;
 	}
-	m_cursor->x = m_codeBox->x + ( m_cursorX - m_codeBox->view.x ) * m_charW;	
-	m_cursor->y = m_codeBox->y + ( m_cursorY - m_codeBox->view.y ) * m_charH;	
+	m_cursor->x = m_codeBox->x + ( m_cursorX * m_charW - m_codeBox->view.x );	
+	m_cursor->y = m_codeBox->y + ( m_cursorY * m_charH - m_codeBox->view.y );	
 	
 	m_codeBox->draw();
 	m_cursor->draw();
@@ -225,9 +228,10 @@ void ScriptEditor::scrollTextBy(int dx, int dy)
 		m_cursorY = 0;
 	}
 	
-	m_codeBox->view.x = Max(0, m_cursorX - m_codeBox->tw);
-	m_codeBox->view.y = Max(0, m_cursorY - m_codeBox->th);
-	printf("%d %d ", m_codeBox->view.x, m_codeBox->view.y); 
+	//-2 allow to see cursor
+	m_codeBox->view.x = Max(0, m_cursorX - (m_lineW-2)) * m_charW;
+	m_codeBox->view.y = Max(0, m_cursorY - m_lineH) * m_charH;
+
 	updateTextOffset();
 }
 

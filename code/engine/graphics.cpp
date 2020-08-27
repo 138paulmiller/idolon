@@ -425,7 +425,7 @@ namespace Graphics
         if(!m_fontcache) return;   
         if(filled)
             Engine::DrawRect(fillColor, {x,y,w,h}, true);
-        Engine::DrawTexture(m_texture, view, {x,y,w,h});
+        Engine::DrawTexture(m_texture, view, { x, y, w, h });
     }
     const Font *TextBox::getFont() 
     { 
@@ -435,7 +435,7 @@ namespace Graphics
     void TextBox::refresh()
     {
         Engine::ClearTexture(m_texture, {0,0,0,0});
-        m_fontcache->blit(m_texture, text, { borderX, borderY , w, h });
+        m_fontcache->blit(m_texture, text, { borderX, borderY , m_textureW, m_textureH });
         Engine::MultiplyTexture(m_texture, textColor);
 
     }
@@ -449,9 +449,19 @@ namespace Graphics
         if(!m_fontcache) return;
         //only do if texture w/h changes
         if(m_texture) Engine::DestroyTexture(m_texture);
-        w = tw * m_fontcache->charW + borderX*2;
-        h = th * m_fontcache->charH + borderY*2;
-        view = {0, 0, w, h};
+        
+        m_textureW = tw * m_fontcache->charW + borderX*2;
+        m_textureH = th * m_fontcache->charH + borderY*2;
+        
+        if(w == 0)
+            w = m_textureW;
+        if(h == 0 )
+            h = m_textureH;
+        
+        if(view.w == 0)
+            view.w = w;
+        if(view.h == 0)
+            view.h = w;
 
         m_texture = Engine::CreateTexture(w, h, TEXTURE_TARGET);
         refresh();

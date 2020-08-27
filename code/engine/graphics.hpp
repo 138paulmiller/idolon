@@ -190,6 +190,7 @@ namespace Graphics
         int m_texture; 
         //font sheet to use
         Font * m_fontcache;
+        int m_textureW, m_textureH; 
 	};
 
 }

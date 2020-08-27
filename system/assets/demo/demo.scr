@@ -1,8 +1,6 @@
-$ demo/demo python
+$demo/demo python
 
 from time import time,ctime
-import idolon as I
+from idolon import *
 
-print('Today is:', ctime(time()))
-print("Mouse:" % I.mx(), I.my())
-
+print("Mouse:", mx(), my())

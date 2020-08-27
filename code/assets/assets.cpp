@@ -283,7 +283,6 @@ namespace Assets
 		asset->filepath = path;
 		try 
 		{		
-
 			LOG("Assets: Saving %s%s (%s)\n", asset->name.c_str(), GetAssetTypeExtImpl(type).c_str(), path.c_str());
 
 			std::ofstream outfile;
