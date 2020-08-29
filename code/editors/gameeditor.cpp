@@ -22,6 +22,7 @@ void GameEditor::onEnter()
 	//App::addWidget( m_toolbar );
 
 	Editor::onEnter();
+
 }
 
 void GameEditor::onExit()
@@ -54,4 +55,9 @@ void GameEditor::redo()
 
 void GameEditor::save()
 {
+}
+
+void GameEditor::load( const std::string & gamepath )
+{
+	std::string m_gamepath;
 }

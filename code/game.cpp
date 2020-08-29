@@ -63,8 +63,14 @@ namespace
 namespace Game
 {
 
+
+	Desc::Desc( const std::string name )
+		:Asset(name)
+	{
+	}
+
 	Cartridge::Cartridge( const std::string & name, const Desc * desc, char * data )
-		: name(name)
+		: Asset(name)
 		, m_desc(desc)
 		, m_data(data)
 	{
@@ -88,7 +94,7 @@ namespace Game
 		delete factory;
 		return map;
 	}
-
+///////////////////////////////////////////////////////////////////////////////
 
 	void Startup(const std::string & cartpath)
 	{
@@ -104,9 +110,17 @@ namespace Game
 			s_maps[i] = 0;
 		}
 		//load cart
-		const std::string sourcefile = ""; 
-		//compile game code
-//		Eval::Compile(sourcefile);
+	}
+
+
+	void Shutdown()
+	{
+		delete s_sm;
+		for(int i = 0 ; i < LAYER_COUNT; i++)
+		{
+			if(s_maps[i])
+				delete s_maps[i];
+		}
 
 	}
 	//call script init
@@ -133,16 +147,12 @@ namespace Game
 		return GAME_RUNNING;
 	}
 
-	void Shutdown()
+	//package game into cartridge
+	void Package( const std::string &descname, const std::string &cartpath )
 	{
-		delete s_sm;
-		for(int i = 0 ; i < LAYER_COUNT; i++)
-		{
-			if(s_maps[i])
-				delete s_maps[i];
-		}
-
+		ASSERT( 0, "Package not implemented" );
 	}
+
 
 	//load map into layer. unloads previous
 	void Load(Layer layer, const std::string & mapname)

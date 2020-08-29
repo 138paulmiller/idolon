@@ -209,5 +209,8 @@
     <ClCompile Include="..\code\assets\assets.cpp">
       <Filter>Source Files\assets</Filter>
     </ClCompile>
+    <ClCompile Include="..\code\editors\gameeditor.cpp">
+      <Filter>Source Files\editors</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

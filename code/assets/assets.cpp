@@ -10,11 +10,6 @@
 
  */
 
-Asset::Asset( const std::string &name )
-	:name(name)
-{
-
-}
 
 namespace
 {
@@ -27,14 +22,24 @@ namespace
 
 	struct AssetDetails
 	{
-		AssetDetails() = default;
 		std::string ext;
-		std::function<Asset*(std::istream & in)> deserialize;
-		std::function<void(const Asset*, std::ostream & out)> serialize;
+		Factory *factory;
 	};
 	std::unordered_map<const char*, AssetDetails> s_details ; 
 
 } // namespace
+
+Asset::Asset( const std::string &name )
+	:name(name)
+{
+
+}
+
+Factory::Factory( const std::type_info& type, const std::string &ext )
+{
+	s_details[type.name()] =  { ext, this };
+}
+
 
 
 namespace Assets
@@ -74,94 +79,14 @@ namespace Assets
 	{
 		LOG("Assets: Starting up...\n");
 		s_assetdirs.push_back(dirpath);
-		s_details = {
-			{ 
-				typeid(Graphics::Map).name(), 
-				{ 
-					DEFAULT_MAP_EXT, 
-					//deserialize
-					[](std::istream & in)->Asset*{
-						MapFactory * factory = new MapFactory();
-						Asset * asset =  factory->deserialize( in );
-						delete factory;
-						return asset;
-
-					},
-					//serialize
-					[](const Asset* asset, std::ostream & out){
-						MapFactory* factory = new MapFactory();
-						factory->serialize( asset, out );
-						delete factory;
-					} 
-				}
-			},
-			{ 
-				typeid(Graphics::Tileset).name(), 
-				{ 
-					DEFAULT_TILESET_EXT, 
-					//deserialize
-					[](std::istream & in)->Asset*{						
-						TilesetFactory * factory = new TilesetFactory();
-						Asset * asset =  factory->deserialize( in );
-						delete factory;
-						return asset;
-
-					},
-					//serialize
-					[](const Asset* asset, std::ostream & out){
-						TilesetFactory* factory = new TilesetFactory();
-						factory->serialize( asset, out );
-						delete factory;
-					} 
-				}
-			},
-			{ 
-				typeid(Graphics::Font).name(), 
-				{ 
-					DEFAULT_FONT_EXT, 
-					//deserialize
-					[](std::istream & in)->Asset*{						
-						FontFactory * factory = new FontFactory();
-						Asset * asset =  factory->deserialize( in );
-						delete factory;
-						return asset;
-					},
-					//serialize
-					[](const Asset* asset, std::ostream & out){
-						FontFactory* factory = new FontFactory();
-						factory->serialize( asset, out );
-						delete factory;
-					} 
-				}
-			},
-			{ 
-				typeid(Script).name(), 
-				{ 
-					DEFAULT_SCRIPT_EXT, 
-					//deserialize
-					[](std::istream & in)->Asset*{
-						ScriptFactory * factory = new ScriptFactory();
-						Asset * asset =  factory->deserialize( in );
-						delete factory;
-						return asset;
-
-					},
-					//serialize
-					[](const Asset* asset, std::ostream & out){
-						ScriptFactory* factory = new ScriptFactory();
-						factory->serialize( asset, out );
-						delete factory;
-					} 
-				}
-			},
-		};
-
+		
 	}
 
 	void Shutdown()
 	{
-		s_details.clear();
 		LOG("Assets:: Shutting down...\n");
+
+		s_details.clear();
 		for(auto & pair : s_assets)
 		{
 			const Asset * asset = pair.second;
@@ -194,7 +119,8 @@ namespace Assets
 		const auto it = s_details.find(type.name());
 		if(it == s_details.end())
 			return 0;
-		return it->second.deserialize(in);
+		Factory *factory = it->second.factory;
+		return factory->deserialize(in);
 	}
 
 	void Serialize(const Asset * asset, const std::type_info& type,  std::ostream& out )
@@ -202,7 +128,8 @@ namespace Assets
 		const auto it = s_details.find(type.name());
 		if(it == s_details.end())
 			return;
-		it->second.serialize(asset, out);
+		Factory *factory = it->second.factory;
+		factory->serialize(asset, out);
 	}	
 	
 	void UnloadImpl(const std::type_info& type, const std::string& name)

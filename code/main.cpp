@@ -16,13 +16,6 @@ void EditAsset(const Args& args);
 #define ARG_RANGE(args, min, max) if(args.size() < min || args.size() > max ) { SHELL_LOG("Incorrect argument range"); return; }
 #define ARG_COUNT(args, i) if(args.size() != i ){ SHELL_LOG("Incorrect number of arguments"); return; }
 
-/*
-	load <game>.game
-	- loads game code as well as map and tileset editor. 
-	- Will also have a code editor. and cmd line. switchable by a single button press
-	- you can have up to 4 sheets. And A few maps. Can select assets to be used.  
-	2 modes
-*/
 static const CommandTable & g_cmds = 
 {
 	{ 	

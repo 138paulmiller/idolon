@@ -2,11 +2,10 @@
 #include "../ui/api.hpp"
 #include "../game.hpp"
 
+/*
+	
 
-//use system to switch contexts 
-
-//This is the main editor. used to switch to set tilesets, and edit scripts
-//Edits the description file
+*/
 class  GameEditor : public Editor 
 {
 public:
@@ -18,7 +17,13 @@ public:
 	void redo()override;
 	void undo()override;
 	void save()override;
+
+	
+	//path to game directory. contains .desc file
+	void load(const std::string & gamepath);
+
 private:
+	std::string m_gamepath;
 	Graphics::TextBox * m_text;
 	Game::Desc * desc;
 };

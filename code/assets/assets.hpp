@@ -27,8 +27,9 @@ public:
 class Factory 
 {
 public:
-	virtual Asset * deserialize( std::istream& in ) = 0 ;
-	virtual void serialize( const Asset * asset, std::ostream& out ) const = 0;
+	Factory( const std::type_info& type, const std::string &ext );
+	virtual void serialize( const Asset *asset, std::ostream &out ) const {}
+	virtual Asset *deserialize( std::istream &in ) { return 0; }
 };
 
 namespace Assets

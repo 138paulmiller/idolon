@@ -1,8 +1,25 @@
 #include "factories.hpp"
 
+#include "../game.hpp"
 #include "../engine/api.hpp"
 #include "../scripting/api.hpp"
 #include "../scripting/api.hpp"
+
+
+namespace
+{
+	//each factory self registers with asset system
+    TilesetFactory s_tilesetFactory;
+    MapFactory s_mapFactory;
+    FontFactory s_fontFactory;
+    ScriptFactory s_scriptFactory;
+    GameDescFactory s_gamedescFactory;
+}
+
+TilesetFactory::TilesetFactory()
+:Factory( typeid(Graphics::Tileset), DEFAULT_TILESET_EXT )
+{
+}
 
 Asset * TilesetFactory::deserialize(std::istream & in)
 {
@@ -31,6 +48,10 @@ Asset * TilesetFactory::deserialize(std::istream & in)
             delete tileset;
             tileset = 0;
         }
+        else 
+        { 
+            LOG( "TilesetFactory: Failed to load map\n" );
+        }
     }
     return tileset;
 }
@@ -48,6 +69,13 @@ void TilesetFactory::serialize(const Asset * asset, std::ostream & out) const
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+
+MapFactory::MapFactory()
+:Factory( typeid(Graphics::Map), DEFAULT_MAP_EXT )
+{
+}
+
+
 Asset *  MapFactory::deserialize( std::istream & in)
 {
     Graphics::Map * map = 0;
@@ -91,6 +119,10 @@ Asset *  MapFactory::deserialize( std::istream & in)
             delete map;
             map= 0;
         }
+        else 
+        {
+            LOG("MapFactory: Failed to load map\n");
+        }
     }
     return map;
 }   
@@ -116,6 +148,11 @@ void MapFactory::serialize(const Asset * asset, std::ostream & out) const
 }
 
 /////////////////////////////////////////////////////////////////////////////////
+FontFactory::FontFactory()
+:Factory( typeid(Graphics::Font), DEFAULT_FONT_EXT )
+{
+}
+
 Asset *  FontFactory::deserialize( std::istream& in )
 {
     Graphics::Font *font = 0;
@@ -143,6 +180,10 @@ Asset *  FontFactory::deserialize( std::istream& in )
             delete font;
             font = 0;
         }
+        else
+        {
+            LOG("FontFactory: Failed to load font\n");
+        }
     }
     return font;
 }   
@@ -165,19 +206,23 @@ void FontFactory::serialize(const Asset * asset, std::ostream & out) const
 }
 
 //////////////////////////////////////////////////////////////////////////
-static const std::unordered_map<std::string, ScriptLanguage > LangStrToEnum = 
-{
-	{ "python", SCRIPT_PYTHON }
-};
 
-static const std::string StrToLangEnum[] = 
+
+
+ScriptFactory::ScriptFactory()
+:Factory( typeid(Script), DEFAULT_SCRIPT_EXT )
 {
-	"none",
-	"python"
-};
+}
 
 Asset * ScriptFactory::deserialize( std::istream& in )
 {
+
+    static const std::unordered_map<std::string, ScriptLanguage > LangStrToEnum = 
+    {
+	    { "none", SCRIPT_NONE },
+	    { "python", SCRIPT_PYTHON }
+    };
+
     Script *script = 0;
 	try
 	{
@@ -247,8 +292,7 @@ Asset * ScriptFactory::deserialize( std::istream& in )
         }
         else
         {
-            LOG("Script : failed to load script %s\n", script->filepath.c_str());
-
+            LOG("Script : failed to load script\n");
         }
     }
     return script ;
@@ -256,11 +300,77 @@ Asset * ScriptFactory::deserialize( std::istream& in )
 
 void ScriptFactory::serialize( const Asset * asset, std::ostream& out ) const
 {
+    static const std::string LangEnumToStr[] = 
+    {
+	    "none",
+	    "python"
+    };
 
     const Script* script = dynamic_cast< const Script* >( asset );
-
     ASSERT( script , "ScriptFactory: Asset not loaded" );
 
-    out << "$" << script->name << " " << StrToLangEnum[script->lang] << std::endl;
+    out << "$" << script->name << " " << LangEnumToStr[script->lang] << std::endl;
 	out << script->code;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////
+GameDescFactory::GameDescFactory()
+:Factory( typeid(Game::Desc), DEFAULT_GAMEDESC_EXT )
+{
+}
+Asset *GameDescFactory::deserialize( std::istream &in )
+{
+    Game::Desc *desc= 0;
+    try
+    {        
+        std::string name;
+        std::getline( in, name );
+
+        desc = new Game::Desc(name);
+        std::string subassetName;
+        
+        int len = 0;
+        in >> len; 
+        desc->tilesets.resize( len );
+        while ( len-- > 0 )
+        {
+            std::getline( in, subassetName );
+            desc->tilesets.push_back( subassetName );
+        }
+
+        in >> len; 
+        desc->maps.resize( len );
+        while ( len-- > 0 )
+        {
+            std::getline( in, subassetName );
+            desc->maps.push_back( subassetName);
+        }
+        
+        in >> len; 
+        desc->scripts.resize( len );
+        while ( len-- > 0 )
+        {
+            std::getline( in, subassetName );
+            desc->scripts.push_back( subassetName);
+        }
+
+    }
+    catch ( ... )
+    {
+        if ( desc )
+        {
+		    LOG("Game Desc : failed to load game description %s\n", desc->filepath.c_str());
+            delete desc ;
+            desc = 0;
+        }
+        else
+        {
+            LOG("Game Desc : failed to load game description\n");
+        }
+    }
+    return desc;
+}
+
+void GameDescFactory::serialize( const  Asset *asset, std::ostream &out ) const
+{
 }

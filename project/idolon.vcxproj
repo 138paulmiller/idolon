@@ -202,6 +202,7 @@
   <ItemGroup>
     <ClCompile Include="..\code\assets\assets.cpp" />
     <ClCompile Include="..\code\assets\factories.cpp" />
+    <ClCompile Include="..\code\editors\gameeditor.cpp" />
     <ClCompile Include="..\code\editors\mapeditor.cpp" />
     <ClCompile Include="..\code\editors\scripteditor.cpp" />
     <ClCompile Include="..\code\editors\tileseteditor.cpp" />

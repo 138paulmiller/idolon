@@ -40,8 +40,9 @@ namespace  Game
 	//Create a loader for each asset type. given a block of data load the asset into the CPU
 	//
 	//these describe the game files.
-	struct Desc : Asset 
+	struct Desc : public Asset 
 	{
+		Desc(const std::string name);
 		//array of tileset names
 		std::vector<std::string> tilesets;
 		std::vector<std::string> maps;
@@ -50,8 +51,8 @@ namespace  Game
 
 	//create a mapping from tileset name to cartridge 
 	//create cart factory
-	struct Cartridge
-	{ 
+	struct Cartridge : public Asset
+	{  
 		struct Header
 		{
 			std::unordered_map<std::string, uint> offsets;
@@ -64,13 +65,14 @@ namespace  Game
 		Graphics::Map * LoadMap(const std::string & mapname);
 
 	private:
-		std::string name;
 		char * m_data;
 		const Desc * m_desc;
 	};
 
 
+
 	void Startup(const std::string & cartpath);
+	void Shutdown();
 
 	//call script init
 	void Init();
@@ -78,7 +80,8 @@ namespace  Game
 	//call update and 
 	GameState Update();
 	
-	void Shutdown();
+	//package game into cartridge
+	void Package(const std::string & descname, const std::string & cartpath);
 
 	//load map into layer. unloads previous
 	void Load(Layer layer, const std::string & mapname);

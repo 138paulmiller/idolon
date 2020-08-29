@@ -68,4 +68,5 @@ Animation to sprite. Create serializable sprites that can be edited in tileset e
 
 Create game editor. This is used to set the tilesets used, maps used, sprites used. 
 
-MOVE ALL TOOLBARS to Main Editor Toolbar
+
+Hot key shell mode that executes commands after hitting tilda.

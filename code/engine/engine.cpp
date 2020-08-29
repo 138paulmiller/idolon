@@ -440,10 +440,9 @@ namespace Engine
     {
         x = s_ue.mousex / s_windowScale;
         y = s_ue.mousey / s_windowScale;
-        int sx = s_alignX ;
-        int sy = s_alignY ;
-        x = (int)(( x / sx)* sx);
-        y = (int)(( y / sy)* sy);
+
+        x = (int)(( x / s_alignX)* s_alignX);
+        y = (int)(( y / s_alignY)* s_alignY);
 
     }
 

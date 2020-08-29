@@ -11,6 +11,8 @@ namespace
 	Shell  * s_shell;
 	Context* s_context;
 	
+	std::list<Factory *>s_factories;
+
 	//default config
 	//system are for default system data
 	std::string s_sysPath ;
@@ -25,6 +27,8 @@ namespace Sys
 
 	void Startup( const CommandTable &cmds )
 	{
+
+
 		s_gamestate = GAME_OFF;
 		s_context = new Context( APP_COUNT );
 
@@ -65,16 +69,19 @@ namespace Sys
 		s_shell->addCommands( cmds );
 
 		Eval::Startup();
+
 		LOG( "System On!\n" );
 	}
 
 	void Shutdown()
 	{
+		
 		s_context->clear();
 		delete s_context;
 
 		Eval::Shutdown();
 		LOG( "Shutting down assets ...\n" );
+
 
 		Assets::Shutdown();
 

@@ -28,6 +28,7 @@
 #define DEFAULT_MAP_EXT ".map" 
 #define DEFAULT_TILESET_EXT ".tls"
 #define DEFAULT_SCRIPT_EXT ".scr"
+#define DEFAULT_GAMEDESC_EXT  ".cfg"
 #define DEFAULT_RAW_EXT  ".raw"
 
 #define CACHE_PATH "__cache__"
