@@ -30,7 +30,7 @@ static const CommandTable & g_cmds =
 		} 
 	},
 	{
-		{ "sys", "id [args] -system settings" }, 
+		{ "sys", "<cmd> <args>... system settings" }, 
 		[](Args args)
 		{ 
 			ARG_NONEMPTY(args);
@@ -42,15 +42,15 @@ static const CommandTable & g_cmds =
 		} 
 	},
 	{
-		{ "import", "asset name.png -create asset from file"}, 
+		{ "import", "<asset> <name>"}, 
 		ImportAsset
 	},
 	{
-		{ "new", "asset name [args] -create asset"} ,
+		{ "new", "<asset> <name> [args]"} ,
 		NewAsset
 	},
 	{
-		{ "edit", "name.asset"}, 
+		{ "edit", "<filename>"}, 
 		EditAsset
 	},
 	{
@@ -71,7 +71,7 @@ static const CommandTable & g_cmds =
 		} 
 	},
 	{
-		{ "cd", "dir : change dir"}, 
+		{ "cd", "<dirname>"}, 
 		[](Args args)
 		{ 
 			ARG_COUNT(args, 1); // 	
@@ -80,7 +80,7 @@ static const CommandTable & g_cmds =
 		} 
 	},
 	{
-		{ "cwd", "print current path"}, 
+		{ "cwd", ""}, 
 		[](Args args)
 		{ 
 			SHELL_LOG(FS::Cwd());
@@ -182,12 +182,16 @@ void PrintHelp(const Args& args)
 
 // -------------- Convert raw to asset ------------------------
 
+#define ARG_NAME_TILESET "tls"
+#define ARG_NAME_FONT "font"
+#define ARG_NAME_MAP "map"
+
 
 void ImportAsset(const Args& args)
 {			
 	ARG_NONEMPTY(args);
-
-	if(args[0] == "-s" )
+	const std::string &type = args[0];
+	if(type == ARG_NAME_TILESET )
 	{
 		//must be two args
 		ARG_COUNT(args, 2);
@@ -202,7 +206,7 @@ void ImportAsset(const Args& args)
 		Assets::SaveAs(sheet, filepath );
 
 	}
-	else if(args[0] == "-f" )
+	else if(type == ARG_NAME_FONT )
 	{
 		ARG_RANGE(args, 4, 6); // 
 		const std::string &  imgpath = FS::Append(FS::Root(), args[1]);
@@ -242,33 +246,40 @@ void ImportAsset(const Args& args)
 
 		delete[] newpixels;
 	}
+	else
+	{
+		SHELL_LOG("Invalid asset type (%s)", type.c_str());
+	}
 }
 
 
 void NewAsset(const Args& args)
 {			 
 	//new <asset>  <name>  
-	ARG_RANGE(args, 2, 3); // 
-	const std::string& asset = args[0];
+	ARG_RANGE(args, 2, 3); 
+	const std::string& type = args[0];
 	const std::string& name = args[1];
-	if(asset == "tileset")
+	if(type == ARG_NAME_TILESET)
 	{
 		Graphics::Tileset * sheet = new Graphics::Tileset(name);
 		Assets::SaveAs(sheet, UserAssetPath<Graphics::Tileset>(name));
 	}
-	else if(asset == "map")
+	else if(type == ARG_NAME_MAP)
 	{
 		Graphics::Map* map= new Graphics::Map(name);
 		Assets::SaveAs(map, UserAssetPath<Graphics::Map>(name));
-
 	}
-	else if(asset == "font")
+	else if(type == ARG_NAME_FONT)
 	{
 		//8x8 chars. 18 x 6  
 		const int w = 18 * 8;
 		const int h =  6 * 8;
 		Graphics::Font* font= new Graphics::Font(name, w, h);
 		Assets::SaveAs(font, UserAssetPath<Graphics::Font>(name));
+	}
+	else
+	{
+		SHELL_LOG("Invalid asset type (%s)", type.c_str());
 	}
 }
 
@@ -301,16 +312,16 @@ void EditAsset(const Args& args)
 	Assets::ClearPaths();
 	Assets::AddPath(FS::Cwd());
 	//keep the dot
-	const std::string& ext = "." + FS::FileExt(args[0]);
+	const std::string& type = "." + FS::FileExt(args[0]);
 	const std::string& name = FS::NoExt(args[0]);
-	auto it = assetToEditorMap.find(ext);
+	auto it = assetToEditorMap.find(type);
 	if(it != assetToEditorMap.end())
 	{
 		it->second(name);
 	}
 	else
 	{
-		SHELL_LOG("Could not find editor for asset type"  );
+		SHELL_LOG("Could load asset type (%s)", type.c_str() );
 	}
 }
 

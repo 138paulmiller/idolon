@@ -160,6 +160,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include="..\code\scripting\pybindings.inl" />
+    <None Include="..\Makefile" />
+    <None Include="..\README.md" />
     <None Include="..\system\.gitignore" />
     <None Include="..\system\assets\basic.fnt" />
     <None Include="..\system\assets\default.fnt" />
@@ -168,6 +170,8 @@
     <None Include="..\system\assets\demo\demo.tls" />
     <None Include="..\system\assets\full.fnt" />
     <None Include="..\system\game.py" />
+    <None Include="..\TODO" />
+    <None Include="..\WIKI" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\code\algo.hpp" />

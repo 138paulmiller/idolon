@@ -58,6 +58,18 @@
     <None Include="..\system\assets\demo\demo.tls">
       <Filter>System Files\assets\demo</Filter>
     </None>
+    <None Include="..\Makefile">
+      <Filter>System Files</Filter>
+    </None>
+    <None Include="..\README.md">
+      <Filter>System Files</Filter>
+    </None>
+    <None Include="..\TODO">
+      <Filter>System Files</Filter>
+    </None>
+    <None Include="..\WIKI">
+      <Filter>System Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\code\scripting\api.hpp">

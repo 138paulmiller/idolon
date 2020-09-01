@@ -87,6 +87,7 @@ namespace Engine
 
     void Shutdown()
     {
+		LOG("Engine: Shutting down...\n");
         for (int i = 0; i < s_textures.size(); i++)
         {
             if (s_textures[i])SDL_DestroyTexture(s_textures[i]);

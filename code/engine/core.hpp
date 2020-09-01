@@ -24,6 +24,7 @@
 //todo mov to config
 #define TAB_SIZE 4
 
+//copy to file as well
 #define LOG(...) printf(__VA_ARGS__);
 
 

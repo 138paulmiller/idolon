@@ -7,6 +7,8 @@ struct CommandDesc
 	//command name
 	CommandDesc(const std::string & name, const std::string & help = "");
 	const std::string name;
+	//const std::string tip; 
+	//detailed help
 	const std::string help; 
 	struct Hash
 	{

@@ -27,7 +27,8 @@ namespace Sys
 
 	void Startup( const CommandTable &cmds )
 	{
-
+		char title[24];
+        snprintf( title,24, "%s v%d.%d", SYSTEM_NAME, VERSION_MAJOR, VERSION_MINOR );
 
 		s_gamestate = GAME_OFF;
 		s_context = new Context( APP_COUNT );
@@ -35,26 +36,28 @@ namespace Sys
 		//default config
 		s_sysPath = FS::ExePath() + "/system/";
 		s_sysAssetPath = s_sysPath + "/assets/";
-		char title[24];
-        snprintf( title,24, "%s v%d.%d", SYSTEM_NAME, VERSION_MAJOR, VERSION_MINOR );
-		
+
+
 		Engine::Startup( title, SCREEN_W, SCREEN_H, WINDOW_SCALE );
-		//add system assets path
 		Assets::Startup( Sys::AssetPath() );
+		Eval::Startup();
 
-
+		//setup context apps
 		s_context->create( APP_SHELL,          s_shell = new Shell() );
 		s_context->create( APP_TILESET_EDITOR, new TilesetEditor()   );
 		s_context->create( APP_MAP_EDITOR,     new MapEditor()       );
 		s_context->create( APP_SCRIPT_EDITOR,  new ScriptEditor()    );
+		s_shell->addCommands( cmds );
 
+		//redirect key event to appropriate app. 
+		//handle system level keys. i.e escape and quick shell toggle (tilda ? )
 		Engine::SetKeyEcho( true );
 		Engine::PushKeyHandler(
 			[&] ( Key key, bool isDown )
 			{
 				if ( isDown && key == KEY_ESCAPE )
 				{	
-					s_context->app()->signal( APP_CODE_CONTINUE );
+					s_context->app()->signal( APP_CODE_CONTINUE ); //allow reenter
 					s_context->exit();
 				}
 				else
@@ -63,12 +66,10 @@ namespace Sys
 				}
 			}
 		);
+
 		//boot into shell
 		Sys::GetContext()->enter( APP_SHELL );
 
-		s_shell->addCommands( cmds );
-
-		Eval::Startup();
 
 		LOG( "System On!\n" );
 	}
@@ -80,15 +81,10 @@ namespace Sys
 		delete s_context;
 
 		Eval::Shutdown();
-		LOG( "Shutting down assets ...\n" );
-
-
 		Assets::Shutdown();
-
-		LOG( "Shutting down engine ...\n" );
 		Engine::Shutdown();
 
-		LOG( "Goodbye :)\n" );
+		LOG( "System Off!\n" );
 		exit( 1 );
 	}
 
@@ -145,7 +141,7 @@ namespace Sys
 		//every 1 seconds
 		if (timer > FPS_STAT_RATE) 
 		{
-			printf("FPS:%.2f\n", Engine::GetFPS());
+			LOG("FPS:%.2f\n", Engine::GetFPS());
 			timer = 0.f;
 		}
 		//

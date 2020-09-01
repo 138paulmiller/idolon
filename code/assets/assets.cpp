@@ -84,7 +84,7 @@ namespace Assets
 
 	void Shutdown()
 	{
-		LOG("Assets:: Shutting down...\n");
+		LOG("Assets: Shutting down...\n");
 
 		s_details.clear();
 		for(auto & pair : s_assets)
