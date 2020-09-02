@@ -58,8 +58,7 @@ void ScriptEditor::onEnter()
 	reload();
 
 	addTool("RUN", [&](){
-		m_script->compile();
-		Eval::Execute(m_script->code);
+		runCode();
 	}, false);
 
 }
@@ -268,6 +267,14 @@ void ScriptEditor::updateTextOffset()
 		}
 	}
 
+}
+
+void ScriptEditor::runCode()
+{
+	//set input handler. escape to resume
+	m_script->compile();
+	Eval::Execute(m_script->code);
+	
 }
 
 void ScriptEditor::undo()

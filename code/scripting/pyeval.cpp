@@ -168,31 +168,45 @@ bool PyScript::call(const std::string & func, const std::vector<TypedArg> & args
 	return 1;
 }
 
+/*
+const char * name, //name of the method
+PyCFunction method //pointer to the C implementation PyObject* name(PyObject *self, PyObject *args)
+int flags          //flag bits indicating how the call should be constructed
+const char * doc   //points to the contents of the docstring
+*/
+
+#define PYDECL(module, name, doc )\
+	{ #name, module##_##name, METH_VARARGS, doc },
+
+#define PYBIND(module, name) \
+	PyObject* module##_##name(PyObject *self, PyObject *args)
+
+#define PYERR(...) \
+	LOG(__VA_ARGS__)
+
+
 namespace 
 {
+
 	#include "pybindings.inl"
-	/*
-	const char * name, //name of the method
-	PyCFunction method //pointer to the C implementation PyObject* name(PyObject *self, PyObject *args)
-	int flags          //flag bits indicating how the call should be constructed
-	const char * doc   //points to the contents of the docstring
-	*/
+
 	PyMethodDef s_pymethods[]
 	{	
 		PYTHON_BINDINGS
 		{0,0,0,0}
 	};
+
 	PyModuleDef s_pymodule = 
 	{
 	    PyModuleDef_HEAD_INIT, 
-		SYSTEM_NAME,     						/* m_name */
-		"API to the " SYSTEM_NAME " system ",  	/* m_doc */
-		-1,                  	/* m_size */
-		s_pymethods,    		/* m_methods */
-		NULL,                	/* m_reload */
-		NULL,                	/* m_traverse */
-		NULL,                	/* m_clear */
-		NULL,                	/* m_free */
+		SYSTEM_NAME,     						// m_name 
+		"API to the " SYSTEM_NAME " system ",  	// m_doc 
+		-1,                  	                // m_size 
+		s_pymethods,    		                // m_methods 
+		NULL,                	                // m_reload 
+		NULL,                	                // m_traverse 
+		NULL,                	                // m_clear 
+		NULL,                	                // m_free 
 	};
 
 	PyObject* InitModule(void)
@@ -215,8 +229,8 @@ namespace PyEval
 		//add system path for imports
 		const std::string & cmd = "import sys\nimport os\nsys.path.append('" +  Sys::Path() + "')\n";
 		PyRun_SimpleString(cmd.c_str());
-
 	}
+
 	void Shutdown()
 	{
 		Py_Finalize();

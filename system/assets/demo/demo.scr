@@ -4,3 +4,4 @@ from time import time,ctime
 from idolon import *
 
 print("Mouse:", mx(), my())
+cls(255,0,0)

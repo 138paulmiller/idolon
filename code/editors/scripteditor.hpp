@@ -23,7 +23,7 @@ public:
 private:
 	//draw line numbers
 	void updateTextOffset();
-
+	void runCode();
 	void scrollTextBy( int dx, int dy);
 	void reload();
 

@@ -10,7 +10,6 @@ void EditAsset(const Args& args);
 
 #define SHELL_LOG(msg) Sys::GetShell()->log(msg);
 
-
 //TODO - handle error more elegantly. Throw exception with msg ? Log mesage to shell ? with usage. 
 #define ARG_NONEMPTY(args) if(args.size() <= 0  ) { SHELL_LOG("Missing arguments"); return; }
 #define ARG_RANGE(args, min, max) if(args.size() < min || args.size() > max ) { SHELL_LOG("Incorrect argument range"); return; }
