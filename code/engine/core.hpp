@@ -34,6 +34,7 @@ typedef unsigned int uint;
 
 //Add Vector / Math classes
 #define Max( x, y ) (((x) > (y)) ? x : y)
+#define Clamp(x, lo, hi) ((x) < (lo)) ? (lo) : (((x) > (hi)) ? (hi) : (x)); 
 
 std::string Trim( const std::string &s );
 

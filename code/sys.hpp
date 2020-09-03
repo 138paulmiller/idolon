@@ -4,11 +4,14 @@
 
 */
 #include "config.hpp"
+#include "rt.hpp"
+#include "game.hpp"
 #include "algo.hpp"
 #include "shell.hpp"
 #include "ui/api.hpp"
 #include "scripting/api.hpp"
 #include "assets/api.hpp"
+
 
 enum : uint8
 {

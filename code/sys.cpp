@@ -1,9 +1,8 @@
 
 
 #include "sys.hpp"
-#include "game.hpp"
-#include "ui/api.hpp"
 #include "editors/api.hpp"
+#include "rt.hpp"
 
 //TODO handle all exceptions here. Close down, or restart system if necessary. Worst case shutdown, then startup system.
 namespace
@@ -20,6 +19,7 @@ namespace
 
 	GameState s_gamestate;
 } // namespace
+
 
 namespace Sys
 {
@@ -111,8 +111,7 @@ namespace Sys
 
 	static void GameStep()
 	{
-		TypedArg ret;
-		s_gamestate = Game::Update(); 
+		Runtime::Step(); 
 		if(s_gamestate == GAME_OFF)
 		{
 			Game::Shutdown();

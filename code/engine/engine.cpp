@@ -31,8 +31,8 @@ namespace
         int mousex, mousey;
         int wheelx, wheely;
         int wheeldx, wheeldy;
-        ButtonState mousebuttons[5] = { BUTTON_UP } ;
-        ButtonState keymap[512] = { BUTTON_UP } ;
+        ButtonState mousebuttons[5] = { BUTTON_RELEASE } ;
+        ButtonState keymap[512] = { BUTTON_RELEASE } ;
     } s_ue;
 
  
@@ -126,7 +126,7 @@ namespace Engine
 
         for(int i = 0; i < 5; i++)
         {
-            if (s_ue.mousebuttons[i] == BUTTON_DOWN)
+            if (s_ue.mousebuttons[i] == BUTTON_CLICK)
                 s_ue.mousebuttons[i] = BUTTON_HOLD;
         }
         while (SDL_PollEvent(&event))
@@ -142,7 +142,7 @@ namespace Engine
                 {
                     cb(Key(sym), false);
                 }
-                s_ue.keymap[sym] = BUTTON_UP;
+                s_ue.keymap[sym] = BUTTON_RELEASE;
             }
                 break;
             case SDL_KEYDOWN:
@@ -158,15 +158,10 @@ namespace Engine
                     }
                 }
                 ButtonState & state = s_ue.keymap[sym];
-                if (state == BUTTON_DOWN || state == BUTTON_HOLD)
-                {
-                    if(Engine::GetTimeDeltaMs() > 10)
-                        state = BUTTON_HOLD;
-                    else
-                        state = BUTTON_UP;
-                }
+                if (state == BUTTON_CLICK || state == BUTTON_HOLD)
+                    state = BUTTON_HOLD;
                 else
-                    state = BUTTON_DOWN;
+                    state = BUTTON_CLICK;
             }
                 break;
             case SDL_MOUSEWHEEL:
@@ -182,11 +177,11 @@ namespace Engine
                 break;
 
             case SDL_MOUSEBUTTONDOWN:
-                s_ue.mousebuttons[event.button.button-1] = BUTTON_DOWN;
+                s_ue.mousebuttons[event.button.button-1] = BUTTON_CLICK;
                 break;
             case SDL_MOUSEBUTTONUP:
             
-                s_ue.mousebuttons[event.button.button-1] = BUTTON_UP;
+                s_ue.mousebuttons[event.button.button-1] = BUTTON_RELEASE;
                 break;
             case SDL_QUIT:
                 s_ue.s_isRunning = false;

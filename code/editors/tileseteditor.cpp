@@ -140,7 +140,7 @@ void TilesetEditor::onTick()
 		case TILE_TOOL_LINE:	
 
 			//invalidate
-			if (Engine::GetMouseButtonState(MOUSEBUTTON_LEFT) == BUTTON_UP)
+			if (Engine::GetMouseButtonState(MOUSEBUTTON_LEFT) == BUTTON_RELEASE)
 				m_shapeRect = { -1, -1, -1, -1 };
 			break;
 		default:
@@ -154,7 +154,7 @@ void TilesetEditor::onTick()
 		int sheetx = tilex + tileSrc.x;
 		int sheety = tiley + tileSrc.y;
 		
-		if ( Engine::GetMouseButtonState( MOUSEBUTTON_LEFT ) == BUTTON_DOWN )
+		if ( Engine::GetMouseButtonState( MOUSEBUTTON_LEFT ) == BUTTON_CLICK )
 		{
 			switch(m_tool)
 			{
@@ -219,7 +219,7 @@ void TilesetEditor::onTick()
 				break;
 			}
 		}
-		else if (Engine::GetMouseButtonState(MOUSEBUTTON_LEFT) == BUTTON_UP)
+		else if (Engine::GetMouseButtonState(MOUSEBUTTON_LEFT) == BUTTON_RELEASE)
 		{
 			if(m_usingTool)
 			{

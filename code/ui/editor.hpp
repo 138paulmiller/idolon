@@ -18,16 +18,19 @@ public:
 	virtual void onExit();
 
 	bool supports(AppSupport support);
-	
+
+	void hideControl( bool hidden );
 	void hideTools(bool hidden);
 	void addTool(const std::string & text, std::function<void()> click, bool sticky=true );
-	inline int menuY() { return m_menuY;  }
+	inline int controlX() { return m_controlX;  }
+	inline int controlY() { return m_controlY;  }
 
 private:
 
 	uint8 m_support;
-	int m_menuY;
-	int m_menu;
+	int m_control;
+	int m_controlX;
+	int m_controlY;
 	int m_toolbar;
 	bool m_resetToolbar;
 

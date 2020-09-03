@@ -6,8 +6,8 @@
 
 enum ButtonState 
 {
-    BUTTON_UP = 0,
-    BUTTON_DOWN,
+    BUTTON_RELEASE = 0,
+    BUTTON_CLICK,
     BUTTON_HOLD,//if previously down
 };
 

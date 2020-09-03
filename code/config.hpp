@@ -14,8 +14,10 @@
 #define SHELL_PREFIX ">"
 #define DEFAULT_FONT "default"
 #define FPS_STAT_RATE  5.f 
-#define GAME_API_UPDATE "update"
+
 #define GAME_API_INIT "init"
+#define GAME_API_UPDATE "update"
+#define GAME_API_ONKEY "onkey"
 
 #define DEFAULT_COLOR_TEXT  WHITE
 #define DEFAULT_COLOR_FILL  BLACK

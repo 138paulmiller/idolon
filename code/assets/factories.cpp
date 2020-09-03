@@ -1,9 +1,6 @@
 #include "factories.hpp"
 
-#include "../game.hpp"
-#include "../engine/api.hpp"
-#include "../scripting/api.hpp"
-#include "../scripting/api.hpp"
+#include "../sys.hpp"
 
 
 namespace

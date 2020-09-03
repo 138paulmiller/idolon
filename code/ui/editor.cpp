@@ -6,7 +6,7 @@
 Editor::Editor(uint8 support) 
 		:m_support(support)
 {
-	m_menu = -1;
+	m_control = -1;
 }
 
 void Editor::redo()  
@@ -33,16 +33,16 @@ bool Editor::supports(AppSupport support)
 
 void Editor::onExit()
 {
-	if(m_menu != -1) 
-		App::removeWidget(m_menu);
+	if(m_control != -1) 
+		App::removeWidget(m_control);
 	if ( m_toolbar != -1 )
 		App::removeWidget( m_toolbar );
 }
 
 void Editor::onEnter()
 {
-	if ( m_menu != -1 )
-		App::removeWidget( m_menu );
+	if ( m_control!= -1 )
+		App::removeWidget( m_control );
 
 	const std::string &fontName = "full";
 
@@ -53,42 +53,50 @@ void Editor::onEnter()
 
 	int screenW, screenH;
 	Engine::GetSize( screenW, screenH );
-	UI::Toolbar *menu = new UI::Toolbar( this, screenW, 0 );
-	m_menu = App::addWidget(menu);
+	UI::Toolbar *control = new UI::Toolbar( this, screenW, 0 );
+	m_control = App::addWidget(control);
 
-	menu->font = fontName; //has glyphs
-	menu->leftAlign = false;
+	control->font = fontName; //has glyphs
+	control->leftAlign = false;
 	
 	//BACK
-	menu->add({'X'}, [&](){
+	control->add({'X'}, [&](){
 		App::signal(APP_CODE_EXIT);
 	}, false);
 	
 	//get tool bar offset
-	m_menuY = menu->get( 0 )->rect().h + menu->get( 0 )->rect().y;
+	m_controlX = control->get( 0 )->rect().x;
+	m_controlY = control->get( 0 )->rect().h + control->get( 0 )->rect().y;
 
 	//SAVE
 	if(supports(APP_SAVE))
 	{	
-		menu->add({20}, [&](){
+		control->add({20}, [&](){
 			this->save();
 		}, false);
 	}
 	//REDO
 	if(supports(APP_REDO))
 	{
-		menu->add({19}, [&](){
+		control->add({19}, [&](){
 			this->redo();
 		}, false);
 	}
 	//UNDO
 	if(supports(APP_UNDO))
 	{	
-		menu->add({18}, [&](){
+		control->add({18}, [&](){
 			this->undo();
 		}, false);
 	}
 }
+
+void Editor::hideControl( bool hidden )
+{
+	UI::Toolbar * control = dynamic_cast<UI::Toolbar*>(App::getWidget( m_control));
+	control->hidden = hidden;
+}
+
 
 void Editor::hideTools( bool hidden )
 {

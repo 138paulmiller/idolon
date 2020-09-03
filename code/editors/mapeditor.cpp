@@ -131,10 +131,7 @@ void MapEditor::onTick()
 		m_map->draw();
 	}
 
-	// for(Graphics::Sprite * sprite : m_sprites )	
-	// {
-	// 	sprite->draw();
-	// }	
+
 	if(!m_workspaceHidden)
 	{
 		drawOverlay();
@@ -148,7 +145,7 @@ bool MapEditor::handleScroll()
 	MouseButton btn = m_shift ? MOUSEBUTTON_LEFT : MOUSEBUTTON_RIGHT;
 
 	//scroll if necessary
-	if ( Engine::GetMouseButtonState( btn ) == BUTTON_DOWN )
+	if ( Engine::GetMouseButtonState( btn ) == BUTTON_CLICK )
 	{
 		m_prevmx = m_tooldata.mx;
 		m_prevmy = m_tooldata.my;
@@ -248,7 +245,7 @@ bool MapEditor::handleTool()
 	switch(m_tool)
 	{
 		case MAP_TOOL_PIXEL:
-			if (( Engine::GetMouseButtonState( MOUSEBUTTON_LEFT ) == BUTTON_DOWN )
+			if (( Engine::GetMouseButtonState( MOUSEBUTTON_LEFT ) == BUTTON_CLICK )
 				|| ( Engine::GetMouseButtonState( MOUSEBUTTON_LEFT ) == BUTTON_HOLD ))
 			{
 				const Rect& cursor = m_map->tile( m_tooldata.mx, m_tooldata.my );
@@ -283,7 +280,7 @@ bool MapEditor::handleTool()
 			}
 		break;
 		case MAP_TOOL_ERASE:
-			if (( Engine::GetMouseButtonState( MOUSEBUTTON_LEFT ) == BUTTON_DOWN )
+			if (( Engine::GetMouseButtonState( MOUSEBUTTON_LEFT ) == BUTTON_CLICK )
 				|| ( Engine::GetMouseButtonState( MOUSEBUTTON_LEFT ) == BUTTON_HOLD ))
 			{
 				const Rect& cursor = m_map->tile( m_tooldata.mx, m_tooldata.my );

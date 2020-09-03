@@ -388,7 +388,7 @@ namespace UI
 
 	void ColorPicker::onUpdate()
 	{
-		if (Engine::GetMouseButtonState(MOUSEBUTTON_LEFT) != BUTTON_UP)
+		if (Engine::GetMouseButtonState(MOUSEBUTTON_LEFT) != BUTTON_RELEASE)
 		{
 			int mx, my;
 			Engine::GetMousePosition(mx, my);
@@ -497,7 +497,7 @@ namespace UI
 	void TilePicker::onUpdate()
 	{
 		const int leftbtn =Engine::GetMouseButtonState(MOUSEBUTTON_LEFT); 
-		if ( leftbtn != BUTTON_UP)
+		if ( leftbtn != BUTTON_RELEASE)
 		{
 			int mx, my;
 			Engine::GetMousePosition(mx, my);
@@ -507,7 +507,7 @@ namespace UI
 
 			if(rmx >= 0 && rmx < m_box.w && rmy >= 0 && rmy < m_box.h)
 			{
-				if(leftbtn == BUTTON_DOWN)
+				if(leftbtn == BUTTON_CLICK)
 				{
 					m_focus = true;
 				}
@@ -521,7 +521,7 @@ namespace UI
 			else
 			{
 				//clicked outside
-				if(leftbtn == BUTTON_DOWN)
+				if(leftbtn == BUTTON_CLICK)
 					m_focus = false;
 			}
 		}

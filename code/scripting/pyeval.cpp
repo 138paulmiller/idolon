@@ -4,7 +4,6 @@
 
 #include "../sys.hpp"
 
-
 #define PY_SSIZE_T_CLEAN
 #undef _DEBUG
 #include <Python.h>
@@ -22,6 +21,7 @@ const char * doc   //points to the contents of the docstring
 
 #define PYBIND(module, name) \
 	PyObject* module##_##name(PyObject *self, PyObject *args)
+
 
 #define PYERR(...) \
 	LOG(__VA_ARGS__)
@@ -102,6 +102,10 @@ void PyScript::compile()
 	const std::string &prelude = "import sys\nsys.path.append('" + tempdir + "')\n";
 	PyRun_SimpleString(prelude .c_str());
 
+	for ( auto pair : m_funcs)
+	{
+		Py_DECREF(pair.second);
+	}
 	m_funcs.clear();
 	if ( m_module )
 	{
@@ -109,7 +113,8 @@ void PyScript::compile()
 	}	
     m_module = PyImport_ImportModule(modulename.c_str());
 
-	
+	 PyErr_Print();
+
     if(!m_module)
     {
         PyErr_Print();
@@ -132,7 +137,7 @@ void PyScript::compile()
 			}
 		}
 		*/
-		const char * api[] = { GAME_API_INIT, GAME_API_UPDATE, 0 };
+		const char * api[] = { GAME_API_INIT, GAME_API_UPDATE, GAME_API_ONKEY, 0 };
 		for ( const char **funcptr = api; *funcptr; funcptr++ )
 		{
 			PyObject *attr = PyObject_GetAttrString( m_module, *funcptr );
@@ -140,17 +145,12 @@ void PyScript::compile()
 			{
 				m_funcs[*funcptr] = attr;
 			}
+			else
+			{
+				LOG("Script:%s %s is missing!\n", name.c_str(), *funcptr );
+			}
 		}
-		
-		if ( m_funcs.find( GAME_API_INIT ) == m_funcs.end() )
-		{
-			LOG("Script: %s %s() is missing!\n", name.c_str(), GAME_API_INIT);
-		}
-		
-		if(m_funcs.find(GAME_API_UPDATE) == m_funcs.end())
-		{
-			LOG("Script:%s %s() is missing!\n", name.c_str(), GAME_API_UPDATE );
-		}
+
 	}
 	const std::string &postlude = "import sys\nsys.path.pop();";
 	PyRun_SimpleString(postlude .c_str());
@@ -170,7 +170,8 @@ bool PyScript::call(const std::string & func, TypedArg & ret, const std::vector<
 	PyObject* value;
 	PyObject* funcobj = m_funcs[func.c_str()];
 	//create tuple to pass into func
-	PyObject* argsobj = PyTuple_New(args.size());
+
+	PyObject* argsobj = args.size() ? PyTuple_New(args.size()) : nullptr;
 	int i = 0;
     for (const TypedArg & arg : args ) 
     {
@@ -198,8 +199,9 @@ bool PyScript::call(const std::string & func, TypedArg & ret, const std::vector<
         PyTuple_SetItem(argsobj, i, value);
 		i++;
     }
-    value = PyObject_CallObject(funcobj, argsobj);
-    Py_DECREF(argsobj);
+
+	value = PyObject_CallObject(funcobj, argsobj);
+	
     if (value != NULL) 
 	{
     	switch ( ret.type )
@@ -219,9 +221,10 @@ bool PyScript::call(const std::string & func, TypedArg & ret, const std::vector<
     else 
 	{
         PyErr_Print();
-        LOG("Eval: Call failed\n");
+        LOG("Eval: Calling %s failed\n", func.c_str());
         return 0;
     }
+
 	return 1;
 }
 

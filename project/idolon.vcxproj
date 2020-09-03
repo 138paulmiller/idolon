@@ -191,6 +191,7 @@
     <ClInclude Include="..\code\engine\fs.hpp" />
     <ClInclude Include="..\code\engine\graphics.hpp" />
     <ClInclude Include="..\code\game.hpp" />
+    <ClInclude Include="..\code\rt.hpp" />
     <ClInclude Include="..\code\scripting\api.hpp" />
     <ClInclude Include="..\code\scripting\eval.hpp" />
     <ClInclude Include="..\code\engine\api.hpp" />
@@ -218,6 +219,7 @@
     <ClCompile Include="..\code\engine\graphics.cpp" />
     <ClCompile Include="..\code\game.cpp" />
     <ClCompile Include="..\code\main.cpp" />
+    <ClCompile Include="..\code\rt.cpp" />
     <ClCompile Include="..\code\scripting\eval.cpp" />
     <ClCompile Include="..\code\scripting\pyeval.cpp" />
     <ClCompile Include="..\code\shell.cpp" />

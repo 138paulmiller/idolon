@@ -1,16 +1,29 @@
 $demo/demo python
-
 from time import time,ctime
 from idolon import *
 
+tile = 0
+s = 0
+
 
 def init():
-  print("Starting Script") 
-    
+  global s
+  sheet("demo/demo")
+  s = spawn(0,0,0)
+
+def onkey(k, click):
+  global s, tile
+  dt = 0
+  if click:
+    if k == DOWN:
+      dt = -1
+    elif k == UP:
+      dt = 1
+  else:
+    tile = tile + dt
+  flipTo(s, tile+dt)
+  print("TILE",dt) 
 
 def update():
-  print("Mouse:", mx(), my())
-  cls(255,0,0)
-  k = key(DOWN)
-  if k:
-    print("Down arrow")
+  global s, dt
+  moveTo(s, mx(), my())

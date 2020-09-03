@@ -41,7 +41,7 @@ void ScriptEditor::onEnter()
 	//create highlight box
 	m_codeBox = new Graphics::TextBox(m_lineW * 2, m_lineH, "",fontname);
 	m_codeBox->x = m_charW;
-	m_codeBox->y = menuY(); 
+	m_codeBox->y = controlY(); 
 	m_codeBox->textColor = WHITE;
 	m_codeBox->fillColor = BLACK;       
 	m_codeBox->filled = false;
@@ -86,13 +86,15 @@ void ScriptEditor::onExit()
 void ScriptEditor::onTick()
 {
 
-	hideTools(m_scriptRunning  );
+	hide(m_scriptRunning  );
+
 	if ( m_scriptRunning ) 
 	{ 
 		TypedArg ret;
 		m_script->call( GAME_API_UPDATE, ret );
 		m_scriptRunning = ret.type == ARG_NONE ||  ret.value.i != 0;
 		//reset 
+		Runtime::Step();
 		return;
 	}
 
@@ -100,7 +102,7 @@ void ScriptEditor::onTick()
 
 	int mx, my;
 	Engine::GetMousePosition(mx, my);
-	if ( Engine::GetMouseButtonState(MOUSEBUTTON_LEFT)== BUTTON_DOWN)
+	if ( Engine::GetMouseButtonState(MOUSEBUTTON_LEFT)== BUTTON_CLICK)
 	{
 		//relative to textbox
 		const int tx = mx - m_codeBox->x;
@@ -311,21 +313,27 @@ void ScriptEditor::runCode()
 {
 	if ( m_timer == 0 ) return; //on enter do nothing 
 
+	Runtime::Quit();
+
 	//set input handler. escape to resume
+	printf( "%s", m_script->code.c_str() );
 	m_script->compile();
-	Eval::Execute(m_script->code);
 	Engine::PushKeyHandler( 
 		[&] ( const Key &key, bool isDown )
 		{
-				if ( isDown && key == KEY_ESCAPE )
-				{
-					m_scriptRunning  = false;
-					Engine::PopKeyHandler();
-				}
+			TypedArg ret;
+			m_script->call( GAME_API_ONKEY, ret, { TypedArg( key ), TypedArg( isDown ) } );
+
+			if ( (ret.type != ARG_NONE && ret.value.i == 0 ) || (isDown && key == KEY_ESCAPE) )
+			{
+				m_scriptRunning  = false;
+				Engine::PopKeyHandler();
+			}
 		} 
 	);
 	TypedArg ret;
 	m_script->call( GAME_API_INIT, ret );
+
 	m_scriptRunning  = true;
 	
 }
@@ -348,4 +356,10 @@ void ScriptEditor::setScript(const std::string & name)
 {
 	m_scriptName = name;
 
+}
+
+void ScriptEditor::hide(bool isHidden)
+{
+	hideControl( isHidden);
+	hideTools( isHidden);
 }

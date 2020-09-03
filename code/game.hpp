@@ -1,5 +1,5 @@
 #pragma once
-#include "sys.hpp"
+#include "engine/api.hpp"
 
 
 enum GameState : uint8  
@@ -70,31 +70,10 @@ namespace  Game
 		const Desc * m_desc;
 	};
 
-
-
 	void Startup(const std::string & cartpath);
 	void Shutdown();
 
-	//call script init
-	void Init();
-	
-	//call update and 
-	GameState Update();
-
 	//package game into cartridge
 	void Package(const std::string & descname, const std::string & cartpath);
-
-	//load map into layer. unloads previous
-	void Load(Layer layer, const std::string & mapname);
-	void Unload(Layer layer);
-	void Resize(Layer layer, int w, int h);
-	void Scroll(Layer layer, int x, int y);
-	
-	//Use integer to pass to scrits. large uses large sprite 
-	int Spawn(int tileId, int x, int y, bool isSmall = false);
-	//despawn sprite
-	void Despawn(int spriteId);
-	Graphics::Sprite * GetSprite(int spriteId);
-	void UseSpriteSheet(const std::string & tileset);
 	
 }

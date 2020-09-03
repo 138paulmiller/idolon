@@ -26,6 +26,7 @@ private:
 	void runCode();
 	void scrollTextBy( int dx, int dy);
 	void reload();
+	void hide(bool isHidden);
 
 	Script * m_script;
 	bool m_scriptRunning;

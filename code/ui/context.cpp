@@ -131,7 +131,7 @@ AppCode Context::run( )
 				
 					if(button->rect().intersects({mx, my, 1,1}))
 					{
-						if( Engine::GetMouseButtonState(MouseButton::MOUSEBUTTON_LEFT) == BUTTON_DOWN)
+						if( Engine::GetMouseButtonState(MouseButton::MOUSEBUTTON_LEFT) == BUTTON_CLICK)
 						{
 							button->click();
 						}	
@@ -144,7 +144,7 @@ AppCode Context::run( )
 					}
 					else
 					{
-						if ( Engine::GetMouseButtonState( MouseButton::MOUSEBUTTON_LEFT ) == BUTTON_DOWN )
+						if ( Engine::GetMouseButtonState( MouseButton::MOUSEBUTTON_LEFT ) == BUTTON_CLICK )
 						{
 							button->leave();
 						}

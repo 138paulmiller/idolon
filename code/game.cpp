@@ -122,30 +122,7 @@ namespace Game
 		}
 
 	}
-	//call script init
-	void Init()
-	{
-
-	}
 	
-	//call update and 
-	//Step the game
-	GameState Update()
-	{
-		//handle collisions. dispatch events
-		//update game state 
-		//handle return state RUN, EXIT, PAUSE
-		//clear screen, draw map, draw sprites, draw ui
-		for(int i = 0 ; i < LAYER_COUNT; i++)
-		{
-			if( s_mapsEnabled[i])
-				s_maps[i]->draw();
-		}
-		s_sm->draw();
-		
-		return GAME_RUNNING;
-	}
-
 	//package game into cartridge
 	void Package( const std::string &descname, const std::string &cartpath )
 	{
@@ -153,29 +130,9 @@ namespace Game
 	}
 
 
-	//load map into layer. unloads previous
-	void Load(Layer layer, const std::string & mapname)
-	{
-		bool success;
-		//if no cartridge use local
-		if ( m_cart == 0 )
-		{
-			s_maps[layer] = Assets::Load<Graphics::Map>( mapname );
-		}
-		else
-		{
-			s_maps[layer] = m_cart->LoadMap(mapname);
-		}
-		//success
-		s_mapsEnabled[layer] = ( s_maps[layer] != nullptr );
-	}
-
 	void Unload(Layer layer)
 	{
-		if(s_maps[layer])
-			Assets::Unload<Graphics::Map>(s_maps[layer]->name);
 
-		s_mapsEnabled[layer] = 0;
 	}
 
 	void Resize(Layer layer, int w, int h)
@@ -190,33 +147,10 @@ namespace Game
 	
 	//Sprite Manager 
 	//spawn sprite at x y
-	int Spawn(int tileId, int x, int y, bool isSmall)
-	{
-		if( tileId < 0 || tileId < (isSmall ? SPRITE_SMALL_COUNT : SPRITE_COUNT )  )
-		{
-			return -1;
-		}
-		return s_sm->spawn(tileId, x, y);
-	}
-	//despawn sprite
-	void Despawn(int spriteId)
-	{
-		if(spriteId > -1 && spriteId < s_sm->sprites.size())
-		{
-			return ;
-		}
-		delete 	s_sm->sprites[spriteId];
-		s_sm->sprites[spriteId] = 0;
 
-	}
-	Graphics::Sprite * GetSprite(int spriteId)
-	{
-		ASSERT(s_sm, "Game is shut down!");
-		return s_sm->sprite(spriteId);
-	}
+
 
 	void UseSpriteSheet(const std::string & tileset)
 	{
-		s_sm->tileset = tileset;
 	}
 }
