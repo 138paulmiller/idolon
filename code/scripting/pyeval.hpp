@@ -15,7 +15,7 @@ public:
 	PyScript(const std::string & name="");
 	~PyScript();
 	void compile() override;
-	bool call(const std::string & func, const std::vector<TypedArg> & args, TypedArg & ret ) override;
+	bool call( const std::string &func, TypedArg &ret, const std::vector<TypedArg> &args = {} ) override;
 
 
 private:

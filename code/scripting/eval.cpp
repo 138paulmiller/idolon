@@ -50,7 +50,7 @@ void Script::compile()
 	ASSERT(0, "Script: Language cannot compile! Language does not support it");
 }
 
-bool Script::call(const std::string & func, const std::vector<TypedArg> & args, TypedArg & ret ) 
+bool Script::call(const std::string & func, TypedArg & ret, const std::vector<TypedArg> & args ) 
 {
 	ASSERT(0, "Script: Language cannot compile! Language does not support it");
 	return 0;

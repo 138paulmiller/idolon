@@ -42,7 +42,7 @@ public:
 	Script( const 	std::string & name );
 	virtual ~Script() = default;
 	virtual void compile();
-	virtual bool call(const std::string & func, const std::vector<TypedArg> & args, TypedArg & ret ) ;
+	virtual bool call( const std::string &func, TypedArg &ret, const std::vector<TypedArg> &args = {} );
 
 	std::string code;
 	ScriptLanguage lang;

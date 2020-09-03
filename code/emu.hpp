@@ -41,11 +41,14 @@ union MMU
 } mmu;
 
 //maps from tileset/map name to page. 
-std::unordered_map<char *, Page> s_memmap; 
+std::unordered_map<char *, Page> s_memmap;
+
+//This is an abstraction to run the game using local assets rather than 
 namespace Emu
 {
 	void Startup();
 	void Shutdown();
+
 
 	//Instruction interface 
 	//void Load Cartridge file 

@@ -37,6 +37,7 @@ enum GameState : uint8
 */
 namespace  Game
 {
+	
 	//Create a loader for each asset type. given a block of data load the asset into the CPU
 	//
 	//these describe the game files.
@@ -79,7 +80,7 @@ namespace  Game
 	
 	//call update and 
 	GameState Update();
-	
+
 	//package game into cartridge
 	void Package(const std::string & descname, const std::string & cartpath);
 

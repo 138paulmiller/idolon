@@ -3,7 +3,6 @@
 
 namespace 
 {
-
 	//TODO Sprite Manager should use octree
 	struct SpriteManager
 	{
@@ -157,11 +156,20 @@ namespace Game
 	//load map into layer. unloads previous
 	void Load(Layer layer, const std::string & mapname)
 	{
-
-		bool success = (s_maps[layer] = m_cart->LoadMap(mapname));
-		s_mapsEnabled[layer] = success;
-
+		bool success;
+		//if no cartridge use local
+		if ( m_cart == 0 )
+		{
+			s_maps[layer] = Assets::Load<Graphics::Map>( mapname );
+		}
+		else
+		{
+			s_maps[layer] = m_cart->LoadMap(mapname);
+		}
+		//success
+		s_mapsEnabled[layer] = ( s_maps[layer] != nullptr );
 	}
+
 	void Unload(Layer layer)
 	{
 		if(s_maps[layer])

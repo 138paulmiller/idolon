@@ -17,6 +17,7 @@ ScriptEditor::ScriptEditor()
 
 void ScriptEditor::onEnter()
 {
+
 	Editor::onEnter();
 
 	LOG("Entering script editor ... ");
@@ -57,10 +58,11 @@ void ScriptEditor::onEnter()
 
 	reload();
 
+	m_scriptRunning = false;
+
 	addTool("RUN", [&](){
 		runCode();
 	}, false);
-
 }
 
 void ScriptEditor::onExit()
@@ -83,6 +85,17 @@ void ScriptEditor::onExit()
 
 void ScriptEditor::onTick()
 {
+
+	hideTools(m_scriptRunning  );
+	if ( m_scriptRunning ) 
+	{ 
+		TypedArg ret;
+		m_script->call( GAME_API_UPDATE, ret );
+		m_scriptRunning = ret.type == ARG_NONE ||  ret.value.i != 0;
+		//reset 
+		return;
+	}
+
 	Engine::ClearScreen(EDITOR_COLOR);
 
 	int mx, my;
@@ -140,6 +153,20 @@ void ScriptEditor::onKey(Key key, bool isDown)
 {
 	if(isDown)
 	{
+		
+		if ( m_scriptRunning ) 
+		{
+			switch ( key )
+			{
+			case KEY_ESCAPE:
+				m_scriptRunning = false;
+				break;
+			default:
+				break;
+			
+			}
+			return;
+		}
 		switch(key)
 		{
 			case KEY_UP:
@@ -163,18 +190,29 @@ void ScriptEditor::onKey(Key key, bool isDown)
 				m_cursorX = 0;
 				scrollTextBy(0, 1);
 				break;
-			case KEY_TAB:
 			default:
 				if(KeyPrintable(key))
 				{
 					//TODO allow horizontal scrolling
 					if(m_cursorX < m_codeBox->tw-1)
 					{
-						if (m_cursorPos == m_script->code.size()) 
-							m_script->code += key;
+						//use spaces
+						if ( key == KEY_TAB )
+						{
+							if (m_cursorPos == m_script->code.size()) 
+								m_script->code += std::string(TAB_SIZE, ' ');
+							else
+								m_script->code.insert(m_cursorPos, TAB_SIZE, ' ');
+							scrollTextBy(TAB_SIZE , 0);
+						}
 						else
-							m_script->code.insert(m_cursorPos, 1, key);
-						scrollTextBy(1, 0);
+						{
+							if (m_cursorPos == m_script->code.size()) 
+								m_script->code += key;
+							else
+								m_script->code.insert(m_cursorPos, 1, key);
+							scrollTextBy(1 , 0);
+						}
 					}
 					m_dirty = true;
 				}
@@ -271,9 +309,24 @@ void ScriptEditor::updateTextOffset()
 
 void ScriptEditor::runCode()
 {
+	if ( m_timer == 0 ) return; //on enter do nothing 
+
 	//set input handler. escape to resume
 	m_script->compile();
 	Eval::Execute(m_script->code);
+	Engine::PushKeyHandler( 
+		[&] ( const Key &key, bool isDown )
+		{
+				if ( isDown && key == KEY_ESCAPE )
+				{
+					m_scriptRunning  = false;
+					Engine::PopKeyHandler();
+				}
+		} 
+	);
+	TypedArg ret;
+	m_script->call( GAME_API_INIT, ret );
+	m_scriptRunning  = true;
 	
 }
 

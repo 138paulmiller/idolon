@@ -10,8 +10,55 @@
 #include <Python.h>
 //map form filename to module
 
+/*
+const char * name, //name of the method
+PyCFunction method //pointer to the C implementation PyObject* name(PyObject *self, PyObject *args)
+int flags          //flag bits indicating how the call should be constructed
+const char * doc   //points to the contents of the docstring
+*/
 
-	//
+#define PYDECL(module, name, doc )\
+	{ #name, module##_##name, METH_VARARGS, doc },
+
+#define PYBIND(module, name) \
+	PyObject* module##_##name(PyObject *self, PyObject *args)
+
+#define PYERR(...) \
+	LOG(__VA_ARGS__)
+
+
+namespace 
+{
+
+	#include "pybindings.inl"
+
+	PyMethodDef s_pymethods[]
+	{	
+		PYTHON_BINDINGS
+		{0,0,0,0}
+	};
+
+	PyModuleDef s_pymodule = 
+	{
+	    PyModuleDef_HEAD_INIT, 
+		SYSTEM_NAME,     						// m_name 
+		"API to the " SYSTEM_NAME " system ",  	// m_doc 
+		-1,                  	                // m_size 
+		s_pymethods,    		                // m_methods 
+		NULL,                	                // m_reload 
+		NULL,                	                // m_traverse 
+		NULL,                	                // m_clear 
+		NULL,                	                // m_free 
+	};
+
+	PyObject* InitModule(void)
+	{
+	    return PyModule_Create(&s_pymodule);
+	}
+
+}
+
+
 PyScript::PyScript(const std::string & name)
 	:Script(name)
 {
@@ -48,7 +95,7 @@ void PyScript::compile()
         LOG("Eval: Could not create temp file %s\n", temppath.c_str());
 		return;
 	}
-	tempfile << code;
+	tempfile << PYTHON_DEFINES << code;
 	tempfile.close();
 
 	//set execute dir
@@ -59,14 +106,10 @@ void PyScript::compile()
 	if ( m_module )
 	{
 		Py_DECREF(m_module);
-	}
+	}	
+    m_module = PyImport_ImportModule(modulename.c_str());
+
 	
-	PyObject * modname = PyUnicode_FromString(modulename.c_str());
-    m_module = PyImport_Import(modname);
-
-	const std::string &postlude = "import sys\nsys.path.pop();";
-	PyRun_SimpleString(postlude .c_str());
-
     if(!m_module)
     {
         PyErr_Print();
@@ -74,20 +117,32 @@ void PyScript::compile()
     }
 	else
 	{
+
+		// find all functions?
+		/*
 		PyObject *const pDict = PyModule_GetDict(m_module); // borrowed
-		// find functions
 		PyObject *key = nullptr, *value = nullptr;
 		for (Py_ssize_t i = 0; PyDict_Next(pDict, &i, &key, &value); i++) 
 		{
+			const char *const name = PyUnicode_AsUTF8( key );
 			//if function
 			if (PyFunction_Check(value)) 
 			{
-				m_funcs[PyUnicode_AsUTF8(key)] = value;
+				m_funcs[name] = value;
 			}
 		}
-		Py_DECREF(modname);
-
-  		if(m_funcs.find(GAME_API_INIT) == m_funcs.end())
+		*/
+		const char * api[] = { GAME_API_INIT, GAME_API_UPDATE, 0 };
+		for ( const char **funcptr = api; *funcptr; funcptr++ )
+		{
+			PyObject *attr = PyObject_GetAttrString( m_module, *funcptr );
+			if ( attr )
+			{
+				m_funcs[*funcptr] = attr;
+			}
+		}
+		
+		if ( m_funcs.find( GAME_API_INIT ) == m_funcs.end() )
 		{
 			LOG("Script: %s %s() is missing!\n", name.c_str(), GAME_API_INIT);
 		}
@@ -97,13 +152,15 @@ void PyScript::compile()
 			LOG("Script:%s %s() is missing!\n", name.c_str(), GAME_API_UPDATE );
 		}
 	}
-	
+	const std::string &postlude = "import sys\nsys.path.pop();";
+	PyRun_SimpleString(postlude .c_str());
+
 	//remove all dirs
 	FS::Remove( tempfilename );
 
 }
 
-bool PyScript::call(const std::string & func, const std::vector<TypedArg> & args, TypedArg & ret )
+bool PyScript::call(const std::string & func, TypedArg & ret, const std::vector<TypedArg> & args )
 {
 	if ( m_funcs.find( func) == m_funcs.end() )
 	{
@@ -168,53 +225,7 @@ bool PyScript::call(const std::string & func, const std::vector<TypedArg> & args
 	return 1;
 }
 
-/*
-const char * name, //name of the method
-PyCFunction method //pointer to the C implementation PyObject* name(PyObject *self, PyObject *args)
-int flags          //flag bits indicating how the call should be constructed
-const char * doc   //points to the contents of the docstring
-*/
 
-#define PYDECL(module, name, doc )\
-	{ #name, module##_##name, METH_VARARGS, doc },
-
-#define PYBIND(module, name) \
-	PyObject* module##_##name(PyObject *self, PyObject *args)
-
-#define PYERR(...) \
-	LOG(__VA_ARGS__)
-
-
-namespace 
-{
-
-	#include "pybindings.inl"
-
-	PyMethodDef s_pymethods[]
-	{	
-		PYTHON_BINDINGS
-		{0,0,0,0}
-	};
-
-	PyModuleDef s_pymodule = 
-	{
-	    PyModuleDef_HEAD_INIT, 
-		SYSTEM_NAME,     						// m_name 
-		"API to the " SYSTEM_NAME " system ",  	// m_doc 
-		-1,                  	                // m_size 
-		s_pymethods,    		                // m_methods 
-		NULL,                	                // m_reload 
-		NULL,                	                // m_traverse 
-		NULL,                	                // m_clear 
-		NULL,                	                // m_free 
-	};
-
-	PyObject* InitModule(void)
-	{
-	    return PyModule_Create(&s_pymodule);
-	}
-
-}
  //=========================================== PyEval ==================================================
 
 namespace PyEval

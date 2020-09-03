@@ -360,33 +360,37 @@ namespace Graphics
                 dx = 0;
                 dy++;
             }
-            
-            if(s == KEY_TAB)
+            int repeat = 1;
+            if ( s == KEY_TAB )
             {
-                dx += TAB_SIZE;
+                s = ' ';
+                repeat = TAB_SIZE;
             }
-            
-            if(dx == destW)
+            while ( repeat )
             {
-                dx = 0;
-                dy++;
+                repeat--;
+                if(dx == destW)
+                {
+                    dx = 0;
+                    dy++;
+                }
+                c =  s - start;
+                sx = (c % srcW);
+                sy = (c / srcW) ;            
+                Rect src = { 
+                    sx * charW, sy * charH, 
+                    charW, charH 
+                } ;
+                Rect pos = { 
+                    dest.x + dx * charW, 
+                    dest.y + dy * charH, 
+                    charW, charH 
+                };   
+                if(dy > destH) 
+                    break;
+                Engine::Blit(texture, destTexture, src, pos);
+                dx++;
             }
-            c =  s - start;
-            sx = (c % srcW);
-            sy = (c / srcW) ;            
-            Rect src = { 
-                sx * charW, sy * charH, 
-                charW, charH 
-            } ;
-            Rect pos = { 
-                dest.x + dx * charW, 
-                dest.y + dy * charH, 
-                charW, charH 
-            };   
-            if(dy > destH) 
-                break;
-            Engine::Blit(texture, destTexture, src, pos);
-            dx++;
         }
     }
 

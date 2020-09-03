@@ -28,6 +28,7 @@ private:
 	void reload();
 
 	Script * m_script;
+	bool m_scriptRunning;
 	std::string m_scriptName;
 	int m_cursorX, m_cursorY;
 	uint m_cursorPos, m_textOffset;

@@ -3,5 +3,14 @@ $demo/demo python
 from time import time,ctime
 from idolon import *
 
-print("Mouse:", mx(), my())
-cls(255,0,0)
+
+def init():
+  print("Starting Script") 
+    
+
+def update():
+  print("Mouse:", mx(), my())
+  cls(255,0,0)
+  k = key(DOWN)
+  if k:
+    print("Down arrow")

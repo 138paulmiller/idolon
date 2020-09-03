@@ -124,25 +124,30 @@ AppCode Context::run( )
 			if(button)
 			{
 				button->onReset();
-
-				if(button->rect().intersects({mx, my, 1,1}))
+				
+				//handle collision only for visible buttons
+				if ( !button->hidden )
 				{
-					if( Engine::GetMouseButtonState(MouseButton::MOUSEBUTTON_LEFT) == BUTTON_DOWN)
+				
+					if(button->rect().intersects({mx, my, 1,1}))
 					{
-						button->click();
-					}	
+						if( Engine::GetMouseButtonState(MouseButton::MOUSEBUTTON_LEFT) == BUTTON_DOWN)
+						{
+							button->click();
+						}	
+						else
+						{
+							if(button->cbHover)
+								button->cbHover();
+							button->onHover();
+						}
+					}
 					else
 					{
-						if(button->cbHover)
-							button->cbHover();
-						button->onHover();
-					}
-				}
-				else
-				{
-					if ( Engine::GetMouseButtonState( MouseButton::MOUSEBUTTON_LEFT ) == BUTTON_DOWN )
-					{
-						button->leave();
+						if ( Engine::GetMouseButtonState( MouseButton::MOUSEBUTTON_LEFT ) == BUTTON_DOWN )
+						{
+							button->leave();
+						}
 					}
 				}
 				button->onUpdate();

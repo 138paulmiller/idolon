@@ -19,7 +19,6 @@ namespace
 	std::string s_sysAssetPath;
 
 	GameState s_gamestate;
-
 } // namespace
 
 namespace Sys
@@ -31,6 +30,7 @@ namespace Sys
         snprintf( title,24, "%s v%d.%d", SYSTEM_NAME, VERSION_MAJOR, VERSION_MINOR );
 
 		s_gamestate = GAME_OFF;
+
 		s_context = new Context( APP_COUNT );
 
 		//default config

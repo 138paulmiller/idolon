@@ -17,7 +17,6 @@
 #define GAME_API_UPDATE "update"
 #define GAME_API_INIT "init"
 
-
 #define DEFAULT_COLOR_TEXT  WHITE
 #define DEFAULT_COLOR_FILL  BLACK
 #define DEFAULT_COLOR_CLICK Palette[26] 
