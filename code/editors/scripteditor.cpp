@@ -131,10 +131,11 @@ void ScriptEditor::onTick()
 		m_codeBox->refresh();
 		m_dirty = false;
 	}
-	m_cursor->x = m_codeBox->x + ( m_cursorX * m_charW - m_codeBox->view.x );
-
 	const int cy = Clamp( m_cursorY - m_codeBox->scrolly, 0, m_lineH  );
+
+	m_cursor->x = m_codeBox->x + ( m_cursorX * m_charW - m_codeBox->view.x );
 	m_cursor->y = m_codeBox->y + ( cy * m_charH );	
+
 
 	m_codeBox->draw();
 	m_cursor->draw();
@@ -242,8 +243,22 @@ void ScriptEditor::reload()
 
 void ScriptEditor::scrollTextBy(int dx, int dy)
 {
+	int prevCursorY = m_cursorY;
 	m_cursorX+=dx;
 	m_cursorY+=dy;
+
+	int prevScroll = m_codeBox->scrolly;
+	//if below 
+	if ( m_cursorY - m_codeBox->scrolly > m_lineH )
+	{
+		m_codeBox->scrolly += m_cursorY - m_codeBox->scrolly - m_lineH;
+	}
+	else if( m_cursorY < m_codeBox->scrolly )
+	{
+		m_codeBox->scrolly +=  m_cursorY - m_codeBox->scrolly;
+		if ( m_codeBox->scrolly < 0 )
+			m_codeBox->scrolly = 0;
+	}
 
 	if(m_cursorX < 0)
 	{
@@ -256,14 +271,11 @@ void ScriptEditor::scrollTextBy(int dx, int dy)
 	{
 		m_cursorY = 0;
 	}
-	
 	updateTextOffset();
-
+	
 	//-2 allow to see cursor
 	m_codeBox->view.x  = Max( 0, m_cursorX- (m_lineW-2) );
 
-	//use delta. only move when hitting edges
-	m_codeBox->scrolly = Max( 0, m_cursorY- (m_lineH-2) );
 }
 
 void ScriptEditor::updateTextOffset()
