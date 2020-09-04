@@ -95,7 +95,9 @@ void PyScript::compile()
         LOG("Eval: Could not create temp file %s\n", temppath.c_str());
 		return;
 	}
-	tempfile << PYTHON_DEFINES << code;
+
+
+	tempfile << PYTHON_PRELUDE << code;
 	tempfile.close();
 
 	//set execute dir
@@ -137,7 +139,7 @@ void PyScript::compile()
 			}
 		}
 		*/
-		const char * api[] = { GAME_API_INIT, GAME_API_UPDATE, GAME_API_ONKEY, 0 };
+		const char * api[] = { GAME_API_UPDATE, GAME_API_ONKEY, 0 };
 		for ( const char **funcptr = api; *funcptr; funcptr++ )
 		{
 			PyObject *attr = PyObject_GetAttrString( m_module, *funcptr );
@@ -169,6 +171,7 @@ bool PyScript::call(const std::string & func, TypedArg & ret, const std::vector<
 	}
 	PyObject* value;
 	PyObject* funcobj = m_funcs[func.c_str()];
+	if ( !funcobj ) return false;
 	//create tuple to pass into func
 
 	PyObject* argsobj = args.size() ? PyTuple_New(args.size()) : nullptr;

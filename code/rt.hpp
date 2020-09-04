@@ -1,6 +1,6 @@
 #pragma once
 
-//Game Runtime 
+//Game Runtime API 
 namespace Runtime
 {
 	//boot from cartridge. this will load data into ram. otherwise will use assets syste
@@ -23,6 +23,8 @@ namespace Runtime
 	void FlipTo(int spriteId, int tileId);
 	void FlipBy(int spriteId, int di);
 	void Sheet(const char *  tileset);
+	int Frame( int spriteId );
+	bool Position( int spriteId, int &x, int &y );
 
 	int TileAt( int layer, int x, int y );
 

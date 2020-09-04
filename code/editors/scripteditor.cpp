@@ -319,7 +319,6 @@ void ScriptEditor::runCode()
 	Runtime::Quit();
 
 	//set input handler. escape to resume
-	printf( "%s", m_script->code.c_str() );
 	m_script->compile();
 	Engine::PushKeyHandler( 
 		[&] ( const Key &key, bool isDown )
@@ -330,13 +329,12 @@ void ScriptEditor::runCode()
 			if ( (ret.type != ARG_NONE && ret.value.i == 0 ) || (isDown && key == KEY_ESCAPE) )
 			{
 				m_scriptRunning  = false;
+
 				Engine::PopKeyHandler();
 			}
 		} 
 	);
-	TypedArg ret;
-	m_script->call( GAME_API_INIT, ret );
-
+	
 	m_scriptRunning  = true;
 	
 }

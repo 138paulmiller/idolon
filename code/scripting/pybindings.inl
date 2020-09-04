@@ -15,7 +15,7 @@ or
 */
 
 
-#define PYTHON_DEFINES R"(
+#define PYTHON_PRELUDE R"(
 #layers
 BG=0
 SP=1
@@ -34,49 +34,56 @@ UP = ALT + 1
 DOWN = UP + 1
 LEFT = DOWN + 1
 RIGHT = LEFT + 1
+
+
 )"
 
 
 #define PYTHON_BINDINGS \
 	PYDECL( idolon, mx      , "Get mouse x position"                        )\
 	PYDECL( idolon, my      , "Get mouse y position"                        )\
-	PYDECL( idolon, cls     , "Clear screen with color r,g,b"               )\
+	PYDECL( idolon, clear     , "Clear screen with color r,g,b"               )\
 	PYDECL( idolon, key     , "Get key state. 0 is up, 1 is down. 2 is hold")\
 	PYDECL( idolon, load    , "Load layer"                                  )\
 	PYDECL( idolon, unload  , "Unload layer"                                )\
 	PYDECL( idolon, resize  , "Resize layer"                                )\
 	PYDECL( idolon, scroll  , "Scroll layer"                                )\
-	PYDECL( idolon, spawn   , "Spawn sprite "                               )\
-	PYDECL( idolon, despawn , "Despawn sprite "                             )\
-	PYDECL( idolon, moveTo  , "Move sprite to x,y "                         )\
-	PYDECL( idolon, moveBy  , "Move sprite by x,y"                          )\
-	PYDECL( idolon, flipTo  , "Move sprite tile to id"                      )\
-	PYDECL( idolon, flipBy  , "Move sprite tile by id"                      )\
+	PYDECL( idolon, sprite  , "Spawn sprite "                               )\
+	PYDECL( idolon, kill    , "Despawn sprite "                             )\
+	PYDECL( idolon, pos     , "Get or set sprite position"                  )\
+	PYDECL( idolon, move    , "Move sprite by x,y"                          )\
+	PYDECL( idolon, frame   , "Get or set sprite current tile"              )\
+	PYDECL( idolon, flip    , "Flip sprite tile by di"                      )\
 	PYDECL( idolon, sheet   , "Set surrent sprite sheetsprite "             )\
-
 
 
 //-------------------------------------------------------------------//
 PYBIND( idolon, mx)
 {
+	
 	static int x = 0;
 	static int y = 0;
 	Engine::GetMousePosition( x, y);
+
 	return PyLong_FromLong(x);
 }
 
 //-------------------------------------------------------------------//
 PYBIND( idolon, my)
 {
+	
 	static int x = 0;
 	static int y = 0;
 	Engine::GetMousePosition( x, y);
+
+
 	return PyLong_FromLong(y);
 }
 
 //-------------------------------------------------------------------//
-PYBIND( idolon, cls)
+PYBIND( idolon, clear)
 {
+	
 	Color c = { 255,0,0,0 };
 	if ( PyArg_ParseTuple( args, "iii", &c.r, &c.g, &c.b ) == 0 )
 	{
@@ -92,6 +99,7 @@ PYBIND( idolon, cls)
 //-------------------------------------------------------------------//
 PYBIND( idolon, key)
 {
+	
 	Key key;
 	if ( PyArg_ParseTuple( args, "i", &key ) == 0 )
 	{
@@ -105,6 +113,7 @@ PYBIND( idolon, key)
 //-------------------------------------------------------------------//
 PYBIND( idolon, load)
 {
+	
 	int layer; 
 	char *mapname;
 	if ( PyArg_ParseTuple( args, "is", &layer, &mapname ) == 0 )
@@ -120,6 +129,7 @@ PYBIND( idolon, load)
 //-------------------------------------------------------------------//
 PYBIND( idolon, unload)
 {
+	
 	int layer; 
 	if ( PyArg_ParseTuple( args, "i", &layer)== 0 )
 	{
@@ -134,6 +144,7 @@ PYBIND( idolon, unload)
 //-------------------------------------------------------------------//
 PYBIND( idolon, resize)
 {
+	
 	int layer, w,h; 
 	if ( PyArg_ParseTuple( args, "iii", &layer, &w, &h )== 0 )
 	{
@@ -148,6 +159,7 @@ PYBIND( idolon, resize)
 //-------------------------------------------------------------------//
 PYBIND( idolon, scroll)
 {
+	
 	int layer, x,y; 
 	if ( PyArg_ParseTuple( args, "iii", &layer, &x, &y)== 0 )
 	{
@@ -161,27 +173,26 @@ PYBIND( idolon, scroll)
 }
 
 //-------------------------------------------------------------------//
-PYBIND( idolon, spawn )
+PYBIND( idolon, sprite )
 {
+	
 	int id = -1;
-	int tile,  x,  y,  isSmall ;
-	if ( PyArg_ParseTuple( args, "iii", &tile, &x, &y)== 0 )
+	int tile,  x,  y,  isSmall = true;
+	if ( PyArg_ParseTuple( args, "iii|i", &tile, &x, &y, &isSmall)== 0 )
 	{
 		PYERR( "Expected args (int, int, int, int?)" );
 	}
 	else
 	{
-		if ( PyArg_ParseTuple( args, "i", &isSmall ) == 0 )
-		{
-			isSmall = true;
-		}
 		id = Runtime::Spawn( tile, x, y, isSmall );
 	}
+
 	return PyLong_FromLong(id);
 }
 //-------------------------------------------------------------------//
-PYBIND( idolon, despawn)
+PYBIND( idolon, kill )
 {
+	
 	int id; 
 	if ( PyArg_ParseTuple( args, "i", &id)== 0 )
 	{
@@ -191,26 +202,42 @@ PYBIND( idolon, despawn)
 	{
 		Runtime::Despawn( id );
 	}
+
 	Py_RETURN_NONE;
 }
 //-------------------------------------------------------------------//
-PYBIND( idolon, moveTo )
+PYBIND( idolon, pos )
 {
-	int id, x,y; 
-	if ( PyArg_ParseTuple( args, "iii", &id, &x, &y)== 0 )
+	
+	int id, x = -1,y = -1; 
+
+	if ( PyArg_ParseTuple( args, "i|ii", &id,  &x, &y) == 0 )
 	{
-		PYERR( "Expected args (int, int, int)" );
+		PYERR( "Expected args (int, int?, int?)" );
+	
+		Py_RETURN_NONE;
 	}
-	else
+	//get pos
+	if ( x == -1 && y == -1 )
 	{
-		Runtime::MoveTo( id, x, y);
+		Runtime::Position( id, x, y );
 	}
-	Py_RETURN_NONE;
+
+	Runtime::MoveTo( id, x, y);
+
+	PyObject *xy = PyTuple_New(2);
+	PyTuple_SetItem( xy, 0, PyLong_FromLong( x ) );
+	PyTuple_SetItem( xy, 1, PyLong_FromLong( y ) );
+	
+	Py_XINCREF( xy );
+	return xy;
+
 }
 
 //-------------------------------------------------------------------//
-PYBIND(idolon, moveBy)
+PYBIND(idolon, move )
 {
+	
 	int id, dx,dy; 
 	if ( PyArg_ParseTuple( args, "iii", &id, &dx, &dy)== 0 )
 	{
@@ -220,26 +247,29 @@ PYBIND(idolon, moveBy)
 	{
 		Runtime::MoveBy( id, dx, dy);
 	}
+
 	Py_RETURN_NONE;
 }
 
 //-------------------------------------------------------------------//
-PYBIND(idolon, flipTo)
+PYBIND(idolon, frame )
 {
+	
 	int id, tile; 
-	if ( PyArg_ParseTuple( args, "ii", &id, &tile)== 0 )
+	
+	if ( PyArg_ParseTuple( args, "i|ii", &id, &id, &tile) == 0 )
 	{
-		PYERR( "Expected args (int, int)" );
+		PYERR( "Expected args (int, int?)" );
+		Py_RETURN_NONE;
 	}
-	else
-	{
-		Runtime::FlipTo( id, tile);
-	}
-	Py_RETURN_NONE;
+	
+	Runtime::FlipTo( id, tile);
+	return PyLong_FromLong(Runtime::Frame( id ));
 }
 //-------------------------------------------------------------------//
-PYBIND(idolon, flipBy)
+PYBIND(idolon, flip )
 {
+	
 	int id, di; 
 	if ( PyArg_ParseTuple( args, "ii", &id, &di)== 0 )
 	{
@@ -249,12 +279,15 @@ PYBIND(idolon, flipBy)
 	{
 		Runtime::FlipBy( id, di);
 	}
+
 	Py_RETURN_NONE;
 }
 
 //-------------------------------------------------------------------//
 PYBIND(idolon, sheet )
 {
+
+	
 	char *sheet ;
 	if ( PyArg_ParseTuple( args, "s", &sheet  ) == 0 )
 	{
@@ -264,6 +297,7 @@ PYBIND(idolon, sheet )
 	{
 		Runtime::Sheet( sheet );
 	}
+
 	Py_RETURN_NONE;
 }
 //-------------------------------------------------------------------//

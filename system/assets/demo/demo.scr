@@ -2,28 +2,27 @@ $demo/demo python
 from time import time,ctime
 from idolon import *
 
-tile = 0
-s = 0
+dt = 0
+pk = 0
+sheet("demo/demo")
+s = sprite(0,0,0)
 
 
-def init():
-  global s
-  sheet("demo/demo")
-  s = spawn(0,0,0)
-
-def onkey(k, click):
-  global s, tile
+def onkey(k, dwn ):
+  global s, pk
   dt = 0
-  if click:
+  if dwn and pk != k:
+    pk = k
     if k == DOWN:
       dt = -1
     elif k == UP:
-      dt = 1
+      dt = 1  
+    flip(s, dt)
   else:
-    tile = tile + dt
-  flipTo(s, tile+dt)
-  print("TILE",dt) 
+    pk = 0
+
 
 def update():
-  global s, dt
-  moveTo(s, mx(), my())
+  global s, di
+  pos(s, mx(), my())
+  print("update:", pos(s))

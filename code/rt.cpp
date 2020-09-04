@@ -185,12 +185,34 @@ namespace Runtime
 		sprite->tile = Clamp(sprite->tile, 0, (sprite->w == SPRITE_H_SMALL ? SPRITE_SMALL_COUNT : SPRITE_COUNT) );
 	}
 
+	int Frame( int spriteId )
+	{
+		Graphics::Sprite *sprite = s_sm.sprite( spriteId );
+		if ( sprite )
+		{
+			return sprite->tile;
+		}
+		return -1;
+	}
+
+	bool Position( int spriteId, int & x, int & y)
+	{
+		Graphics::Sprite *sprite = s_sm.sprite( spriteId );
+		if ( sprite )
+		{
+			x = sprite->x;
+			y = sprite->y;
+			return true;
+		}
+		return false;
+	}
+
+
 	void Sheet( const char *tileset )
 	{
 		Assets::Unload<Graphics::Tileset>( tileset );
 		s_sm.tileset = tileset;
-	}
-
+	}	
 	int TileAt( int layer,  int x, int y )
 	{
 		Graphics::Map *map = s_maps[layer];
