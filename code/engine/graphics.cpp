@@ -331,15 +331,26 @@ namespace Graphics
     { 
     }
 
-    void Font::blit(int destTexture, const std::string & text, const Rect & dest)
+    void Font::blit(int destTexture, const std::string & text, const Rect & dest, int scrolly)
     {
         int c, sx,sy;
         const int srcW = w / charW;  
         const int destW = dest.w / charW;     
         const int destH = dest.h / charH;     
-        int scrolly = 0;
+        
         int dx = 0, dy = 0;
-        for(int i = 0; i < text.size(); i++)
+        int i = 0;
+        //skip scrollY lines
+        while( scrolly )
+        {
+            if ( i > text.size() ) break;
+            const int s =  text[i++];
+            if( s == '\n' || s == KEY_RETURN )
+            {
+                scrolly--;
+            }
+        }
+        for(; i < text.size(); i++)
         {
             int s =  text[i];
             //handle newlines
@@ -439,7 +450,7 @@ namespace Graphics
     void TextBox::refresh()
     {
         Engine::ClearTexture(m_texture, {0,0,0,0});
-        m_fontcache->blit(m_texture, text, { borderX, borderY , m_textureW, m_textureH });
+        m_fontcache->blit(m_texture, text, { borderX, borderY , m_textureW, m_textureH }, scrolly);
         Engine::MultiplyTexture(m_texture, textColor);
 
     }

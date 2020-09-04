@@ -6,6 +6,8 @@
 #define OS_WINDOWS
 #endif
 
+#include "../config.hpp"
+
 #include "err.hpp"
 #include <cstring>
 #include <cmath>
@@ -53,14 +55,7 @@ struct Color
 extern const Color Palette[];
 extern const int PaletteCount;
 
-//clear as in transparent, not the color used to redraw the display
-#define CLEAR Color()
-#define BLACK Palette[0]
-#define WHITE Palette[1]
-#define HIGHLIGHT Color( 255 / 2, 250, 250, 250 )
 
-//the rate in which cursors flicker on and off
-#define CURSOR_FLICKER_RATE  3
 
 struct Rect
 {

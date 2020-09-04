@@ -32,7 +32,7 @@ private:
 	bool m_scriptRunning;
 	std::string m_scriptName;
 	int m_cursorX, m_cursorY;
-	uint m_cursorPos, m_textOffset;
+	uint m_cursorPos;
 	//size of code box in chars
 	int m_lineW;
 	int m_lineH;

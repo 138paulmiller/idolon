@@ -33,3 +33,12 @@
 #define DEFAULT_RAW_EXT  ".raw"
 
 #define CACHE_PATH "__cache__"
+
+//clear as in transparent, not the color used to redraw the display
+#define CLEAR { 0, 0, 0, 0 }
+#define BLACK { 255, 0, 0, 0 }
+#define WHITE { 255, 255, 255, 255 }
+#define HIGHLIGHT { 255 / 2, 250, 250, 250 }
+
+//the rate in which cursors flicker on and off
+#define CURSOR_FLICKER_RATE  3

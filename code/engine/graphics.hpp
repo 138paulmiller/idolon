@@ -122,7 +122,7 @@ namespace Graphics
         Font(const std::string& name, int w, int h, int charW = TILE_W, int charH = TILE_H, char start = ' ');
 
         //src is textbox in character units
-        void blit(int destTexture, const std::string & text, const Rect & dest);
+        void blit(int destTexture, const std::string & text, const Rect & dest, int scrolly);
 
         //do not modify!s
         int charW,charH;

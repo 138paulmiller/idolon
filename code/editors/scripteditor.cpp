@@ -36,7 +36,8 @@ void ScriptEditor::onEnter()
 	//can scroll horiz 
 	m_lineW = w / m_charW;
 	//space for toolbar
-	m_lineH = h / m_charH;
+	m_lineH = (h-controlY()) / m_charH - 2;
+
 
 	//create highlight box
 	m_codeBox = new Graphics::TextBox(m_lineW * 2, m_lineH, "",fontname);
@@ -126,26 +127,15 @@ void ScriptEditor::onTick()
 	if(m_dirty)
 	{
 		//copy lines to codeview.
-		m_codeBox->text.clear();
-		int line = 0;
-		for(int i = m_textOffset; i < m_script->code.size(); i++)
-		{
-			//if beyond code view 
-			if(line >= m_codeBox->th)
-				break;
-			const char c = m_script->code[i];
-			if(c == '\n')
-			{
-				line++;
-			}
-			m_codeBox->text += c;
-		}
+		m_codeBox->text = m_script->code;
 		m_codeBox->refresh();
 		m_dirty = false;
 	}
-	m_cursor->x = m_codeBox->x + ( m_cursorX * m_charW - m_codeBox->view.x );	
-	m_cursor->y = m_codeBox->y + ( m_cursorY * m_charH - m_codeBox->view.y );	
-	
+	m_cursor->x = m_codeBox->x + ( m_cursorX * m_charW - m_codeBox->view.x );
+
+	const int cy = Clamp( m_cursorY - m_codeBox->scrolly, 0, m_lineH  );
+	m_cursor->y = m_codeBox->y + ( cy * m_charH );	
+
 	m_codeBox->draw();
 	m_cursor->draw();
 }
@@ -245,7 +235,7 @@ void ScriptEditor::reload()
 	
 	m_timer = 0;
 	m_codeBox->view.x = m_codeBox->view.y = 0;
-	m_cursorPos = m_textOffset = 0;
+	m_cursorPos  = 0;
 
 }
 
@@ -267,11 +257,13 @@ void ScriptEditor::scrollTextBy(int dx, int dy)
 		m_cursorY = 0;
 	}
 	
-	//-2 allow to see cursor
-	m_codeBox->view.x = Max(0, m_cursorX - (m_lineW-2)) * m_charW;
-	m_codeBox->view.y = Max(0, m_cursorY - m_lineH) * m_charH;
-
 	updateTextOffset();
+
+	//-2 allow to see cursor
+	m_codeBox->view.x  = Max( 0, m_cursorX- (m_lineW-2) );
+
+	//use delta. only move when hitting edges
+	m_codeBox->scrolly = Max( 0, m_cursorY- (m_lineH-2) );
 }
 
 void ScriptEditor::updateTextOffset()
@@ -306,7 +298,6 @@ void ScriptEditor::updateTextOffset()
 			m_cursorX = 0;
 		}
 	}
-
 }
 
 void ScriptEditor::runCode()
