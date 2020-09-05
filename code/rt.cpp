@@ -181,8 +181,8 @@ namespace Runtime
 		if ( sprite )
 		{
 			sprite->tile += di;
+			sprite->tile = Clamp(sprite->tile, 0, (sprite->w == SPRITE_H_SMALL ? SPRITE_SMALL_COUNT : SPRITE_COUNT) );
 		}
-		sprite->tile = Clamp(sprite->tile, 0, (sprite->w == SPRITE_H_SMALL ? SPRITE_SMALL_COUNT : SPRITE_COUNT) );
 	}
 
 	int Frame( int spriteId )

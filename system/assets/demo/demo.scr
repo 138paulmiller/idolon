@@ -1,28 +1,21 @@
 $demo/demo python
-from time import time,ctime
 from idolon import *
 
-dt = 0
-pk = 0
 sheet("demo/demo")
 s = sprite(0,0,0)
+dt = 0
 
-
-def onkey(k, dwn ):
-  global s, pk
-  dt = 0
-  if dwn and pk != k:
-    pk = k
+def onkey(k, dwn):
+  global s, dt
+  if dwn:
     if k == DOWN:
-      dt = -1
-    elif k == UP:
-      dt = 1  
+      dt-=1
+    if k == UP:
+      dt+=1
     flip(s, dt)
-  else:
-    pk = 0
-
 
 def update():
-  global s, di
+  global s
   pos(s, mx(), my())
   print("update:", pos(s))
+

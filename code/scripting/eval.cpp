@@ -63,29 +63,43 @@ namespace
 
 namespace Eval
 {
-	void Startup(ScriptLanguage lang)
-	{		
+	void Startup( ScriptLanguage lang )
+	{
 		s_lang = lang;
-		switch(s_lang)
+		switch ( s_lang )
 		{
-			case SCRIPT_PYTHON:
-				PyEval::Startup();
+		case SCRIPT_PYTHON:
+			PyEval::Startup();
 			break;
 
-			default:
+		default:
 			break;
 		}
 
 	}
 	void Shutdown()
 	{
-		switch(s_lang)
+		switch ( s_lang )
 		{
-			case SCRIPT_PYTHON:
-				PyEval::Shutdown();
+		case SCRIPT_PYTHON:
+			PyEval::Shutdown();
 			break;
 
-			default:
+		default:
+			break;
+		}
+	}
+	void Reset()
+	{
+		switch ( s_lang )
+		{
+		case SCRIPT_PYTHON:
+			PyEval::Shutdown();
+			PyEval::Startup();
+
+			break;
+
+		default:
 			break;
 		}
 	}

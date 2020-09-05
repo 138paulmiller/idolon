@@ -53,6 +53,8 @@ namespace Eval
 	void Startup(ScriptLanguage lang = SCRIPT_PYTHON);
 	void Shutdown();
 
+	void Reset();
+	
 	void Execute(const std::string & code);
 	//
 	Script * Compile(const std::string & name);

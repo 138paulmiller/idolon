@@ -253,6 +253,8 @@ namespace PyEval
 		Py_Finalize();
 	}
 
+
+
 	void Execute(const std::string & code)
 	{
 	    PyRun_SimpleString(code.c_str());

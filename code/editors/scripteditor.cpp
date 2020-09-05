@@ -316,7 +316,9 @@ void ScriptEditor::runCode()
 {
 	if ( m_timer == 0 ) return; //on enter do nothing 
 
+
 	Runtime::Quit();
+	Eval::Reset();
 
 	//set input handler. escape to resume
 	m_script->compile();
