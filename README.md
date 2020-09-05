@@ -3,8 +3,13 @@ An emulator for a nonexistent system
 
 ### Installation
 
-### Game API
-
+### Features 
+At its core, this is a virtual Game Creation System. 
+- System terminal
+- Tilesheet editor
+- Map editor
+- Python scripting
+- Code editor
 
 ### Development
 1. Download the source using git
