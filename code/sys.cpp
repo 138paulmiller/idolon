@@ -10,14 +10,17 @@ namespace
 	Shell  * s_shell;
 	Context* s_context;
 	
-	std::list<Factory *>s_factories;
-
 	//default config
 	//system are for default system data
 	std::string s_sysPath ;
 	std::string s_sysAssetPath;
 
 	GameState s_gamestate;
+
+	Factory * s_factories[FACTORY_COUNT];
+
+
+
 } // namespace
 
 
@@ -28,10 +31,16 @@ namespace Sys
 	{
 		char title[24];
         snprintf( title,24, "%s v%d.%d", SYSTEM_NAME, VERSION_MAJOR, VERSION_MINOR );
-
 		s_gamestate = GAME_OFF;
-
 		s_context = new Context( APP_COUNT );
+
+
+			//each factory self registers with asset system
+	    s_factories[0] = new TilesetFactory();
+	    s_factories[1] = new MapFactory();
+	    s_factories[2] = new FontFactory();
+	    s_factories[3] = new ScriptFactory();
+	    s_factories[4] = new GameDescFactory();
 
 		//default config
 		s_sysPath = FS::ExePath() + "/system/";
@@ -76,7 +85,6 @@ namespace Sys
 
 	void Shutdown()
 	{
-		
 		s_context->clear();
 		delete s_context;
 
@@ -84,6 +92,10 @@ namespace Sys
 		Assets::Shutdown();
 		Engine::Shutdown();
 
+		for(int i = 0; i < FACTORY_COUNT; i++)
+		{
+			delete s_factories[i];
+		}
 		LOG( "System Off!\n" );
 		exit( 1 );
 	}

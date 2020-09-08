@@ -8,7 +8,14 @@ void NewAsset(const Args& args);
 void EditAsset(const Args& args);
 
 
-#define SHELL_LOG(msg) Sys::GetShell()->log(msg);
+#define SHELL_LOG(...) \
+{\
+	const int n_  = 512;\
+	char * msg_ = new char [n_];\
+	snprintf(msg_, n_, __VA_ARGS__);\
+	Sys::GetShell()->log(msg_);\
+	delete[] msg_;\
+}
 
 //TODO - handle error more elegantly. Throw exception with msg ? Log mesage to shell ? with usage. 
 #define ARG_NONEMPTY(args) if(args.size() <= 0  ) { SHELL_LOG("Missing arguments"); return; }
@@ -66,7 +73,7 @@ static const CommandTable & g_cmds =
 				FS::Ls(files);
 			
 			for (const std::string& file : files)
-				SHELL_LOG(file);
+				SHELL_LOG("%s",file.c_str());
 		} 
 	},
 	{
@@ -82,7 +89,7 @@ static const CommandTable & g_cmds =
 		{ "cwd", ""}, 
 		[](Args args)
 		{ 
-			SHELL_LOG(FS::Cwd());
+			SHELL_LOG("%s", FS::Cwd().c_str());
 		} 
 	},
 	{
@@ -138,7 +145,7 @@ static const CommandTable & g_cli =
 //----------------------------
 
 
-int main(int argc, char** argv)
+int try_main(int argc, char** argv)
 { 
 	argc--; argv++;	//skip exe path arg
 
@@ -150,6 +157,21 @@ int main(int argc, char** argv)
 
 
 	return Sys::Run();
+}
+
+int main(int argc, char** argv)
+{ 
+	try
+	{
+		return try_main(argc, argv);
+	}
+	catch (const std::exception &exc)
+	{
+	    printf("Caugth exception\n");
+	    // catch anything thrown within try block that derives from std::exception
+	    std::cerr << exc.what() << std::endl;
+	}
+	return -1;
 }
 
 ////////////////// Commands  ///////////////////////////////////////
@@ -176,7 +198,7 @@ void PrintHelp(const Args& args)
 	else 
 		HelpAll(g_cmds, out);
 	Sys::GetShell()->clear();
-	SHELL_LOG(out);
+	SHELL_LOG("%s", out.c_str());
 }
 
 // -------------- Convert raw to asset ------------------------

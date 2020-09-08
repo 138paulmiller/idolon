@@ -14,6 +14,11 @@ namespace Graphics
     class Map;
     class Font;
 }
+/*
+    Factories
+*/
+
+#define FACTORY_COUNT 5
 
 class TilesetFactory : public Factory
 {
@@ -25,7 +30,8 @@ public:
     void serialize( const Asset * asset, std::ostream& out ) const override;
 };
 
-
+/*--------------------------- -------------  MapFactory  ------------------------------------
+*/
 class MapFactory : public Factory
 {
 public: 
@@ -35,6 +41,8 @@ public:
     void serialize( const Asset * asset, std::ostream& out ) const override;
 };
 
+/*--------------------------- -------------  FontFactory  ------------------------------------
+*/
 class FontFactory : public Factory
 {
 public: 
@@ -44,6 +52,8 @@ public:
     void serialize( const Asset * asset, std::ostream& out ) const override;
 };
 
+/*--------------------------- -------------  ScriptFactory  ------------------------------------
+*/
 class ScriptFactory : public Factory
 {
 public:
@@ -54,6 +64,8 @@ public:
 };
 
 
+/*--------------------------- -------------  GameDescFactory  ------------------------------------
+*/
 class GameDescFactory : public Factory
 {
 public:

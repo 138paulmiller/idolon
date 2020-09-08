@@ -3,16 +3,6 @@
 #include "../sys.hpp"
 
 
-namespace
-{
-	//each factory self registers with asset system
-    TilesetFactory s_tilesetFactory;
-    MapFactory s_mapFactory;
-    FontFactory s_fontFactory;
-    ScriptFactory s_scriptFactory;
-    GameDescFactory s_gamedescFactory;
-}
-
 TilesetFactory::TilesetFactory()
 :Factory( typeid(Graphics::Tileset), DEFAULT_TILESET_EXT )
 {
