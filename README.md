@@ -23,6 +23,7 @@ At its core, this is a virtual Game Creation System.
 
 ##### Windows
 1. Install [Visual Studio 2019](https://visualstudio.microsoft.com/downloads/)
+2. Install [Python 3.8](https://www.python.org/downloads/release/python-380/)
 2. Open the solution using VS2019 `idolon.sln`
 3. To build and run, select *Local Windows Debugger*
 

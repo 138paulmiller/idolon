@@ -5,8 +5,8 @@
 std::string Trim(const std::string &s)
 {
 	int i = 0,j = s.size(); 
-	while(i < s.size() && std::isspace(s[i]) ) i++;
-	while(j > 0 && std::isspace(s[j-1]) ) j--;
+	while(i < s.size() && isspace(s[i]) ) i++;
+	while(j > 0 && isspace(s[j-1]) ) j--;
 	if(i == s.size()) i = s.size()-1;
 	if(j == 0) j=0;
 	return s.substr(i,j);

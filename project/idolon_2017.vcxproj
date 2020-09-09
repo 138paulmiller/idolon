@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <ProjectGuid>{c63dae4c-ecc0-43a8-a6b8-a8fd091ac2f9}</ProjectGuid>
+    <RootNamespace>idolon</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertyTilesets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertyTilesets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertyTilesets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertyTilesets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IntDir>$(SolutionDir)\build\temp\$(Platform)\$(Configuration)\</IntDir>
+    <OutDir>$(SolutionDir)\Build\$(Platform)\$(Configuration)\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IntDir>$(SolutionDir)\build\temp\$(Platform)\$(Configuration)\</IntDir>
+    <OutDir>$(SolutionDir)\Build\$(Platform)\$(Configuration)\</OutDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)\code\external</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <AdditionalLibraryDirectories>$(SolutionDir)\code\external\SDL2\x86</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2test.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)\code\external\;$(SolutionDir)\code\external\Python3\include;</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>
+      </PrecompiledHeaderOutputFile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <AdditionalLibraryDirectories>$(SolutionDir)\code\external\SDL2\x64;$(SolutionDir)\code\external\Python3\libs</AdditionalLibraryDirectories>
+      <AdditionalDependencies>python38.lib;SDL2.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>xcopy /Y "$(SolutionDir)code\external\Python3\*.dll" "$(OutDir)"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)\code\external</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>$(SolutionDir)\code\external\SDL2\x86</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2test.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)\code\external\;$(SolutionDir)\code\external\Python3\include;</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_UNICODE;UNICODE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(SolutionDir)code\pch.gen.hpp</PrecompiledHeaderOutputFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>$(SolutionDir)\code\external\SDL2\x64;$(SolutionDir)\code\external\Python3\libs</AdditionalLibraryDirectories>
+      <AdditionalDependencies>python38.lib;SDL2.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>xcopy /Y "$(SolutionDir)code\external\Python3\*.dll" "$(OutDir)"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <None Include="..\code\scripting\pybindings.inl" />
+    <None Include="..\Makefile" />
+    <None Include="..\README.md" />
+    <None Include="..\system\.gitignore" />
+    <None Include="..\system\assets\basic.fnt" />
+    <None Include="..\system\assets\default.fnt" />
+    <None Include="..\system\assets\demo\demo.map" />
+    <None Include="..\system\assets\demo\demo.scr" />
+    <None Include="..\system\assets\demo\demo.tls" />
+    <None Include="..\system\assets\full.fnt" />
+    <None Include="..\system\game.py" />
+    <None Include="..\TODO" />
+    <None Include="..\WIKI" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\code\algo.hpp" />
+    <ClInclude Include="..\code\assets\api.hpp" />
+    <ClInclude Include="..\code\assets\assets.hpp" />
+    <ClInclude Include="..\code\assets\factories.hpp" />
+    <ClInclude Include="..\code\config.hpp" />
+    <ClInclude Include="..\code\editors\api.hpp" />
+    <ClInclude Include="..\code\editors\gameeditor.hpp" />
+    <ClInclude Include="..\code\editors\mapeditor.hpp" />
+    <ClInclude Include="..\code\editors\scripteditor.hpp" />
+    <ClInclude Include="..\code\editors\tileseteditor.hpp" />
+    <ClInclude Include="..\code\emu.hpp" />
+    <ClInclude Include="..\code\engine\core.hpp" />
+    <ClInclude Include="..\code\engine\engine.hpp" />
+    <ClInclude Include="..\code\engine\err.hpp" />
+    <ClInclude Include="..\code\engine\fs.hpp" />
+    <ClInclude Include="..\code\engine\graphics.hpp" />
+    <ClInclude Include="..\code\game.hpp" />
+    <ClInclude Include="..\code\rt.hpp" />
+    <ClInclude Include="..\code\scripting\api.hpp" />
+    <ClInclude Include="..\code\scripting\eval.hpp" />
+    <ClInclude Include="..\code\engine\api.hpp" />
+    <ClInclude Include="..\code\scripting\pyeval.hpp" />
+    <ClInclude Include="..\code\shell.hpp" />
+    <ClInclude Include="..\code\sys.hpp" />
+    <ClInclude Include="..\code\ui\api.hpp" />
+    <ClInclude Include="..\code\ui\commands.hpp" />
+    <ClInclude Include="..\code\ui\context.hpp" />
+    <ClInclude Include="..\code\ui\editor.hpp" />
+    <ClInclude Include="..\code\ui\ui.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\code\assets\assets.cpp" />
+    <ClCompile Include="..\code\assets\factories.cpp" />
+    <ClCompile Include="..\code\editors\gameeditor.cpp" />
+    <ClCompile Include="..\code\editors\mapeditor.cpp" />
+    <ClCompile Include="..\code\editors\scripteditor.cpp" />
+    <ClCompile Include="..\code\editors\tileseteditor.cpp" />
+    <ClCompile Include="..\code\emu.cpp" />
+    <ClCompile Include="..\code\engine\core.cpp" />
+    <ClCompile Include="..\code\engine\engine.cpp" />
+    <ClCompile Include="..\code\engine\err.cpp" />
+    <ClCompile Include="..\code\engine\fs.cpp" />
+    <ClCompile Include="..\code\engine\graphics.cpp" />
+    <ClCompile Include="..\code\game.cpp" />
+    <ClCompile Include="..\code\main.cpp" />
+    <ClCompile Include="..\code\rt.cpp" />
+    <ClCompile Include="..\code\scripting\eval.cpp" />
+    <ClCompile Include="..\code\scripting\pyeval.cpp" />
+    <ClCompile Include="..\code\shell.cpp" />
+    <ClCompile Include="..\code\sys.cpp" />
+    <ClCompile Include="..\code\ui\commands.cpp" />
+    <ClCompile Include="..\code\ui\context.cpp" />
+    <ClCompile Include="..\code\ui\editor.cpp" />
+    <ClCompile Include="..\code\ui\ui.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

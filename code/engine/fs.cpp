@@ -62,7 +62,7 @@ namespace FS
 	std::string Root()
 	{
 #ifdef OS_WINDOWS
-		const char* mountPoint = "C:/Program Files/idolon/";
+		const char* mountPoint = "C:/idolon/";
 #elif defined(OS_LINUX)
 		char mountPoint[MAX_PATH];
 	    glob_t globbuf;
@@ -78,17 +78,7 @@ namespace FS
 				exit( -1 );
 			}
 		}
-		std::string root = mountPoint + std::string("root/") ;
-		if ( !FS::IsDir( root ) )
-		{
-			int status = mkdir(root.c_str());
-			if ( status == -1 )
-			{
-				LOG( "Failed to create user root! Check app privileges" );
-				exit( -1 );
-			}
-		}
-		return root;
+		return mountPoint;
 	}
 	std::string Cwd()
 	{

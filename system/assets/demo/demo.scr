@@ -5,8 +5,26 @@ sheet("demo/demo")
 s = sprite(0,0,0)
 dt = 0
 
+class App:
+  def __init__(self):
+    pass    
+
+  def __update__(self):
+    pos(s,mx(), my())
+
+  def __onkey__(self):
+    if dwn:
+      if k == DOWN:
+        dt-=1
+      elif k == UP:
+        dt+=1
+      flip(s,dt)
+
+app = App()
+
 def onkey(k, dwn):
-  global s, dt
+  app.__onkey__(k, dwn)
+
   if dwn:
     if k == DOWN:
       dt-=1
@@ -15,7 +33,4 @@ def onkey(k, dwn):
     flip(s, dt)
 
 def update():
-  global s
-  pos(s, mx(), my())
-  print("update:", pos(s))
-
+  app.__update__()
