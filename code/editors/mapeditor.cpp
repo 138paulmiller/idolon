@@ -166,7 +166,7 @@ bool MapEditor::handleScroll()
 
 
 //
-void MapEditor::onKey( Key key, bool isDown )
+void MapEditor::onKey( Key key, ButtonState state)
 {
 	int mx, my;
 	Engine::GetMousePosition(mx, my);
@@ -181,11 +181,11 @@ void MapEditor::onKey( Key key, bool isDown )
 
 	if(key == KEY_SHIFT) 
 	{  
-		m_shift = isDown;
+		m_shift = state == BUTTON_CLICK;
 		return;
 	}	
 
-	if ( !isDown )
+	if ( state == BUTTON_RELEASE)
 	{
 		return;
 	}
@@ -230,7 +230,7 @@ void MapEditor::onKey( Key key, bool isDown )
 				hideWorkspace();
 		break;
 		default:
-			m_tilepicker->handleKey(key, isDown);
+			m_tilepicker->handleKey(key, state);
 		break;
 	}
 

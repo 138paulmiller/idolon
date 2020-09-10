@@ -111,7 +111,7 @@ void ScriptEditor::onTick()
 		if(tx >= 0 && ty >= 0 )
 		{
 			m_cursorX = tx / m_charW ;
-			m_cursorY = ty / m_charH ;
+			m_cursorY = ty / m_charH + m_codeBox->scrolly ;
 			updateTextOffset();				
 		}
 	}
@@ -142,9 +142,9 @@ void ScriptEditor::onTick()
 }
 
 //
-void ScriptEditor::onKey(Key key, bool isDown)
+void ScriptEditor::onKey(Key key, ButtonState state)
 {
-	if(isDown)
+	if(state != BUTTON_RELEASE)
 	{
 		
 		if ( m_scriptRunning ) 
@@ -243,6 +243,7 @@ void ScriptEditor::reload()
 
 void ScriptEditor::scrollTextBy(int dx, int dy)
 {
+
 	int prevCursorY = m_cursorY;
 	m_cursorX+=dx;
 	m_cursorY+=dy;
@@ -259,18 +260,33 @@ void ScriptEditor::scrollTextBy(int dx, int dy)
 		if ( m_codeBox->scrolly < 0 )
 			m_codeBox->scrolly = 0;
 	}
-
-	if(m_cursorX < 0)
+	if(m_cursorX < 0 )
 	{
-		m_cursorY--;
-		//go to end of line
-		m_cursorX = -1;
-	}
+		//snap to end of previous line
+		if (m_cursorY > 0)
+		{
+			m_cursorY--;
+			//go to end of line
+			m_cursorX = -1;
+		}
+		else
+		{
+			m_cursorX = 0;
+		}
 	
-	if(m_cursorY < 0)
+	}
+	//if moving past newline go to next line
+	else if (dx > 0 && m_cursorPos && m_cursorPos < m_script->code.size() && m_script->code[m_cursorPos] == '\n')
+	{
+		m_cursorX = 0;
+		m_cursorY++;
+	}
+
+	else if(m_cursorY < 0)
 	{
 		m_cursorY = 0;
 	}
+
 	updateTextOffset();
 	
 	//-2 allow to see cursor
@@ -290,9 +306,9 @@ void ScriptEditor::updateTextOffset()
 	
 	for(m_cursorPos = 0; m_cursorPos < m_script->code.size(); m_cursorPos++)
 	{
+
 		if(m_cursorY == cy)
 		{
-
 			//get as close to cursor X as possible
 			while(m_cursorPos < m_script->code.size() 
 				&& (cx == -1 || m_cursorX < cx )
@@ -301,6 +317,7 @@ void ScriptEditor::updateTextOffset()
 				m_cursorPos++;
 				m_cursorX++;
 			}
+			//
 			break;
 		}
 		m_cursorX++;
@@ -323,12 +340,12 @@ void ScriptEditor::runCode()
 	//set input handler. escape to resume
 	m_script->compile();
 	Engine::PushKeyHandler( 
-		[&] ( const Key &key, bool isDown )
+		[&] ( const Key &key, ButtonState state)
 		{
 			TypedArg ret;
-			m_script->call( GAME_API_ONKEY, ret, { TypedArg( key ), TypedArg( isDown ) } );
+			m_script->call( GAME_API_ONKEY, ret, { TypedArg( key ), TypedArg(state) } );
 
-			if ( (ret.type != ARG_NONE && ret.value.i == 0 ) || (isDown && key == KEY_ESCAPE) )
+			if ( (ret.type != ARG_NONE && ret.value.i == 0 ) || (state && key == KEY_ESCAPE) )
 			{
 				m_scriptRunning  = false;
 

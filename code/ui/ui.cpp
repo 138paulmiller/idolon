@@ -170,9 +170,9 @@ namespace UI
 		
 	{
 		this->text = text;
-		auto handleKey = [this](Key key, bool isDown)
+		auto handleKey = [this](Key key, ButtonState state)
 		{
-			if(!isDown) return;
+			if(state == BUTTON_RELEASE ) return;
 
 			switch(key)
 			{
@@ -567,9 +567,9 @@ namespace UI
 
 	}
 
-	void TilePicker::handleKey(Key key, bool isDown)
+	void TilePicker::handleKey(Key key, ButtonState state)
 	{
-		if(!isDown) 
+		if( state == BUTTON_RELEASE) 
 			return;
 		
 		switch(key)

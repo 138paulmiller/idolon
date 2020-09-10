@@ -18,7 +18,7 @@ public:
 	virtual void onEnter() = 0;
 	virtual void onExit() = 0;
 	virtual void onTick() = 0;
-	virtual void onKey(Key key, bool isDown) = 0;
+	virtual void onKey(Key key, ButtonState state) = 0;
 						
 
 	void signal(AppCode code);
@@ -58,7 +58,7 @@ public:
 	//kill previous process
 	void enter(uint8 appId, bool kill = true);
 	void exit();
-	void handleKey( Key key, bool isDown );
+	void handleKey( Key key, ButtonState state);
 	AppCode run( );
 
 

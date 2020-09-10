@@ -93,10 +93,10 @@ void Shell::onExit()
 
 }
 
-void Shell::onKey(Key key, bool isDown)
+void Shell::onKey(Key key, ButtonState state)
 {
 
-	if (!isDown)
+	if (state == BUTTON_RELEASE)
 	{
 		switch(key)
 		{
@@ -106,7 +106,7 @@ void Shell::onKey(Key key, bool isDown)
 		default: break;
 		}
 	}
-	else 
+	else if(state == BUTTON_CLICK )
 	{
 
 		switch (key)

@@ -39,7 +39,7 @@ enum TextureMode
 };
 
 
-using KeyHandler = std::function<void(Key, bool)>;
+using KeyHandler = std::function<void(Key, ButtonState)>;
 
 namespace Engine
 {

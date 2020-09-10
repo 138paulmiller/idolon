@@ -214,11 +214,9 @@ namespace UI
 		//get tile/frame relative to given sheet
 		Rect selection();
 		int selectionIndex();
-		//get the id of the tile
-		int indexOf(const Rect & tile);
 		void moveCursor(int dx, int dy);
 		void resizeCursor(int w, int h);
-		void handleKey(Key key, bool isDown) ;
+		void handleKey(Key key, ButtonState state) ;
 
 		const Graphics::Tileset * tileset() const { return m_tileset; } 
 

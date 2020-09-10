@@ -13,7 +13,7 @@ public:
 	void onEnter() override ;
 	void onExit() override ;
 	//process key event
-	void onKey(Key key, bool isDown)override ;
+	void onKey(Key key, ButtonState state )override ;
 	void onTick() override ;
 
 	void clear();

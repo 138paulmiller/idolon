@@ -101,7 +101,7 @@ namespace Engine
         if (!on)
             s_echo = 0;
     }
-    void PushKeyHandler(std::function<void(Key, bool)> cb)
+    void PushKeyHandler(KeyHandler cb)
     {
         s_keyhandlers.push( cb );
 
@@ -137,31 +137,32 @@ namespace Engine
             {
                 Key sym = GetKeyFromKeyCode(event.key.keysym.sym, event.key.keysym.mod & KMOD_SHIFT);
                 if (sym == KEY_UNKNOWN) break;
-                const KeyHandler & cb = s_keyhandlers.top();
+                s_ue.keymap[sym] = BUTTON_RELEASE;
+
+				const KeyHandler & cb = s_keyhandlers.top();
                 if( s_echo && cb)
                 {
-                    cb(Key(sym), false);
+                    cb(Key(sym), s_ue.keymap[sym]);
                 }
-                s_ue.keymap[sym] = BUTTON_RELEASE;
             }
                 break;
             case SDL_KEYDOWN:
             {
                 Key sym = GetKeyFromKeyCode(event.key.keysym.sym, event.key.keysym.mod & KMOD_SHIFT);
                 if (sym == KEY_UNKNOWN) break;
-                if ( s_keyhandlers.size() )
-                {
-                    const KeyHandler & cb = s_keyhandlers.top();
-                    if( s_echo && cb)
-                    {
-                        cb(Key(sym), true);
-                    }
-                }
                 ButtonState & state = s_ue.keymap[sym];
                 if (state == BUTTON_CLICK || state == BUTTON_HOLD)
                     state = BUTTON_HOLD;
                 else
                     state = BUTTON_CLICK;
+                if ( s_keyhandlers.size() )
+                {
+                    const KeyHandler & cb = s_keyhandlers.top();
+                    if( s_echo && cb)
+                    {
+                        cb(Key(sym), s_ue.keymap[sym]);
+                    }
+                }
             }
                 break;
             case SDL_MOUSEWHEEL:

@@ -22,8 +22,8 @@ SP=1
 FG=2
 UI=3
 #button states
-CLICK = 1
 RELEASE = 0
+CLICK = 1
 HOLD = 2
 
 #keys

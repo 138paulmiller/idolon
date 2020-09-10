@@ -340,9 +340,9 @@ void TilesetEditor::drawOverlay(int tilex, int tiley, const Rect & dest)
 }
 
 //
-void TilesetEditor::onKey(Key key, bool isDown)
+void TilesetEditor::onKey(Key key, ButtonState state)
 {
-	if(isDown)
+	if(state == BUTTON_CLICK)
 	{
 		switch(key)
 		{
@@ -367,7 +367,7 @@ void TilesetEditor::onKey(Key key, bool isDown)
 				}
 				break;
 			default:
-				m_tilepicker->handleKey(key, isDown);
+				m_tilepicker->handleKey(key, state);
 				break;
 		}
 	}

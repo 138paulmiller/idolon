@@ -62,16 +62,16 @@ namespace Sys
 		//handle system level keys. i.e escape and quick shell toggle (tilda ? )
 		Engine::SetKeyEcho( true );
 		Engine::PushKeyHandler(
-			[&] ( Key key, bool isDown )
+			[&] ( Key key, ButtonState state)
 			{
-				if ( isDown && key == KEY_ESCAPE )
+				if ( state == BUTTON_CLICK && key == KEY_ESCAPE )
 				{	
 					s_context->app()->signal( APP_CODE_CONTINUE ); //allow reenter
 					s_context->exit();
 				}
 				else
 				{
-					s_context->handleKey( key, isDown );
+					s_context->handleKey( key, state );
 				}
 			}
 		);

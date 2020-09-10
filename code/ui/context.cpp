@@ -53,10 +53,10 @@ void Context::exit()
 
 	enter(m_prevAppId);
 }
-void Context::handleKey( Key key, bool isDown )
+void Context::handleKey( Key key, ButtonState state)
 {
 	if(m_app)
-		m_app->onKey(key, isDown);
+		m_app->onKey(key, state);
 }
 
 AppCode Context::run( )

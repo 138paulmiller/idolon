@@ -13,7 +13,7 @@ public:
 	void onEnter() override;
 	void onExit() override;
 	void onTick()override;
-	void onKey(Key key , bool isDown) override;
+	void onKey(Key key , ButtonState state) override;
 	void redo()override;
 	void undo()override;
 	void save()override;

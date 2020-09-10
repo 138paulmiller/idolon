@@ -40,7 +40,7 @@ void GameEditor::onTick()
 }
 
 //
-void GameEditor::onKey(Key key, bool isDown)
+void GameEditor::onKey(Key key, ButtonState state)
 {
 }
 

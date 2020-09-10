@@ -1,0 +1,220 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\code\emu.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\game.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\rt.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\shell.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\sys.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\assets\assets.cpp">
+      <Filter>Source Files\assets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\ui\commands.cpp">
+      <Filter>Source Files\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\engine\core.cpp">
+      <Filter>Source Files\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\ui\editor.cpp">
+      <Filter>Source Files\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\ui\context.cpp">
+      <Filter>Source Files\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\engine\engine.cpp">
+      <Filter>Source Files\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\editors\gameeditor.cpp">
+      <Filter>Source Files\editors</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\editors\mapeditor.cpp">
+      <Filter>Source Files\editors</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\editors\scripteditor.cpp">
+      <Filter>Source Files\editors</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\editors\tileseteditor.cpp">
+      <Filter>Source Files\editors</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\scripting\pyeval.cpp">
+      <Filter>Source Files\scripting</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\scripting\eval.cpp">
+      <Filter>Source Files\scripting</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\engine\err.cpp">
+      <Filter>Source Files\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\assets\factories.cpp">
+      <Filter>Source Files\assets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\engine\fs.cpp">
+      <Filter>Source Files\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\engine\graphics.cpp">
+      <Filter>Source Files\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\ui\ui.cpp">
+      <Filter>Source Files\ui</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\code\algo.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\config.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\emu.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\game.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\rt.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\shell.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\sys.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\engine\api.hpp">
+      <Filter>Source Files\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\editors\api.hpp">
+      <Filter>Source Files\editors</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\assets\api.hpp">
+      <Filter>Source Files\assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\ui\api.hpp">
+      <Filter>Source Files\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\scripting\api.hpp">
+      <Filter>Source Files\scripting</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\assets\assets.hpp">
+      <Filter>Source Files\assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\ui\commands.hpp">
+      <Filter>Source Files\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\engine\core.hpp">
+      <Filter>Source Files\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\ui\editor.hpp">
+      <Filter>Source Files\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\ui\context.hpp">
+      <Filter>Source Files\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\engine\engine.hpp">
+      <Filter>Source Files\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\editors\gameeditor.hpp">
+      <Filter>Source Files\editors</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\editors\mapeditor.hpp">
+      <Filter>Source Files\editors</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\editors\scripteditor.hpp">
+      <Filter>Source Files\editors</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\editors\tileseteditor.hpp">
+      <Filter>Source Files\editors</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\scripting\pyeval.hpp">
+      <Filter>Source Files\scripting</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\scripting\eval.hpp">
+      <Filter>Source Files\scripting</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\engine\err.hpp">
+      <Filter>Source Files\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\assets\factories.hpp">
+      <Filter>Source Files\assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\engine\fs.hpp">
+      <Filter>Source Files\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\engine\graphics.hpp">
+      <Filter>Source Files\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\ui\ui.hpp">
+      <Filter>Source Files\ui</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Makefile" />
+    <None Include="..\README.md" />
+    <None Include="..\system\.gitignore" />
+    <None Include="..\TODO" />
+    <None Include="..\WIKI" />
+    <None Include="..\system\assets\full.fnt">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\code\scripting\pybindings.inl">
+      <Filter>Source Files\scripting</Filter>
+    </None>
+    <None Include="..\system\assets\demo\demo.map">
+      <Filter>Assets\demo</Filter>
+    </None>
+    <None Include="..\system\assets\demo\demo.scr">
+      <Filter>Assets\demo</Filter>
+    </None>
+    <None Include="..\system\assets\demo\demo.tls">
+      <Filter>Assets\demo</Filter>
+    </None>
+    <None Include="..\system\assets\basic.fnt">
+      <Filter>Assets</Filter>
+    </None>
+    <None Include="..\system\assets\default.fnt">
+      <Filter>Assets</Filter>
+    </None>
+    <None Include="..\system\game.py">
+      <Filter>Assets</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{75a7e52e-6ff6-4ac9-ab7a-d7d37ff7d122}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\engine">
+      <UniqueIdentifier>{ed4bbfe0-328e-45f9-8e54-2767e61fa299}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\editors">
+      <UniqueIdentifier>{83e8c242-535d-4f09-87b9-85534b2d4007}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\assets">
+      <UniqueIdentifier>{b7cc0de7-c5b4-4b86-bccc-fd14e4401b3d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\ui">
+      <UniqueIdentifier>{efcb3abc-a3d5-4e94-8407-72485c434302}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\scripting">
+      <UniqueIdentifier>{86a3543e-a82b-4a51-b257-c38c46d86688}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets">
+      <UniqueIdentifier>{48c5022e-f7d3-4182-951f-7168e1193171}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\demo">
+      <UniqueIdentifier>{754b3d1f-072f-4682-8520-a51d9b03f0b9}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

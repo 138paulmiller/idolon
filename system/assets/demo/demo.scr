@@ -2,7 +2,7 @@ $demo/demo python
 from idolon import *
 
 sheet("demo/demo")
-s = sprite(0,0,0)
+s0 = sprite(0,0,0)
 dt = 0
 
 class App:
@@ -10,27 +10,19 @@ class App:
     pass    
 
   def __update__(self):
-    pos(s,mx(), my())
+    pos(s0, mx(), my())
 
-  def __onkey__(self):
-    if dwn:
+  def __onkey__(self, k, s):
+    if s == CLICK:
       if k == DOWN:
-        dt-=1
+        flip(s0,-1)
       elif k == UP:
-        dt+=1
-      flip(s,dt)
+        flip(s0, 1)
 
 app = App()
 
-def onkey(k, dwn):
-  app.__onkey__(k, dwn)
-
-  if dwn:
-    if k == DOWN:
-      dt-=1
-    if k == UP:
-      dt+=1
-    flip(s, dt)
+def onkey(key, state):
+  app.__onkey__(key, state)
 
 def update():
   app.__update__()
