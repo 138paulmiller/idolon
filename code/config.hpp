@@ -41,3 +41,8 @@
 
 //the rate in which cursors flicker on and off
 #define CURSOR_FLICKER_RATE  3
+
+#define ARG_NAME_TILESET "tls"
+#define ARG_NAME_FONT "font"
+#define ARG_NAME_MAP "map"
+#define ARG_NAME_SCRIPT "script"

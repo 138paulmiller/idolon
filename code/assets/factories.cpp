@@ -204,11 +204,6 @@ ScriptFactory::ScriptFactory()
 Asset * ScriptFactory::deserialize( std::istream& in )
 {
 
-    static const std::unordered_map<std::string, ScriptLanguage > LangStrToEnum = 
-    {
-	    { "none", SCRIPT_NONE },
-	    { "python", SCRIPT_PYTHON }
-    };
 
     Script *script = 0;
 	try
@@ -244,24 +239,18 @@ Asset * ScriptFactory::deserialize( std::istream& in )
 			std::string langstr = Trim(header.substr( off ));
 			name = Trim(name);
 
-            auto it = LangStrToEnum.find( langstr );
-			if ( it == LangStrToEnum.end() )
+			ScriptLanguage lang = ScriptLanguageFromStr(langstr);
+			if ( lang == SCRIPT_NONE )
 			{
 				LOG( "ScriptFactory: Invalid language %s\n", langstr.c_str() );
 				throw;
 			}
-			ScriptLanguage lang = it->second;
 		
 			char * codedata = new char[codelen]; 
             memset(codedata, 0, codelen);
 			in.read(codedata, len);
 			
-            switch ( lang )
-            {
-            case SCRIPT_PYTHON:
-                script  = new PyScript( name );
-                break;
-            }
+			script  = Eval::CreateScript(name, lang);
             script->lang = lang;
 			script->code = std::string(codedata);
 			

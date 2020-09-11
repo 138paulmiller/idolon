@@ -33,9 +33,10 @@ struct TypedArg
 
 enum ScriptLanguage
 {
-	SCRIPT_NONE=0, SCRIPT_PYTHON
+	SCRIPT_NONE=0, SCRIPT_PYTHON, SCRIPT_JAVASCRIPT
 };
 
+ScriptLanguage ScriptLanguageFromStr(const std::string & str);
 class Script : public Asset
 {
 public:
@@ -56,7 +57,6 @@ namespace Eval
 	void Reset();
 	
 	void Execute(const std::string & code);
-	//
-	Script * Compile(const std::string & name);
 
+	Script * CreateScript(const std::string name, ScriptLanguage lang);
 }

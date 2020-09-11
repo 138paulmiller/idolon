@@ -176,8 +176,8 @@ void MapEditor::onKey( Key key, ButtonState state)
 	const int offx = m_map ? m_map->view.x : 0.0;
 	const int offy = m_map ? m_map->view.y : 0.0;
 
-	const int pixelx = offx + mx*scale;
-	const int pixely = offy + my*scale;
+	const int pixelx = static_cast<int>(offx + mx*scale);
+	const int pixely = static_cast<int>(offy + my*scale);
 
 	if(key == KEY_SHIFT) 
 	{  

@@ -203,9 +203,7 @@ void PrintHelp(const Args& args)
 
 // -------------- Convert raw to asset ------------------------
 
-#define ARG_NAME_TILESET "tls"
-#define ARG_NAME_FONT "font"
-#define ARG_NAME_MAP "map"
+
 
 
 void ImportAsset(const Args& args)
@@ -276,7 +274,7 @@ void ImportAsset(const Args& args)
 
 void NewAsset(const Args& args)
 {			 
-	//new <asset>  <name>  
+	//new <asset> <name>  [args]
 	ARG_RANGE(args, 2, 3); 
 	const std::string& type = args[0];
 	const std::string& name = args[1];
@@ -298,8 +296,18 @@ void NewAsset(const Args& args)
 		Graphics::Font* font= new Graphics::Font(name, w, h);
 		Assets::SaveAs(font, UserAssetPath<Graphics::Font>(name));
 	}
+	else if (type == ARG_NAME_SCRIPT)
+	{
+		const std::string& langstr = args[2];
+		const ScriptLanguage lang = ScriptLanguageFromStr(langstr);
+
+		Script * script = Eval::CreateScript(name, lang);
+		Assets::SaveAs(script, UserAssetPath<Script>(name));
+	}
 	else
 	{
+
+		const std::string& name = args[1];
 		SHELL_LOG("Invalid asset type (%s)", type.c_str());
 	}
 }
