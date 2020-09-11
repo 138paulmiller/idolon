@@ -36,11 +36,11 @@ void ScriptEditor::onEnter()
 	//can scroll horiz 
 	m_lineW = w / m_charW;
 	//space for toolbar
-	m_lineH = (h-controlY()) / m_charH - 2;
+	m_lineH = (h-controlY()) / m_charH - 1;
 
 
 	//create highlight box
-	m_codeBox = new Graphics::TextBox(m_lineW * 2, m_lineH, "",fontname);
+	m_codeBox = new Graphics::TextBox(m_lineW * 2, m_lineH+1, "",fontname);
 	m_codeBox->x = m_charW;
 	m_codeBox->y = controlY(); 
 	m_codeBox->textColor = WHITE;
@@ -131,10 +131,6 @@ void ScriptEditor::onTick()
 		m_codeBox->refresh();
 		m_dirty = false;
 	}
-	const int cy = Clamp( m_cursorY - m_codeBox->scrolly, 0, m_lineH  );
-
-	m_cursor->x = m_codeBox->x + ( m_cursorX * m_charW - m_codeBox->view.x );
-	m_cursor->y = m_codeBox->y + ( cy * m_charH );	
 
 
 	m_codeBox->draw();
@@ -237,18 +233,15 @@ void ScriptEditor::reload()
 	m_timer = 0;
 	m_codeBox->view.x = m_codeBox->view.y = 0;
 	m_cursorPos  = 0;
-
+	scrollTextBy(0, 0);
 }
 
 
 void ScriptEditor::scrollTextBy(int dx, int dy)
 {
-
-	int prevCursorY = m_cursorY;
 	m_cursorX+=dx;
 	m_cursorY+=dy;
 
-	int prevScroll = m_codeBox->scrolly;
 	//if below 
 	if ( m_cursorY - m_codeBox->scrolly > m_lineH )
 	{
@@ -289,8 +282,14 @@ void ScriptEditor::scrollTextBy(int dx, int dy)
 
 	updateTextOffset();
 	
+	//update cursor and code view
 	//-2 allow to see cursor
-	m_codeBox->view.x  = Max( 0, m_cursorX- (m_lineW-2) );
+	m_codeBox->view.x  = Max( 0, m_cursorX-(m_lineW-1) ) * m_charW;
+	
+	const int cy = Clamp( m_cursorY - m_codeBox->scrolly, 0, m_lineH );
+
+	m_cursor->x = m_codeBox->x + ( m_cursorX * m_charW - m_codeBox->view.x );
+	m_cursor->y = m_codeBox->y + ( cy * m_charH );	
 
 }
 

@@ -299,7 +299,4 @@ void Shell::showOption()
 			m_option=m_options.size()-1;
 		overrideInput(m_options[m_option]);	
 	}
-
-
-
 }

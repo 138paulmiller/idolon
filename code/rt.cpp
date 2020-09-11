@@ -5,7 +5,7 @@
 
 namespace Runtime
 {
-		//TODO Sprite Manager should use octree
+	//TODO Sprite Manager should use octree
 	struct SpriteManager
 	{
 		SpriteManager()
@@ -207,12 +207,12 @@ namespace Runtime
 		return false;
 	}
 
-
 	void Sheet( const char *tileset )
 	{
 		Assets::Unload<Graphics::Tileset>( tileset );
 		s_sm.tileset = tileset;
 	}	
+
 	int TileAt( int layer,  int x, int y )
 	{
 		Graphics::Map *map = s_maps[layer];

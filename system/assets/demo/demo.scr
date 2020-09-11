@@ -19,6 +19,7 @@ class App:
       elif k == UP:
         flip(s0, 1)
 
+
 app = App()
 
 def onkey(key, state):
@@ -26,3 +27,5 @@ def onkey(key, state):
 
 def update():
   app.__update__()
+
+
