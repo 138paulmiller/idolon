@@ -59,6 +59,23 @@ namespace Runtime
 	bool s_mapsEnabled[LAYER_COUNT];
 	Game::Cartridge * m_cart;
 }
+#define GET_MAP(name, layer, ...)\
+	if(layer >= 0 && layer < LAYER_COUNT)\
+	{\
+		Graphics::Map *name = s_maps[ layer ];\
+		if (name)\
+		{\
+			__VA_ARGS__\
+		}\
+	}
+
+#define GET_SPRITE(name, spriteId, ...) 		\
+	Graphics::Sprite *name = s_sm.sprite( spriteId );\
+	if (name)\
+	{\
+		__VA_ARGS__\
+	}
+
 
 namespace Runtime
 {
@@ -88,8 +105,8 @@ namespace Runtime
 		s_sm.clear();
 	}
 
-
-	//load map into layer. unloads previous
+	// =============================== Sprite ==================================
+	
 	void Load( int layer, const char *mapname )
 	{
 		bool success;
@@ -106,6 +123,7 @@ namespace Runtime
 		//success
 		s_mapsEnabled[layer] = ( s_maps[layer] != nullptr );
 	}
+	
 	void Unload( int layer )
 	{
 		if(m_cart == 0 && s_maps[layer])
@@ -113,16 +131,37 @@ namespace Runtime
 
 		s_mapsEnabled[layer] = 0;
 	}
-	void Resize( int layer, int w, int h )
-	{
-		ASSERT( 0, "Resize Unimplemented" );
-	}
-	void Scroll( int layer, int x, int y )
-	{
-		ASSERT( 0, "Scroll Unimplemented" );
-	}
 	
 	
+	//scroll map to x,y
+	void Scroll(int layer, int dx, int dy)
+	{
+		GET_MAP(map, layer,
+			map->scroll(dx, dy);
+		)
+	}
+
+	void View(int layer, int x, int y, int w, int h)
+	{
+		GET_MAP(map, layer,
+			map->view = { x,y,w,h };
+			map->clampView();
+		)
+	}
+
+
+	int TileAt(int layer, int x, int y)
+	{
+		GET_MAP(map, layer,
+			int tx, ty;
+			if (map->getTileXY(x, y, tx, ty))
+			{
+				return map->tiles[ty * map->w + tx];
+			}
+		)
+	}
+	// =============================== Sprite ==================================
+
 	int Spawn(int tileId, int x, int y, bool isSmall)
 	{
 		if( tileId < 0 || tileId >= (isSmall ? SPRITE_SMALL_COUNT : SPRITE_COUNT )  )
@@ -147,63 +186,51 @@ namespace Runtime
 
 	void MoveTo( int spriteId, int x, int y )
 	{
-		Graphics::Sprite *sprite = s_sm.sprite( spriteId );
-		if ( sprite )
-		{
+		GET_SPRITE(sprite, spriteId,
 			sprite->x = x;
 			sprite->y = y;
-		}
+		)
 	}
 	void MoveBy( int spriteId, int dx, int dy )
 	{
-		Graphics::Sprite *sprite = s_sm.sprite( spriteId );
-		if ( sprite )
-		{
+		GET_SPRITE(sprite, spriteId,
 			sprite->x += dx;
 			sprite->y += dy;
-		}
+		)
 	}
 
 	void FlipTo( int spriteId, int tileId )
 	{
-		Graphics::Sprite *sprite = s_sm.sprite( spriteId );
-		if ( sprite )
-		{
+		GET_SPRITE(sprite, spriteId,
 			sprite->tile = tileId;
-		}
-		sprite->tile = Clamp(sprite->tile, 0, (sprite->w == SPRITE_H_SMALL ? SPRITE_SMALL_COUNT : SPRITE_COUNT) );
+			sprite->tile = Clamp(sprite->tile, 0, (sprite->w == SPRITE_H_SMALL ? SPRITE_SMALL_COUNT : SPRITE_COUNT) );
+		)
 
 	}
 
 	void FlipBy( int spriteId, int di )
 	{
-		Graphics::Sprite *sprite = s_sm.sprite( spriteId );
-		if ( sprite )
-		{
+		GET_SPRITE(sprite, spriteId,
 			sprite->tile += di;
 			sprite->tile = Clamp(sprite->tile, 0, (sprite->w == SPRITE_H_SMALL ? SPRITE_SMALL_COUNT : SPRITE_COUNT) );
-		}
+		)
 	}
 
 	int Frame( int spriteId )
 	{
-		Graphics::Sprite *sprite = s_sm.sprite( spriteId );
-		if ( sprite )
-		{
+		GET_SPRITE(sprite, spriteId,
 			return sprite->tile;
-		}
+		)
 		return -1;
 	}
 
 	bool Position( int spriteId, int & x, int & y)
 	{
-		Graphics::Sprite *sprite = s_sm.sprite( spriteId );
-		if ( sprite )
-		{
+		GET_SPRITE(sprite, spriteId,
 			x = sprite->x;
 			y = sprite->y;
 			return true;
-		}
+		)
 		return false;
 	}
 
@@ -213,16 +240,5 @@ namespace Runtime
 		s_sm.tileset = tileset;
 	}	
 
-	int TileAt( int layer,  int x, int y )
-	{
-		Graphics::Map *map = s_maps[layer];
-		if ( map )
-		{
-			int tx, ty;
-			if ( map->getTileXY( x, y, tx, ty ) )
-			{
-				return map->tiles[ty * map->w + tx];
-			}
-		}
-	}
+
 }

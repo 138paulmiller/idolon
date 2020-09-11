@@ -39,14 +39,16 @@ RIGHT = LEFT + 1
 
 
 #define PYTHON_BINDINGS \
+PYDECL( idolon, scrw    , "Get screen width "                           )\
+PYDECL( idolon, scrh    , "Get screen height "                          )\
 PYDECL( idolon, mx      , "Get mouse x position"                        )\
 PYDECL( idolon, my      , "Get mouse y position"                        )\
 PYDECL( idolon, clear   , "Clear screen with color r,g,b"               )\
 PYDECL( idolon, key     , "Get key state. 0 is up, 1 is down. 2 is hold")\
 PYDECL( idolon, load    , "Load layer"                                  )\
 PYDECL( idolon, unload  , "Unload layer"                                )\
-PYDECL( idolon, resize  , "Resize layer"                                )\
-PYDECL( idolon, scroll  , "Scroll layer"                                )\
+PYDECL( idolon, view    , "Set the layer viewport"                      )\
+PYDECL( idolon, scroll  , "Scroll layer by dx,dy"                       )\
 PYDECL( idolon, sprite  , "Spawn sprite "                               )\
 PYDECL( idolon, kill    , "Despawn sprite "                             )\
 PYDECL( idolon, pos     , "Get or set sprite position"                  )\
@@ -57,13 +59,29 @@ PYDECL( idolon, sheet   , "Set surrent sprite sheetsprite "             )\
 
 
 //-------------------------------------------------------------------//
+PYBIND(idolon, scrw)
+{
+	static int w = 0;
+	static int h = 0;
+	Engine::GetSize(w, h);
+	return PyLong_FromLong(w);
+}
+
+//-------------------------------------------------------------------//
+PYBIND(idolon, scrh)
+{
+	static int w = 0;
+	static int h = 0;
+	Engine::GetSize(w, h);
+	return PyLong_FromLong(h);
+}
+
+//-------------------------------------------------------------------//
 PYBIND( idolon, mx)
 {
-	
 	static int x = 0;
 	static int y = 0;
 	Engine::GetMousePosition( x, y);
-
 	return PyLong_FromLong(x);
 }
 
@@ -74,8 +92,6 @@ PYBIND( idolon, my)
 	static int x = 0;
 	static int y = 0;
 	Engine::GetMousePosition( x, y);
-
-
 	return PyLong_FromLong(y);
 }
 
@@ -141,17 +157,17 @@ PYBIND( idolon, unload)
 	Py_RETURN_NONE;
 }
 //-------------------------------------------------------------------//
-PYBIND( idolon, resize)
+PYBIND( idolon, view)
 {
 	
-	int layer, w,h; 
-	if ( PyArg_ParseTuple( args, "iii", &layer, &w, &h )== 0 )
+	int layer, x,y,w,h; 
+	if ( PyArg_ParseTuple( args, "iiiii", &layer, &x, &y, &w, &h )== 0 )
 	{
 		PYERR( "Expected args (int, int, int)" );
 	}
 	else
 	{
-		Runtime::Resize( layer , w, h);
+		Runtime::View( layer, x,y, w, h);
 	}
 	Py_RETURN_NONE;
 }

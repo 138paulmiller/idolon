@@ -162,22 +162,13 @@ namespace Graphics
     
     }
 
-    void Map::scroll( int dx, int dy )
+	
+	void Map::scroll( int dx, int dy )
     {
 
         view.x += dx * m_scale;
         view.y += dy * m_scale;
-    	
-        if(view.x < 0) 
-		    view.x = 0;
-	    else if(view.x+view.w > worldw) 
-		    view.x = worldw-view.w;
-	    
-        if(view.y < 0) 
-		    view.y = 0;
-	    else if(view.y+view.h > worldh) 
-		    view.y = worldh-view.h;
-	
+		clampView();
     }
 
     void Map::reset(char * newTiles, int newW, int newH, int newTilew, int newTileh)
@@ -218,6 +209,21 @@ namespace Graphics
         update({0,0,w,h}); 
 
     }
+
+	void Map::clampView()
+	{
+		if (view.x < 0)
+			view.x = 0;
+		else if (view.x + view.w > worldw)
+			view.x = worldw - view.w;
+
+		if (view.y < 0)
+			view.y = 0;
+		else if (view.y + view.h > worldh)
+			view.y = worldh - view.h;
+
+	}
+
     //rect is in tile space
     void Map::update(const Rect & rect )
     {

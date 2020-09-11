@@ -1,24 +1,37 @@
 $demo/demo python
 from idolon import *
 
+bg = 0
+load(bg, "demo/demo")
 sheet("demo/demo")
 s0 = sprite(0,0,0)
-dt = 0
+spd = 1
+
 
 class App:
   def __init__(self):
-    pass    
+    self.vx = 0
+    self.vy = 0    
 
   def __update__(self):
     pos(s0, mx(), my())
+    scroll(bg, self.vx, self.vy )
 
   def __onkey__(self, k, s):
     if s == CLICK:
-      if k == DOWN:
+      if k == 'q':
         flip(s0,-1)
-      elif k == UP:
+      elif k == 'w':
         flip(s0, 1)
-
+    v = spd if s != RELEASE else 0
+    if k == DOWN:
+      self.vy = v
+    elif k == UP:
+      self.vy = -v
+    elif k == LEFT:
+      self.vx = -v
+    elif k == RIGHT:
+      self.vx = v  
 
 app = App()
 

@@ -8,24 +8,29 @@ namespace Runtime
 	void Step();
 	void Quit();
 
+
+	//======= map api  =========
 	//load map into layer. unloads previous
 	void Load(int layer, const char * mapname);
 	void Unload(int layer);
-	void Resize(int layer, int w, int h);
+	//set view into layer
+	void View(int layer, int x, int y, int w, int h);
+	//scroll map to x,y
 	void Scroll(int layer, int x, int y);
+	//get tile identifier at pixel xy
+	int TileAt( int layer, int x, int y );
 	
-	//sprite api
+	//========= sprite api =========
 	int Spawn(int tileId, int x, int y, bool isSmall = false);
 	void Despawn( int spriteId );
-
 	void MoveTo(int spriteId, int x, int y);
 	void MoveBy(int spriteId, int dx, int dy);
 	void FlipTo(int spriteId, int tileId);
 	void FlipBy(int spriteId, int di);
-	void Sheet(const char *  tileset);
 	int Frame( int spriteId );
 	bool Position( int spriteId, int &x, int &y );
+	//set sprite sheet
+	void Sheet(const char *  tileset);
 
-	int TileAt( int layer, int x, int y );
 
 }
