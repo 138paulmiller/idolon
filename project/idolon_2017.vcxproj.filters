@@ -49,9 +49,6 @@
     <ClCompile Include="..\code\editors\tileseteditor.cpp">
       <Filter>Source Files\editors</Filter>
     </ClCompile>
-    <ClCompile Include="..\code\scripting\pyeval.cpp">
-      <Filter>Source Files\scripting</Filter>
-    </ClCompile>
     <ClCompile Include="..\code\scripting\eval.cpp">
       <Filter>Source Files\scripting</Filter>
     </ClCompile>
@@ -69,6 +66,12 @@
     </ClCompile>
     <ClCompile Include="..\code\ui\ui.cpp">
       <Filter>Source Files\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\scripting\pyeval.cpp">
+      <Filter>Source Files\scripting</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\scripting\jseval.cpp">
+      <Filter>Source Files\scripting</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -138,9 +141,6 @@
     <ClInclude Include="..\code\editors\tileseteditor.hpp">
       <Filter>Source Files\editors</Filter>
     </ClInclude>
-    <ClInclude Include="..\code\scripting\pyeval.hpp">
-      <Filter>Source Files\scripting</Filter>
-    </ClInclude>
     <ClInclude Include="..\code\scripting\eval.hpp">
       <Filter>Source Files\scripting</Filter>
     </ClInclude>
@@ -159,6 +159,13 @@
     <ClInclude Include="..\code\ui\ui.hpp">
       <Filter>Source Files\ui</Filter>
     </ClInclude>
+    <ClInclude Include="..\code\scripting\pyeval.hpp">
+      <Filter>Source Files\scripting</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\scripting\jseval.hpp">
+      <Filter>Source Files\scripting</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Makefile" />
@@ -168,9 +175,6 @@
     <None Include="..\WIKI" />
     <None Include="..\system\assets\full.fnt">
       <Filter>Source Files</Filter>
-    </None>
-    <None Include="..\code\scripting\pybindings.inl">
-      <Filter>Source Files\scripting</Filter>
     </None>
     <None Include="..\system\assets\demo\demo.map">
       <Filter>Assets\demo</Filter>
@@ -189,6 +193,9 @@
     </None>
     <None Include="..\system\game.py">
       <Filter>Assets</Filter>
+    </None>
+    <None Include="..\code\scripting\pybindings.inl">
+      <Filter>Source Files\scripting</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -216,5 +223,8 @@
     <Filter Include="Assets\demo">
       <UniqueIdentifier>{754b3d1f-072f-4682-8520-a51d9b03f0b9}</UniqueIdentifier>
     </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="idolon_2017.rc" />
   </ItemGroup>
 </Project>

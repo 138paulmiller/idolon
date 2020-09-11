@@ -195,6 +195,7 @@
     <ClInclude Include="..\code\scripting\api.hpp" />
     <ClInclude Include="..\code\scripting\eval.hpp" />
     <ClInclude Include="..\code\engine\api.hpp" />
+    <ClInclude Include="..\code\scripting\jseval.hpp" />
     <ClInclude Include="..\code\scripting\pyeval.hpp" />
     <ClInclude Include="..\code\shell.hpp" />
     <ClInclude Include="..\code\sys.hpp" />
@@ -203,6 +204,7 @@
     <ClInclude Include="..\code\ui\context.hpp" />
     <ClInclude Include="..\code\ui\editor.hpp" />
     <ClInclude Include="..\code\ui\ui.hpp" />
+    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\code\assets\assets.cpp" />
@@ -221,6 +223,7 @@
     <ClCompile Include="..\code\main.cpp" />
     <ClCompile Include="..\code\rt.cpp" />
     <ClCompile Include="..\code\scripting\eval.cpp" />
+    <ClCompile Include="..\code\scripting\jseval.cpp" />
     <ClCompile Include="..\code\scripting\pyeval.cpp" />
     <ClCompile Include="..\code\shell.cpp" />
     <ClCompile Include="..\code\sys.cpp" />
@@ -228,6 +231,14 @@
     <ClCompile Include="..\code\ui\context.cpp" />
     <ClCompile Include="..\code\ui\editor.cpp" />
     <ClCompile Include="..\code\ui\ui.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="idolon_2017.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\code\external\duktape\duktape.vcxproj">
+      <Project>{0018dd48-b330-4522-b94e-ec161aa41bba}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
