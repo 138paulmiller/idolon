@@ -17,10 +17,10 @@ const char * doc   //points to the contents of the docstring
 */
 
 #define PYDECL(module, name, doc )\
-	{ #name, module##_##name, METH_VARARGS, doc },
+	{ #name, py_##module##_##name, METH_VARARGS, doc },
 
 #define PYBIND(module, name) \
-	PyObject* module##_##name(PyObject *self, PyObject *args)
+	PyObject* py_##module##_##name(PyObject *self, PyObject *args)
 
 
 #define PYERR(...) \
@@ -60,7 +60,7 @@ namespace
 
 
 PyScript::PyScript(const std::string & name)
-	:Script(name)
+	:Script(name, SCRIPT_PYTHON)
 {
 	m_module = 0;
 	compile();

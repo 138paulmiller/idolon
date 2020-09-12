@@ -70,6 +70,9 @@
     <None Include="..\WIKI">
       <Filter>System Files</Filter>
     </None>
+    <None Include="..\code\scripting\jsbindings.inl">
+      <Filter>Source Files\scripting</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\code\scripting\api.hpp">
@@ -159,6 +162,9 @@
     <ClInclude Include="..\code\rt.hpp">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\code\scripting\jseval.hpp">
+      <Filter>Source Files\scripting</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\code\scripting\eval.cpp">
@@ -229,6 +235,9 @@
     </ClCompile>
     <ClCompile Include="..\code\rt.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\scripting\jseval.cpp">
+      <Filter>Source Files\scripting</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

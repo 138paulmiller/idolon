@@ -39,23 +39,23 @@ RIGHT = LEFT + 1
 
 
 #define PYTHON_BINDINGS \
-PYDECL( idolon, scrw    , "Get screen width "                           )\
-PYDECL( idolon, scrh    , "Get screen height "                          )\
-PYDECL( idolon, mx      , "Get mouse x position"                        )\
-PYDECL( idolon, my      , "Get mouse y position"                        )\
-PYDECL( idolon, clear   , "Clear screen with color r,g,b"               )\
-PYDECL( idolon, key     , "Get key state. 0 is up, 1 is down. 2 is hold")\
-PYDECL( idolon, load    , "Load layer"                                  )\
-PYDECL( idolon, unload  , "Unload layer"                                )\
-PYDECL( idolon, view    , "Set the layer viewport"                      )\
-PYDECL( idolon, scroll  , "Scroll layer by dx,dy"                       )\
-PYDECL( idolon, sprite  , "Spawn sprite "                               )\
-PYDECL( idolon, kill    , "Despawn sprite "                             )\
-PYDECL( idolon, pos     , "Get or set sprite position"                  )\
-PYDECL( idolon, move    , "Move sprite by x,y"                          )\
-PYDECL( idolon, frame   , "Get or set sprite current tile"              )\
-PYDECL( idolon, flip    , "Flip sprite tile by di"                      )\
-PYDECL( idolon, sheet   , "Set surrent sprite sheetsprite "             )\
+	PYDECL( idolon, scrw    , "Get screen width "                           )\
+	PYDECL( idolon, scrh    , "Get screen height "                          )\
+	PYDECL( idolon, mx      , "Get mouse x position"                        )\
+	PYDECL( idolon, my      , "Get mouse y position"                        )\
+	PYDECL( idolon, clear   , "Clear screen with color r,g,b"               )\
+	PYDECL( idolon, key     , "Get key state. 0 is up, 1 is down. 2 is hold")\
+	PYDECL( idolon, load    , "Load layer"                                  )\
+	PYDECL( idolon, unload  , "Unload layer"                                )\
+	PYDECL( idolon, view    , "Set the layer viewport"                      )\
+	PYDECL( idolon, scroll  , "Scroll layer by dx,dy"                       )\
+	PYDECL( idolon, sprite  , "Spawn sprite "                               )\
+	PYDECL( idolon, kill    , "Despawn sprite "                             )\
+	PYDECL( idolon, pos     , "Get or set sprite position"                  )\
+	PYDECL( idolon, move    , "Move sprite by x,y"                          )\
+	PYDECL( idolon, frame   , "Get or set sprite current tile"              )\
+	PYDECL( idolon, flip    , "Flip sprite tile by di"                      )\
+	PYDECL( idolon, sheet   , "Set surrent sprite sheetsprite "             )\
 
 
 //-------------------------------------------------------------------//

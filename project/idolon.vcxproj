@@ -159,6 +159,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <None Include="..\code\scripting\jsbindings.inl" />
     <None Include="..\code\scripting\pybindings.inl" />
     <None Include="..\Makefile" />
     <None Include="..\README.md" />
@@ -195,6 +196,7 @@
     <ClInclude Include="..\code\scripting\api.hpp" />
     <ClInclude Include="..\code\scripting\eval.hpp" />
     <ClInclude Include="..\code\engine\api.hpp" />
+    <ClInclude Include="..\code\scripting\jseval.hpp" />
     <ClInclude Include="..\code\scripting\pyeval.hpp" />
     <ClInclude Include="..\code\shell.hpp" />
     <ClInclude Include="..\code\sys.hpp" />
@@ -221,6 +223,7 @@
     <ClCompile Include="..\code\main.cpp" />
     <ClCompile Include="..\code\rt.cpp" />
     <ClCompile Include="..\code\scripting\eval.cpp" />
+    <ClCompile Include="..\code\scripting\jseval.cpp" />
     <ClCompile Include="..\code\scripting\pyeval.cpp" />
     <ClCompile Include="..\code\shell.cpp" />
     <ClCompile Include="..\code\sys.cpp" />
@@ -228,6 +231,11 @@
     <ClCompile Include="..\code\ui\context.cpp" />
     <ClCompile Include="..\code\ui\editor.cpp" />
     <ClCompile Include="..\code\ui\ui.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="duktape\duktape\duktape.vcxproj">
+      <Project>{269c5154-d03a-44cb-9d8c-645539bd409c}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

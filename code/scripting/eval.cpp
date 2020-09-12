@@ -40,8 +40,9 @@ TypedArg::TypedArg( char* s )
 }
 
 
-Script::Script( const 	std::string &name )
-	:Asset(name)
+Script::Script( const std::string &name, ScriptLanguage lang  )
+	: Asset(name)
+	, lang(lang)
 {
 }
 
@@ -58,12 +59,20 @@ bool Script::call(const std::string & func, TypedArg & ret, const std::vector<Ty
 
 namespace 
 {
-	const std::unordered_map<std::string, ScriptLanguage > LangStrToEnum =
+	const std::string s_langEnumToStr[] = 
 	{
-		{ "none", SCRIPT_NONE },
-		{ "python", SCRIPT_PYTHON },
-		{ "javascript", SCRIPT_JAVASCRIPT },
+		"none",
+		"python",
+		"javascript"
 	};
+
+	const std::unordered_map<std::string, ScriptLanguage > s_langStrToEnum =
+	{
+		{ s_langEnumToStr[SCRIPT_NONE]       , SCRIPT_NONE       },
+		{ s_langEnumToStr[SCRIPT_PYTHON]     , SCRIPT_PYTHON     },
+		{ s_langEnumToStr[SCRIPT_JAVASCRIPT ], SCRIPT_JAVASCRIPT },
+	};
+
 
 	ScriptLanguage s_lang;
 	typedef void(*StartupFunc)() ;
@@ -73,16 +82,25 @@ namespace
 	StartupFunc s_startupImpl = 0 ;
 	ShutdownFunc s_shutdownImpl = 0;
 	ExecuteFunc s_executeImpl = 0;
+
+	bool s_initialized = false;
+
 }
 
 ScriptLanguage ScriptLanguageFromStr(const std::string & str)
 {
-	auto it = LangStrToEnum.find(str);
-	if (it == LangStrToEnum.end())
+	auto it = s_langStrToEnum.find(str);
+	if (it == s_langStrToEnum.end())
 	{
 		return SCRIPT_NONE;
 	}
 	return it->second;
+}
+
+
+const std::string ScriptLanguageToStr( ScriptLanguage lang )
+{
+	return s_langEnumToStr[lang];
 }
 
 namespace Eval
@@ -105,11 +123,17 @@ namespace Eval
 		default:
 			break;
 		}
+		s_initialized = true;
+
 		s_startupImpl();
 	}
 	void Shutdown()
 	{
-		s_shutdownImpl();
+		if ( s_initialized )
+		{
+			s_shutdownImpl();
+			s_initialized = false;
+		}
 
 		s_startupImpl = 0;
 		s_shutdownImpl = 0;

@@ -203,8 +203,6 @@ ScriptFactory::ScriptFactory()
 
 Asset * ScriptFactory::deserialize( std::istream& in )
 {
-
-
     Script *script = 0;
 	try
 	{
@@ -251,7 +249,6 @@ Asset * ScriptFactory::deserialize( std::istream& in )
 			in.read(codedata, len);
 			
 			script  = Eval::CreateScript(name, lang);
-            script->lang = lang;
 			script->code = std::string(codedata);
 			
             delete[] codedata;
@@ -276,16 +273,11 @@ Asset * ScriptFactory::deserialize( std::istream& in )
 
 void ScriptFactory::serialize( const Asset * asset, std::ostream& out ) const
 {
-    static const std::string LangEnumToStr[] = 
-    {
-	    "none",
-	    "python"
-    };
 
     const Script* script = dynamic_cast< const Script* >( asset );
     ASSERT( script , "ScriptFactory: Asset not loaded" );
 
-    out << "$" << script->name << " " << LangEnumToStr[script->lang] << std::endl;
+    out << "$" << script->name << " " << ScriptLanguageToStr(script->lang) << std::endl;
 	out << script->code;
 }
 

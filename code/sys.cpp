@@ -49,7 +49,6 @@ namespace Sys
 
 		Engine::Startup( title, SCREEN_W, SCREEN_H, WINDOW_SCALE );
 		Assets::Startup( Sys::AssetPath() );
-		Eval::Startup();
 
 		//setup context apps
 		s_context->create( APP_SHELL,          s_shell = new Shell() );
@@ -88,7 +87,6 @@ namespace Sys
 		s_context->clear();
 		delete s_context;
 
-		Eval::Shutdown();
 		Assets::Shutdown();
 		Engine::Shutdown();
 

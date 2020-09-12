@@ -72,14 +72,17 @@ void ScriptEditor::onExit()
 	m_script =  0;
 
 	delete m_codeBox;
-	App::clear();
-	Editor::onExit();
-	LOG("Exited script editor");
 	if(m_cursor)
 	{
 		delete m_cursor;
 		m_cursor = 0;
 	} 
+	App::clear();
+	Editor::onExit();
+	Eval::Shutdown();
+	
+	LOG("Exited script editor");
+
 }
 
 
@@ -225,8 +228,10 @@ void ScriptEditor::onKey(Key key, ButtonState state)
 
 void ScriptEditor::reload()
 {
+	
 	Assets::Unload<Script>(m_scriptName);
 	m_script = Assets::Load<Script>(m_scriptName);
+
 
 	m_dirty = true;
 	
@@ -234,6 +239,9 @@ void ScriptEditor::reload()
 	m_codeBox->view.x = m_codeBox->view.y = 0;
 	m_cursorPos  = 0;
 	scrollTextBy(0, 0);
+
+	Eval::Shutdown();
+	Eval::Startup(m_script->lang);
 }
 
 

@@ -37,10 +37,14 @@ enum ScriptLanguage
 };
 
 ScriptLanguage ScriptLanguageFromStr(const std::string & str);
+const std::string ScriptLanguageToStr(ScriptLanguage lang);
+
+
+
 class Script : public Asset
 {
 public:
-	Script( const 	std::string & name );
+	Script( const std::string & name, ScriptLanguage lang = SCRIPT_NONE);
 	virtual ~Script() = default;
 	virtual void compile();
 	virtual bool call( const std::string &func, TypedArg &ret, const std::vector<TypedArg> &args = {} );
