@@ -48,21 +48,21 @@ JsScript::~JsScript()
 void JsScript::compile()
 {
 	//load code
-
-	duk_push_lstring(s_ctx, code.c_str(), code.size());
-
-	if ( duk_peval( s_ctx ) != 0 ) {
+	if ( duk_peval_lstring(s_ctx, code.c_str(), code.size()) != 0 ) {
 		/* Use duk_safe_to_string() to convert error into string.  This API
 		 * call is guaranteed not to throw an error during the coercion.
 		 */
-		printf( "Script error: %s\n", duk_safe_to_string( s_ctx, -1 ) );
+		LOG( "Script error: %s\n", duk_safe_to_string( s_ctx, -1 ) );
 	}
-	duk_pop(s_ctx);
 }
 
 bool JsScript::call(const std::string & func, TypedArg & ret, const std::vector<TypedArg> & args )
 {
-	duk_get_global_string(s_ctx, func.c_str());
+	if ( !duk_get_global_string( s_ctx, func.c_str() ) )
+	{
+		LOG( "Script error: %s\n", duk_safe_to_string( s_ctx, -1 ) );
+		return false;
+	}
 
 	for ( TypedArg arg : args )
 	{

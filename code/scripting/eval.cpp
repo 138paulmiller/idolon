@@ -139,10 +139,10 @@ namespace Eval
 		s_shutdownImpl = 0;
 		s_executeImpl = 0;
 	}
-	void Reset()
+	void Reset(ScriptLanguage lang)
 	{
-		s_shutdownImpl();
-		s_startupImpl();
+		Shutdown();
+		Startup(lang);
 	}
 
 	void Execute(const std::string & code)

@@ -240,8 +240,6 @@ void ScriptEditor::reload()
 	m_cursorPos  = 0;
 	scrollTextBy(0, 0);
 
-	Eval::Shutdown();
-	Eval::Startup(m_script->lang);
 }
 
 
@@ -342,7 +340,7 @@ void ScriptEditor::runCode()
 
 
 	Runtime::Quit();
-	Eval::Reset();
+	Eval::Reset(m_script->lang);
 
 	//set input handler. escape to resume
 	m_script->compile();
