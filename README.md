@@ -1,31 +1,43 @@
-# idolon [WIP]
-An emulator for a nonexistent system  
+# idolon 
+An emulator for a nonexistent system, aimed to facilitate simple game creation  
 
 ### Installation
 
 ### Features 
-At its core, this is a virtual Game Creation System. 
+
+At its core, idolon is a virtual Game Creation System. 
+
 - System terminal
 - Tilesheet editor
 - Map editor
-- Python scripting
-- Code editor
+- Game scripting
+	- Python 3.8 and Javascript (ECMAScript E5/E5.1)
+
 
 ### Development
+
 1. Download the source using git
 `git clone https://github.com/138paulmiller/idolon.git`
 2. Navigate to project root
 `cd idolon`
 
-##### Linux
-1. Install 3rd Party Libraries using `sudo make install` . This is only required to do once.
-2. Build the executable with `make`, of which will generate a executable *idolon*. 
-
 ##### Windows
+
 1. Install [Visual Studio 2019](https://visualstudio.microsoft.com/downloads/)
 2. Install [Python 3.8](https://www.python.org/downloads/release/python-380/)
 2. Open the solution using VS2019 `idolon.sln`
 3. To build and run, select *Local Windows Debugger*
+
+##### Linux 
+
+1. Install 3rd Party Libraries using `sudo make install` . This is only required to do once.
+2. Build the executable with `make`, of which will generate a executable *idolon*. 
+
+
+### Thanks
+
+- [Duktape](https://duktape.org/)
+- [SDL2](https://www.libsdl.org/)
 
 ## Logs 
 

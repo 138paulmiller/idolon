@@ -165,12 +165,16 @@ int main(int argc, char** argv)
 	{
 		return try_main(argc, argv);
 	}
-	catch (const std::exception &exc)
+	// catch anything thrown within try block that derives from std::exception
+	catch (const std::exception &ex)
 	{
-	    printf("Caugth exception\n");
-	    // catch anything thrown within try block that derives from std::exception
-	    std::cerr << exc.what() << std::endl;
+	    printf("System : Caught exception\n%s\n", ex.what());
 	}
+	catch (...)
+	{
+	    printf("System : Caught Unknown exception\n");
+	}
+
 	return -1;
 }
 

@@ -19,7 +19,7 @@ struct JsBinding
 	int js_##module##_##name(duk_context *ctx)
 
 
-#define PYERR(...) \
+#define JSERR(...) \
 	LOG(__VA_ARGS__)
 
 
@@ -52,7 +52,7 @@ void JsScript::compile()
 		/* Use duk_safe_to_string() to convert error into string.  This API
 		 * call is guaranteed not to throw an error during the coercion.
 		 */
-		LOG( "Script error: %s\n", duk_safe_to_string( s_ctx, -1 ) );
+		JSERR( "Js Script error: %s\n", duk_safe_to_string( s_ctx, -1 ) );
 	}
 }
 
@@ -60,7 +60,7 @@ bool JsScript::call(const std::string & func, TypedArg & ret, const std::vector<
 {
 	if ( !duk_get_global_string( s_ctx, func.c_str() ) )
 	{
-		LOG( "Script error: %s\n", duk_safe_to_string( s_ctx, -1 ) );
+		JSERR( "Js Script error: %s\n", duk_safe_to_string( s_ctx, -1 ) );
 		return false;
 	}
 
@@ -92,6 +92,8 @@ bool JsScript::call(const std::string & func, TypedArg & ret, const std::vector<
 			ret.value.s =  duk_to_string(s_ctx, -1);
 			break;
 	}
+	//pop return
+	duk_pop(s_ctx);
 	return true;
 }
 
@@ -114,7 +116,6 @@ namespace JsEval
 
 	void Shutdown()
 	{
-		duk_pop(s_ctx);
 		duk_destroy_heap(s_ctx);
 	}
 

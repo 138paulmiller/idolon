@@ -39,6 +39,7 @@ RIGHT = LEFT + 1
 
 
 #define PYTHON_BINDINGS \
+	PYDECL( idolon, log     , "Log message to debug console and file"    	)\
 	PYDECL( idolon, scrw    , "Get screen width "                           )\
 	PYDECL( idolon, scrh    , "Get screen height "                          )\
 	PYDECL( idolon, mx      , "Get mouse x position"                        )\
@@ -57,6 +58,14 @@ RIGHT = LEFT + 1
 	PYDECL( idolon, flip    , "Flip sprite tile by di"                      )\
 	PYDECL( idolon, sheet   , "Set surrent sprite sheetsprite "             )\
 
+
+
+//-------------------------------------------------------------------//
+PYBIND(idolon, log)
+{
+	//todo log t
+	Py_RETURN_NONE;
+}
 
 //-------------------------------------------------------------------//
 PYBIND(idolon, scrw)

@@ -19,10 +19,11 @@ class App:
 
   def __onkey__(self, k, s):
     if s == CLICK:
-      if k == 'q':
+      if k == ord('q'):
         flip(s0,-1)
-      elif k == 'w':
+      elif k == ord('w'):
         flip(s0, 1)
+    
     v = spd if s != RELEASE else 0
     if k == DOWN:
       self.vy = v
