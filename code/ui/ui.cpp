@@ -255,7 +255,290 @@ namespace UI
 		}
 	}
 
+/*-------------------------------------------------------------------
+TextScrollArea
+*/
+	TextScrollArea::TextScrollArea(int x, int y, int w, int h, const std::string & fontname)
 
+	{
+		Graphics::Font * font = Assets::Load<Graphics::Font>(fontname);
+		m_charW = font->charW;
+		m_charH = font->charH;
+		Assets::Unload<Graphics::Font>(fontname);
+		m_cursorX = m_cursorY = 0;
+
+		m_timer = 0;
+		m_textW = w / m_charW ;
+		m_textH = h / m_charH;
+
+		//buffer the textbox
+		m_textBox = new Graphics::TextBox(m_textW * 2, m_textH, "", fontname);
+		m_textBox->x = x;
+		m_textBox->y = y;
+		m_textBox->textColor = WHITE;
+		m_textBox->fillColor = BLACK;
+		m_textBox->filled = false;
+		m_textBox->text = "";
+		m_textBox->reload();
+
+		//only draw text that fits within screen
+		m_textBox->view.x = m_textBox->view.y = 0;
+		m_textBox->w = m_textBox->view.w = w;
+		m_textBox->view.h = h;
+
+		//init cursor
+		m_cursor = new Graphics::TextBox(1, 1, " ", fontname);
+		m_cursor->filled = true;
+		m_cursor->fillColor = WHITE;
+		m_cursor->reload();
+	}
+
+	TextScrollArea::~TextScrollArea()
+	{
+		delete m_textBox;
+		if (m_cursor)
+		{
+			delete m_cursor;
+			m_cursor = 0;
+		}
+	}
+	
+	void TextScrollArea::onUpdate() 
+	{
+
+	}
+	
+	void TextScrollArea::onDraw()
+	{
+		if (m_hidden) return;
+		//handle mouse 
+
+		int mx, my;
+		Engine::GetMousePosition(mx, my);
+		if (Engine::GetMouseButtonState(MOUSEBUTTON_LEFT) == BUTTON_CLICK)
+		{
+			//relative to textbox
+			const int tx = mx - m_textBox->x;
+			const int ty = my - m_textBox->y;
+			if (tx >= 0 && ty >= 0)
+			{
+				m_cursorX = tx / m_charW;
+				m_cursorY = ty / m_charH + m_textBox->scrolly;
+				updateTextOffset();
+			}
+		}
+
+		m_timer += Engine::GetTimeDeltaMs() / 1000.0f;
+		if (m_timer > 1.0 / CURSOR_FLICKER_RATE)
+		{
+			m_cursor->visible = !m_cursor->visible;
+			m_timer = 0;
+		}
+
+		m_textBox->draw();
+		m_cursor->draw();
+	}
+
+	bool TextScrollArea::handleKey(Key key, ButtonState state)
+	{
+		bool dirty = false;
+		if (state != BUTTON_RELEASE)
+		{
+			switch (key)
+			{
+			case KEY_UP:
+				scrollTextBy(0, -1);
+				break;
+			case KEY_DOWN:
+				scrollTextBy(0, 1);
+				break;
+			case KEY_LEFT:
+				scrollTextBy(-1, 0);
+				break;
+			case KEY_RIGHT:
+				scrollTextBy(1, 0);
+				break;
+			case KEY_RETURN:
+				if (m_cursorPos == m_textBox->text.size())
+					m_textBox->text += '\n';
+				else
+					m_textBox->text.insert(m_cursorPos, 1, '\n');
+				dirty = true;
+				m_cursorX = 0;
+				scrollTextBy(0, 1);
+				break;
+			default:
+				if (KeyPrintable(key))
+				{
+					//TODO allow horizontal scrolling
+					if (m_cursorX < m_textBox->tw - 1)
+					{
+						//use spaces
+						if (key == KEY_TAB)
+						{
+							if (m_cursorPos == m_textBox->text.size())
+								m_textBox->text += std::string(TAB_SIZE, ' ');
+							else
+								m_textBox->text.insert(m_cursorPos, TAB_SIZE, ' ');
+							scrollTextBy(TAB_SIZE, 0);
+						}
+						else
+						{
+							if (m_cursorPos == m_textBox->text.size())
+								m_textBox->text += key;
+							else
+								m_textBox->text.insert(m_cursorPos, 1, key);
+							scrollTextBy(1, 0);
+						}
+					}
+					dirty = true;
+
+				}
+				break;
+			case KEY_BACKSPACE:
+				if (m_cursorPos > 0)
+				{
+					scrollTextBy(-1, 0);
+					if (m_cursorPos == m_textBox->text.size())
+						m_textBox->text.pop_back();
+					else
+						m_textBox->text.erase(m_cursorPos, 1);
+					dirty = true;
+				}
+
+				break;
+			}
+		}
+		if (dirty)
+		{
+			m_textBox->refresh();
+		}
+		return dirty;
+	}
+
+
+	void TextScrollArea::setText(const std::string & text)
+	{
+		if (text.size() == 0)
+		{
+			m_textBox->text = "";
+		}
+		else
+		{
+			//copy lines to codeview.
+			m_textBox->text = text;
+		}
+		m_textBox->refresh();
+	}
+
+	const std::string & TextScrollArea::getText()
+	{
+		return m_textBox->text;
+	}
+
+	void TextScrollArea::hide(bool isHidden)
+	{
+		m_hidden = isHidden;
+	}
+
+	void TextScrollArea::resetCursor()
+	{
+		m_timer = 0;
+		m_cursorPos = 0;
+		m_textBox->scrolly = 0;
+		scrollTextBy(0, 0);
+	}
+	void TextScrollArea::scrollTextBy(int dx, int dy)
+	{
+		m_cursorX += dx;
+		m_cursorY += dy;
+
+		//if below 
+		if (m_cursorY - m_textBox->scrolly >= m_textH - 1)
+		{
+			m_textBox->scrolly += m_cursorY - (m_textBox->scrolly + m_textH - 1);
+			m_textBox->refresh();
+
+		}
+		else if (m_cursorY < m_textBox->scrolly)
+		{
+			m_textBox->scrolly += m_cursorY - m_textBox->scrolly;
+			if (m_textBox->scrolly < 0)
+				m_textBox->scrolly = 0;
+			m_textBox->refresh();
+
+		}
+		if (m_cursorX < 0)
+		{
+			//snap to end of previous line
+			if (m_cursorY > 0)
+			{
+				m_cursorY--;
+				//go to end of line
+				m_cursorX = -1;
+			}
+			else
+			{
+				m_cursorX = 0;
+			}
+
+		}
+		//if moving past newline go to next line
+		else if (dx > 0 && m_cursorPos && m_cursorPos < m_textBox->text.size() && m_textBox->text[m_cursorPos] == '\n')
+		{
+			m_cursorX = 0;
+			m_cursorY++;
+		}
+
+		else if (m_cursorY < 0)
+		{
+			m_cursorY = 0;
+		}
+
+		updateTextOffset();
+
+		//update cursor and code view
+		//-2 allow to see cursor
+		m_textBox->view.x = Max(0, m_cursorX - (m_textW - 2)) * m_charW;
+
+		const int cy = Clamp(m_cursorY - m_textBox->scrolly, 0, m_textH);
+
+		m_cursor->x = m_textBox->x + (m_cursorX * m_charW - m_textBox->view.x);
+		m_cursor->y = m_textBox->y + (cy * m_charH);
+	}
+
+	void TextScrollArea::updateTextOffset()
+	{
+		//set text offset
+		int cx = m_cursorX;
+		int cy = m_cursorY;
+		m_cursorX = 0;
+		m_cursorY = 0;
+
+		for (m_cursorPos = 0; m_cursorPos < m_textBox->text.size(); m_cursorPos++)
+		{
+
+			if (m_cursorY == cy)
+			{
+				//get as close to cursor X as possible
+				while (m_cursorPos < m_textBox->text.size()
+					&& (cx == -1 || m_cursorX < cx)
+					&& m_textBox->text[m_cursorPos] != '\n')
+				{
+					m_cursorPos++;
+					m_cursorX++;
+				}
+				//
+				break;
+			}
+			m_cursorX++;
+			if (m_textBox->text[m_cursorPos] == '\n')
+			{
+				m_cursorY++;
+				m_cursorX = 0;
+			}
+		}
+	}
 /*--------------------------------------------------------------------------------------
 	 Toolbar
 */

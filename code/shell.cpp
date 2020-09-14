@@ -106,9 +106,8 @@ void Shell::onKey(Key key, ButtonState state)
 		default: break;
 		}
 	}
-	else if(state == BUTTON_CLICK )
+	else if(state == BUTTON_CLICK || state == BUTTON_HOLD)
 	{
-
 		switch (key)
 		{
 		case KEY_SHIFT:

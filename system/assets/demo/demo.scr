@@ -41,4 +41,3 @@ def onkey(key, state):
 def update():
   app.__update__()
 
-

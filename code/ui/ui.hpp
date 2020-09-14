@@ -40,7 +40,9 @@ enum AppSupport
 
 namespace UI
 {
-	//////////////////////////////////////////////////////////////////////////////////
+
+	/*-------------------------------------------------------------------
+	*/
 	class Widget
 	{
 	public:
@@ -50,7 +52,9 @@ namespace UI
 		bool hidden = false;
 	};
 	
-	//////////////////////////////////////////////////////////////////////////////////
+
+	/*-------------------------------------------------------------------
+	*/	
 	class Button : public Widget
 	{
 	public:
@@ -90,8 +94,9 @@ namespace UI
 		bool m_isDown;
 	};
 	
-	
-	//////////////////////////////////////////////////////////////////////////////////
+
+	/*-------------------------------------------------------------------
+	*/
 	class TextButton : public Button
 	{
 	public:
@@ -108,10 +113,8 @@ namespace UI
 	protected:
 		Graphics::TextBox * m_textbox; 
 	};
-	//////////////////////////////////////////////////////////////////////////////////
-	/*
+	/*-------------------------------------------------------------------
 		Input
-
 	*/
 
 	class TextInput : public TextButton
@@ -132,10 +135,49 @@ namespace UI
 		bool m_cursorVisible;
 	};
 
-	//////////////////////////////////////////////////////////////////////////////////
-	//TODO - text input. button on click goes into edit mode. captures key input then releases on enter or click  
+	/*-------------------------------------------------------------------
+	*/
+	class TextScrollArea : public Widget
+	{
+	public:
+		TextScrollArea(int x, int y, int w, int h, const std::string & fontname);
+		~TextScrollArea();
+		void onUpdate() override;
+		void onDraw() override;
+		bool handleKey(Key key, ButtonState state);
 
-	//////////////////////////////////////////////////////////////////////////////////
+		void setText(const std::string & text);
+		const std::string & getText();
+
+		void hide(bool isHidden);
+		void resetCursor();
+	private:
+
+		void scrollTextBy(int dx, int dy);
+		void updateTextOffset();
+
+
+		Graphics::TextBox * m_textBox;
+		Graphics::TextBox *m_cursor;
+	
+		int m_cursorX, m_cursorY;
+		uint m_cursorPos;
+		
+		//chars per line width, height
+		int m_textW;
+		int m_textH;
+		//size of char in pixels
+		int m_charW;
+		int m_charH;
+		//flicker timer 
+		float m_timer;
+		bool m_hidden;
+
+
+	};
+
+	/*-------------------------------------------------------------------
+	*/
 	class Toolbar : public Widget
 	{
 		public:
@@ -168,13 +210,11 @@ namespace UI
 
 	};
 
-	//////////////////////////////////////////////////////////////////////////////////
-	/*
+
+	/*-------------------------------------------------------------------
 		Color Selector
-			- Renders the sheet at the top-right of the screen.
-
+			- Renders the sheet at the top-right of the screen
 	*/
-
 	class ColorPicker : public Widget
 	{
 	public:
@@ -195,8 +235,7 @@ namespace UI
 		Color m_borderColor;
 	};
 	
-	//////////////////////////////////////////////////////////////////////////////////
-	/*
+	/*-------------------------------------------------------------------
 		Tileset Tile/Frame picker
 		- Renders the sheet at the bottom of the screen.
 	*/
