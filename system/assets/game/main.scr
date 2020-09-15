@@ -1,0 +1,10 @@
+$test javascript
+ 
+sheet("demo/demo")
+s0 = sprite(0,0,0)
+bg = 0
+load(bg, "demo/demo")
+
+function update(){
+  pos(s0, mx(), my())
+}

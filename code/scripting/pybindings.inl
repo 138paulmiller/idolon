@@ -69,7 +69,6 @@ BIND( idolon, my)
 //-------------------------------------------------------------------//
 BIND( idolon, clear)
 {
-	
 	Color c = { 255,0,0,0 };
 	if ( PyArg_ParseTuple( args, "iii", &c.r, &c.g, &c.b ) == 0 )
 	{
@@ -84,15 +83,13 @@ BIND( idolon, clear)
 
 //-------------------------------------------------------------------//
 BIND( idolon, key)
-{
-	
+{	
 	Key key;
 	if ( PyArg_ParseTuple( args, "i", &key ) == 0 )
 	{
 		ERR( "Expected args (int)" );
 		Py_RETURN_NONE;
 	}
-	printf( "KEY DOWN %d\n", Engine::GetKeyState( key ) );
 
 	return PyLong_FromLong(Engine::GetKeyState( key ));
 }
@@ -241,15 +238,17 @@ BIND(idolon, move )
 BIND(idolon, frame )
 {
 	
-	int id, tile; 
+	int id, tile = -1; 
 	
-	if ( PyArg_ParseTuple( args, "i|ii", &id, &id, &tile) == 0 )
+	if ( PyArg_ParseTuple( args, "i|i", &id, &tile) == 0 )
 	{
 		ERR( "Expected args (int, int?)" );
 		Py_RETURN_NONE;
 	}
-	
-	Runtime::FlipTo( id, tile);
+	if (tile != -1)
+	{
+		Runtime::FlipTo( id, tile);
+	}
 	return PyLong_FromLong(Runtime::Frame( id ));
 }
 //-------------------------------------------------------------------//

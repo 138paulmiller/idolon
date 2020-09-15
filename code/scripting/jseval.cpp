@@ -1,6 +1,8 @@
 
 #include <duktape/duktape.h>
 #include "jseval.hpp"
+#include "../rt.hpp"
+
 //https://duktape.org/guide.html
 
 typedef int ( *JsFunction )( duk_context *ctx );
