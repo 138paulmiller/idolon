@@ -12,16 +12,6 @@ struct JsBinding
 	const char *doc;
 };
 
-#define JSDECL(module, name, doc )\
-	{ #name, js_##module##_##name, doc } ,
-
-#define JSBIND(module, name) \
-	int js_##module##_##name(duk_context *ctx)
-
-
-#define JSERR(...) \
-	LOG(__VA_ARGS__)
-
 
 #include "jsbindings.inl"
 
@@ -31,7 +21,7 @@ namespace
 	duk_context *s_ctx;
 	JsBinding s_bindings[]= 
 	{
-		JS_BINDINGS
+		BINDINGS
 	};
 	const int s_bindingsCount = sizeof( s_bindings ) / sizeof( JsBinding );
 }
@@ -48,19 +38,14 @@ JsScript::~JsScript()
 void JsScript::compile()
 {
 	//load code
-	if ( duk_peval_lstring(s_ctx, code.c_str(), code.size()) != 0 ) {
-		/* Use duk_safe_to_string() to convert error into string.  This API
-		 * call is guaranteed not to throw an error during the coercion.
-		 */
-		JSERR( "Js Script error: %s\n", duk_safe_to_string( s_ctx, -1 ) );
-	}
+	JsEval::Execute(code);
 }
 
 bool JsScript::call(const std::string & func, TypedArg & ret, const std::vector<TypedArg> & args )
 {
 	if ( !duk_get_global_string( s_ctx, func.c_str() ) )
 	{
-		JSERR( "Js Script error: %s\n", duk_safe_to_string( s_ctx, -1 ) );
+		ERR( "Js Script error: %s\n", duk_safe_to_string( s_ctx, -1 ) );
 		return false;
 	}
 
@@ -111,6 +96,7 @@ namespace JsEval
 			duk_push_c_function(s_ctx, s_bindings[i].func, DUK_VARARGS);
 			duk_put_global_string(s_ctx, s_bindings[i].name);
 		}
+		JsEval::Execute(BINDINGS_CONSTS);
 
 	}
 
@@ -121,5 +107,11 @@ namespace JsEval
 
 	void Execute(const std::string & code)
 	{
+		if (duk_peval_lstring(s_ctx, code.c_str(), code.size()) != 0) {
+			/* Use duk_safe_to_string() to convert error into string.  This API
+			 * call is guaranteed not to throw an error during the coercion.
+			 */
+			ERR("Js Script error: %s\n", duk_safe_to_string(s_ctx, -1));
+		}
 	}
 } // namespace Eval

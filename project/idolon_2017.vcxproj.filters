@@ -197,6 +197,12 @@
     <None Include="..\code\scripting\pybindings.inl">
       <Filter>Source Files\scripting</Filter>
     </None>
+    <None Include="..\code\scripting\jsbindings.inl">
+      <Filter>Source Files\scripting</Filter>
+    </None>
+    <None Include="..\code\scripting\prologue.inl">
+      <Filter>Source Files\scripting</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source Files">

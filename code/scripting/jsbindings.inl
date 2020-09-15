@@ -1,40 +1,18 @@
 
-#define JS_PRELUDE R"(
-//layers
-BG=0
-SP=1
-FG=2
-UI=3
 
-//button states
-RELEASE = 0
-CLICK = 1
-HOLD = 2
+#define DECL(module, name, doc )\
+	{ #name, js_##module##_##name, doc } ,
 
-//keys
-ESCAPE = '\033'
-SHIFT = 127
-ALT = SHIFT + 1
-UP = ALT + 1
-DOWN = UP + 1
-LEFT = DOWN + 1
-RIGHT = LEFT + 1
-
-)"
+#define BIND(module, name) \
+	int js_##module##_##name(duk_context *ctx)
 
 
-#define JS_BINDINGS \
-	JSDECL( idolon, log		, "Log message to debug console and file"       )\
-	JSDECL( idolon, scrw    , "Get screen width "                           )\
-	JSDECL( idolon, scrh    , "Get screen height "                          )\
-	JSDECL( idolon, mx      , "Get mouse x position"                        )\
-	JSDECL( idolon, my      , "Get mouse y position"                        )\
-
+#include "prologue.inl"
 
 #define LOG_MAX 2048
 
 //-------------------------------------------------------------------//
-JSBIND(idolon, log)
+BIND(idolon, log)
 {
 	char buffer[LOG_MAX];
 	char *str = buffer;
@@ -59,7 +37,7 @@ JSBIND(idolon, log)
 		}
 		else
 		{
-			JSERR( "Js Script error: Invalid arg type" );
+			ERR( "Js Script error: Invalid arg type" );
 			break;
 		}
 		duk_pop( ctx );
@@ -71,7 +49,7 @@ JSBIND(idolon, log)
 }
 
 //-------------------------------------------------------------------//
-JSBIND(idolon, scrw)
+BIND(idolon, scrw)
 {
 	static int w = 0;
 	static int h = 0;
@@ -81,7 +59,7 @@ JSBIND(idolon, scrw)
 }
 
 //-------------------------------------------------------------------//
-JSBIND(idolon, scrh)
+BIND(idolon, scrh)
 {
 	static int w = 0;
 	static int h = 0;
@@ -91,7 +69,7 @@ JSBIND(idolon, scrh)
 }
 
 //-------------------------------------------------------------------//
-JSBIND( idolon, mx)
+BIND( idolon, mx)
 {
 	static int x = 0;
 	static int y = 0;
@@ -101,7 +79,7 @@ JSBIND( idolon, mx)
 }
 
 //-------------------------------------------------------------------//
-JSBIND( idolon, my)
+BIND( idolon, my)
 {
 	static int x = 0;
 	static int y = 0;
@@ -109,3 +87,71 @@ JSBIND( idolon, my)
 	duk_push_int(ctx, y);
     return 1;
 }
+
+
+BIND(idolon, clear)
+{
+	return 1;
+}
+
+BIND( idolon, key    ) 
+{
+	return 1;
+}
+
+BIND( idolon, load   ) 
+{
+	return 1;
+}
+
+BIND( idolon, unload ) 
+{
+	return 1;
+}
+
+BIND( idolon, view   ) 
+{
+	return 1;
+}
+
+BIND( idolon, scroll ) 
+{
+	return 1;
+}
+
+BIND( idolon, sprite ) 
+{
+	return 1;
+}
+
+BIND( idolon, kill   ) 
+{
+	return 1;
+}
+
+BIND( idolon, pos    ) 
+{
+	return 1;
+}
+
+BIND( idolon, move   ) 
+{
+	return 1;
+}
+
+BIND( idolon, frame  ) 
+{
+	return 1;
+}
+
+BIND( idolon, flip   ) 
+{
+	return 1;
+}
+
+BIND( idolon, sheet  ) 
+{
+	return 1;
+}
+
+

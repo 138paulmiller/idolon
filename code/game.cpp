@@ -51,6 +51,9 @@ namespace
 
 	Graphics::Map * s_maps[LAYER_COUNT];
 
+	//Scripts should be loaded from cartridge and written to disk. 
+	// should allow multiple imports. script compile should instead write to disk, then script run exectutes the code
+
 	bool s_mapsEnabled[LAYER_COUNT];
 	Game::Cartridge * m_cart;
 }

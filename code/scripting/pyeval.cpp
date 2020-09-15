@@ -16,15 +16,6 @@ int flags          //flag bits indicating how the call should be constructed
 const char * doc   //points to the contents of the docstring
 */
 
-#define PYDECL(module, name, doc )\
-	{ #name, py_##module##_##name, METH_VARARGS, doc },
-
-#define PYBIND(module, name) \
-	PyObject* py_##module##_##name(PyObject *self, PyObject *args)
-
-
-#define PYERR(...) \
-	LOG(__VA_ARGS__)
 
 
 namespace 
@@ -34,7 +25,7 @@ namespace
 
 	PyMethodDef s_pymethods[]
 	{	
-		PYTHON_BINDINGS
+		BINDINGS
 		{0,0,0,0}
 	};
 
@@ -84,7 +75,7 @@ void PyScript::compile()
 	LOG("Compiling %s\n", name.c_str());
 	if ( code.size() == 0 ) return;
 	//temp file 
-	const std::string &modulename = "tempscript";
+	const std::string &modulename = name;
 	const std::string & tempfilename = modulename + ".py";
 	const std::string & temppath = FS::Append(FS::Cwd(), tempfilename);
 	const std::string & tempdir  = FS::DirName( temppath);
@@ -97,7 +88,7 @@ void PyScript::compile()
 	}
 
 
-	tempfile << PYTHON_PRELUDE << code;
+	tempfile << BINDINGS_CONSTS << code;
 	tempfile.close();
 
 	//set execute dir

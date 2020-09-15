@@ -1,5 +1,5 @@
-/*
-Some notes
+/* 
+notes
 
  Mouse and sprites should be a type 
  https://docs.python.org/3.5/extending/newtypes.html
@@ -14,61 +14,23 @@ or
 	//issue with this impl is that it will be dict, i.e. mouse['x']
 */
 
+#define DECL(module, name, doc )\
+	{ #name, py_##module##_##name, METH_VARARGS, doc },
 
-#define PYTHON_PRELUDE R"(
-#layers
-BG=0
-SP=1
-FG=2
-UI=3
-#button states
-RELEASE = 0
-CLICK = 1
-HOLD = 2
+#define BIND(module, name) \
+	PyObject* py_##module##_##name(PyObject *self, PyObject *args)
 
-#keys
-ESCAPE = '\033'
-SHIFT = 127
-ALT = SHIFT + 1
-UP = ALT + 1
-DOWN = UP + 1
-LEFT = DOWN + 1
-RIGHT = LEFT + 1
-
-)"
-
-
-#define PYTHON_BINDINGS \
-	PYDECL( idolon, log     , "Log message to debug console and file"    	)\
-	PYDECL( idolon, scrw    , "Get screen width "                           )\
-	PYDECL( idolon, scrh    , "Get screen height "                          )\
-	PYDECL( idolon, mx      , "Get mouse x position"                        )\
-	PYDECL( idolon, my      , "Get mouse y position"                        )\
-	PYDECL( idolon, clear   , "Clear screen with color r,g,b"               )\
-	PYDECL( idolon, key     , "Get key state. 0 is up, 1 is down. 2 is hold")\
-	PYDECL( idolon, load    , "Load layer"                                  )\
-	PYDECL( idolon, unload  , "Unload layer"                                )\
-	PYDECL( idolon, view    , "Set the layer viewport"                      )\
-	PYDECL( idolon, scroll  , "Scroll layer by dx,dy"                       )\
-	PYDECL( idolon, sprite  , "Spawn sprite "                               )\
-	PYDECL( idolon, kill    , "Despawn sprite "                             )\
-	PYDECL( idolon, pos     , "Get or set sprite position"                  )\
-	PYDECL( idolon, move    , "Move sprite by x,y"                          )\
-	PYDECL( idolon, frame   , "Get or set sprite current tile"              )\
-	PYDECL( idolon, flip    , "Flip sprite tile by di"                      )\
-	PYDECL( idolon, sheet   , "Set surrent sprite sheetsprite "             )\
-
-
+#include "prologue.inl"
 
 //-------------------------------------------------------------------//
-PYBIND(idolon, log)
+BIND(idolon, log)
 {
 	//todo log t
 	Py_RETURN_NONE;
 }
 
 //-------------------------------------------------------------------//
-PYBIND(idolon, scrw)
+BIND(idolon, scrw)
 {
 	static int w = 0;
 	static int h = 0;
@@ -77,7 +39,7 @@ PYBIND(idolon, scrw)
 }
 
 //-------------------------------------------------------------------//
-PYBIND(idolon, scrh)
+BIND(idolon, scrh)
 {
 	static int w = 0;
 	static int h = 0;
@@ -86,7 +48,7 @@ PYBIND(idolon, scrh)
 }
 
 //-------------------------------------------------------------------//
-PYBIND( idolon, mx)
+BIND( idolon, mx)
 {
 	static int x = 0;
 	static int y = 0;
@@ -95,7 +57,7 @@ PYBIND( idolon, mx)
 }
 
 //-------------------------------------------------------------------//
-PYBIND( idolon, my)
+BIND( idolon, my)
 {
 	
 	static int x = 0;
@@ -105,13 +67,13 @@ PYBIND( idolon, my)
 }
 
 //-------------------------------------------------------------------//
-PYBIND( idolon, clear)
+BIND( idolon, clear)
 {
 	
 	Color c = { 255,0,0,0 };
 	if ( PyArg_ParseTuple( args, "iii", &c.r, &c.g, &c.b ) == 0 )
 	{
-		PYERR( "Expected args (int, int, int)" );
+		ERR( "Expected args (int, int, int)" );
 	}
 	else 
 	{
@@ -121,13 +83,13 @@ PYBIND( idolon, clear)
 }
 
 //-------------------------------------------------------------------//
-PYBIND( idolon, key)
+BIND( idolon, key)
 {
 	
 	Key key;
 	if ( PyArg_ParseTuple( args, "i", &key ) == 0 )
 	{
-		PYERR( "Expected args (int)" );
+		ERR( "Expected args (int)" );
 		Py_RETURN_NONE;
 	}
 	printf( "KEY DOWN %d\n", Engine::GetKeyState( key ) );
@@ -135,14 +97,14 @@ PYBIND( idolon, key)
 	return PyLong_FromLong(Engine::GetKeyState( key ));
 }
 //-------------------------------------------------------------------//
-PYBIND( idolon, load)
+BIND( idolon, load)
 {
 	
 	int layer; 
 	char *mapname;
 	if ( PyArg_ParseTuple( args, "is", &layer, &mapname ) == 0 )
 	{
-		PYERR( "Expected args (int, string)" );
+		ERR( "Expected args (int, string)" );
 	}
 	else
 	{
@@ -151,13 +113,13 @@ PYBIND( idolon, load)
 	Py_RETURN_NONE;
 }
 //-------------------------------------------------------------------//
-PYBIND( idolon, unload)
+BIND( idolon, unload)
 {
 	
 	int layer; 
 	if ( PyArg_ParseTuple( args, "i", &layer)== 0 )
 	{
-		PYERR( "Expected args (int)" );
+		ERR( "Expected args (int)" );
 	}
 	else
 	{
@@ -166,13 +128,13 @@ PYBIND( idolon, unload)
 	Py_RETURN_NONE;
 }
 //-------------------------------------------------------------------//
-PYBIND( idolon, view)
+BIND( idolon, view)
 {
 	
 	int layer, x,y,w,h; 
 	if ( PyArg_ParseTuple( args, "iiiii", &layer, &x, &y, &w, &h )== 0 )
 	{
-		PYERR( "Expected args (int, int, int)" );
+		ERR( "Expected args (int, int, int)" );
 	}
 	else
 	{
@@ -181,13 +143,13 @@ PYBIND( idolon, view)
 	Py_RETURN_NONE;
 }
 //-------------------------------------------------------------------//
-PYBIND( idolon, scroll)
+BIND( idolon, scroll)
 {
 	
 	int layer, x,y; 
 	if ( PyArg_ParseTuple( args, "iii", &layer, &x, &y)== 0 )
 	{
-		PYERR( "Expected args (int, int, int)" );
+		ERR( "Expected args (int, int, int)" );
 	}
 	else
 	{
@@ -197,14 +159,14 @@ PYBIND( idolon, scroll)
 }
 
 //-------------------------------------------------------------------//
-PYBIND( idolon, sprite )
+BIND( idolon, sprite )
 {
 	
 	int id = -1;
 	int tile,  x,  y,  isSmall = true;
 	if ( PyArg_ParseTuple( args, "iii|i", &tile, &x, &y, &isSmall)== 0 )
 	{
-		PYERR( "Expected args (int, int, int, int?)" );
+		ERR( "Expected args (int, int, int, int?)" );
 	}
 	else
 	{
@@ -214,13 +176,13 @@ PYBIND( idolon, sprite )
 	return PyLong_FromLong(id);
 }
 //-------------------------------------------------------------------//
-PYBIND( idolon, kill )
+BIND( idolon, kill )
 {
 	
 	int id; 
 	if ( PyArg_ParseTuple( args, "i", &id)== 0 )
 	{
-		PYERR( "Expected args (int)" );
+		ERR( "Expected args (int)" );
 	}
 	else
 	{
@@ -230,14 +192,14 @@ PYBIND( idolon, kill )
 	Py_RETURN_NONE;
 }
 //-------------------------------------------------------------------//
-PYBIND( idolon, pos )
+BIND( idolon, pos )
 {
 	
 	int id, x = -1,y = -1; 
 
 	if ( PyArg_ParseTuple( args, "i|ii", &id,  &x, &y) == 0 )
 	{
-		PYERR( "Expected args (int, int?, int?)" );
+		ERR( "Expected args (int, int?, int?)" );
 	
 		Py_RETURN_NONE;
 	}
@@ -259,13 +221,13 @@ PYBIND( idolon, pos )
 }
 
 //-------------------------------------------------------------------//
-PYBIND(idolon, move )
+BIND(idolon, move )
 {
 	
 	int id, dx,dy; 
 	if ( PyArg_ParseTuple( args, "iii", &id, &dx, &dy)== 0 )
 	{
-		PYERR( "Expected args (int, int, int)" );
+		ERR( "Expected args (int, int, int)" );
 	}
 	else
 	{
@@ -276,14 +238,14 @@ PYBIND(idolon, move )
 }
 
 //-------------------------------------------------------------------//
-PYBIND(idolon, frame )
+BIND(idolon, frame )
 {
 	
 	int id, tile; 
 	
 	if ( PyArg_ParseTuple( args, "i|ii", &id, &id, &tile) == 0 )
 	{
-		PYERR( "Expected args (int, int?)" );
+		ERR( "Expected args (int, int?)" );
 		Py_RETURN_NONE;
 	}
 	
@@ -291,12 +253,12 @@ PYBIND(idolon, frame )
 	return PyLong_FromLong(Runtime::Frame( id ));
 }
 //-------------------------------------------------------------------//
-PYBIND(idolon, flip )
+BIND(idolon, flip )
 {	
 	int id, di; 
 	if ( PyArg_ParseTuple( args, "ii", &id, &di)== 0 )
 	{
-		PYERR( "Expected args (int, int)" );
+		ERR( "Expected args (int, int)" );
 	}
 	else
 	{
@@ -307,12 +269,12 @@ PYBIND(idolon, flip )
 }
 
 //-------------------------------------------------------------------//
-PYBIND(idolon, sheet )
+BIND(idolon, sheet )
 {
 	char *sheet ;
 	if ( PyArg_ParseTuple( args, "s", &sheet  ) == 0 )
 	{
-		PYERR( "Expected args (string)" );
+		ERR( "Expected args (string)" );
 	}
 	else
 	{
