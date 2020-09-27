@@ -211,8 +211,8 @@ BIND( idolon, pos )
 	PyObject *xy = PyTuple_New(2);
 	PyTuple_SetItem( xy, 0, PyLong_FromLong( x ) );
 	PyTuple_SetItem( xy, 1, PyLong_FromLong( y ) );
-	
 	Py_XINCREF( xy );
+
 	return xy;
 
 }

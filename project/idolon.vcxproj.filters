@@ -29,6 +29,9 @@
     <Filter Include="Source Files\assets">
       <UniqueIdentifier>{4efbf390-e071-4418-bfb1-c88c0cc57a85}</UniqueIdentifier>
     </Filter>
+    <Filter Include="System Files\assets\game">
+      <UniqueIdentifier>{d8b716d7-cd3a-4859-b23b-35a06ba9daf4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\code\scripting\pybindings.inl">
@@ -72,6 +75,15 @@
     </None>
     <None Include="..\code\scripting\jsbindings.inl">
       <Filter>Source Files\scripting</Filter>
+    </None>
+    <None Include="..\code\scripting\bindings.inl">
+      <Filter>Source Files\scripting</Filter>
+    </None>
+    <None Include="..\code\scripting\prologue.inl">
+      <Filter>Source Files\scripting</Filter>
+    </None>
+    <None Include="..\system\assets\game\main.scr">
+      <Filter>System Files\assets\game</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -159,11 +171,11 @@
     <ClInclude Include="..\code\assets\api.hpp">
       <Filter>Source Files\assets</Filter>
     </ClInclude>
-    <ClInclude Include="..\code\rt.hpp">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\code\scripting\jseval.hpp">
       <Filter>Source Files\scripting</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\idolon.hpp">
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -233,11 +245,11 @@
     <ClCompile Include="..\code\editors\gameeditor.cpp">
       <Filter>Source Files\editors</Filter>
     </ClCompile>
-    <ClCompile Include="..\code\rt.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\code\scripting\jseval.cpp">
       <Filter>Source Files\scripting</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\idolon.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

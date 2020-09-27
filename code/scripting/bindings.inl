@@ -1,115 +1,12 @@
 
-
-#define DECL(module, name, doc )\
-	{ #name, js_##module##_##name, doc } ,
-
-#define BIND(module, name) \
-	int js_##module##_##name(duk_context *ctx)
-
-
-#include "prologue.inl"
-
-#define LOG_MAX 2048
-
-//Note args are pushed in reverse order
-
-#define ARG_STR_OPT(var) \
-	if (duk_get_top(ctx) && duk_get_type_mask(ctx, -1) & DUK_TYPE_MASK_STRING)\
-	{\
-		var = duk_safe_to_string(ctx, -1);\
-		duk_pop( ctx );\
-	}
-
-#define ARG_STR(var) \
-	ARG_STR_OPT(var)\
-	else\
-	{\
-		LOG("Script : Js : Expected string");\
-		return 0;\
-	}
-
-#define ARG_INT_OPT(var) \
-	if (duk_get_top(ctx) && duk_get_type_mask(ctx, -1) & DUK_TYPE_MASK_NUMBER)\
-	{\
-		var = duk_to_int(ctx, -1);\
-		duk_pop( ctx );\
-	}
-
-#define ARG_INT(var) \
-	ARG_INT_OPT(var)\
-	else\
-	{\
-		LOG("Script : Js : Expected integer");\
-		return 0;\
-	}
-
-
-
-#define RET() \
-	return 1;
-
-#define RET_INT(value) \
-	duk_push_int(ctx, value);\
-	return 1;
-
-//Object return 
-
-#define RET_BEG(obj) \
-	duk_idx_t obj = duk_push_object(ctx);
-
-#define RET_SET_INT(obj, id, value ) \
-	duk_push_int(ctx, value);\
-	duk_put_prop_string(ctx, obj, id);
-
-#define RET_END(obj ) \
-	return 1;
-
-
-//-------------------------------------------------------------------//
-BIND(idolon, log)
-{
-	
-	char buffer[LOG_MAX];
-	char *str = buffer;
-	while ( duk_get_top( ctx ) )
-	{
-		if ( str - buffer > LOG_MAX ) break;
-		if ( duk_get_type_mask( ctx, -1 ) & DUK_TYPE_MASK_STRING )
-		{
-			const char * strarg = duk_safe_to_string( ctx, -1 );
-			str+=sprintf_s( str, LOG_MAX, "%s ", strarg );
-		}
-		else if (duk_get_type_mask( ctx, -1 ) & DUK_TYPE_MASK_NUMBER )
-		{
-			const int numarg = duk_to_number( ctx, -1 );
-			str+=sprintf_s( str, LOG_MAX, "%d ", numarg );
-
-		}
-		else if (duk_get_type_mask( ctx, -1 ) & DUK_TYPE_MASK_BOOLEAN )
-		{
-			const int numarg = duk_to_boolean( ctx, -1 );
-			str+=sprintf_s( str, LOG_MAX, "%d ", numarg );
-		}
-		else
-		{
-			ERR( "Js Script error: Invalid arg type" );
-			break;
-		}
-		duk_pop( ctx );
-	}
-
-	LOG( buffer );
-	LOG( "\n" );
-	return 1;
-}
-
 //-------------------------------------------------------------------//
 BIND(idolon, scrw)
 {
 	static int w = 0;
 	static int h = 0;
 	Engine::GetSize(w, h);
-	RET_INT( w );
+	duk_push_int(ctx, w);
+    return 1;
 }
 
 //-------------------------------------------------------------------//
@@ -118,8 +15,8 @@ BIND(idolon, scrh)
 	static int w = 0;
 	static int h = 0;
 	Engine::GetSize(w, h);
-	RET_INT( h );
-
+	duk_push_int(ctx, h);
+    return 1;
 }
 
 //-------------------------------------------------------------------//
@@ -128,8 +25,8 @@ BIND( idolon, mx)
 	static int x = 0;
 	static int y = 0;
 	Engine::GetMousePosition( x, y);
-	RET_INT( x );
-
+	duk_push_int(ctx, x);
+    return 1;
 }
 
 //-------------------------------------------------------------------//
@@ -138,7 +35,8 @@ BIND( idolon, my)
 	static int x = 0;
 	static int y = 0;
 	Engine::GetMousePosition( x, y);
-	RET_INT( y );
+	duk_push_int(ctx, y);
+    return 1;
 }
 
 
@@ -150,15 +48,17 @@ BIND(idolon, clear)
 	ARG_INT(c.g);
 	ARG_INT(c.r);
 	Engine::ClearScreen(c);
-	RET();
+
+	return 1;
 }
 
 BIND( idolon, key    ) 
 {
 	int key;
 	ARG_INT(key);
-	const int state = Engine::GetKeyState( static_cast<Key>( key ) );
-	RET_INT(state);
+
+	duk_push_int(ctx, Engine::GetKeyState(static_cast<Key>(key)));
+	return 1;
 }
 
 BIND( idolon, load   ) 
@@ -171,7 +71,8 @@ BIND( idolon, load   )
 	ARG_INT(layer);
 	
 	Runtime::Load(layer, mapname);
-	RET();
+
+	return 1;
 }
 
 BIND( idolon, unload ) 
@@ -179,8 +80,10 @@ BIND( idolon, unload )
 	int layer;
 	
 	ARG_INT(layer);
+
 	Runtime::Unload(layer);
-	RET();
+
+	return 1;
 }
 
 BIND( idolon, view   ) 
@@ -194,7 +97,8 @@ BIND( idolon, view   )
 	ARG_INT(layer);
 	
 	Runtime::View(layer, x, y, w, h);
-	RET();
+	
+	return 1;
 }
 
 BIND( idolon, scroll ) 
@@ -206,7 +110,8 @@ BIND( idolon, scroll )
 	ARG_INT(layer);
 
 	Runtime::Scroll(layer, x, y);
-	RET();
+	
+	return 1;
 }
 
 BIND( idolon, sprite ) 
@@ -221,7 +126,8 @@ BIND( idolon, sprite )
 
 	id = Runtime::Spawn(tile, x, y, isSmall);
 
-	RET_INT(id);
+	duk_push_int(ctx, id);
+	return 1;
 }
 
 BIND( idolon, kill   ) 
@@ -231,7 +137,7 @@ BIND( idolon, kill   )
 
 	Runtime::Despawn(id);
 
-	RET();
+	return 1;
 }
 
 BIND( idolon, pos    ) 
@@ -248,10 +154,14 @@ BIND( idolon, pos    )
 
 	Runtime::MoveTo(id, x, y);
 
-	RET_BEG( obj );
-	RET_SET_INT( obj, "x", x );
-	RET_SET_INT( obj, "y", y );
-	RET_END( );
+	duk_idx_t obj = duk_push_object(ctx);
+	duk_push_int(ctx, x);
+	duk_put_prop_string(ctx, obj, "x");
+
+	duk_push_int(ctx, y);
+	duk_put_prop_string(ctx, obj, "y");
+	
+	return 1;
 }
 
 BIND( idolon, move   ) 
@@ -262,8 +172,8 @@ BIND( idolon, move   )
 	ARG_INT(id);
 	
 	Runtime::MoveBy(id, dx, dy);
-	RET( );
 
+	return 1;
 }
 
 BIND( idolon, frame  ) 
@@ -276,9 +186,10 @@ BIND( idolon, frame  )
 	{
 		Runtime::FlipTo(id, tile);
 	}
-
-	RET_INT( Runtime::Frame(id));
 	
+	duk_push_int(ctx, Runtime::Frame(id));
+	
+	return 1;
 }
 
 BIND( idolon, flip   ) 
@@ -289,7 +200,7 @@ BIND( idolon, flip   )
 
 	Runtime::FlipBy(id, di);
 
-	RET();
+	return 1;
 }
 
 BIND( idolon, sheet  ) 
@@ -298,7 +209,8 @@ BIND( idolon, sheet  )
 	ARG_STR(sheet);
 	
 	Runtime::Sheet(sheet);
-	RET();
+
+	return 1;
 }
 
 

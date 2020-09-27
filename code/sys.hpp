@@ -4,7 +4,6 @@
 
 */
 #include "config.hpp"
-#include "rt.hpp"
 #include "game.hpp"
 #include "algo.hpp"
 #include "shell.hpp"
@@ -12,6 +11,7 @@
 #include "scripting/api.hpp"
 #include "assets/api.hpp"
 
+#include "idolon.hpp"
 
 enum : uint8
 {
