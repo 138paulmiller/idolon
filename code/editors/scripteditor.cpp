@@ -111,7 +111,7 @@ void ScriptEditor::reload()
 {
 	Assets::Unload<Script>(m_scriptName);
 	m_script = Assets::Load<Script>(m_scriptName);
-	
+	if ( !m_script ) { return; }
 	m_codeArea->setText(m_script->code);
 	m_codeArea->resetCursor();
 

@@ -46,9 +46,6 @@
     <None Include="..\system\assets\full.fnt">
       <Filter>System Files\assets</Filter>
     </None>
-    <None Include="..\system\game.py">
-      <Filter>System Files</Filter>
-    </None>
     <None Include="..\system\.gitignore">
       <Filter>System Files</Filter>
     </None>

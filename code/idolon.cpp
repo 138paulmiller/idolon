@@ -159,6 +159,7 @@ namespace Runtime
 				return map->tiles[ty * map->w + tx];
 			}
 		)
+		return -1;
 	}
 	// =============================== Sprite ==================================
 

@@ -1,10 +1,9 @@
 $test javascript
  
 sheet("demo/demo")
-s0 = sprite(0,0,0)
-bg = 0
-load(bg, "demo/demo")
+spr0 = sprite(0,0,0)
+load(0, "demo/demo")
 
 function update(){
-  pos(s0, mx(), my())
+  pos(spr0, mx(), my())
 }

@@ -248,7 +248,7 @@ bool MapEditor::handleTool()
 			if (( Engine::GetMouseButtonState( MOUSEBUTTON_LEFT ) == BUTTON_CLICK )
 				|| ( Engine::GetMouseButtonState( MOUSEBUTTON_LEFT ) == BUTTON_HOLD ))
 			{
-				const Rect& cursor = m_map->tile( m_tooldata.mx, m_tooldata.my );
+				const Rect& cursor = m_map->getTileRect( m_tooldata.mx, m_tooldata.my );
 				if ( cursor.w != -1 )
 				{
 					//set tile
@@ -283,7 +283,7 @@ bool MapEditor::handleTool()
 			if (( Engine::GetMouseButtonState( MOUSEBUTTON_LEFT ) == BUTTON_CLICK )
 				|| ( Engine::GetMouseButtonState( MOUSEBUTTON_LEFT ) == BUTTON_HOLD ))
 			{
-				const Rect& cursor = m_map->tile( m_tooldata.mx, m_tooldata.my );
+				const Rect& cursor = m_map->getTileRect( m_tooldata.mx, m_tooldata.my );
 				if ( cursor.w != -1 )
 				{
 					//set tile
@@ -312,7 +312,7 @@ void MapEditor::drawOverlay()
 	memset(m_overlay->pixels, 0,  m_overlay->w * m_overlay->h * sizeof(Color));
 	m_overlay->update();
 
-	const Rect& tile = m_map->tile( m_tooldata.mx, m_tooldata.my );
+	const Rect& tile = m_map->getTileRect( m_tooldata.mx, m_tooldata.my );
 	switch(m_tool)
 	{
 		case MAP_TOOL_PIXEL:

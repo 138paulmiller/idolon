@@ -1,5 +1,5 @@
-Temp/
-Build/
+build/
 .vs/
 idolon
 root/
+x64/

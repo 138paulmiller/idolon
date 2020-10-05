@@ -264,7 +264,7 @@ namespace Graphics
         Engine::DrawTexture( m_texture, view, rect );
     }
 
-    Rect Map::tile(int scrx, int scry)
+    Rect Map::getTileRect(int scrx, int scry)
     {
          //tile xy in screen space 
         int tilex;
