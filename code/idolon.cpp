@@ -3,7 +3,7 @@
 #include "game.hpp"
 
 
-namespace Runtime
+namespace Idolon
 {
 	//TODO Sprite Manager should use octree
 	struct SpriteManager
@@ -77,7 +77,7 @@ namespace Runtime
 	}
 
 
-namespace Runtime
+namespace Idolon
 {
 	void Boot( const char *cartname )
 	{

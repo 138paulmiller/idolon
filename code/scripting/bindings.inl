@@ -1,3 +1,63 @@
+//API that must be defined in order to support language bindings
+//#define DECL(module, name, doc )
+//#define BIND(module, name) 
+//#define ARG_STR_OPT(var)
+//#define ARG_STR(var) 
+//#define ARG_INT_OPT(var) 
+//#define ARG_INT(var) 
+//#define RET() 
+//#define RET_INT(value) 
+//#define RET_BEG(obj,cnt) 
+//#define RET_SET_INT(obj, id, value ) 
+//#define RET_END( obj )
+
+
+//Arguments are called in order determined by popping call stack (reversed)!
+
+#define ERR(...) \
+	LOG(__VA_ARGS__)
+
+#define BINDINGS_CONSTS  R"(
+BG=0
+SP=1
+FG=2
+UI=3
+RELEASE = 0
+CLICK = 1
+HOLD = 2
+ESCAPE = '\033'
+SHIFT = 127
+ALT = SHIFT + 1
+UP = ALT + 1
+DOWN = UP + 1
+LEFT = DOWN + 1
+RIGHT = LEFT + 1
+)"
+
+
+#define BINDINGS \
+	DECL( idolon, log     , "Log message to debug console and file"    	)\
+	DECL( idolon, scrw    , "Get screen width "                           )\
+	DECL( idolon, scrh    , "Get screen height "                          )\
+	DECL( idolon, mx      , "Get mouse x position"                        )\
+	DECL( idolon, my      , "Get mouse y position"                        )\
+	DECL( idolon, clear   , "Clear screen with color r,g,b"               )\
+	DECL( idolon, key     , "Get key state. 0 is up, 1 is down. 2 is hold")\
+	DECL( idolon, load    , "Load layer"                                  )\
+	DECL( idolon, unload  , "Unload layer"                                )\
+	DECL( idolon, view    , "Set the layer viewport"                      )\
+	DECL( idolon, scroll  , "Scroll layer by dx,dy"                       )\
+	DECL( idolon, sprite  , "Spawn sprite "                               )\
+	DECL( idolon, kill    , "Despawn sprite "                             )\
+	DECL( idolon, pos     , "Set sprite position"                  )\
+	DECL( idolon, move    , "Move sprite by x,y"                          )\
+	DECL( idolon, frame   , "Set sprite current tile"              )\
+	DECL( idolon, flip    , "Flip sprite tile by di"                      )\
+	DECL( idolon, sheet   , "Set surrent sprite sheetsprite "             )\
+
+
+
+
 
 //-------------------------------------------------------------------//
 BIND(idolon, scrw)
@@ -5,8 +65,7 @@ BIND(idolon, scrw)
 	static int w = 0;
 	static int h = 0;
 	Engine::GetSize(w, h);
-	duk_push_int(ctx, w);
-    return 1;
+	RET_INT( w );
 }
 
 //-------------------------------------------------------------------//
@@ -15,8 +74,8 @@ BIND(idolon, scrh)
 	static int w = 0;
 	static int h = 0;
 	Engine::GetSize(w, h);
-	duk_push_int(ctx, h);
-    return 1;
+	RET_INT( h );
+
 }
 
 //-------------------------------------------------------------------//
@@ -25,8 +84,8 @@ BIND( idolon, mx)
 	static int x = 0;
 	static int y = 0;
 	Engine::GetMousePosition( x, y);
-	duk_push_int(ctx, x);
-    return 1;
+	RET_INT( x );
+
 }
 
 //-------------------------------------------------------------------//
@@ -35,8 +94,7 @@ BIND( idolon, my)
 	static int x = 0;
 	static int y = 0;
 	Engine::GetMousePosition( x, y);
-	duk_push_int(ctx, y);
-    return 1;
+	RET_INT( y );
 }
 
 
@@ -48,31 +106,27 @@ BIND(idolon, clear)
 	ARG_INT(c.g);
 	ARG_INT(c.r);
 	Engine::ClearScreen(c);
-
-	return 1;
+	RET();
 }
 
 BIND( idolon, key    ) 
 {
 	int key;
 	ARG_INT(key);
-
-	duk_push_int(ctx, Engine::GetKeyState(static_cast<Key>(key)));
-	return 1;
+	const int state = Engine::GetKeyState( static_cast<Key>( key ) );
+	RET_INT(state);
 }
 
 BIND( idolon, load   ) 
 {	
 	int layer;
 	const char *mapname;
-	int m = duk_get_type_mask(ctx, -1);
 	
 	ARG_STR(mapname);
 	ARG_INT(layer);
 	
-	Runtime::Load(layer, mapname);
-
-	return 1;
+	Idolon::Load(layer, mapname);
+	RET();
 }
 
 BIND( idolon, unload ) 
@@ -80,10 +134,8 @@ BIND( idolon, unload )
 	int layer;
 	
 	ARG_INT(layer);
-
-	Runtime::Unload(layer);
-
-	return 1;
+	Idolon::Unload(layer);
+	RET();
 }
 
 BIND( idolon, view   ) 
@@ -96,9 +148,8 @@ BIND( idolon, view   )
 	ARG_INT(x);
 	ARG_INT(layer);
 	
-	Runtime::View(layer, x, y, w, h);
-	
-	return 1;
+	Idolon::View(layer, x, y, w, h);
+	RET();
 }
 
 BIND( idolon, scroll ) 
@@ -109,9 +160,8 @@ BIND( idolon, scroll )
 	ARG_INT(x);
 	ARG_INT(layer);
 
-	Runtime::Scroll(layer, x, y);
-	
-	return 1;
+	Idolon::Scroll(layer, x, y);
+	RET();
 }
 
 BIND( idolon, sprite ) 
@@ -124,10 +174,9 @@ BIND( idolon, sprite )
 	ARG_INT(x);
 	ARG_INT(tile);
 
-	id = Runtime::Spawn(tile, x, y, isSmall);
+	id = Idolon::Spawn(tile, x, y, isSmall);
 
-	duk_push_int(ctx, id);
-	return 1;
+	RET_INT(id);
 }
 
 BIND( idolon, kill   ) 
@@ -135,33 +184,29 @@ BIND( idolon, kill   )
 	int id = -1;
 	ARG_INT(id);
 
-	Runtime::Despawn(id);
+	Idolon::Despawn(id);
 
-	return 1;
+	RET();
 }
 
 BIND( idolon, pos    ) 
 {
 	int id, x = -1, y = -1;
-	ARG_INT_OPT(y);
-	ARG_INT_OPT(x);
+	ARG_INT(y);
+	ARG_INT(x);
 	ARG_INT(id);
 	//get pos
 	if (x == -1 && y == -1)
 	{
-		Runtime::Position(id, x, y);
+		Idolon::Position(id, x, y);
 	}
 
-	Runtime::MoveTo(id, x, y);
+	Idolon::MoveTo(id, x, y);
 
-	duk_idx_t obj = duk_push_object(ctx);
-	duk_push_int(ctx, x);
-	duk_put_prop_string(ctx, obj, "x");
-
-	duk_push_int(ctx, y);
-	duk_put_prop_string(ctx, obj, "y");
-	
-	return 1;
+	RET_BEG( obj, 2 );
+	RET_SET_INT( obj, "x", x );
+	RET_SET_INT( obj, "y", y );
+	RET_END( obj );
 }
 
 BIND( idolon, move   ) 
@@ -171,25 +216,24 @@ BIND( idolon, move   )
 	ARG_INT(dx);
 	ARG_INT(id);
 	
-	Runtime::MoveBy(id, dx, dy);
+	Idolon::MoveBy(id, dx, dy);
+	RET( );
 
-	return 1;
 }
 
 BIND( idolon, frame  ) 
 {
-	int id, tile = - 1;
-	ARG_INT_OPT(tile);
+	int id, tile;
+	ARG_INT(tile);
 	ARG_INT(id);
 
 	if (tile != -1)
 	{
-		Runtime::FlipTo(id, tile);
+		Idolon::FlipTo(id, tile);
 	}
+
+	RET_INT( Idolon::Frame(id));
 	
-	duk_push_int(ctx, Runtime::Frame(id));
-	
-	return 1;
 }
 
 BIND( idolon, flip   ) 
@@ -198,9 +242,9 @@ BIND( idolon, flip   )
 	ARG_INT(di);
 	ARG_INT(id);
 
-	Runtime::FlipBy(id, di);
+	Idolon::FlipBy(id, di);
 
-	return 1;
+	RET();
 }
 
 BIND( idolon, sheet  ) 
@@ -208,9 +252,8 @@ BIND( idolon, sheet  )
 	const char *sheet;
 	ARG_STR(sheet);
 	
-	Runtime::Sheet(sheet);
-
-	return 1;
+	Idolon::Sheet(sheet);
+	RET();
 }
 
 

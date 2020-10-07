@@ -1,13 +1,28 @@
 #pragma once
 
+//TODO This will be dll api
+
 //Game Runtime API 
-namespace Runtime
+namespace Idolon
 {
 	//boot from cartridge. this will load data into ram. otherwise will use assets syste
 	void Boot(const char * cartname);
 	void Step();
 	void Quit();
 
+	////TODO - asset api to create/load assets from disk or datas. use 
+	//void Load( const char *assetName )
+	//{}
+	//void Create( const char *assetName )
+	//{}
+	//
+	//void Destroy( int id )
+	//{}
+	////if empty ,will use generated
+	//void Save( int id, const char *assetName = "" )
+	//{}
+
+	//
 
 	//======= map api  =========
 	//load map into layer. unloads previous

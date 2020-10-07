@@ -14,6 +14,7 @@ public:
 
 
 private:
+	bool m_compiled;
 };
 
 
@@ -22,6 +23,6 @@ namespace JsEval
 {
 	void Startup();
 	void Shutdown();
-	void Execute(const std::string & code);
+	bool Execute(const std::string & code);
 
 }

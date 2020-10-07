@@ -77,7 +77,7 @@ namespace
 	ScriptLanguage s_lang;
 	typedef void(*StartupFunc)() ;
 	typedef void(*ShutdownFunc)();
-	typedef void(*ExecuteFunc)(const std::string & code);
+	typedef bool(*ExecuteFunc)(const std::string & code);
 
 	StartupFunc s_startupImpl = 0 ;
 	ShutdownFunc s_shutdownImpl = 0;

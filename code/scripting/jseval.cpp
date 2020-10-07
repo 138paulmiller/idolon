@@ -31,6 +31,7 @@ namespace
 JsScript::JsScript(const std::string & name)
 	:Script(name, SCRIPT_JAVASCRIPT)
 {
+	m_compiled = false;
 }
 
 JsScript::~JsScript()
@@ -40,11 +41,15 @@ JsScript::~JsScript()
 void JsScript::compile()
 {
 	//load code
-	JsEval::Execute(code);
+	m_compiled = JsEval::Execute(code);
 }
 
 bool JsScript::call(const std::string & func, TypedArg & ret, const std::vector<TypedArg> & args )
 {
+	if ( !m_compiled )
+	{
+		return false;
+	}
 	if ( !duk_get_global_string( s_ctx, func.c_str() ) )
 	{
 		ERR( "Js Script error: %s\n", duk_safe_to_string( s_ctx, -1 ) );
@@ -80,19 +85,27 @@ bool JsScript::call(const std::string & func, TypedArg & ret, const std::vector<
 			break;
 	}
 	//pop return
-	duk_pop(s_ctx);
+	duk_pop(s_ctx );
 	return true;
 }
 
 
  //=========================================== PyEval ==================================================
 
+static void my_fatal(void *udata, const char *msg) 
+{
+    /* Note that 'msg' may be NULL. */
+    ERR("Js Script error: %s\n", (msg ? msg : "no message"));
+}
 
 namespace JsEval
 {
 	void Startup()
 	{		
-		s_ctx = duk_create_heap_default();
+		void *my_udata = (void *) 0xdeadbeef;  /* whatever's most useful, can be NULL */
+
+		s_ctx = duk_create_heap(NULL, NULL, NULL, my_udata, my_fatal);
+		
 		for ( int i = 0; i < s_bindingsCount; i++ )
 		{
 			duk_push_c_function(s_ctx, s_bindings[i].func, DUK_VARARGS);
@@ -107,13 +120,16 @@ namespace JsEval
 		duk_destroy_heap(s_ctx);
 	}
 
-	void Execute(const std::string & code)
+	bool Execute(const std::string & code)
 	{
 		if (duk_peval_lstring(s_ctx, code.c_str(), code.size()) != 0) {
 			/* Use duk_safe_to_string() to convert error into string.  This API
 			 * call is guaranteed not to throw an error during the coercion.
 			 */
 			ERR("Js Script error: %s\n", duk_safe_to_string(s_ctx, -1));
+			duk_pop(s_ctx);  /* pop result */
+			return false;
 		}
+		return true;
 	}
 } // namespace Eval

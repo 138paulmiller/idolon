@@ -1,9 +1,77 @@
 $test javascript
+// anim obj {frames:[], frameMs:-1}
+
+function Player (tile, x, y, anims ){
+    this.x = x
+    this.y = y
+    this.tile = tile
+    this.id = sprite(tile,x,y)
+    this.anims = anims
+    this.anim = null
+
+    this.animate = function(animIndex ){
+        this.animIndex  = animIndex
+        this.frame = 0
+        this.startTime = new Date()
+        if( this.animIndex < this.anims.length ) {
+            this.anim = this.anims[this.animIndex]
+            this.tile = this.anim.frames[this.frame]
+            frame(this.frame)
+        }
+    }
+
+
+    this.update = function(){              
+        now = new Date()
+        elapsed = now - this.startTime  
+
+        if( this.anim && elapsed > this.anim.frameMs ){
+            this.frame+=1
+            this.frame %= this.anim.frames.length   
+            this.startTime = new Date()
+            this.tile = this.anim.frames[this.frame]
+            frame(this.tile)
+        }
+
+        pos(this.id , this.x, this.y)
+    }
+}
  
 sheet("demo/demo")
-spr0 = sprite(0,0,0)
-load(0, "demo/demo")
+load(0, "demo/demo" )
 
-function update(){
-  pos(spr0, mx(), my())
+P0 = new Player(0, 0, 0, [])
+
+function onframe(deltaSec) {
+    P0.update()
+}
+
+
+function onkey(key, state){
+    
+    k = String.fromCharCode(key) 
+    switch(state)
+    {
+        case CLICK:
+        case HOLD:
+        {
+            switch(k)
+            {
+                case 'w':
+                    P0.y -=1
+                break;
+                case 's':
+                    P0.y +=1
+                break;
+                case 'a':
+                    P0.x -=1;
+                break;
+                case 'd':
+                    P0.x +=1
+                break;
+            }
+   
+            break;
+        }
+    }
 }

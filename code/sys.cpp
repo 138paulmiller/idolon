@@ -121,7 +121,7 @@ namespace Sys
 
 	static void GameStep()
 	{
-		Runtime::Step(); 
+		Idolon::Step(); 
 		if(s_gamestate == GAME_OFF)
 		{
 			Game::Shutdown();

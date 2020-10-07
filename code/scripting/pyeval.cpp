@@ -75,7 +75,7 @@ void PyScript::compile()
 	LOG("Compiling %s\n", name.c_str());
 	if ( code.size() == 0 ) return;
 	//temp file 
-	const std::string &modulename = name;
+	const std::string &modulename = "tempmodule";
 	const std::string & tempfilename = modulename + ".py";
 	const std::string & temppath = FS::Append(FS::Cwd(), tempfilename);
 	const std::string & tempdir  = FS::DirName( temppath);
@@ -246,8 +246,8 @@ namespace PyEval
 
 
 
-	void Execute(const std::string & code)
+	bool Execute(const std::string & code)
 	{
-	    PyRun_SimpleString(code.c_str());
+	    return PyRun_SimpleString(code.c_str()) == 0;
 	}
 } // namespace Eval

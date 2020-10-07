@@ -1,8 +1,12 @@
 
 #include "../sys.hpp"
 #include "scripteditor.hpp"
-#include <iostream>
 
+
+#include <iostream>
+#include <locale>
+#include <codecvt>
+#include <string>
 
 ScriptEditor::ScriptEditor()
 	:Editor(
@@ -32,7 +36,6 @@ void ScriptEditor::onEnter()
 	int col = 8;
 	m_codeArea = new UI::TextScrollArea(col, controlY(), w, h, DEFAULT_FONT);
 	
-	
 	addWidget(m_codeArea);
 	reload();
 
@@ -40,6 +43,10 @@ void ScriptEditor::onEnter()
 
 	addTool("RUN", [&](){
 		runCode();
+	}, false);
+	
+	addTool("RELOAD", [&](){
+		reload();
 	}, false);
 
 	m_initialized = true;
@@ -59,6 +66,7 @@ void ScriptEditor::onExit()
 	LOG("Exited script editor");
 
 	m_initialized = false;
+			
 }
 
 
@@ -71,10 +79,11 @@ void ScriptEditor::onTick()
 	if ( m_scriptRunning ) 
 	{ 
 		TypedArg ret;
-		m_script->call( GAME_API_UPDATE, ret );
+		float deltaSec = Engine::GetTimeDeltaMs() / 1000.f;
+		m_script->call( GAME_API_UPDATE, ret, { TypedArg( deltaSec ) } );
 		m_scriptRunning = ret.type == ARG_NONE ||  ret.value.i != 0;
 		//reset 
-		Runtime::Step();
+		Idolon::Step();
 		return;
 	}
 
@@ -114,7 +123,6 @@ void ScriptEditor::reload()
 	if ( !m_script ) { return; }
 	m_codeArea->setText(m_script->code);
 	m_codeArea->resetCursor();
-
 }
 
 
@@ -123,7 +131,7 @@ void ScriptEditor::runCode()
 	if (!m_initialized) return; //on enter do nothing 
 
 
-	Runtime::Quit();
+	Idolon::Quit();
 	Eval::Reset(m_script->lang);
 
 	//set input handler. escape to resume

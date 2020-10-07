@@ -70,9 +70,6 @@
     <None Include="..\WIKI">
       <Filter>System Files</Filter>
     </None>
-    <None Include="..\code\scripting\jsbindings.inl">
-      <Filter>Source Files\scripting</Filter>
-    </None>
     <None Include="..\code\scripting\bindings.inl">
       <Filter>Source Files\scripting</Filter>
     </None>
@@ -81,6 +78,9 @@
     </None>
     <None Include="..\system\assets\game\main.scr">
       <Filter>System Files\assets\game</Filter>
+    </None>
+    <None Include="..\code\scripting\jsbindings.inl">
+      <Filter>Source Files\scripting</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
