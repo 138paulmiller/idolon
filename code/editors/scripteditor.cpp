@@ -137,10 +137,12 @@ void ScriptEditor::runCode()
 	//set input handler. escape to resume
 	m_script->compile();
 	Engine::PushKeyHandler( 
-		[&] ( const Key &key, ButtonState state)
+		[&] ( const Key &key, ButtonState state )
 		{
 			TypedArg ret;
-			m_script->call( GAME_API_ONKEY, ret, { TypedArg( key ), TypedArg(state) } );
+			const char const keysym[2] = { key, '\0'} ;
+			
+			m_script->call( GAME_API_ONKEY, ret, { TypedArg( keysym ), TypedArg(state) } );
 
 			if ( (ret.type != ARG_NONE && ret.value.i == 0 ) || (state && key == KEY_ESCAPE) )
 			{

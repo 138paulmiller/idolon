@@ -111,8 +111,7 @@ namespace JsEval
 			duk_push_c_function(s_ctx, s_bindings[i].func, DUK_VARARGS);
 			duk_put_global_string(s_ctx, s_bindings[i].name);
 		}
-		JsEval::Execute(BINDINGS_CONSTS);
-
+		JsEval::Execute(JS_PRELUDE);
 	}
 
 	void Shutdown()

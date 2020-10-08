@@ -1,13 +1,26 @@
 $test javascript
-// anim obj {frames:[], frameMs:-1}
 
-function Player (tile, x, y, anims ){
-    this.x = x
-    this.y = y
+
+// anim obj {frames:[], frameMs:-1}
+function Player (tile, anims ){
+    
+    //move these to physics proto
+    this.pos = new vec2(0,0)
+    this.vel = new vec2(0,0)    
+    this.speed = 0.5    
+
+    
     this.tile = tile
-    this.id = sprite(tile,x,y)
     this.anims = anims
     this.anim = null
+
+    this.id = sprite( tile, 0, 0 )
+
+    this.move_to = function(x, y){
+        this.pos = new vec2(x,y)
+        this.vel = new vec2(0,0)
+    }
+
 
     this.animate = function(animIndex ){
         this.animIndex  = animIndex
@@ -21,7 +34,7 @@ function Player (tile, x, y, anims ){
     }
 
 
-    this.update = function(){              
+    this.update = function(delta_sec){              
         now = new Date()
         elapsed = now - this.startTime  
 
@@ -33,45 +46,64 @@ function Player (tile, x, y, anims ){
             frame(this.tile)
         }
 
-        pos(this.id , this.x, this.y)
+        this.pos = this.pos.add( this.vel )
+        pos(this.id , this.pos.x, this.pos.y)
     }
 }
  
 sheet("demo/demo")
 load(0, "demo/demo" )
 
-P0 = new Player(0, 0, 0, [])
+P0 = new Player(0, [])
 
-function onframe(deltaSec) {
-    P0.update()
+function on_frame(delta_sec) {
+    P0.update(delta_sec)
 }
 
 
-function onkey(key, state){
-    
-    k = String.fromCharCode(key) 
+function on_key(key, state){
+
     switch(state)
     {
-        case CLICK:
-        case HOLD:
+        case BTN_CLICK:
+        case BTN_HOLD:
         {
-            switch(k)
+            switch(key)
             {
-                case 'w':
-                    P0.y -=1
+                case KEY_w:
+                    P0.vel.y = - 1 * P0.speed
                 break;
-                case 's':
-                    P0.y +=1
+                case KEY_s:
+                    P0.vel.y = P0.speed
                 break;
-                case 'a':
-                    P0.x -=1;
+                case KEY_a:
+                    P0.vel.x = -1 * P0.speed
                 break;
-                case 'd':
-                    P0.x +=1
+                case KEY_d:
+                    P0.vel.x = P0.speed
                 break;
             }
-   
             break;
         }
+        case BTN_RELEASE:
+        {
+            switch(key)
+            {
+                case KEY_w:
+                    P0.vel.y = 0
+                break;
+                case KEY_s:
+                    P0.vel.y = 0
+                break;
+                case KEY_a:
+                    P0.vel.x = 0
+                break;
+                case KEY_d:
+                    P0.vel.x = 0
+                break;
+            }
+            break;
+        }
+        
     }
 }

@@ -33,7 +33,7 @@ TypedArg::TypedArg( float f )
 	value.f = f;
 }
 
-TypedArg::TypedArg( char* s )
+TypedArg::TypedArg( const char* s )
 	:type( ARG_STRING )
 {
 	value.s = s;

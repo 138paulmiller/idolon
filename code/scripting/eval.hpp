@@ -17,9 +17,10 @@ enum ArgType
 struct TypedArg
 {
 	TypedArg(ArgType type = ARG_NONE);
-	TypedArg(int i );
-	TypedArg(float f);
-	TypedArg( char* s );
+	TypedArg( int i );
+	TypedArg( float f );
+	TypedArg( const char* s );
+	
 	union Value
 	{
 		int i ;

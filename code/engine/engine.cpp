@@ -256,7 +256,7 @@ namespace Engine
         if (i >= s_textures.size()) {
             s_textures.push_back(0);
         }
-        SDL_TextureAccess access;
+        SDL_TextureAccess access = SDL_TEXTUREACCESS_STATIC;
         switch ( mode )
         {
         case TEXTURE_LOCKABLE: access = SDL_TEXTUREACCESS_STREAMING;

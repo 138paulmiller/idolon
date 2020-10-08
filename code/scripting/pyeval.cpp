@@ -88,7 +88,7 @@ void PyScript::compile()
 	}
 
 
-	tempfile << BINDINGS_CONSTS << code;
+	tempfile << PY_PRELUDE << code;
 	tempfile.close();
 
 	//set execute dir

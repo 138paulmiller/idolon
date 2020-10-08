@@ -41,8 +41,9 @@ namespace  Game
 	//Create a loader for each asset type. given a block of data load the asset into the CPU
 	//
 	//these describe the game files.
-	struct Desc : public Asset 
+	class Desc : public Asset 
 	{
+	public:
 		Desc(const std::string name);
 		//array of tileset names
 		std::vector<std::string> tilesets;
@@ -52,8 +53,9 @@ namespace  Game
 
 	//create a mapping from tileset name to cartridge 
 	//create cart factory
-	struct Cartridge : public Asset
+	class Cartridge : public Asset
 	{  
+	public:
 		struct Header
 		{
 			std::unordered_map<std::string, uint> offsets;

@@ -17,23 +17,6 @@
 #define ERR(...) \
 	LOG(__VA_ARGS__)
 
-#define BINDINGS_CONSTS  R"(
-BG=0
-SP=1
-FG=2
-UI=3
-RELEASE = 0
-CLICK = 1
-HOLD = 2
-ESCAPE = '\033'
-SHIFT = 127
-ALT = SHIFT + 1
-UP = ALT + 1
-DOWN = UP + 1
-LEFT = DOWN + 1
-RIGHT = LEFT + 1
-)"
-
 
 #define BINDINGS \
 	DECL( idolon, log     , "Log message to debug console and file"    	)\
