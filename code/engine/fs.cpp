@@ -280,4 +280,25 @@ namespace FS
 			return path.substr(0, sep);
 		return "";
 	}
+
+	bool ReadFile( const std::string &path, std::string& contents )
+	{
+		std::ifstream file;
+		file.open( path );
+		
+		if ( !file.is_open() )
+		{
+			LOG( "FS: Failed to read%s", path.c_str() );
+			return false ;
+		}
+
+		file.seekg (0, file.end);
+		const int len = file.tellg();
+		file.seekg ( 0, file.beg );
+	
+		contents = std::string(len, ' ');
+		file.read( &contents[0], len );
+		return true;
+	}
+
 } // namespace FS

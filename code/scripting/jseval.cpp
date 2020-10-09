@@ -1,6 +1,7 @@
 
 #include <duktape/duktape.h>
 #include "jseval.hpp"
+#include "../idolon.hpp"
 #include "../sys.hpp"
 
 //https://duktape.org/guide.html
@@ -97,6 +98,7 @@ static void my_fatal(void *udata, const char *msg)
     /* Note that 'msg' may be NULL. */
     ERR("Js Script error: %s\n", (msg ? msg : "no message"));
 }
+//https://wiki.duktape.org/howtomodules
 
 namespace JsEval
 {
@@ -111,7 +113,8 @@ namespace JsEval
 			duk_push_c_function(s_ctx, s_bindings[i].func, DUK_VARARGS);
 			duk_put_global_string(s_ctx, s_bindings[i].name);
 		}
-		JsEval::Execute(JS_PRELUDE);
+
+		JsEval::Import( "core.js" );
 	}
 
 	void Shutdown()
@@ -119,13 +122,30 @@ namespace JsEval
 		duk_destroy_heap(s_ctx);
 	}
 
+	bool Import(const std::string & filepath)
+	{
+		const std::string fullpath = Sys::AssetPath() + "lib/" + filepath;
+		
+		std::string code;
+		if ( !FS::ReadFile(fullpath, code) )
+		{
+			LOG( "Js Script Import error: Failed to import %s", fullpath.c_str() );
+			return false;
+		}
+
+		bool success = JsEval::Execute( code );
+
+		return true;
+	}
+
 	bool Execute(const std::string & code)
 	{
 		if (duk_peval_lstring(s_ctx, code.c_str(), code.size()) != 0) {
+			printf( "%d, %s\n", code.size(), code.c_str() );
 			/* Use duk_safe_to_string() to convert error into string.  This API
 			 * call is guaranteed not to throw an error during the coercion.
 			 */
-			ERR("Js Script error: %s\n", duk_safe_to_string(s_ctx, -1));
+			ERR("Js Script Execute error: %s\n", duk_safe_to_string(s_ctx, -1));
 			duk_pop(s_ctx);  /* pop result */
 			return false;
 		}

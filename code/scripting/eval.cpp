@@ -78,11 +78,12 @@ namespace
 	typedef void(*StartupFunc)() ;
 	typedef void(*ShutdownFunc)();
 	typedef bool(*ExecuteFunc)(const std::string & code);
+	typedef bool(*ImportFunc)(const std::string & filepath);
 
 	StartupFunc s_startupImpl = 0 ;
 	ShutdownFunc s_shutdownImpl = 0;
 	ExecuteFunc s_executeImpl = 0;
-
+	ImportFunc s_importImpl;
 	bool s_initialized = false;
 
 }
@@ -113,11 +114,13 @@ namespace Eval
 		case SCRIPT_PYTHON:
 			s_startupImpl = PyEval::Startup;
 			s_shutdownImpl = PyEval::Shutdown;
+			s_importImpl = PyEval::Import;
 			s_executeImpl = PyEval::Execute;
 			break;
 		case SCRIPT_JAVASCRIPT:
 			s_startupImpl = JsEval::Startup;
 			s_shutdownImpl = JsEval::Shutdown;
+			s_importImpl  = JsEval::Import;
 			s_executeImpl = JsEval::Execute;
 			break;
 		default:
@@ -145,9 +148,23 @@ namespace Eval
 		Startup(lang);
 	}
 
-	void Execute(const std::string & code)
+	bool Execute(const std::string & code)
 	{
-		s_executeImpl(code);
+		if ( s_executeImpl )
+		{
+			return s_executeImpl(code);
+		}
+		return false;
+	}
+	
+	bool Import( const std::string &filepath )
+	{
+		if ( s_importImpl )
+		{
+			return s_importImpl(filepath);
+		}
+		return false;
+	
 	}
 
 	Script * CreateScript(const std::string name, ScriptLanguage lang)

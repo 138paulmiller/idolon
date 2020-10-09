@@ -277,7 +277,7 @@ namespace Engine
         s_textures[textureId] = 0;
         SDL_DestroyTexture(texture);
     }
-    void ClearScreen(const Color& color)
+    void Clear(const Color& color)
     {
         ClearTexture(s_target, color);
     }

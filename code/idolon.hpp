@@ -22,7 +22,19 @@ namespace Idolon
 	//void Save( int id, const char *assetName = "" )
 	//{}
 
-	//
+	//======== System API ===========
+	
+	//execute  gamescript code
+	bool Use( const char *filepath );
+	void DisplaySize( int & w,int & h );
+	void MousePosition( int & x,int & y );
+		
+	// ==== Primitive Drawing api === 
+	// clear the display
+	void Clear( unsigned char r, unsigned char g, unsigned char b  );
+
+	//TODO - set pixel
+	//void SetPixel( int x, int y, int r, int g, int b  );
 
 	//======= map api  =========
 	//load map into layer. unloads previous

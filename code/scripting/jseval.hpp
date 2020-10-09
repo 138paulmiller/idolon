@@ -23,6 +23,8 @@ namespace JsEval
 {
 	void Startup();
 	void Shutdown();
+	bool Import( const std::string &filepath );
+
 	bool Execute(const std::string & code);
 
 }

@@ -1,0 +1,17 @@
+$game/rpg javascript
+
+require("rpg.js")
+sheet("game/rpg")
+load(0, "game/rpg" )
+
+P0 = new Player(0, [])
+
+function on_frame(delta_sec) {
+    P0.on_frame(delta_sec)
+}
+
+function on_key(key, state){
+    P0.on_key(key, state)
+}
+
+                 

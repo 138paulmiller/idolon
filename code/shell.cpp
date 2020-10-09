@@ -61,7 +61,7 @@ void Shell::onEnter()
 		log(linesText);
 */
 	m_lines.clear();
-	Engine::ClearScreen();
+	Engine::Clear();
 
 	char msg[24];
 	snprintf( msg, 24, "%s v%d.%d", SYSTEM_NAME, VERSION_MAJOR, VERSION_MINOR );

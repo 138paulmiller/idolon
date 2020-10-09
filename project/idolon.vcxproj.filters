@@ -23,14 +23,14 @@
     <Filter Include="Source Files\editors">
       <UniqueIdentifier>{20d152f5-7e55-49a2-bd53-95ad93195fad}</UniqueIdentifier>
     </Filter>
-    <Filter Include="System Files\assets\demo">
-      <UniqueIdentifier>{2d5d8863-5e13-475f-82ed-a6f3d1bb15f4}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\assets">
       <UniqueIdentifier>{4efbf390-e071-4418-bfb1-c88c0cc57a85}</UniqueIdentifier>
     </Filter>
     <Filter Include="System Files\assets\game">
       <UniqueIdentifier>{d8b716d7-cd3a-4859-b23b-35a06ba9daf4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="System Files\assets\lib">
+      <UniqueIdentifier>{24449318-2ca7-4341-80c6-249d479b8fd0}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -49,15 +49,6 @@
     <None Include="..\system\.gitignore">
       <Filter>System Files</Filter>
     </None>
-    <None Include="..\system\assets\demo\demo.map">
-      <Filter>System Files\assets\demo</Filter>
-    </None>
-    <None Include="..\system\assets\demo\demo.scr">
-      <Filter>System Files\assets\demo</Filter>
-    </None>
-    <None Include="..\system\assets\demo\demo.tls">
-      <Filter>System Files\assets\demo</Filter>
-    </None>
     <None Include="..\Makefile">
       <Filter>System Files</Filter>
     </None>
@@ -73,14 +64,26 @@
     <None Include="..\code\scripting\bindings.inl">
       <Filter>Source Files\scripting</Filter>
     </None>
-    <None Include="..\code\scripting\prologue.inl">
-      <Filter>Source Files\scripting</Filter>
-    </None>
-    <None Include="..\system\assets\game\main.scr">
-      <Filter>System Files\assets\game</Filter>
-    </None>
     <None Include="..\code\scripting\jsbindings.inl">
       <Filter>Source Files\scripting</Filter>
+    </None>
+    <None Include="..\system\assets\game\rpg.map">
+      <Filter>System Files\assets\game</Filter>
+    </None>
+    <None Include="..\system\assets\game\rpg.scr">
+      <Filter>System Files\assets\game</Filter>
+    </None>
+    <None Include="..\system\assets\game\rpg.tls">
+      <Filter>System Files\assets\game</Filter>
+    </None>
+    <None Include="..\system\assets\game\rpg_py.scr">
+      <Filter>System Files\assets\game</Filter>
+    </None>
+    <None Include="..\system\assets\lib\rpg.js">
+      <Filter>System Files\assets\lib</Filter>
+    </None>
+    <None Include="..\system\assets\lib\core.js">
+      <Filter>System Files\assets\lib</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

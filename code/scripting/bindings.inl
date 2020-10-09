@@ -19,35 +19,45 @@
 
 
 #define BINDINGS \
-	DECL( idolon, log     , "Log message to debug console and file"    	)\
-	DECL( idolon, scrw    , "Get screen width "                           )\
-	DECL( idolon, scrh    , "Get screen height "                          )\
-	DECL( idolon, mx      , "Get mouse x position"                        )\
-	DECL( idolon, my      , "Get mouse y position"                        )\
-	DECL( idolon, clear   , "Clear screen with color r,g,b"               )\
-	DECL( idolon, key     , "Get key state. 0 is up, 1 is down. 2 is hold")\
-	DECL( idolon, load    , "Load layer"                                  )\
-	DECL( idolon, unload  , "Unload layer"                                )\
-	DECL( idolon, view    , "Set the layer viewport"                      )\
-	DECL( idolon, scroll  , "Scroll layer by dx,dy"                       )\
-	DECL( idolon, sprite  , "Spawn sprite "                               )\
-	DECL( idolon, kill    , "Despawn sprite "                             )\
-	DECL( idolon, pos     , "Set sprite position"                  )\
-	DECL( idolon, move    , "Move sprite by x,y"                          )\
-	DECL( idolon, frame   , "Set sprite current tile"              )\
-	DECL( idolon, flip    , "Flip sprite tile by di"                      )\
-	DECL( idolon, sheet   , "Set surrent sprite sheetsprite "             )\
+	DECL( idolon, require     , "use code from system lib file"					)\
+	DECL( idolon, log     , "Log message to debug console and file"    		)\
+	DECL( idolon, scrw    , "Get screen width "								)\
+	DECL( idolon, scrh    , "Get screen height "							)\
+	DECL( idolon, mx      , "Get mouse x position"							)\
+	DECL( idolon, my      , "Get mouse y position"							)\
+	DECL( idolon, clear   , "Clear screen with color r,g,b"					)\
+	DECL( idolon, key     , "Get key state. 0 is up, 1 is down. 2 is hold"	)\
+	DECL( idolon, load    , "Load layer"									)\
+	DECL( idolon, unload  , "Unload layer"									)\
+	DECL( idolon, view    , "Set the layer viewport"						)\
+	DECL( idolon, scroll  , "Scroll layer by dx,dy"							)\
+	DECL( idolon, sprite  , "Spawn sprite "									)\
+	DECL( idolon, kill    , "Despawn sprite "								)\
+	DECL( idolon, pos     , "Set sprite position"							)\
+	DECL( idolon, move    , "Move sprite by x,y"							)\
+	DECL( idolon, frame   , "Set sprite current tile"						)\
+	DECL( idolon, flip    , "Flip sprite tile by di"						)\
+	DECL( idolon, sheet   , "Set surrent sprite sheetsprite "				)\
 
 
 
+BIND( idolon, require )
+{
+	
+	const char *scriptPath;
+	
+	ARG_STR(scriptPath);
+	const int state = Idolon::Use( scriptPath );
+	RET_INT( state != 0 );
 
+}
 
 //-------------------------------------------------------------------//
 BIND(idolon, scrw)
 {
 	static int w = 0;
 	static int h = 0;
-	Engine::GetSize(w, h);
+	Idolon::DisplaySize(w, h);
 	RET_INT( w );
 }
 
@@ -56,7 +66,7 @@ BIND(idolon, scrh)
 {
 	static int w = 0;
 	static int h = 0;
-	Engine::GetSize(w, h);
+	Idolon::DisplaySize(w, h);
 	RET_INT( h );
 
 }
@@ -64,9 +74,9 @@ BIND(idolon, scrh)
 //-------------------------------------------------------------------//
 BIND( idolon, mx)
 {
-	static int x = 0;
-	static int y = 0;
-	Engine::GetMousePosition( x, y);
+	int x = 0;
+	int y = 0;
+	Idolon::MousePosition( x, y);
 	RET_INT( x );
 
 }
@@ -74,9 +84,9 @@ BIND( idolon, mx)
 //-------------------------------------------------------------------//
 BIND( idolon, my)
 {
-	static int x = 0;
-	static int y = 0;
-	Engine::GetMousePosition( x, y);
+	int x = 0;
+	int y = 0;
+	Idolon::MousePosition( x, y);
 	RET_INT( y );
 }
 
@@ -84,11 +94,11 @@ BIND( idolon, my)
 BIND(idolon, clear)
 {
 	//get three args.
-	Color c = { 255,0,0,0 };
-	ARG_INT(c.b);
-	ARG_INT(c.g);
-	ARG_INT(c.r);
-	Engine::ClearScreen(c);
+	int r, g, b;;
+	ARG_INT(b);
+	ARG_INT(g);
+	ARG_INT(r);
+	Idolon::Clear(r,g,b);
 	RET();
 }
 

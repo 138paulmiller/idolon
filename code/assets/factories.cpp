@@ -243,16 +243,12 @@ Asset * ScriptFactory::deserialize( std::istream& in )
 				LOG( "ScriptFactory: Invalid language %s\n", langstr.c_str() );
 				throw;
 			}
-		
-			char * codedata = new char[codelen]; 
-            memset(codedata, 0, codelen);
-			in.read(codedata, len);
 			
 			script  = Eval::CreateScript(name, lang);
-			script->code = std::string(codedata);
+			script->code = std::string(codelen, ' ');
 			
-            delete[] codedata;
-
+			in.read(&script->code[0], len);
+            
 		}
 	}
 	catch(...)

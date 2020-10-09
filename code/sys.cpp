@@ -44,7 +44,7 @@ namespace Sys
 
 		//default config
 		s_sysPath = FS::ExePath() + "/system/";
-		s_sysAssetPath = s_sysPath + "/assets/";
+		s_sysAssetPath = s_sysPath + "assets/";
 
 
 		Engine::Startup( title, SCREEN_W, SCREEN_H, WINDOW_SCALE );

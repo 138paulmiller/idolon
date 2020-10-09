@@ -1,9 +1,9 @@
-$demo/demo python
+$game/rpg python
 from idolon import *
 
 bg = 0
-load(bg, "demo/demo")
-sheet("demo/demo")
+load(bg, "game/rpg")
+sheet("game/rpg")
 s0 = sprite(0,0,0)
 spd = 1
 

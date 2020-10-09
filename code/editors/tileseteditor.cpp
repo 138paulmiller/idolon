@@ -109,7 +109,7 @@ void TilesetEditor::onTick()
 {
 
 	//set pixel tool by default if not set
-	Engine::ClearScreen(EDITOR_COLOR);
+	Engine::Clear(EDITOR_COLOR);
 	//update 
 	int mx, my;
 	Engine::GetMousePosition(mx, my);

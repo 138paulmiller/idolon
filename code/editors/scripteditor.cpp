@@ -87,7 +87,7 @@ void ScriptEditor::onTick()
 		return;
 	}
 
-	Engine::ClearScreen(EDITOR_COLOR);
+	Engine::Clear(EDITOR_COLOR);
 
 }
 

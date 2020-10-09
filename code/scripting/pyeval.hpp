@@ -1,5 +1,6 @@
 #pragma once 
 
+
 #include "eval.hpp"
 
 //forward declar PyObject. Uses
@@ -29,6 +30,7 @@ namespace PyEval
 {
 	void Startup();
 	void Shutdown();
+	bool Import( const std::string &filepath );
 	bool Execute(const std::string & code);
 
 }

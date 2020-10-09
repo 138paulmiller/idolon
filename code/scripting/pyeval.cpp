@@ -1,8 +1,9 @@
 
 
 #include "pyeval.hpp"
-
 #include "../sys.hpp"
+
+#include "../idolon.hpp"
 
 #define PY_SSIZE_T_CLEAN
 #undef _DEBUG
@@ -41,6 +42,9 @@ namespace
 		NULL,                	                // m_clear 
 		NULL,                	                // m_free 
 	};
+
+
+	std::unordered_map<std::string, PyObject *> m_modules;
 
 	PyObject* InitModule(void)
 	{
@@ -245,9 +249,46 @@ namespace PyEval
 	}
 
 
+	bool Import(const std::string & filepath)
+	{
+		auto it = m_modules.find( filepath );
+		if(it != m_modules.end() )
+		{
+			Py_DECREF(it->second);
+		}
+
+		const std::string & path = FS::DirName( filepath );
+		const std::string & name = FS::BaseName( filepath );
+		const std::string & cmd = "import sys\nimport os\nsys.path.append('" +  path + "')\n";
+		PyRun_SimpleString(cmd.c_str());
+		PyObject * module = PyImport_ImportModule(name.c_str());
+
+		PyErr_Print();
+
+		if(!module)
+		{
+			PyErr_Print();
+			LOG("Eval: Could not import %s\n", filepath.c_str());
+
+			return false;
+		}
+		else
+		{
+			m_modules[filepath] = module;
+		}
+		return true;
+	}
 
 	bool Execute(const std::string & code)
 	{
+#if SUPPORT_PYTHON
 	    return PyRun_SimpleString(code.c_str()) == 0;
+#else
+		LOG( "Scripting: Python not supported!" );
+		return false;
+#endif 
 	}
 } // namespace Eval
+
+
+

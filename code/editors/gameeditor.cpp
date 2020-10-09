@@ -36,7 +36,7 @@ void GameEditor::onExit()
 
 void GameEditor::onTick()
 {
-	Engine::ClearScreen(EDITOR_COLOR);
+	Engine::Clear(EDITOR_COLOR);
 }
 
 //

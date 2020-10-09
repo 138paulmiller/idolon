@@ -31,4 +31,7 @@ namespace FS
 	std::string FileExt(const std::string& path);
 	//returns path to file (excluding filename )
 	std::string DirName(const std::string& path);
+
+
+	bool ReadFile( const std::string &path, std::string& contents );
 }

@@ -161,18 +161,19 @@
   <ItemGroup>
     <None Include="..\code\scripting\bindings.inl" />
     <None Include="..\code\scripting\jsbindings.inl" />
-    <None Include="..\code\scripting\prologue.inl" />
     <None Include="..\code\scripting\pybindings.inl" />
     <None Include="..\Makefile" />
     <None Include="..\README.md" />
     <None Include="..\system\.gitignore" />
     <None Include="..\system\assets\basic.fnt" />
     <None Include="..\system\assets\default.fnt" />
-    <None Include="..\system\assets\demo\demo.map" />
-    <None Include="..\system\assets\demo\demo.scr" />
-    <None Include="..\system\assets\demo\demo.tls" />
     <None Include="..\system\assets\full.fnt" />
-    <None Include="..\system\assets\game\main.scr" />
+    <None Include="..\system\assets\game\rpg.map" />
+    <None Include="..\system\assets\game\rpg.scr" />
+    <None Include="..\system\assets\game\rpg.tls" />
+    <None Include="..\system\assets\game\rpg_py.scr" />
+    <None Include="..\system\assets\lib\core.js" />
+    <None Include="..\system\assets\lib\rpg.js" />
     <None Include="..\TODO" />
     <None Include="..\WIKI" />
   </ItemGroup>

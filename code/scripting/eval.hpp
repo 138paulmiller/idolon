@@ -56,12 +56,14 @@ public:
 
 namespace Eval
 {
-	void Startup(ScriptLanguage lang = SCRIPT_PYTHON);
+	//VM api
+	void Startup(ScriptLanguage lang = SCRIPT_JAVASCRIPT);
 	void Shutdown();
-
-	void Reset(ScriptLanguage lang = SCRIPT_PYTHON);
+	void Reset(ScriptLanguage lang = SCRIPT_JAVASCRIPT);
 	
-	void Execute(const std::string & code);
+	//
+	bool Import(const std::string & filepath);
+	bool Execute(const std::string & code);
 
 	Script * CreateScript(const std::string name, ScriptLanguage lang);
 }

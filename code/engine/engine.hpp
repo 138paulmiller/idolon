@@ -73,7 +73,7 @@ namespace Engine
     void DrawTexture(int textureId, const Rect & src, const Rect & dest);
     void DrawLine(const Color& color, int x1, int y1, int x2, int y2);
     void DrawRect(const Color& color, const Rect& rect, bool filled);
-    void ClearScreen(const Color& color = { 255, 0, 0, 0 } );
+    void Clear(const Color& color = { 255, 0, 0, 0 } );
     void SetDrawBlendMode(BlendMode mode);
 
     //Getters/setters

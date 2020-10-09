@@ -124,7 +124,7 @@ void MapEditor::onTick()
 		handleTool();
 	}
 
-	Engine::ClearScreen(EDITOR_COLOR);
+	Engine::Clear(EDITOR_COLOR);
 
 	if(m_map)
 	{

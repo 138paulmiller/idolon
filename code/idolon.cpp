@@ -1,6 +1,7 @@
 #pragma once
 #include "idolon.hpp"
 #include "game.hpp"
+#include "sys.hpp"
 
 
 namespace Idolon
@@ -92,7 +93,7 @@ namespace Idolon
 		//update game state 
 		//handle return state RUN, EXIT, PAUSE
 		//clear screen, draw map, draw sprites, draw ui
-		Engine::ClearScreen();
+		Engine::Clear();
 		for(int i = 0 ; i < LAYER_COUNT; i++)
 		{
 			if( s_mapsEnabled[i])
@@ -104,6 +105,32 @@ namespace Idolon
 	{
 		s_sm.clear();
 	}
+
+	bool Use( const char *filepath )
+	{
+		//tries system lib
+		return Eval::Import( filepath );
+	}
+
+
+	void DisplaySize( int &w, int &h )
+	{
+		Engine::GetSize(w, h);
+	}
+	
+	void MousePosition( int &x, int &y )
+	{
+		Engine::GetMousePosition( x, y);
+	}
+	
+	// ==== Primitive Drawing api === 
+	// clear the display
+	void Clear( unsigned char r, unsigned char g, unsigned char b )
+	{
+		const Color & c = { 255,r,g,b };
+		Engine::Clear(c);	
+	}
+
 
 	// =============================== Sprite ==================================
 	
