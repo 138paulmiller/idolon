@@ -60,15 +60,6 @@ namespace Idolon
 	bool s_mapsEnabled[LAYER_COUNT];
 	Game::Cartridge * m_cart;
 }
-#define GET_MAP(name, layer, ...)\
-	if(layer >= 0 && layer < LAYER_COUNT)\
-	{\
-		Graphics::Map *name = s_maps[ layer ];\
-		if (name)\
-		{\
-			__VA_ARGS__\
-		}\
-	}
 
 #define GET_SPRITE(name, spriteId, ...) 		\
 	Graphics::Sprite *name = s_sm.sprite( spriteId );\
@@ -163,29 +154,44 @@ namespace Idolon
 	//scroll map to x,y
 	void Scroll(int layer, int dx, int dy)
 	{
-		GET_MAP(map, layer,
-			map->scroll(dx, dy);
-		)
+		if(layer >= 0 && layer < LAYER_COUNT)
+		{
+			Graphics::Map *map = s_maps[ layer ];
+			if (map)
+			{
+				map->scroll(dx, dy);
+			}
+		}
 	}
 
 	void View(int layer, int x, int y, int w, int h)
 	{
-		GET_MAP(map, layer,
-			map->view = { x,y,w,h };
-			map->clampView();
-		)
+		if(layer >= 0 && layer < LAYER_COUNT)
+		{
+			Graphics::Map *map = s_maps[ layer ];
+			if (map)
+			{
+				map->view = { x,y,w,h };
+				map->clampView();
+			}
+		}
 	}
 
 
 	int GetTile(int layer, int x, int y)
 	{
-		GET_MAP(map, layer,
-			int tx, ty;
-			if (map->getTileXY(x, y, tx, ty))
+		if(layer >= 0 && layer < LAYER_COUNT)
+		{
+			Graphics::Map *map = s_maps[ layer ];
+			if (map)
 			{
-				return map->tiles[ty * map->w + tx];
+				int tx, ty;
+				if (map->getTileXY(x, y, tx, ty))
+				{
+					return map->tiles[ty * map->w + tx];
+				}
 			}
-		)
+		}
 		return -1;
 	}
 
@@ -193,13 +199,19 @@ namespace Idolon
 	
 	void SetTile( int layer, int x, int y, int tile )
 	{
-		GET_MAP(map, layer,
-			int tx, ty;
-			if (map->getTileXY(x, y, tx, ty))
+		if(layer >= 0 && layer < LAYER_COUNT)
+		{
+			Graphics::Map *map = s_maps[ layer ];
+			if (map)
 			{
-				map->tiles[ty * map->w + tx] = tile;
+				int tilex, tiley;
+				if (map->getTileXY(x, y, tilex, tiley))
+				{
+					map->tiles[tiley * map->w + tilex] = tile;
+					map->update(  { tilex, tiley, 1, 1 }  );
+				}
 			}
-		)
+		}
 		return ;	
 	}
 
@@ -272,6 +284,17 @@ namespace Idolon
 		GET_SPRITE(sprite, spriteId,
 			x = sprite->x;
 			y = sprite->y;
+			return true;
+		)
+		return false;
+	}
+
+	
+	bool SpriteSize( int spriteId, int & w, int & h)
+	{
+		GET_SPRITE(sprite, spriteId,
+			w = sprite->w;
+			h = sprite->h;
 			return true;
 		)
 		return false;

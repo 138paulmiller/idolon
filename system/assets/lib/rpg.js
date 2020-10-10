@@ -16,7 +16,23 @@ Sprite = function (tile ) {
     this.anims = {} 
     this.cur_anim = null
     this.id = sprite(tile, 0, 0)
+    this.size = new vec2(spr_w(this.id), spr_h(this.id))
 
+    this.x = function () {
+        return this.pos.x
+    }
+
+    this.y = function () {
+        return this.pos.y
+    }
+
+    this.w = function () {
+        return this.size.x
+    }
+
+    this.h = function () {
+        return this.size.y
+    }
 
     this.move_by = function (dx, dy) {
         this.vel.x += dx * this.speed

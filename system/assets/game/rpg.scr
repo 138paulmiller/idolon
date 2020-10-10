@@ -29,7 +29,17 @@ function on_frame(delta_ms) {
 }
 
 function on_key(key, state){ 
-    
+    if( state == BTN_CLICK ){
+        c = p0.pos.add( p0.size.scale( 0.5 ) )
+        
+        t = get_tile(0, c.x, c.y)
+        if(key == KEY_q){
+            t -=1
+        }else if(key == KEY_e){
+            t +=1
+        }
+        set_tile(0, c.x, c.y, t )
+    }
 }
 
 

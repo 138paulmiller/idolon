@@ -140,6 +140,10 @@ function vec2(x, y) {
         return new vec2(this.x + v.x, this.y + v.y)
     }
 
+    this.scale = function (s) {
+        return new vec2(this.x * s, this.y * s )
+    }
+
 
     this.dot = function (v) {
         return this.x * v.x + this.y * v.y

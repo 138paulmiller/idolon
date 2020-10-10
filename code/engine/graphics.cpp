@@ -280,6 +280,7 @@ namespace Graphics
 
         return {  alignscrx, alignscry, scrTW,  scrTH };
     }
+
     bool Map::getTileXY( int scrx, int scry, int& tilex, int& tiley )
     {
         if ( ( scrx < rect.x || scrx > rect.x + rect.w )

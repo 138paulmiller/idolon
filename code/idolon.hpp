@@ -58,6 +58,8 @@ namespace Idolon
 	void FlipBy(int spriteId, int di);
 	int Frame( int spriteId );
 	bool Position( int spriteId, int &x, int &y );
+	bool SpriteSize( int spriteId, int &w, int &h );
+	
 	//set sprite sheet
 	void Sheet(const char *  tileset);
 
