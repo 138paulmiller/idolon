@@ -177,7 +177,7 @@ namespace Idolon
 	}
 
 
-	int TileAt(int layer, int x, int y)
+	int GetTile(int layer, int x, int y)
 	{
 		GET_MAP(map, layer,
 			int tx, ty;
@@ -188,6 +188,21 @@ namespace Idolon
 		)
 		return -1;
 	}
+
+
+	
+	void SetTile( int layer, int x, int y, int tile )
+	{
+		GET_MAP(map, layer,
+			int tx, ty;
+			if (map->getTileXY(x, y, tx, ty))
+			{
+				map->tiles[ty * map->w + tx] = tile;
+			}
+		)
+		return ;	
+	}
+
 	// =============================== Sprite ==================================
 
 	int Spawn(int tileId, int x, int y, bool isSmall)

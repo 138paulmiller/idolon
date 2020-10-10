@@ -1,3 +1,11 @@
+
+- Create Master Control menu on right click!
+
+- Dialogue system and trigger system in map editor!
+
+- Game edit view. Switch to tilesheet, map and editors, as well as game config page
+
+
 - Create Dialog system. Used for RPG style games
 	- Dialog(text)
 		- start : render text to bottom of screen

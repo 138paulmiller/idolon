@@ -79,8 +79,8 @@ void ScriptEditor::onTick()
 	if ( m_scriptRunning ) 
 	{ 
 		TypedArg ret;
-		float deltaSec = Engine::GetTimeDeltaMs() / 1000.f;
-		m_script->call( GAME_API_UPDATE, ret, { TypedArg( deltaSec ) } );
+		float delta_ms = Engine::GetTimeDeltaMs() ;
+		m_script->call( GAME_API_UPDATE, ret, { TypedArg( delta_ms ) } );
 		m_scriptRunning = ret.type == ARG_NONE ||  ret.value.i != 0;
 		//reset 
 		Idolon::Step();

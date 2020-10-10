@@ -17,16 +17,18 @@
 #define ERR(...) \
 	LOG(__VA_ARGS__)
 
+/*
+	create prefix for object to operate on ? like spr_kill, spr_pos
 
+*/
 #define BINDINGS \
-	DECL( idolon, require     , "use code from system lib file"					)\
+	DECL( idolon, require , "use code from system lib file"					)\
 	DECL( idolon, log     , "Log message to debug console and file"    		)\
-	DECL( idolon, scrw    , "Get screen width "								)\
-	DECL( idolon, scrh    , "Get screen height "							)\
+	DECL( idolon, gfx_w    , "Get gfx width "								)\
+	DECL( idolon, gfx_h    , "Get gfx height "							)\
 	DECL( idolon, mx      , "Get mouse x position"							)\
 	DECL( idolon, my      , "Get mouse y position"							)\
 	DECL( idolon, clear   , "Clear screen with color r,g,b"					)\
-	DECL( idolon, key     , "Get key state. 0 is up, 1 is down. 2 is hold"	)\
 	DECL( idolon, load    , "Load layer"									)\
 	DECL( idolon, unload  , "Unload layer"									)\
 	DECL( idolon, view    , "Set the layer viewport"						)\
@@ -35,10 +37,9 @@
 	DECL( idolon, kill    , "Despawn sprite "								)\
 	DECL( idolon, pos     , "Set sprite position"							)\
 	DECL( idolon, move    , "Move sprite by x,y"							)\
-	DECL( idolon, frame   , "Set sprite current tile"						)\
-	DECL( idolon, flip    , "Flip sprite tile by di"						)\
+	DECL( idolon, flip    , "Set sprite current tile"						)\
 	DECL( idolon, sheet   , "Set surrent sprite sheetsprite "				)\
-
+	DECL( idolon, key     , "Get key state. 0 is up, 1 is down. 2 is hold"	)\
 
 
 BIND( idolon, require )
@@ -53,7 +54,7 @@ BIND( idolon, require )
 }
 
 //-------------------------------------------------------------------//
-BIND(idolon, scrw)
+BIND(idolon, gfx_w)
 {
 	static int w = 0;
 	static int h = 0;
@@ -62,7 +63,7 @@ BIND(idolon, scrw)
 }
 
 //-------------------------------------------------------------------//
-BIND(idolon, scrh)
+BIND(idolon, gfx_h)
 {
 	static int w = 0;
 	static int h = 0;
@@ -100,14 +101,6 @@ BIND(idolon, clear)
 	ARG_INT(r);
 	Idolon::Clear(r,g,b);
 	RET();
-}
-
-BIND( idolon, key    ) 
-{
-	int key;
-	ARG_INT(key);
-	const int state = Engine::GetKeyState( static_cast<Key>( key ) );
-	RET_INT(state);
 }
 
 BIND( idolon, load   ) 
@@ -214,7 +207,7 @@ BIND( idolon, move   )
 
 }
 
-BIND( idolon, frame  ) 
+BIND( idolon, flip  ) 
 {
 	int id, tile;
 	ARG_INT(tile);
@@ -229,16 +222,6 @@ BIND( idolon, frame  )
 	
 }
 
-BIND( idolon, flip   ) 
-{
-	int id, di;
-	ARG_INT(di);
-	ARG_INT(id);
-
-	Idolon::FlipBy(id, di);
-
-	RET();
-}
 
 BIND( idolon, sheet  ) 
 {
@@ -249,4 +232,16 @@ BIND( idolon, sheet  )
 	RET();
 }
 
+BIND( idolon, key    ) 
+{
+	const char * keysym;
+	ARG_STR(keysym);
+	if ( keysym == nullptr ) 
+	{
+		RET_INT( 0 );
+	}
+	Key key = static_cast<Key>(*keysym);
+	const int state = Engine::GetKeyState(key);
+	RET_INT(state);
+}
 

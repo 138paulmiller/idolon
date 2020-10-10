@@ -1,5 +1,5 @@
 # idolon 
-An emulator for a nonexistent system, aimed to facilitate simple game creation  
+A nonexistent game system, aimed to create topdown small RPG 
 
 ### Installation
 
@@ -11,8 +11,8 @@ At its core, idolon is a virtual Game Creation System.
 - Tilesheet editor
 - Map editor
 - Game scripting
-	- Python 3.8 and Javascript (ECMAScript E5/E5.1)
-
+	- Javascript (ECMAScript E5/E5.1)
+	- Python 3.8 also supported, though focus is on JS
 
 ### Development
 

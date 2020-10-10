@@ -45,7 +45,9 @@ namespace Idolon
 	//scroll map to x,y
 	void Scroll(int layer, int x, int y);
 	//get tile identifier at pixel xy
-	int TileAt( int layer, int x, int y );
+	int GetTile( int layer, int x, int y );
+	//get tile identifier at pixel xy
+	void SetTile( int layer, int x, int y, int tile );
 	
 	//========= sprite api =========
 	int Spawn(int tileId, int x, int y, bool isSmall = false);
