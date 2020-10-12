@@ -23,31 +23,36 @@ namespace Idolon
 	//{}
 
 	//======== System API ===========
-	
-	//execute  gamescript code
-	bool Use( const char *filepath );
-	void DisplaySize( int & w,int & h );
-	void MousePosition( int & x,int & y );
-		
-	// ==== Primitive Drawing api === 
-	// clear the display
-	void Clear( unsigned char r, unsigned char g, unsigned char b  );
+	//load from disc or cartirdge, returns asset id 
+	int Load( const char *assetName );
+	//unload. free
+	void Unload( int assetId );
 
+	void MousePosition( int & x, int & y );
+
+	//execute  gamescript code
+	bool Import( const char *filepath );
+
+	// ==== Primitive Drawing api === 
+	//get display size
+	void GfxSize( int & w, int & h );
+	// clear the display
+	void GfxClear( unsigned char r, unsigned char g, unsigned char b  );
 	//TODO - set pixel
-	//void SetPixel( int x, int y, int r, int g, int b  );
+	//void gfx_pixel( int x, int y, int r, int g, int b  );
 
 	//======= map api  =========
 	//load map into layer. unloads previous
-	void Load(int layer, const char * mapname);
-	void Unload(int layer);
+	void SetLayer(int layer, int mapId);
 	//set view into layer
-	void View(int layer, int x, int y, int w, int h);
+	void SetView(int layer, int x, int y, int w, int h);
 	//scroll map to x,y
-	void Scroll(int layer, int x, int y);
-	//get tile identifier at pixel xy
+	void ScrollTo(int layer, int x, int y);
+	void ScrollBy(int layer, int dx, int dy);
+	//set/get tile identifier at pixel xy
 	int GetTile( int layer, int x, int y );
-	//get tile identifier at pixel xy
-	void SetTile( int layer, int x, int y, int tile );
+	int SetTile( int layer, int x, int y, int tile );
+
 	
 	//========= sprite api =========
 	int Spawn(int tileId, int x, int y, bool isSmall = false);
@@ -56,12 +61,11 @@ namespace Idolon
 	void MoveBy(int spriteId, int dx, int dy);
 	void FlipTo(int spriteId, int tileId);
 	void FlipBy(int spriteId, int di);
-	int Frame( int spriteId );
-	bool Position( int spriteId, int &x, int &y );
-	bool SpriteSize( int spriteId, int &w, int &h );
+	int GetFrame( int spriteId );
+	bool GetSpritePosition( int spriteId, int &x, int &y );
+	bool GetSpriteSize( int spriteId, int &w, int &h );
 	
 	//set sprite sheet
-	void Sheet(const char *  tileset);
-
+	void SetSpriteSheet( int tilesetId );
 
 }

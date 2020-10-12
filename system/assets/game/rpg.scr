@@ -1,9 +1,13 @@
 $game/rpg javascript
 
 require("rpg.js")
-sheet("game/rpg")
-load(0, "game/rpg" )
 
+sheet0 = load("game/rpg.tls")
+map0 = load("game/rpg.map")
+ 
+layer(LAYER_BG, map0 )
+
+spr_sheet(sheet0)
 
 p0 = new Sprite( 0 )
 

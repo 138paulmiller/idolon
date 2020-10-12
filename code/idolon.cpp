@@ -6,12 +6,16 @@
 
 namespace Idolon
 {
+	/*
+		TODO - all graphics elements should not use Asset::Load/Unload but rather contain weak pointers to assets. All loading Unloading should be handled at this level, to allow cartridge or disk IO
+	*/
+
 	//TODO Sprite Manager should use octree
 	struct SpriteManager
 	{
 		SpriteManager()
 		{
-			tileset = "";
+			tileset = nullptr;
 		}
 
 		void clear()
@@ -28,11 +32,24 @@ namespace Idolon
 			Graphics::Sprite * sprite = new Graphics::Sprite(tileId, w,h);
 			sprite->x = x;
 			sprite->y = y;
-			sprite->tileset = tileset;
+			sprite->tileset = tileset ? tileset->name : "";
 			sprite->reload();
 			sprites.push_back(sprite);
 			return spriteId;
 		}
+
+		int despawn( int spriteId  )
+		{
+			if(spriteId > -1 && spriteId < sprites.size())
+			{
+				return 0;
+			}
+			delete 	sprites[spriteId];
+			sprites[spriteId] = 0;
+			return 1;
+		}
+
+
 		Graphics::Sprite * sprite(int id)
 		{
 			if(id > -1 && id < sprites.size())
@@ -52,10 +69,13 @@ namespace Idolon
 
 		std::vector<Graphics::Sprite*> sprites;
 		//sprite sheet
-		std::string tileset;
+		Graphics::Tileset * tileset;
 	} s_sm;
 
-	Graphics::Map * s_maps[LAYER_COUNT];
+	//these are owning pointers
+	std::vector<Asset *> s_assets;
+	//these are weak ref
+	Graphics::Map* s_maps[LAYER_COUNT];
 
 	bool s_mapsEnabled[LAYER_COUNT];
 	Game::Cartridge * m_cart;
@@ -95,16 +115,136 @@ namespace Idolon
 	void Quit()
 	{
 		s_sm.clear();
+		for ( int i = 0; i < s_assets.size(); i++ )
+		{
+			Unload( i );
+		}
+		for ( int i = 0; i < LAYER_COUNT; i++ )
+		{
+			s_maps[i] = 0;
+		}
 	}
 
-	bool Use( const char *filepath )
+	bool Import( const char *filepath )
 	{
 		//tries system lib
 		return Eval::Import( filepath );
 	}
 
+	inline Graphics::Map* LoadMap( const std::string & assetName )
+	{
+		if ( m_cart == 0 )
+		{
+			return Assets::Load<Graphics::Map>( assetName );
+		}
+		else
+		{
+			return m_cart->LoadMap( assetName );
+		}
+	}
+	inline void UnloadMap( Graphics::Map *map )
+	{
+		if ( m_cart == 0 )
+		{
+			Assets::Unload<Graphics::Map>( map->name );
+		}
+		else
+		{
+			m_cart->UnloadMap( map );
+		}
+	}
 
-	void DisplaySize( int &w, int &h )
+	inline Graphics::Tileset* LoadTileset( const std::string & assetName )
+	{
+		if ( m_cart == 0 )
+		{
+			return Assets::Load<Graphics::Tileset>( assetName );
+		}
+		else
+		{
+			//return m_cart->LoadTileset( assetName );
+			LOG( "ERROR:  Cart Load Tileset Unimpl!\n" );
+
+		}
+		return 0;
+	}
+	inline void UnloadTileset( Graphics::Tileset *tileset )
+	{
+		if ( m_cart == 0 )
+		{
+			Assets::Unload<Graphics::Map>( tileset->name );
+		}
+		else
+		{
+			//return m_cart->UnloadTileset( map );
+			LOG( "ERROR:  Cart Unload Tileset Unimpl!\n" );
+		}
+	}
+
+	int Load( const char *assetName )
+	{
+		int id ;
+		//find empty or end
+		for ( id = 0; id < s_assets.size(); id++ )
+		{
+			if ( s_assets[id] == 0 )
+			{
+				break;
+			}
+		}
+		if ( id == s_assets.size() )
+		{
+			s_assets.emplace_back();
+		}
+		const std::string & type = FS::FileExt( assetName );
+		const std::string& name = FS::NoExt(assetName);
+
+		//add 
+		if ( type == "map" )
+		{
+			s_assets[id] = LoadMap( name );
+		}
+		else if ( type == "tls" )
+		{
+			s_assets[id] = LoadTileset( name );
+		}
+		else
+		{
+			LOG( "Load:  Could not load %s", name.c_str(), type.c_str() );
+		}
+		//if valid 
+		if ( !s_assets[id] )
+		{
+			id = -1;
+		}
+		return id;	
+
+	}
+
+	void Unload( int assetId )
+	{
+		//add 
+		if ( assetId >= 0 && assetId < s_assets.size() )
+		{
+			Asset *asset = s_assets[assetId];
+			if ( asset )
+			{
+				const std::string & type = FS::FileExt( asset->name );
+				if ( type == "map" )
+				{
+					UnloadMap( dynamic_cast< Graphics::Map *>(asset) );
+				}
+				else if ( type == "tls" )
+				{
+					UnloadTileset( dynamic_cast< Graphics::Tileset *>(asset) );
+				}
+				s_assets[assetId] = 0;
+			}
+		}
+	}
+
+
+	void GfxSize( int &w, int &h )
 	{
 		Engine::GetSize(w, h);
 	}
@@ -116,43 +256,49 @@ namespace Idolon
 	
 	// ==== Primitive Drawing api === 
 	// clear the display
-	void Clear( unsigned char r, unsigned char g, unsigned char b )
+	void GfxClear( unsigned char r, unsigned char g, unsigned char b )
 	{
 		const Color & c = { 255,r,g,b };
 		Engine::Clear(c);	
 	}
 
 
-	// =============================== Sprite ==================================
+	// =============================== Map ==================================
 	
-	void Load( int layer, const char *mapname )
+	void SetLayer( int layer, int mapId )
 	{
 		bool success;
 		//if no cartridge use assets
-		if ( m_cart == 0 )
+		s_mapsEnabled[layer] = 0;
+		if ( mapId >= 0 && mapId < s_assets.size() )
 		{
-			Unload( layer );
-			s_maps[layer] = Assets::Load<Graphics::Map>( mapname );
+			s_maps[layer] = dynamic_cast<Graphics::Map*>(s_assets[mapId]);
 		}
 		else
 		{
-			s_maps[layer] = m_cart->LoadMap(mapname);
+			s_maps[layer] = 0;
 		}
 		//success
 		s_mapsEnabled[layer] = ( s_maps[layer] != nullptr );
 	}
 	
-	void Unload( int layer )
-	{
-		if(m_cart == 0 && s_maps[layer])
-			Assets::Unload<Graphics::Map>(s_maps[layer]->name);
-
-		s_mapsEnabled[layer] = 0;
-	}
-	
 	
 	//scroll map to x,y
-	void Scroll(int layer, int dx, int dy)
+	void ScrollTo(int layer, int x, int y)
+	{
+		if(layer >= 0 && layer < LAYER_COUNT)
+		{
+			Graphics::Map *map = s_maps[ layer ];
+			if (map)
+			{
+				const int dx = x - map->view.x;
+				const int dy = y - map->view.y;
+				map->scroll(dx, dy);
+			}
+		}
+	}
+	//scroll map to x,y
+	void ScrollBy(int layer, int dx, int dy)
 	{
 		if(layer >= 0 && layer < LAYER_COUNT)
 		{
@@ -164,7 +310,7 @@ namespace Idolon
 		}
 	}
 
-	void View(int layer, int x, int y, int w, int h)
+	void SetView(int layer, int x, int y, int w, int h)
 	{
 		if(layer >= 0 && layer < LAYER_COUNT)
 		{
@@ -177,27 +323,7 @@ namespace Idolon
 		}
 	}
 
-
-	int GetTile(int layer, int x, int y)
-	{
-		if(layer >= 0 && layer < LAYER_COUNT)
-		{
-			Graphics::Map *map = s_maps[ layer ];
-			if (map)
-			{
-				int tx, ty;
-				if (map->getTileXY(x, y, tx, ty))
-				{
-					return map->tiles[ty * map->w + tx];
-				}
-			}
-		}
-		return -1;
-	}
-
-
-	
-	void SetTile( int layer, int x, int y, int tile )
+	int SetTile( int layer, int x, int y, int tile )
 	{
 		if(layer >= 0 && layer < LAYER_COUNT)
 		{
@@ -212,7 +338,24 @@ namespace Idolon
 				}
 			}
 		}
-		return ;	
+		return -1;	
+	}
+	
+	int GetTile( int layer, int x, int y )
+	{
+		if(layer >= 0 && layer < LAYER_COUNT)
+		{
+			Graphics::Map *map = s_maps[ layer ];
+			if (map)
+			{
+				int tilex, tiley;
+				if (map->getTileXY(x, y, tilex, tiley))
+				{
+					return map->tiles[tiley * map->w + tilex];
+				}
+			}
+		}
+		return -1;	
 	}
 
 	// =============================== Sprite ==================================
@@ -230,12 +373,7 @@ namespace Idolon
 
 	void Despawn(int spriteId)
 	{
-		if(spriteId > -1 && spriteId < s_sm.sprites.size())
-		{
-			return ;
-		}
-		delete 	s_sm.sprites[spriteId];
-		s_sm.sprites[spriteId] = 0;
+		s_sm.despawn(spriteId);
 	}
 	
 
@@ -271,7 +409,7 @@ namespace Idolon
 		)
 	}
 
-	int Frame( int spriteId )
+	int GetFrame( int spriteId )
 	{
 		GET_SPRITE(sprite, spriteId,
 			return sprite->tile;
@@ -279,7 +417,7 @@ namespace Idolon
 		return -1;
 	}
 
-	bool Position( int spriteId, int & x, int & y)
+	bool GetSpritePosition( int spriteId, int & x, int & y)
 	{
 		GET_SPRITE(sprite, spriteId,
 			x = sprite->x;
@@ -290,7 +428,7 @@ namespace Idolon
 	}
 
 	
-	bool SpriteSize( int spriteId, int & w, int & h)
+	bool GetSpriteSize( int spriteId, int & w, int & h)
 	{
 		GET_SPRITE(sprite, spriteId,
 			w = sprite->w;
@@ -300,10 +438,12 @@ namespace Idolon
 		return false;
 	}
 
-	void Sheet( const char *tileset )
+	void SetSpriteSheet( int tilesetId  )
 	{
-		Assets::Unload<Graphics::Tileset>( tileset );
-		s_sm.tileset = tileset;
+		if ( tilesetId >= 0 && tilesetId < s_assets.size() )
+		{
+			s_sm.tileset = dynamic_cast<Graphics::Tileset*>(s_assets[tilesetId]);
+		}
 	}	
 
 

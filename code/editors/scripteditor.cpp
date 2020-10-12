@@ -55,6 +55,7 @@ void ScriptEditor::onEnter()
 
 void ScriptEditor::onExit()
 {
+	Idolon::Quit();
 	Assets::Unload<Script>(m_scriptName);
 	m_script =  0;
 	m_codeArea = 0;
@@ -118,6 +119,7 @@ void ScriptEditor::onKey(Key key, ButtonState state)
 
 void ScriptEditor::reload()
 {
+
 	Assets::Unload<Script>(m_scriptName);
 	m_script = Assets::Load<Script>(m_scriptName);
 	if ( !m_script ) { return; }

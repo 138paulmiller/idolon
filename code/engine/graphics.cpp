@@ -165,7 +165,6 @@ namespace Graphics
 	
 	void Map::scroll( int dx, int dy )
     {
-
         view.x += dx * m_scale;
         view.y += dy * m_scale;
 		clampView();

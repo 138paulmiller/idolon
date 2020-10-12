@@ -96,6 +96,15 @@ namespace Game
 		delete factory;
 		return map;
 	}
+
+	void Cartridge::UnloadMap( Graphics::Map * map )
+	{
+		//save to cart ? 
+		delete map;
+	}
+
+
+
 ///////////////////////////////////////////////////////////////////////////////
 
 	void Startup(const std::string & cartpath)

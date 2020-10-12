@@ -15,7 +15,7 @@ Sprite = function (tile ) {
     this.tile = tile
     this.anims = {} 
     this.cur_anim = null
-    this.id = sprite(tile, 0, 0)
+    this.id = spr(tile, 0, 0)
     this.size = new vec2(spr_w(this.id), spr_h(this.id))
 
     this.x = function () {
@@ -47,7 +47,7 @@ Sprite = function (tile ) {
     }
 
     this.kill = function () {
-        kill( this.id )
+        spr_kill( this.id )
     }
 
     this.make_anim = function (id, frames, duration) {
@@ -66,7 +66,7 @@ Sprite = function (tile ) {
         this.cur_anim = this.anims[anim_name]
         if (this.cur_anim ) {
             this.tile = this.cur_anim.frames[this.frame]
-            flip(this.id, this.tile)
+            spr_flip(this.id, this.tile)
         }
     }
 
@@ -79,11 +79,11 @@ Sprite = function (tile ) {
                 this.frame %= this.cur_anim.frames.length
                 this.startTime = new Date()
                 this.tile = this.cur_anim.frames[this.frame]
-                flip(this.id, this.tile)
+                spr_flip(this.id, this.tile)
             }
         }
         this.pos = this.pos.add(this.vel)
-        pos(this.id, this.pos.x, this.pos.y)
+        spr_pos(this.id, this.pos.x, this.pos.y)
 
         this.vel.x *= this.speed
         this.vel.y *= this.speed

@@ -66,6 +66,7 @@ namespace  Game
 		~Cartridge();	
 
 		Graphics::Map * LoadMap(const std::string & mapname);
+		void UnloadMap(Graphics::Map * map);
 
 	private:
 		char * m_data;

@@ -24,26 +24,27 @@
 #define BINDINGS \
 	DECL( idolon, log     , "Log message to debug console and file"    		)\
 	DECL( idolon, require , "use code from system lib file"					)\
+	DECL( idolon, load   , "Load asset"									)\
+	DECL( idolon, unload  , "Unload asset"									)\
 	DECL( idolon, key     , "Get key state. 0 is up, 1 is down. 2 is hold"	)\
 	DECL( idolon, gfx_w   , "Get gfx width "								)\
 	DECL( idolon, gfx_h   , "Get gfx height "								)\
 	DECL( idolon, clear   , "Clear screen with color r,g,b"					)\
 	DECL( idolon, mx      , "Get mouse x position"							)\
 	DECL( idolon, my      , "Get mouse y position"							)\
-	DECL( idolon, load    , "Load layer"									)\
-	DECL( idolon, unload  , "Unload layer"									)\
+	DECL( idolon, layer    , "Load layer"									)\
 	DECL( idolon, get_tile , "Get tile at given x,y"  						)\
 	DECL( idolon, set_tile    , "Set tile at given x,y"  						)\
 	DECL( idolon, view    , "Set the layer viewport"						)\
 	DECL( idolon, scroll  , "Scroll layer by dx,dy"							)\
-	DECL( idolon, sprite  , "Spawn sprite "									)\
+	DECL( idolon, spr, "Spawn sprite "									)\
 	DECL( idolon, spr_w   , "Get sprite width "								)\
 	DECL( idolon, spr_h   , "Get sprite height "								)\
-	DECL( idolon, kill    , "Despawn sprite "								)\
-	DECL( idolon, pos     , "Set sprite position"							)\
-	DECL( idolon, move    , "Move sprite by x,y"							)\
-	DECL( idolon, flip    , "Set sprite current tile"						)\
-	DECL( idolon, sheet   , "Set surrent sprite sheetsprite "				)\
+	DECL( idolon, spr_kill    , "Despawn sprite "								)\
+	DECL( idolon, spr_pos     , "Set sprite position"							)\
+	DECL( idolon, spr_move    , "Move sprite by x,y"							)\
+	DECL( idolon, spr_flip    , "Set sprite current tile"						)\
+	DECL( idolon, spr_sheet   , "Set surrent sprite sheetsprite "				)\
 
 
 BIND( idolon, require )
@@ -51,9 +52,26 @@ BIND( idolon, require )
 	const char *scriptPath;
 	
 	ARG_STR(scriptPath);
-	const int state = Idolon::Use( scriptPath );
+	const int state = Idolon::Import( scriptPath );
 	RET_INT( state != 0 );
 
+}
+
+BIND( idolon, load )
+{
+	const char *assetName;
+	ARG_STR(assetName);
+	const int state = Idolon::Load( assetName );
+	RET_INT( state != 0 );
+}
+
+
+BIND( idolon, unload )
+{
+	int assetId;
+	ARG_INT(assetId);
+	Idolon::Unload( assetId );
+	RET( );
 }
 
 BIND( idolon, key    ) 
@@ -74,7 +92,7 @@ BIND(idolon, gfx_w)
 {
 	static int w = 0;
 	static int h = 0;
-	Idolon::DisplaySize(w, h);
+	Idolon::GfxSize(w, h);
 	RET_INT( w );
 }
 
@@ -83,7 +101,7 @@ BIND(idolon, gfx_h)
 {
 	static int w = 0;
 	static int h = 0;
-	Idolon::DisplaySize(w, h);
+	Idolon::GfxSize(w, h);
 	RET_INT( h );
 
 }
@@ -115,30 +133,22 @@ BIND(idolon, clear)
 	ARG_INT(b);
 	ARG_INT(g);
 	ARG_INT(r);
-	Idolon::Clear(r,g,b);
+	Idolon::GfxClear(r,g,b);
 	RET();
 }
 
-BIND( idolon, load   ) 
+BIND( idolon, layer   ) 
 {	
-	int layer;
-	const char *mapname;
+	int layer,mapId;
 	
-	ARG_STR(mapname);
+	ARG_INT(mapId);
 	ARG_INT(layer);
 	
-	Idolon::Load(layer, mapname);
+	Idolon::SetLayer(layer, mapId);
 	RET();
 }
 
-BIND( idolon, unload ) 
-{
-	int layer;
-	
-	ARG_INT(layer);
-	Idolon::Unload(layer);
-	RET();
-}
+
 BIND( idolon, get_tile )
 {
 	int layer, x,y;
@@ -171,7 +181,7 @@ BIND( idolon, view   )
 	ARG_INT(x);
 	ARG_INT(layer);
 	
-	Idolon::View(layer, x, y, w, h);
+	Idolon::SetView(layer, x, y, w, h);
 	RET();
 }
 
@@ -183,11 +193,11 @@ BIND( idolon, scroll )
 	ARG_INT(x);
 	ARG_INT(layer);
 
-	Idolon::Scroll(layer, x, y);
+	Idolon::ScrollTo(layer, x, y);
 	RET();
 }
 
-BIND( idolon, sprite ) 
+BIND( idolon, spr ) 
 {
 	int id = -1;
 	int tile, x, y, isSmall = true;
@@ -210,7 +220,7 @@ BIND( idolon, spr_w )
 	//TODO handle small sprite
 	ARG_INT(id);
 
-	id = Idolon::SpriteSize(id, w, h);
+	id = Idolon::GetSpriteSize(id, w, h);
 
 	RET_INT(w);
 }
@@ -223,12 +233,12 @@ BIND( idolon, spr_h )
 	//TODO handle small sprite
 	ARG_INT(id);
 
-	id = Idolon::SpriteSize(id, w, h);
+	id = Idolon::GetSpriteSize(id, w, h);
 
 	RET_INT(h);
 }
 
-BIND( idolon, kill   ) 
+BIND( idolon, spr_kill   ) 
 {
 	int id = -1;
 	ARG_INT(id);
@@ -238,7 +248,7 @@ BIND( idolon, kill   )
 	RET();
 }
 
-BIND( idolon, pos    ) 
+BIND( idolon, spr_pos    ) 
 {
 	int id, x = -1, y = -1;
 	ARG_INT(y);
@@ -253,7 +263,7 @@ BIND( idolon, pos    )
 	RET_END( obj );
 }
 
-BIND( idolon, move   ) 
+BIND( idolon, spr_move   ) 
 {
 	int id, dx, dy;
 	ARG_INT(dy);
@@ -265,25 +275,25 @@ BIND( idolon, move   )
 
 }
 
-BIND( idolon, flip  ) 
+BIND( idolon, spr_flip  ) 
 {
 	int id, tile;
 	ARG_INT(tile);
 	ARG_INT(id);
 
 	Idolon::FlipTo(id, tile);
-	int frame = Idolon::Frame( id );
+	int frame = Idolon::GetFrame( id );
 	RET_INT( frame );
 	
 }
 
 
-BIND( idolon, sheet  ) 
+BIND( idolon, spr_sheet  ) 
 {
-	const char *sheet;
-	ARG_STR(sheet);
+	int sheetId;
+	ARG_INT(sheetId);
 	
-	Idolon::Sheet(sheet);
+	Idolon::SetSpriteSheet(sheetId);
 	RET();
 }
 
