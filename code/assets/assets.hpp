@@ -37,9 +37,9 @@ namespace Assets
 	void Startup(const std::string & dirpath);
 	void Shutdown();
 	//Run for the given game 
-	void AddPath(const std::string & dirpath);
+	void PushPath(const std::string & dirpath);
 	//clear all but default path
-	void ClearPaths();
+	void PopPath();
 	//update the cache. Do not call each frame.
 	//void Prune();
 
@@ -48,7 +48,6 @@ namespace Assets
 	void SaveImpl( Asset* asset, const std::type_info& type, const std::string& name);
 	void SaveAsImpl( Asset* asset, const std::type_info& type, const std::string& path);
 
-	bool ChangeNameImpl( const std::type_info& type, const std::string& name, const std::string& newname );
 	std::string GetAssetTypeExtImpl(const std::type_info& type);
 
 	template <typename Type>

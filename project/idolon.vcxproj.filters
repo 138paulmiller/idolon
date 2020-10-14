@@ -26,9 +26,6 @@
     <Filter Include="Source Files\assets">
       <UniqueIdentifier>{4efbf390-e071-4418-bfb1-c88c0cc57a85}</UniqueIdentifier>
     </Filter>
-    <Filter Include="System Files\assets\game">
-      <UniqueIdentifier>{d8b716d7-cd3a-4859-b23b-35a06ba9daf4}</UniqueIdentifier>
-    </Filter>
     <Filter Include="System Files\assets\lib">
       <UniqueIdentifier>{24449318-2ca7-4341-80c6-249d479b8fd0}</UniqueIdentifier>
     </Filter>
@@ -67,23 +64,29 @@
     <None Include="..\code\scripting\jsbindings.inl">
       <Filter>Source Files\scripting</Filter>
     </None>
-    <None Include="..\system\assets\game\rpg.map">
-      <Filter>System Files\assets\game</Filter>
-    </None>
-    <None Include="..\system\assets\game\rpg.scr">
-      <Filter>System Files\assets\game</Filter>
-    </None>
-    <None Include="..\system\assets\game\rpg.tls">
-      <Filter>System Files\assets\game</Filter>
-    </None>
-    <None Include="..\system\assets\game\rpg_py.scr">
-      <Filter>System Files\assets\game</Filter>
-    </None>
     <None Include="..\system\assets\lib\rpg.js">
       <Filter>System Files\assets\lib</Filter>
     </None>
     <None Include="..\system\assets\lib\core.js">
       <Filter>System Files\assets\lib</Filter>
+    </None>
+    <None Include="..\system\assets\rpg.map">
+      <Filter>System Files\assets</Filter>
+    </None>
+    <None Include="..\system\assets\rpg.scr">
+      <Filter>System Files\assets</Filter>
+    </None>
+    <None Include="..\system\assets\rpg.tls">
+      <Filter>System Files\assets</Filter>
+    </None>
+    <None Include="..\system\assets\rpg_py.scr">
+      <Filter>System Files\assets</Filter>
+    </None>
+    <None Include="..\system\assets\rpg.cart">
+      <Filter>System Files\assets</Filter>
+    </None>
+    <None Include="..\system\assets\rpg.cfg">
+      <Filter>System Files\assets</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

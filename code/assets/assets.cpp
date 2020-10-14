@@ -44,29 +44,18 @@ Factory::Factory( const std::type_info& type, const std::string &ext )
 
 namespace Assets
 {
-	std::string GetAssetTypeExtImpl(const std::type_info& type)
-	{
-		const auto it = s_details.find(type.name());
-		if(it != s_details.end())
-		{
-			return s_details[type.name()].ext;
-		}
-		return DEFAULT_RAW_EXT;
-	}
-
-	bool FileExists(const std::string & filepath)
+	
+	static bool FileExists(const std::string & filepath)
 	{
 	    std::ifstream infile(filepath);
 	    return infile.good();
 	}
 
-	std::string FindAssetPath(const std::type_info& type, const std::string & name)
+	static std::string FindAssetPath(const std::type_info& type, const std::string & name)
 	{
-		std::string n = name;
 		for(const std::string & dirpath : s_assetdirs)
 		{
-
-			const std::string & path = FS::Append(dirpath, n) + GetAssetTypeExtImpl(type);
+			const std::string & path = FS::Append(dirpath, name) + GetAssetTypeExtImpl(type);
 			if(FileExists(path))
 			{
 				return path;
@@ -99,17 +88,25 @@ namespace Assets
 		s_assets.clear();
 	}
 
-	void AddPath(const std::string & dirpath)
+	void PushPath(const std::string & dirpath)
 	{
 		s_assetdirs.push_back(dirpath);
 	}
 
-	void ClearPaths()
+	void PopPath()
 	{
 		//default path
-		std::string path = s_assetdirs[0];
-		s_assetdirs.clear();
-		s_assetdirs.push_back(path);   
+		s_assetdirs.pop_back();   
+	}
+	
+	std::string GetAssetTypeExtImpl(const std::type_info& type)
+	{
+		const auto it = s_details.find(type.name());
+		if(it != s_details.end())
+		{
+			return s_details[type.name()].ext;
+		}
+		return "";
 	}
 
 	// -------------------------- Impl -----------------------
@@ -207,7 +204,6 @@ namespace Assets
 	void SaveAsImpl( Asset* asset, const std::type_info& type, const std::string& path)
 	{
 		if ( !asset ) return;
-		asset->filepath = path;
 		try 
 		{		
 			LOG("Assets: Saving %s%s (%s)\n", asset->name.c_str(), GetAssetTypeExtImpl(type).c_str(), path.c_str());
@@ -216,12 +212,14 @@ namespace Assets
 			outfile.open(path);
 			Serialize(asset, type, outfile);
 			outfile.close();
+			asset->filepath = path;
 		}
 		catch (...)
 		{
 			LOG("Assets: Failed to open %s for writing\n", path.c_str());
 		}
 	}
+
 	void SaveImpl( Asset* asset, const std::type_info& type, const std::string& name)
 	{
 		std::string n = name;

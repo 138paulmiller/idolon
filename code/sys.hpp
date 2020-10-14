@@ -19,6 +19,7 @@ enum : uint8
 	APP_TILESET_EDITOR,
 	APP_MAP_EDITOR,
 	APP_SCRIPT_EDITOR,
+	APP_GAME_EDITOR,
 	APP_COUNT
 };
 
@@ -36,6 +37,7 @@ namespace Sys
 	void RunTilesetEditor(const std::string & tilesetName);
 	void RunMapEditor(const std::string & mapName);
 	void RunScriptEditor(const std::string & scriptName);
+	void RunGameEditor(const std::string & cartPath);
 	void RunGame(const std::string & gameName);
 
 }

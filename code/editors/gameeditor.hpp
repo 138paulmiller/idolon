@@ -3,8 +3,6 @@
 #include "../game.hpp"
 
 /*
-	
-
 */
 class  GameEditor : public Editor 
 {
@@ -18,12 +16,25 @@ public:
 	void undo()override;
 	void save()override;
 
-	
-	//path to game directory. contains .desc file
-	void load(const std::string & gamepath);
+	void setGame(const std::string & gameHeaderPath);
 
 private:
-	std::string m_gamepath;
-	Graphics::TextBox * m_text;
-	Game::Desc * desc;
+
+	//if a new row is added, then must offset all text inputs
+	void redrawHeaderData();
+	void requestRedrawHeader();
+
+	void setName( const std::string &name );
+
+	void openTilesetInputs( );
+	void closeTilesetInputs( );
+	
+	//managed to allow redraw
+	std::vector<int> m_headerButtons;
+	
+	Game::Header * m_header;
+	//may not be loaded. only load when running game
+	Game::Cartridge * m_cart;
+
+	bool m_requiresRedraw;
 };

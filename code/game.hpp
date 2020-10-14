@@ -41,42 +41,64 @@ namespace  Game
 	//Create a loader for each asset type. given a block of data load the asset into the CPU
 	//
 	//these describe the game files.
-	class Desc : public Asset 
+	struct Header : public Asset
 	{
-	public:
-		Desc(const std::string name);
+		Header( const std::string &name );
+		//game name
+		
 		//array of tileset names
 		std::vector<std::string> tilesets;
 		std::vector<std::string> maps;
 		std::vector<std::string> scripts;
+	} ;
+
+
+	struct Chunk
+	{
+		~Chunk() { delete data; }
+		//asset offset in chunk
+		std::unordered_map<std::string, int> offsets;
+		char *data = 0;
+		int size = 0 ;
 	};
 
 	//create a mapping from tileset name to cartridge 
 	//create cart factory
-	class Cartridge : public Asset
+	class Cartridge
 	{  
 	public:
-		struct Header
-		{
-			std::unordered_map<std::string, uint> offsets;
-		} 
-		header;
 
-		Cartridge(const std::string & name, const Desc * desc, char * m_data );
+		Cartridge( const Header &header, const Chunk &chunk );
+
 		~Cartridge();	
 
-		Graphics::Map * LoadMap(const std::string & mapname);
-		void UnloadMap(Graphics::Map * map);
+		Asset* LoadImpl( const std::type_info& type, const std::string& name);
+		void UnloadImpl( const std::type_info& type, Asset*  asset);
+
+
+		template <typename AssetType>
+		AssetType *Load( const std::string &name )
+		{
+			return dynamic_cast<AssetType*>(LoadImpl( typeid(AssetType), name));
+		}
+		
+		template <typename AssetType>
+		void Unload( Asset* asset )
+		{			
+			UnloadImpl( typeid(AssetType), asset);
+		}
+
+		Header header;
+		Chunk chunk;
 
 	private:
-		char * m_data;
-		const Desc * m_desc;
 	};
 
 	void Startup(const std::string & cartpath);
 	void Shutdown();
 
 	//package game into cartridge
-	void Package(const std::string & descname, const std::string & cartpath);
+	void Package( const Game::Header & header, const std::string & cartpath);
+	Cartridge * Unpackage( const std::string &cartpath );
 	
 }

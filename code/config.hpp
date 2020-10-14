@@ -28,8 +28,8 @@
 #define DEFAULT_MAP_EXT ".map" 
 #define DEFAULT_TILESET_EXT ".tls"
 #define DEFAULT_SCRIPT_EXT ".scr"
-#define DEFAULT_GAMEDESC_EXT  ".cfg"
-#define DEFAULT_RAW_EXT  ".raw"
+#define DEFAULT_GAME_HEADER_EXT  ".cfg"
+#define DEFAULT_CARTRIDGE_EXT  ".cart"
 
 #define CACHE_PATH "__cache__"
 
@@ -45,4 +45,5 @@
 #define ARG_NAME_TILESET "tls"
 #define ARG_NAME_FONT "font"
 #define ARG_NAME_MAP "map"
-#define ARG_NAME_SCRIPT "script"
+#define ARG_NAME_SCRIPT "scr"
+#define ARG_NAME_GAME "game"

@@ -4,6 +4,8 @@
 
 /*
 	Primary Editor interface. 
+	Replace toolbar with tooltip menu! This will display on right click and disaapear on click. 
+
 */
 
 class Editor : public App

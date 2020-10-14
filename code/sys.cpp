@@ -34,13 +34,12 @@ namespace Sys
 		s_gamestate = GAME_OFF;
 		s_context = new Context( APP_COUNT );
 
-
-			//each factory self registers with asset system
+		//each factory self registers with asset system
 	    s_factories[0] = new TilesetFactory();
 	    s_factories[1] = new MapFactory();
 	    s_factories[2] = new FontFactory();
 	    s_factories[3] = new ScriptFactory();
-	    s_factories[4] = new GameDescFactory();
+	    s_factories[4] = new GameFactory();
 
 		//default config
 		s_sysPath = FS::ExePath() + "/system/";
@@ -55,6 +54,7 @@ namespace Sys
 		s_context->create( APP_TILESET_EDITOR, new TilesetEditor()   );
 		s_context->create( APP_MAP_EDITOR,     new MapEditor()       );
 		s_context->create( APP_SCRIPT_EDITOR,  new ScriptEditor()    );
+		s_context->create( APP_GAME_EDITOR,  new GameEditor()    );
 		s_shell->addCommands( cmds );
 
 		//redirect key event to appropriate app. 
@@ -194,6 +194,13 @@ namespace Sys
 	{
 		s_context->app<ScriptEditor>(APP_SCRIPT_EDITOR)->setScript(scriptName);
 		s_context->enter(APP_SCRIPT_EDITOR);
+	}
+
+		
+	void RunGameEditor(const std::string & cartPath)
+	{
+		s_context->app<GameEditor>(APP_GAME_EDITOR)->setGame(cartPath);
+		s_context->enter(APP_GAME_EDITOR);
 	}
 
 	void RunGame(const std::string & gameName)

@@ -276,65 +276,68 @@ void ScriptFactory::serialize( const Asset * asset, std::ostream& out ) const
     out << "$" << script->name << " " << ScriptLanguageToStr(script->lang) << std::endl;
 	out << script->code;
 }
+//////////////////////////////////////////////////////////////////////////
 
-//////////////////////////////////////////////////////////////////////////////////////////////
-GameDescFactory::GameDescFactory()
-:Factory( typeid(Game::Desc), DEFAULT_GAMEDESC_EXT )
+#define SERIALIZE_NAMES( names, out )\
+{\
+	out << names.size();\
+	for ( int i = 0; i < names.size(); i++ )\
+	{\
+		out << names[i] << "\n";\
+	}\
+}
+
+#define DESERIALIZE_NAMES( names, in )\
+{\
+	int len = 0;\
+	std::string assetname;\
+	in >> len;\
+	names.resize( len );\
+	while ( len-- > 0 )\
+	{\
+		std::getline( in, assetname );\
+		names[len] = assetname;\
+	}\
+}
+
+
+GameFactory::GameFactory()
+:Factory( typeid(Game::Header), DEFAULT_GAME_HEADER_EXT )
 {
 }
-Asset *GameDescFactory::deserialize( std::istream &in )
+
+Asset * GameFactory::deserialize( std::istream& in )
 {
-    Game::Desc *desc= 0;
+    Game::Header *header = nullptr;
+    
     try
-    {        
+    {
         std::string name;
         std::getline( in, name );
+        header = new Game::Header( name );
 
-        desc = new Game::Desc(name);
-        std::string subassetName;
-        
-        int len = 0;
-        in >> len; 
-        desc->tilesets.resize( len );
-        while ( len-- > 0 )
-        {
-            std::getline( in, subassetName );
-            desc->tilesets.push_back( subassetName );
-        }
-
-        in >> len; 
-        desc->maps.resize( len );
-        while ( len-- > 0 )
-        {
-            std::getline( in, subassetName );
-            desc->maps.push_back( subassetName);
-        }
-        
-        in >> len; 
-        desc->scripts.resize( len );
-        while ( len-- > 0 )
-        {
-            std::getline( in, subassetName );
-            desc->scripts.push_back( subassetName);
-        }
-
+        DESERIALIZE_NAMES( header->tilesets, in)
+        DESERIALIZE_NAMES( header->maps, in )
+        DESERIALIZE_NAMES( header->scripts, in )
     }
     catch ( ... )
     {
-        if ( desc )
-        {
-		    LOG("Game Desc : failed to load game description %s\n", desc->filepath.c_str());
-            delete desc ;
-            desc = 0;
-        }
-        else
-        {
-            LOG("Game Desc : failed to load game description\n");
-        }
+        LOG("Game : failed to load game header\n");
+        if ( header ) delete header;
+        header = 0;
     }
-    return desc;
+    return header;
 }
 
-void GameDescFactory::serialize( const  Asset *asset, std::ostream &out ) const
+void GameFactory::serialize( const Asset * asset, std::ostream& out ) const
 {
+    const Game::Header* header = dynamic_cast< const Game::Header* >( asset );
+    ASSERT( header, "GameFactory: Asset not loaded" );
+    
+    out << header->name << "\n";
+    SERIALIZE_NAMES( header->tilesets, out )
+    SERIALIZE_NAMES( header->maps, out )
+    SERIALIZE_NAMES( header->scripts, out )
+
+
 }

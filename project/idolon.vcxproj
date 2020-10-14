@@ -168,12 +168,14 @@
     <None Include="..\system\assets\basic.fnt" />
     <None Include="..\system\assets\default.fnt" />
     <None Include="..\system\assets\full.fnt" />
-    <None Include="..\system\assets\game\rpg.map" />
-    <None Include="..\system\assets\game\rpg.scr" />
-    <None Include="..\system\assets\game\rpg.tls" />
-    <None Include="..\system\assets\game\rpg_py.scr" />
     <None Include="..\system\assets\lib\core.js" />
     <None Include="..\system\assets\lib\rpg.js" />
+    <None Include="..\system\assets\rpg.cart" />
+    <None Include="..\system\assets\rpg.cfg" />
+    <None Include="..\system\assets\rpg.map" />
+    <None Include="..\system\assets\rpg.scr" />
+    <None Include="..\system\assets\rpg.tls" />
+    <None Include="..\system\assets\rpg_py.scr" />
     <None Include="..\TODO" />
     <None Include="..\WIKI" />
   </ItemGroup>

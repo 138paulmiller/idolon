@@ -1,4 +1,4 @@
-$game/rpg python
+$rpg python
 from idolon import *
 
 bg = 0

@@ -291,6 +291,7 @@ void NewAsset(const Args& args)
 	{
 		Graphics::Map* map= new Graphics::Map(name);
 		Assets::SaveAs(map, UserAssetPath<Graphics::Map>(name));
+		delete map;
 	}
 	else if(type == ARG_NAME_FONT)
 	{
@@ -299,6 +300,7 @@ void NewAsset(const Args& args)
 		const int h =  6 * 8;
 		Graphics::Font* font= new Graphics::Font(name, w, h);
 		Assets::SaveAs(font, UserAssetPath<Graphics::Font>(name));
+		delete font;
 	}
 	else if (type == ARG_NAME_SCRIPT)
 	{
@@ -307,6 +309,14 @@ void NewAsset(const Args& args)
 
 		Script * script = Eval::CreateScript(name, lang);
 		Assets::SaveAs(script, UserAssetPath<Script>(name));
+		delete script;
+	}
+	else if (type == ARG_NAME_GAME)
+	{
+		//create empty game
+		Game::Header * header= new Game::Header(name);
+		Assets::SaveAs(header, UserAssetPath<Game::Header>(name));
+		delete header;
 	}
 	else
 	{
@@ -331,7 +341,11 @@ void EditAsset(const Args& args)
 		{
 			Assets::GetAssetTypeExt<Script>(),
 			Sys::RunScriptEditor
-		}
+		},
+		{
+			Assets::GetAssetTypeExt<Game::Header>(),
+			Sys::RunGameEditor
+		},
 		//TODO load font as tls
 		//{
 		//	Assets::GetAssetTypeExt<Graphics::Font>(),
@@ -341,9 +355,9 @@ void EditAsset(const Args& args)
 	//edit <asset>   
 	ARG_COUNT(args, 1);
 	//clear previous asset paths
-	// use current working directory
-	Assets::ClearPaths();
-	Assets::AddPath(FS::Cwd());
+	// use current working directory, plus any user provided like/this/
+	const std::string workingDir = FS::Cwd();
+	Assets::PushPath(workingDir);
 	//keep the dot
 	const std::string& type = "." + FS::FileExt(args[0]);
 	const std::string& name = FS::NoExt(args[0]);
@@ -354,8 +368,10 @@ void EditAsset(const Args& args)
 	}
 	else
 	{
-		SHELL_LOG("Could load asset type (%s)", type.c_str() );
+		SHELL_LOG("Could not load asset type (%s)", type.c_str() );
 	}
+	Assets::PopPath();
+
 }
 
 

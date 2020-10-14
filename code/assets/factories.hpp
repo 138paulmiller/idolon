@@ -2,18 +2,7 @@
 
 #include "assets.hpp"
 
-class Script;
 
-namespace Game
-{
-    class Desc;
-}
-namespace Graphics
-{
-    class Tileset;
-    class Map;
-    class Font;
-}
 /*
     Factories
 */
@@ -64,15 +53,14 @@ public:
 };
 
 
-/*--------------------------- -------------  GameDescFactory  ------------------------------------
+
+/*--------------------------- -------------  ScriptFactory  ------------------------------------
 */
-class GameDescFactory : public Factory
+class GameFactory : public Factory
 {
 public:
     //asset 
-    GameDescFactory();
+    GameFactory();
     Asset * deserialize( std::istream& in ) override;
     void serialize(const  Asset * asset, std::ostream& out ) const override;
 };
-
-

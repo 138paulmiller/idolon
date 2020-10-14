@@ -1,9 +1,9 @@
-$game/rpg javascript
+$rpg javascript
 
 require("rpg.js")
 
-sheet0 = load("game/rpg.tls")
-map0 = load("game/rpg.map")
+sheet0 = load("rpg.tls")
+map0 = load("rpg.map")
  
 layer(LAYER_BG, map0 )
 

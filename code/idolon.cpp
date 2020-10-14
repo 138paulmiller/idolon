@@ -131,53 +131,31 @@ namespace Idolon
 		return Eval::Import( filepath );
 	}
 
-	inline Graphics::Map* LoadMap( const std::string & assetName )
+	template <typename AssetType>
+	inline AssetType* LoadAs( const std::string & assetName )
 	{
 		if ( m_cart == 0 )
 		{
-			return Assets::Load<Graphics::Map>( assetName );
+			return Assets::Load<AssetType>( assetName );
 		}
 		else
 		{
-			return m_cart->LoadMap( assetName );
+			return m_cart->Load<AssetType>( assetName );
 		}
 	}
-	inline void UnloadMap( Graphics::Map *map )
+	
+	
+	template <typename AssetType>
+	inline void UnloadAs( AssetType *asset )
 	{
 		if ( m_cart == 0 )
 		{
-			Assets::Unload<Graphics::Map>( map->name );
+			if( asset )
+				Assets::Unload<AssetType>( asset->name );
 		}
 		else
 		{
-			m_cart->UnloadMap( map );
-		}
-	}
-
-	inline Graphics::Tileset* LoadTileset( const std::string & assetName )
-	{
-		if ( m_cart == 0 )
-		{
-			return Assets::Load<Graphics::Tileset>( assetName );
-		}
-		else
-		{
-			//return m_cart->LoadTileset( assetName );
-			LOG( "ERROR:  Cart Load Tileset Unimpl!\n" );
-
-		}
-		return 0;
-	}
-	inline void UnloadTileset( Graphics::Tileset *tileset )
-	{
-		if ( m_cart == 0 )
-		{
-			Assets::Unload<Graphics::Map>( tileset->name );
-		}
-		else
-		{
-			//return m_cart->UnloadTileset( map );
-			LOG( "ERROR:  Cart Unload Tileset Unimpl!\n" );
+			m_cart->Unload<AssetType>( asset);
 		}
 	}
 
@@ -202,15 +180,19 @@ namespace Idolon
 		//add 
 		if ( type == "map" )
 		{
-			s_assets[id] = LoadMap( name );
+			s_assets[id] = LoadAs<Graphics::Map>( name );
 		}
 		else if ( type == "tls" )
 		{
-			s_assets[id] = LoadTileset( name );
+			s_assets[id] = LoadAs<Graphics::Tileset>( name );
+		}
+		else if ( type == "scr" )
+		{
+			s_assets[id] = LoadAs<Script>( name );
 		}
 		else
 		{
-			LOG( "Load:  Could not load %s", name.c_str(), type.c_str() );
+			LOG( "Load:  Could not load %s %s", name.c_str(), type.c_str() );
 		}
 		//if valid 
 		if ( !s_assets[id] )
@@ -232,11 +214,15 @@ namespace Idolon
 				const std::string & type = FS::FileExt( asset->name );
 				if ( type == "map" )
 				{
-					UnloadMap( dynamic_cast< Graphics::Map *>(asset) );
+					UnloadAs( dynamic_cast< Graphics::Map *>(asset) );
 				}
 				else if ( type == "tls" )
 				{
-					UnloadTileset( dynamic_cast< Graphics::Tileset *>(asset) );
+					UnloadAs( dynamic_cast< Graphics::Tileset *>(asset) );
+				}
+				else if ( type == "scr" )
+				{
+					UnloadAs( dynamic_cast< Script*>(asset) );
 				}
 				s_assets[assetId] = 0;
 			}
