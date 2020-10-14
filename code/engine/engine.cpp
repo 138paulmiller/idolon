@@ -139,10 +139,13 @@ namespace Engine
                 if (sym == KEY_UNKNOWN) break;
                 s_ue.keymap[sym] = BUTTON_RELEASE;
 
-				const KeyHandler & cb = s_keyhandlers.top();
-                if( s_echo && cb)
+                if ( s_keyhandlers.size() > 0 )
                 {
-                    cb(Key(sym), s_ue.keymap[sym]);
+				    const KeyHandler & cb = s_keyhandlers.top();
+                    if( s_echo && cb)
+                    {
+                        cb(Key(sym), s_ue.keymap[sym]);
+                    }
                 }
             }
                 break;
