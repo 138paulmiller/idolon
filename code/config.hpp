@@ -47,3 +47,8 @@
 #define ARG_NAME_MAP "map"
 #define ARG_NAME_SCRIPT "scr"
 #define ARG_NAME_GAME "game"
+
+//remove this 
+#define MAX_TILESET_COUNT 4
+#define MAX_MAP_COUNT     4
+#define MAX_SCRIPT_COUNT  4

@@ -53,6 +53,10 @@ void GameEditor::onTick()
 	{
 		redrawHeaderData();
 	}
+	for ( int i = 0; i < m_labels.size(); i++ )
+	{
+		m_labels[i]->draw();
+	}
 }
 
 //
@@ -76,6 +80,7 @@ void GameEditor::save()
 void GameEditor::setGame( const std::string & headerName )
 {
 	m_header = Assets::Load<Game::Header>(headerName );
+	//if does not exist, create ? 
 }
 
 void GameEditor::setName( const std::string &name )
@@ -87,16 +92,6 @@ void GameEditor::setName( const std::string &name )
 
 }
 
-void GameEditor::openTilesetInputs()
-{
-	//display all tilesetnames, plus a text input with ... to add a new one
-
-	//on click, set tileset
-	//if any of these are clicked, or leave then close
-}
-
-void GameEditor::closeTilesetInputs()
-{}	
 
 void GameEditor::requestRedrawHeader()
 {
@@ -104,8 +99,63 @@ void GameEditor::requestRedrawHeader()
 
 }
 
+
+int GameEditor::AddNamesList(const std::string & labelText, std::vector<std::string> &names, int x, int y, int colx, int offy, int inputw )
+{
+	Graphics::TextBox *label = new Graphics::TextBox( labelText.size(), 1, labelText, DEFAULT_FONT );
+	label->x = x;
+	label->y = y;
+	label->textColor = WHITE; 
+	label->fillColor = EDITOR_COLOR; 
+	label->reload();
+ 
+	m_labels.push_back( label );
+
+	UI::TextButton * addTilesetButton = new UI::TextButton( "+", colx, y, 1, 1, DEFAULT_FONT );
+	addTilesetButton->cbClick = [this, &names] () {
+
+		if ( names.size() < MAX_TILESET_COUNT ) {
+			names.push_back( "" );
+			this->requestRedrawHeader();
+		}
+	};
+	m_headerButtons.push_back(App::addButton( addTilesetButton ));
+
+	UI::TextButton * removeTilesetButton = new UI::TextButton( "-", colx + 10, y, 1, 1, DEFAULT_FONT );
+	removeTilesetButton->cbClick = [this, &names] () {
+
+		if ( names.size() > 0) {
+			names.pop_back( );
+			this->requestRedrawHeader();
+		}
+	};
+	m_headerButtons.push_back(App::addButton( removeTilesetButton ));
+
+
+	y += offy;
+
+	if ( m_header )
+	{
+		for ( int i = 0; i < names.size(); i++ )
+		{
+			UI::TextInput * tilesetInput = new UI::TextInput( names[i], colx, y, inputw, 1, DEFAULT_FONT);
+			y += offy;
+			tilesetInput->cbAccept = [this, i, tilesetInput, &names] () {
+				names[i] = tilesetInput->text;
+			};
+			m_headerButtons.push_back(App::addButton( tilesetInput ));
+
+			//add a goto button, this will load editor on the tileset, if the tileset does not exist, it will be created
+		}
+	}
+	return y + offy;
+	
+}
+
 void GameEditor::redrawHeaderData()
 {
+	if ( m_header == nullptr ) return;
+
 	m_requiresRedraw = false;
 	for ( int i = 0; i < m_headerButtons.size(); i++ )
 	{
@@ -113,6 +163,11 @@ void GameEditor::redrawHeaderData()
 	}
 	m_headerButtons.clear();
 
+	for ( int i = 0; i < m_labels.size(); i++ )
+	{
+		delete m_labels[i];
+	}
+	m_labels.clear();
 	//TODO add + buttons to add
 	// when adding will redraw
 
@@ -123,19 +178,26 @@ void GameEditor::redrawHeaderData()
 	const int charH = font->charH;
 	Assets::Unload<Graphics::Font>( fontName );
 
-	const std::string &name = m_header ? m_header->name : "";
+	const std::string &name = m_header->name;
 
 	int inputw = 15;
-	int colx = charW;
+	int borderx = charW * 3;
+	int colx = charW*15;
 	int offy = charH + 2;
-	int y = 10;
+	int y = 20;
 
 	//name info
 	{
-		const std::string &label = "Game Name";
-		m_headerButtons.push_back( App::addButton( new UI::TextButton( label, 0, y, label.size(), 1, DEFAULT_FONT ) ) );
-		y += offy;
+		const std::string &labelText = "Game Name";
+		Graphics::TextBox *label = new Graphics::TextBox( labelText.size(), 1, labelText, DEFAULT_FONT );
+		label->x = borderx;
+		label->y = y;
+		label->textColor = WHITE; 
+		label->fillColor = EDITOR_COLOR; 
+		label->reload();
 
+		m_labels.push_back( label );
+		
 		UI::TextInput *nameInput = new UI::TextInput( name, colx, y, inputw, 1, DEFAULT_FONT );
 		nameInput->cbAccept = [this, nameInput] () {
 			this->setName( nameInput->text );
@@ -144,32 +206,11 @@ void GameEditor::redrawHeaderData()
 		m_headerButtons.push_back( App::addButton( nameInput ) );
 		y += offy;
 	}
+	y += offy;
 
-	{//tileset info
+	y = AddNamesList( "Tilesets", m_header->tilesets, borderx, y, colx, offy, inputw );
+	y = AddNamesList( "Maps", m_header->maps, borderx, y, colx, offy, inputw );
+	y = AddNamesList( "Scripts", m_header->scripts, borderx, y, colx, offy, inputw );
 
-		const std::string &label = "Tilesets";
-		m_headerButtons.push_back( App::addButton( new UI::TextButton( label, 0, y, label.size(), 1, DEFAULT_FONT ) ));
-
-		UI::TextButton * addTilesetButton = new UI::TextButton( "+", (2+label.size()) * charW, y, 1, 1, DEFAULT_FONT );
-		addTilesetButton->cbClick = [this] () {
-			if ( this->m_header ) this->m_header->tilesets.push_back( "" );
-			this->requestRedrawHeader();
-		};
-		m_headerButtons.push_back(App::addButton( addTilesetButton ));
-		y += offy;
-
-		if ( m_header )
-		{
-			for ( int i = 0; i < m_header->tilesets.size(); i++ )
-			{
-				UI::TextInput * tilesetInput = new UI::TextInput( m_header->tilesets[i], colx, y, inputw, 1, DEFAULT_FONT);
-				y += offy;
-				tilesetInput->cbAccept = [this, i, tilesetInput] () {
-					this->m_header->tilesets[i] = tilesetInput->text;
-				};
-				m_headerButtons.push_back(App::addButton( tilesetInput ));
-			}
-		}
-	}
 
 }
