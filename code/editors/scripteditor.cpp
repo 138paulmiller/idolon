@@ -84,7 +84,7 @@ void ScriptEditor::onTick()
 		m_script->call( GAME_API_UPDATE, ret, { TypedArg( delta_ms ) } );
 		m_scriptRunning = ret.type == ARG_NONE ||  ret.value.i != 0;
 		//reset 
-		Idolon::Step();
+		Idolon::Draw();
 		return;
 	}
 
@@ -95,6 +95,7 @@ void ScriptEditor::onTick()
 //
 void ScriptEditor::onKey(Key key, ButtonState state)
 {
+	if ( m_script == nullptr ) return;
 	if (state != BUTTON_RELEASE)
 	{
 		if (m_scriptRunning)

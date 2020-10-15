@@ -79,7 +79,13 @@ namespace Idolon
 
 	bool s_mapsEnabled[LAYER_COUNT];
 	Game::Cartridge * m_cart;
+
+	//draw mode 
+	int s_drawMode = DRAWMODE_TILED;
+
 }
+
+
 
 #define GET_SPRITE(name, spriteId, ...) 		\
 	Graphics::Sprite *name = s_sm.sprite( spriteId );\
@@ -98,19 +104,23 @@ namespace Idolon
 		s_sm.clear();
 	}
 
-	void  Step()
+	void Draw()
 	{
-		//handle collisions. dispatch events
-		//update game state 
-		//handle return state RUN, EXIT, PAUSE
-		//clear screen, draw map, draw sprites, draw ui
-		Engine::Clear();
-		for(int i = 0 ; i < LAYER_COUNT; i++)
+		//if tiled mode
+		if ( s_drawMode == DRAWMODE_TILED )
 		{
-			if( s_mapsEnabled[i])
-				s_maps[i]->draw();
+			//handle collisions. dispatch events
+			//update game state 
+			//handle return state RUN, EXIT, PAUSE
+			//clear screen, draw map, draw sprites, draw ui
+			Engine::Clear();
+			for(int i = 0 ; i < LAYER_COUNT; i++)
+			{
+				if( s_mapsEnabled[i])
+					s_maps[i]->draw();
+			}
+			s_sm.draw();
 		}
-		s_sm.draw();
 	}
 	void Quit()
 	{
@@ -229,17 +239,24 @@ namespace Idolon
 		}
 	}
 
+	void MousePosition( int &x, int &y )
+	{
+		Engine::GetMousePosition( x, y);
+	}
+	
 
 	void GfxSize( int &w, int &h )
 	{
 		Engine::GetSize(w, h);
 	}
 	
-	void MousePosition( int &x, int &y )
+	void GfxDrawMode( int mode  )
 	{
-		Engine::GetMousePosition( x, y);
+		s_drawMode = mode;
 	}
-	
+
+
+
 	// ==== Primitive Drawing api === 
 	// clear the display
 	void GfxClear( unsigned char r, unsigned char g, unsigned char b )
@@ -248,10 +265,55 @@ namespace Idolon
 		Engine::Clear(c);	
 	}
 
+	int GfxCreateTexture( int width, int height )
+	{
+		return Engine::CreateTexture( width, height, TEXTURE_STATIC );
+	}
 
+	void GfxDestroyTexture( int textureId )
+	{
+		Engine::DestroyTexture(textureId );
+	}
+	
+	void GfxUpdateTexture( int textureId, const unsigned char *pixels, int width, int x, int y, int w, int h )
+	{
+		const Rect &rect = { x,y,w,h };
+		Engine::UpdateTexture( textureId, reinterpret_cast<const Color*>(pixels), width, rect );
+	}
+    
+	void GfxDrawTexture( int textureId, 		
+		int sx, int sy, int sw, int sh, 
+		int dx, int dy, int dw, int dh 
+	)
+	{
+		const Rect &src = { sx,sy,sw,sh };
+		const Rect &dst= { dx,dy,dw,dh };
+
+		Engine::DrawTexture( textureId, src, dst );
+	}
+
+	void GfxDrawLine( 
+		unsigned char r, unsigned char g, unsigned char b, unsigned char a, 
+		int x1, int y1, int x2, int y2 
+	)
+	{
+		const Color &color = { a,r,g,b };
+		Engine::DrawLine( color, x1, y1, x2, y2  );
+	}
+
+	void GfxDrawRect(
+		unsigned char r, unsigned char g, unsigned char b, unsigned char a,  
+		int x, int y, int w, int h, bool filled 
+	)
+	{
+		const Color &color = { a,r,g,b };
+		const Rect &rect = { x,y,w,h };
+		Engine::DrawRect( color, rect, filled );
+	}
+	
 	// =============================== Map ==================================
 	
-	void SetLayer( int layer, int mapId )
+	void MapLoad( int layer, int mapId )
 	{
 		bool success;
 		//if no cartridge use assets
@@ -270,7 +332,7 @@ namespace Idolon
 	
 	
 	//scroll map to x,y
-	void ScrollTo(int layer, int x, int y)
+	void MapScrollTo(int layer, int x, int y)
 	{
 		if(layer >= 0 && layer < LAYER_COUNT)
 		{
@@ -284,7 +346,7 @@ namespace Idolon
 		}
 	}
 	//scroll map to x,y
-	void ScrollBy(int layer, int dx, int dy)
+	void MapScrollBy(int layer, int dx, int dy)
 	{
 		if(layer >= 0 && layer < LAYER_COUNT)
 		{
@@ -296,7 +358,7 @@ namespace Idolon
 		}
 	}
 
-	void SetView(int layer, int x, int y, int w, int h)
+	void MapView(int layer, int x, int y, int w, int h)
 	{
 		if(layer >= 0 && layer < LAYER_COUNT)
 		{
@@ -309,7 +371,7 @@ namespace Idolon
 		}
 	}
 
-	int SetTile( int layer, int x, int y, int tile )
+	int MapSetTile( int layer, int x, int y, int tile )
 	{
 		if(layer >= 0 && layer < LAYER_COUNT)
 		{
@@ -327,7 +389,7 @@ namespace Idolon
 		return -1;	
 	}
 	
-	int GetTile( int layer, int x, int y )
+	int MapGetTile( int layer, int x, int y )
 	{
 		if(layer >= 0 && layer < LAYER_COUNT)
 		{
@@ -346,7 +408,7 @@ namespace Idolon
 
 	// =============================== Sprite ==================================
 
-	int Spawn(int tileId, int x, int y, bool isSmall)
+	int SprSpawn(int tileId, int x, int y, bool isSmall)
 	{
 		if( tileId < 0 || tileId >= (isSmall ? SPRITE_SMALL_COUNT : SPRITE_COUNT )  )
 		{
@@ -357,28 +419,22 @@ namespace Idolon
 		return s_sm.spawn(tileId, x, y,w,h);
 	}
 
-	void Despawn(int spriteId)
+	void SprDespawn(int spriteId)
 	{
 		s_sm.despawn(spriteId);
 	}
 	
 
-	void MoveTo( int spriteId, int x, int y )
+	void SprSetPosition( int spriteId, int x, int y )
 	{
 		GET_SPRITE(sprite, spriteId,
 			sprite->x = x;
 			sprite->y = y;
 		)
 	}
-	void MoveBy( int spriteId, int dx, int dy )
-	{
-		GET_SPRITE(sprite, spriteId,
-			sprite->x += dx;
-			sprite->y += dy;
-		)
-	}
 
-	void FlipTo( int spriteId, int tileId )
+
+	void SprSetFrame( int spriteId, int tileId )
 	{
 		GET_SPRITE(sprite, spriteId,
 			sprite->tile = tileId;
@@ -387,15 +443,9 @@ namespace Idolon
 
 	}
 
-	void FlipBy( int spriteId, int di )
-	{
-		GET_SPRITE(sprite, spriteId,
-			sprite->tile += di;
-			sprite->tile = Clamp(sprite->tile, 0, (sprite->w == SPRITE_H_SMALL ? SPRITE_SMALL_COUNT : SPRITE_COUNT) );
-		)
-	}
 
-	int GetFrame( int spriteId )
+
+	int SprGetFrame( int spriteId )
 	{
 		GET_SPRITE(sprite, spriteId,
 			return sprite->tile;
@@ -403,7 +453,7 @@ namespace Idolon
 		return -1;
 	}
 
-	bool GetSpritePosition( int spriteId, int & x, int & y)
+	bool SprGetPosition( int spriteId, int & x, int & y)
 	{
 		GET_SPRITE(sprite, spriteId,
 			x = sprite->x;
@@ -414,7 +464,7 @@ namespace Idolon
 	}
 
 	
-	bool GetSpriteSize( int spriteId, int & w, int & h)
+	bool SprGetSize( int spriteId, int & w, int & h)
 	{
 		GET_SPRITE(sprite, spriteId,
 			w = sprite->w;
@@ -424,7 +474,7 @@ namespace Idolon
 		return false;
 	}
 
-	void SetSpriteSheet( int tilesetId  )
+	void SprSetSheet( int tilesetId  )
 	{
 		if ( tilesetId >= 0 && tilesetId < s_assets.size() )
 		{

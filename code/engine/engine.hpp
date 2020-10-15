@@ -94,5 +94,5 @@ namespace Engine
     //Tools 
 
     //Load and image and save as an asset
-    Color * LoadTexture(const std::string path, int &w, int &h);
+    Color * LoadPixelsFromFile(const std::string path, int &w, int &h);
 }

@@ -54,43 +54,34 @@
 #define RET_END(obj ) \
 	return 1;
 
-#include "bindings.inl"
 
-//-------------------------------------------------------------------//
-BIND(idolon, log)
-{
-	const int LOG_MAX = 2048;
-
-	char buffer[LOG_MAX];
-	char *str = buffer;
-	while ( duk_get_top( ctx ) )
-	{
-		if ( str - buffer > LOG_MAX ) break;
-		if ( duk_get_type_mask( ctx, -1 ) & DUK_TYPE_MASK_STRING )
-		{
-			const char * strarg = duk_safe_to_string( ctx, -1 );
-			str+=sprintf_s( str, LOG_MAX, "%s ", strarg );
-		}
-		else if (duk_get_type_mask( ctx, -1 ) & DUK_TYPE_MASK_NUMBER )
-		{
-			const int numarg = duk_to_number( ctx, -1 );
-			str+=sprintf_s( str, LOG_MAX, "%d ", numarg );
-
-		}
-		else if (duk_get_type_mask( ctx, -1 ) & DUK_TYPE_MASK_BOOLEAN )
-		{
-			const int numarg = duk_to_boolean( ctx, -1 );
-			str+=sprintf_s( str, LOG_MAX, "%d ", numarg );
-		}
-		else
-		{
-			ERR( "Js Script error: Invalid arg type" );
-			break;
-		}
-		duk_pop( ctx );
+#define ARGS_VARLIST(onInt, onFloat, onStr )\
+	while ( duk_get_top( ctx ) )\
+	{\
+		if ( duk_get_type_mask( ctx, -1 ) & DUK_TYPE_MASK_STRING )\
+		{\
+			const char * s = duk_safe_to_string( ctx, -1 );\
+			onStr;\
+		}\
+		else if (duk_get_type_mask( ctx, -1 ) & DUK_TYPE_MASK_NUMBER )\
+		{\
+			const float f = duk_to_number( ctx, -1 );\
+			onFloat;\
+		}\
+		else if (duk_get_type_mask( ctx, -1 ) & DUK_TYPE_MASK_BOOLEAN )\
+		{\
+			const int i = duk_to_boolean( ctx, -1 );\
+			onInt;\
+		}\
+		else\
+		{\
+			ERR( "Js Script error: Invalid arg type" );\
+			break;\
+		}\
+		duk_pop( ctx );\
 	}
 
-	LOG( buffer );
-	LOG( "\n" );
-	return 1;
-}
+
+#include "bindings.inl"
+
+

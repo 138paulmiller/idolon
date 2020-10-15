@@ -142,21 +142,15 @@ KEY_RIGHT = LEFT + 1
 
 
 
-#define ARG_STR_OPT(var)\
-	PyArg_ParseTuple( args, "s", &var )
-	
 #define ARG_STR(var)\
-	if ( ARG_STR_OPT(var) == 0 )\
+	if ( PyArg_ParseTuple( args, "s", &var ) == 0 )\
 	{\
 		LOG("Script : Python : Expected string");\
 		return 0;\
 	}
-
-#define ARG_INT_OPT(var) \
-	PyArg_ParseTuple( args, "i", &var )
-
+	
 #define ARG_INT(var) \
-	if ( ARG_INT_OPT(var) == 0 )\
+	if ( PyArg_ParseTuple( args, "i", &var ) == 0 )\
 	{\
 		LOG("Script : Python : Expected integer");\
 		Py_RETURN_NONE;\
@@ -179,37 +173,31 @@ KEY_RIGHT = LEFT + 1
 	Py_XINCREF( obj );\
 	return obj;
 
+#define ARGS_VARLIST(onInt, onFloat, onStr )\
+	int i; float f; char *s; \
+	bool found = false; \
+	do{\
+		found = PyArg_ParseTuple( args, "i", &i );\
+		if ( found )\
+		{\
+			onInt;\
+			continue;\
+		}\
+		found = PyArg_ParseTuple( args, "f",  &f );\
+		if ( found )\
+		{\
+			onFloat;\
+			continue;\
+		}\
+		found = PyArg_ParseTuple( args, "s",  &s );\
+		if ( found )\
+		{\
+			onStr;\
+			continue;\
+		}\
+	} while ( found );
+
+
 #include "bindings.inl"
 
 
-BIND(idolon, log)
-{
-	const int LOG_MAX = 2048;
-
-	char buffer[LOG_MAX] = { '\0' };
-	char *str = buffer;
-	int i;
-	char *s;
-	bool found = false;
-	do{
-		if ( str - buffer > LOG_MAX ) break;
-
-		found = ARG_INT_OPT( i );
-		if ( found )
-		{
-			str += sprintf_s( str, LOG_MAX, "%i ", i );
-		}
-		else
-		{ 
-			found = ARG_STR_OPT( s );
-			if ( found )
-			{
-				str += sprintf_s( str, LOG_MAX, "%s ", s );
-			}
-		}
-	} while ( found );
-
-	LOG( buffer );
-	LOG( "\n" );
-	RET();
-}

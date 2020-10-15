@@ -273,6 +273,7 @@ namespace Engine
         SetTextureBlendMode(i, BLEND_MIX);
         return i;
     }
+
     void DestroyTexture(int textureId)
     {  
         CHECK_TEXTURE(textureId )
@@ -280,6 +281,64 @@ namespace Engine
         s_textures[textureId] = 0;
         SDL_DestroyTexture(texture);
     }
+    //if texture is static
+
+    void UpdateTexture( int textureId, const Color * colors, int width, const Rect & rect )
+    {
+        CHECK_TEXTURE( textureId );
+        const SDL_Rect & sdlrect = { rect.x, rect.y, rect.w, rect.h };
+        SDL_UpdateTexture( s_textures[textureId], &sdlrect, colors, width * sizeof( Color ) );
+    }
+
+    //If using streaming 
+    Color * LockTexture(int textureId, const Rect & region)
+    {
+        CHECK_TEXTURE(textureId )
+
+        SDL_Texture* texture = s_textures[textureId];
+
+        uint32_t format;
+        int access, buffw, buffh;
+        SDL_QueryTexture(texture, &format, &access, &buffw, &buffh);
+        ASSERT(region.x+region.w <= buffw && region.y+region.h <= buffh && region.x >= 0 && region.y >= 0 && region.w >= 0 && region.h >= 0, "LockTexture: Invalid rect");
+        const SDL_Rect & rect = { region.x,region.y,region.w,region.h };
+        //internal 
+        int pitch;
+        Color* texpixels = 0;
+        SDL_LockTexture(texture, &rect, (void**)&texpixels, &pitch);
+        return texpixels;
+    }   
+    
+    void UnlockTexture(int textureId)
+    {
+        CHECK_TEXTURE(textureId )
+        SDL_UnlockTexture(s_textures[textureId]);
+    }
+
+    Color * LoadPixelsFromFile(const std::string path, int &w, int &h)
+    {
+        int bpp = 0; //force 4 bpp
+        unsigned char *data = stbi_load(path.c_str(), &w, &h, &bpp, 0);
+        if ( data == 0 ) return 0;
+        Color * pixels = new Color[w*h];
+        for (int y = 0; y < h; y++)
+        {
+            for (int x = 0; x < w; x++)
+            {
+                int i = y * w + x;
+                Color* c = &pixels[i];
+                unsigned char* pixel = data + i * bpp;
+                c->r = pixel[0];
+                c->g = pixel[1];
+                c->b = pixel[2];
+                c->a = bpp == 4 ? pixel[3] : 255;
+            }
+        }
+        stbi_image_free(data);
+        return pixels;
+    }
+
+
     void Clear(const Color& color)
     {
         ClearTexture(s_target, color);
@@ -308,59 +367,8 @@ namespace Engine
         SetTextureBlendMode(  s_target, mode );
     }
     
-    //if texture is static
 
-    void UpdateTexture( int textureId, const Color * colors, int width, const Rect & rect )
-    {
-        CHECK_TEXTURE( textureId );
-        const SDL_Rect & sdlrect = { rect.x, rect.y, rect.w, rect.h };
-        SDL_UpdateTexture( s_textures[textureId], &sdlrect, colors, width * sizeof( Color ) );
-    }
-    //If using streaming 
-    Color * LockTexture(int textureId, const Rect & region)
-    {
-        CHECK_TEXTURE(textureId )
 
-        SDL_Texture* texture = s_textures[textureId];
-
-        uint32_t format;
-        int access, buffw, buffh;
-        SDL_QueryTexture(texture, &format, &access, &buffw, &buffh);
-        ASSERT(region.x+region.w <= buffw && region.y+region.h <= buffh && region.x >= 0 && region.y >= 0 && region.w >= 0 && region.h >= 0, "LockTexture: Invalid rect");
-        const SDL_Rect & rect = { region.x,region.y,region.w,region.h };
-        //internal 
-        int pitch;
-        Color* texpixels = 0;
-        SDL_LockTexture(texture, &rect, (void**)&texpixels, &pitch);
-        return texpixels;
-    }   
-    void UnlockTexture(int textureId)
-    {
-        CHECK_TEXTURE(textureId )
-        SDL_UnlockTexture(s_textures[textureId]);
-    }
-    Color * LoadTexture(const std::string path, int &w, int &h)
-    {
-        int bpp = 0; //force 4 bpp
-        unsigned char *data = stbi_load(path.c_str(), &w, &h, &bpp, 0);
-        if ( data == 0 ) return 0;
-        Color * pixels = new Color[w*h];
-        for (int y = 0; y < h; y++)
-        {
-            for (int x = 0; x < w; x++)
-            {
-                int i = y * w + x;
-                Color* c = &pixels[i];
-                unsigned char* pixel = data + i * bpp;
-                c->r = pixel[0];
-                c->g = pixel[1];
-                c->b = pixel[2];
-                c->a = bpp == 4 ? pixel[3] : 255;
-            }
-        }
-        stbi_image_free(data);
-        return pixels;
-    }
     void ClearTexture(int textureId, const Color& color, BlendMode mode)
     {
         CHECK_TEXTURE(textureId);

@@ -220,7 +220,7 @@ void ImportAsset(const Args& args)
 		ARG_COUNT(args, 2);
 		int w, h;
 		const std::string &  imgpath = args[1];
-		Color * pixels = Engine::LoadTexture(imgpath, w, h);
+		Color * pixels = Engine::LoadPixelsFromFile(imgpath, w, h);
 		std::string name = FS::BaseName(imgpath);
 		Graphics::Tileset * sheet = new Graphics::Tileset(name, w, h);
 		memcpy(sheet->pixels, pixels, w * h * sizeof(Color));
@@ -238,7 +238,7 @@ void ImportAsset(const Args& args)
 		//charcter offset (ascii value)
 		int start = args.size() > 4 ? std::stoi(args[4]) : 0;
 		int w, h;
-		Color * pixels = Engine::LoadTexture(imgpath, w, h);
+		Color * pixels = Engine::LoadPixelsFromFile(imgpath, w, h);
 		if ( !pixels ) return; //log err
 		std::string name = FS::BaseName(imgpath);
 		//remove spaces 

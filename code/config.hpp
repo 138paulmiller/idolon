@@ -15,8 +15,8 @@
 #define DEFAULT_FONT "default"
 #define FPS_STAT_RATE  5.f 
 
-#define GAME_API_UPDATE "on_frame"
-#define GAME_API_ONKEY "on_key"
+#define GAME_API_UPDATE "OnFrame"
+#define GAME_API_ONKEY "OnKey"
 
 #define DEFAULT_COLOR_TEXT  WHITE
 #define DEFAULT_COLOR_FILL  BLACK

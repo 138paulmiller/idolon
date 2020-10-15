@@ -4,19 +4,14 @@ Sprite = function (tile ) {
 
     //move these to physics proto
     this.pos = new vec2(0, 0)
-    this.vel = new vec2(0, 0)
-    this.speed = 0.25
-    this.deccel = 0.5
-    this.max_vel = 1
-    this.is_moving = false
 
     this.frame_timer = 0
     this.frame = 0 //index in animation
     this.tile = tile
     this.anims = {} 
     this.cur_anim = null
-    this.id = spr(tile, 0, 0)
-    this.size = new vec2(spr_w(this.id), spr_h(this.id))
+    this.id = SprSpawn(tile, 0, 0)
+    this.size = new vec2( SprSize(this.id) )
 
     this.x = function () {
         return this.pos.x
@@ -35,19 +30,16 @@ Sprite = function (tile ) {
     }
 
     this.move_by = function (dx, dy) {
-        this.vel.x += dx * this.speed
-        this.vel.y += dy * this.speed
-        this.vel.x = clamp(this.vel.x, -this.max_vel, this.max_vel)
-        this.vel.y = clamp(this.vel.y, -this.max_vel, this.max_vel)
+        this.pos.x += dx
+        this.pos.y += dy
     }
 
     this.move_to = function (x, y) {
         this.pos = new vec2(x, y)
-        this.vel = new vec2(0, 0)
     }
 
     this.kill = function () {
-        spr_kill( this.id )
+        SprKill( this.id )
     }
 
     this.make_anim = function (id, frames, duration) {
@@ -66,7 +58,7 @@ Sprite = function (tile ) {
         this.cur_anim = this.anims[anim_name]
         if (this.cur_anim ) {
             this.tile = this.cur_anim.frames[this.frame]
-            spr_flip(this.id, this.tile)
+            SprFlip(this.id, this.tile)
         }
     }
 
@@ -79,15 +71,11 @@ Sprite = function (tile ) {
                 this.frame %= this.cur_anim.frames.length
                 this.startTime = new Date()
                 this.tile = this.cur_anim.frames[this.frame]
-                spr_flip(this.id, this.tile)
+                SprFlip(this.id, this.tile)
             }
         }
-        this.pos = this.pos.add(this.vel)
-        spr_pos(this.id, this.pos.x, this.pos.y)
 
-        this.vel.x *= this.speed
-        this.vel.y *= this.speed
-
+        SprPos(this.id, this.pos.x, this.pos.y)
     }
 
 }

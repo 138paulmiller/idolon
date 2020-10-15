@@ -1,49 +1,59 @@
 $rpg javascript
 
-require("rpg.js")
+Require("rpg.js")
 
-sheet0 = load("rpg.tls")
-map0 = load("rpg.map")
+sheet0 = Load("rpg.tls")
+map0 = Load("rpg.map")
  
-layer(LAYER_BG, map0 )
-
-spr_sheet(sheet0)
+MapLayer(LAYER_BG, map0 )
+SprSheet(sheet0)
 
 p0 = new Sprite( 0 )
-
 p0.make_anim("walk", [0,1,2], 100 )
 p0.play_anim("walk")
 
-function on_frame(delta_ms) {
-    if(key(KEY_w)){
-        p0.move_by( 0, -1 )
-    }
-    else if(key(KEY_s)){
-        p0.move_by( 0, 1 )
-    }
+vel = new vec2( 0,0 )
+speed = 1/32
+function OnFrame(dMs) {
+    Log(dMs)
 
-    if(key(KEY_a)){
-        p0.move_by( -1, 0 )
-    } else if(key(KEY_d)){
-        p0.move_by( 1, 0 )
-    }
-
-    p0.on_frame(delta_ms)
+    p0.move_by( vel.x*dMs , vel.y*dMs )
+    p0.on_frame(dMs)
 
 }
 
-function on_key(key, state){ 
+//swap tiles
+function debug(key, state){
     if( state == BTN_CLICK ){
+        //get center of tile
         c = p0.pos.add( p0.size.scale( 0.5 ) )
-        
-        t = get_tile(0, c.x, c.y)
-        if(key == KEY_q){
+        t = GetTile(LAYER_BG, c.x, c.y)
+        if(key == KEY_q ){
             t -=1
-        }else if(key == KEY_e){
+        }else if(key == KEY_e ){
             t +=1
         }
-        set_tile(0, c.x, c.y, t )
+        SetTile(LAYER_BG, c.x, c.y, t )
     }
+
+}
+
+function OnKey(key, state){ 
+    s = state == BTN_UP ? 0 : speed 
+    
+    if(key == KEY_a ){
+        vel.x = -1 * s
+    }
+    else if(key == KEY_d ){
+        vel.x = s
+    }
+    else if(key == KEY_w ){
+        vel.y = -1 * s
+    }
+    else if(key == KEY_s ){
+        vel.y = s
+    }
+
 }
 
 

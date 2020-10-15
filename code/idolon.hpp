@@ -5,22 +5,12 @@
 //Game Runtime API 
 namespace Idolon
 {
+	enum { DRAWMODE_PIXEL = 0, DRAWMODE_TILED };
+
 	//boot from cartridge. this will load data into ram. otherwise will use assets syste
 	void Boot(const char * cartname);
-	void Step();
+	void Draw();
 	void Quit();
-
-	////TODO - asset api to create/load assets from disk or datas. use 
-	//void Load( const char *assetName )
-	//{}
-	//void Create( const char *assetName )
-	//{}
-	//
-	//void Destroy( int id )
-	//{}
-	////if empty ,will use generated
-	//void Save( int id, const char *assetName = "" )
-	//{}
 
 	//======== System API ===========
 	//load from disc or cartirdge, returns asset id 
@@ -32,40 +22,59 @@ namespace Idolon
 
 	//execute  gamescript code
 	bool Import( const char *filepath );
+	//TODO - create a serialization api to write into a user file.
+
 
 	// ==== Primitive Drawing api === 
 	//get display size
 	void GfxSize( int & w, int & h );
+	//set draw mode
+	void GfxDrawMode( int mode );
 	// clear the display
 	void GfxClear( unsigned char r, unsigned char g, unsigned char b  );
-	//TODO - set pixel
-	//void gfx_pixel( int x, int y, int r, int g, int b  );
+	int GfxCreateTexture( int width, int height );
+	void GfxDestroyTexture( int textureId );
+	//a,r,g,b formatted array
+	void GfxUpdateTexture( int textureId, const unsigned char *pixels, int width, int x, int y, int w, int h );
+	
+	void GfxDrawTexture( int textureId,
+		int sx, int sy, int sw, int sh,
+		int dx, int dy, int dw, int dh
+	);
+	
+	void GfxDrawLine(
+		unsigned char r, unsigned char g, unsigned char b, unsigned char a,
+		int x1, int y1, int x2, int y2
+	);
+	
+	void GfxDrawRect(
+		unsigned char r, unsigned char g, unsigned char b, unsigned char a,
+		int x, int y, int w, int h, bool filled
+	);
 
 	//======= map api  =========
-	//load map into layer. unloads previous
-	void SetLayer(int layer, int mapId);
+	//load map into layer. unloads previous. to unload just set mapId to -1
+	void MapLoad(int layer, int mapId);
 	//set view into layer
-	void SetView(int layer, int x, int y, int w, int h);
+	void MapView(int layer, int x, int y, int w, int h);
 	//scroll map to x,y
-	void ScrollTo(int layer, int x, int y);
-	void ScrollBy(int layer, int dx, int dy);
+	void MapScrollTo(int layer, int x, int y);
+	void MapScrollBy(int layer, int dx, int dy);
 	//set/get tile identifier at pixel xy
-	int GetTile( int layer, int x, int y );
-	int SetTile( int layer, int x, int y, int tile );
+	int MapGetTile( int layer, int x, int y );
+	int MapSetTile( int layer, int x, int y, int tile );
 
 	
 	//========= sprite api =========
-	int Spawn(int tileId, int x, int y, bool isSmall = false);
-	void Despawn( int spriteId );
-	void MoveTo(int spriteId, int x, int y);
-	void MoveBy(int spriteId, int dx, int dy);
-	void FlipTo(int spriteId, int tileId);
-	void FlipBy(int spriteId, int di);
-	int GetFrame( int spriteId );
-	bool GetSpritePosition( int spriteId, int &x, int &y );
-	bool GetSpriteSize( int spriteId, int &w, int &h );
+	int SprSpawn(int tileId, int x, int y, bool isSmall = false);
+	void SprDespawn( int spriteId );
+	void SprSetPosition(int spriteId, int x, int y);
+	void SprSetFrame(int spriteId, int tileId);
+	int SprGetFrame( int spriteId );
+	bool SprGetPosition( int spriteId, int &x, int &y );
+	bool SprGetSize( int spriteId, int &w, int &h );
 	
 	//set sprite sheet
-	void SetSpriteSheet( int tilesetId );
+	void SprSetSheet( int tilesetId );
 
 }
