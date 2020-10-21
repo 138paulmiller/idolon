@@ -45,17 +45,13 @@ void TilesetEditor::onEnter()
 	int w, h;
 	Engine::GetSize(w, h);
 
-	const int x = w - 16 - 8;
-	const int y = 8 * 2;
+	const int x = 8;
+	const int y = 16;
 	m_colorpicker = new UI::ColorPicker(x,y);
 	m_tilepicker = new UI::TilePicker();
 	m_tilepicker->reload(m_tileset );
 
-	const int idLen  = 3;
-	const int tileidX =  w - m_charW * 3;
-	const int tilesetY =  m_tilepicker->rect().y - m_charH;
-	m_tileIdBox = new UI::TextButton("00", tileidX, tilesetY, idLen , 1, fontName );
-	
+
 	addTool("PENCIL", [&](){
 		m_tool = TILE_TOOL_PENCIL;                     
 	});
@@ -79,7 +75,6 @@ void TilesetEditor::onEnter()
 	//add the ui widgets
 	App::addWidget( m_tilepicker );
 	App::addWidget( m_colorpicker );
-	App::addWidget( m_tileIdBox );
 
 	//choose pixel tool on start
 	m_tool = TILE_TOOL_PENCIL;                     
@@ -138,7 +133,7 @@ void TilesetEditor::onTick()
 	const float scale = tileSrc.w ? ( TILE_SIZE_MAX / tileSrc.w ) * m_tileScale : m_tileScale;
 	
 	//canvas is the tile drawing region in worldspace 
-	const Rect & canvasRect = { m_charW, m_charH * 2, (int)(tileSrc.w * scale), (int)(tileSrc.h * scale) }; 	
+	const Rect & canvasRect = { 24, 16, (int)(tileSrc.w * scale), (int)(tileSrc.h * scale) }; 	
 
 	const float mtilex = (mx-canvasRect.x);
 	const float mtiley = (my-canvasRect.y);
@@ -274,11 +269,6 @@ void TilesetEditor::onTick()
 		}	
 	}	
 
-	//draw box
-	const int id = m_tilepicker->selectionIndex();
-	char idText[]  = "00";
-	snprintf(idText, 3, "%02d", id);
-	m_tileIdBox->setText(idText);
 	// draw tile and border
 	Engine::DrawTexture(m_tileset->texture, tileSrc, canvasRect);
 
@@ -358,6 +348,7 @@ void TilesetEditor::drawOverlay(int tilex, int tiley, const Rect & dest)
 //
 void TilesetEditor::onKey(Key key, ButtonState state)
 {
+	if ( m_tilepicker->handleKey( key, state ) ) return;
 	if(state == BUTTON_CLICK)
 	{
 		switch(key)
@@ -383,7 +374,6 @@ void TilesetEditor::onKey(Key key, ButtonState state)
 				}
 				break;
 			default:
-				m_tilepicker->handleKey(key, state);
 				break;
 		}
 	}

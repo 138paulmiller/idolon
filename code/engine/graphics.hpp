@@ -100,7 +100,8 @@ namespace Graphics
     class Font : public Tileset
     {
     public:
-        Font(const std::string& name, int w, int h, int charW = TILE_W, int charH = TILE_H, char start = ' ');
+        //to make ascii pritanable start be ' '
+        Font(const std::string& name, int w, int h, int charW = TILE_W, int charH = TILE_H, char start = 0 );
 
         //src is textbox in character units
         // if isEscaped, will handle newlines and replace tabs

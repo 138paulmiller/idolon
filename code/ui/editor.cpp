@@ -10,18 +10,18 @@ namespace
 	std::unordered_map<std::string, std::string> s_iconNameMap = {
 		{ "PENCIL", { 0  } },
 		{ "FILL",   { 1  } },
-		{ "ERASER", { 2  } },
-		{ "LINE",   { 3  } },
-		{ "STAMP",  { 4  } },
-		{ "PLAY",   { 5  } },
-		{ "PAUSE",  { 6  } },
-		{ "RELOAD", { 7  } },
-		{ "UNDO",   { 8  } },
-		{ "REDO",   { 9  } },
-		{ "SAVE",   { 10 } },
-		{ "LOAD",   { 11 } },
-		{ "EXIT",   { 12 } },
-		{ "BUILD",  { 13 } },
+		{ "LINE",   { 2  } },
+		{ "ERASER", { 3  } },
+		{ "UNDO",   { 4  } },
+		{ "REDO",   { 5  } },
+		{ "RELOAD", { 6  } },
+		{ "SAVE",   { 7  } },
+		{ "LOAD",   { 8  } },
+		{ "EXIT",   { 9  } },
+		{ "STAMP",  { 10 } },
+		{ "BUILD",  { 11 } },
+		{ "PLAY",   { 12 } },
+		{ "PAUSE",  { 13 } },
 	};
 
 }
@@ -97,7 +97,7 @@ void Editor::onEnter()
 	//BACK
 	control->add( getIcon("EXIT"), [&](){
 		App::signal(APP_CODE_EXIT);
-	}, false);
+	}, false, false );
 	
 	//get tool bar offset
 	m_controlX = control->get( 0 )->rect().x;

@@ -2,10 +2,6 @@
 
 #include "../engine/api.hpp"
 
-//editor "background" color. 
-#define EDITOR_COLOR Palette[17]
-#define CURSOR_COLOR Palette[25]
-#define BORDER_COLOR WHITE
 
 //Classes that can be used by UI 
 class App;
@@ -21,7 +17,7 @@ enum AppCode
 {
 	APP_CODE_CONTINUE = 0, 
 	APP_CODE_EXIT, 		//exit app
-	APP_CODE_SHUTDOWN, 	//shutdown system
+	APP_CODE_SHUTDOWN, 	//shutdown systemicons.
 	//APP_PAUSE,
 };
 
@@ -257,11 +253,14 @@ namespace UI
 		int selectionIndex();
 		void moveCursor(int dx, int dy);
 		void resizeCursor(int w, int h);
-		void handleKey(Key key, ButtonState state) ;
+		bool handleKey(Key key, ButtonState state) ;
 
 		const Graphics::Tileset * tileset() const { return m_tileset; } 
 
 	private:
+		//create hide tab as well as tileset source
+		UI::TextButton * m_tileIdBox;
+
 		const Graphics::Tileset * m_tileset;
 		Rect m_cursor;
 

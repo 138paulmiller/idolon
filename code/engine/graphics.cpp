@@ -355,7 +355,7 @@ namespace Graphics
         int dx = 0, dy = 0;
         int i = 0;
         //skip scrollY lines
-        while( scrolly )
+        while( isEscaped && scrolly )
         {
             if ( i > text.size() ) break;
             const int s =  text[i++];

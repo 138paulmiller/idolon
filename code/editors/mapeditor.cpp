@@ -169,6 +169,9 @@ bool MapEditor::handleScroll()
 //
 void MapEditor::onKey( Key key, ButtonState state)
 {
+	if ( m_tilepicker->handleKey( key, state ) ) return;
+
+
 	int mx, my;
 	Engine::GetMousePosition(mx, my);
 	const float scale = m_map ? m_map->scale() : 1.0;
@@ -231,7 +234,6 @@ void MapEditor::onKey( Key key, ButtonState state)
 				hideWorkspace();
 		break;
 		default:
-			m_tilepicker->handleKey(key, state);
 		break;
 	}
 

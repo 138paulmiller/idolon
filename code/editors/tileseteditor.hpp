@@ -35,7 +35,6 @@ private:
 
 	UI::TilePicker * m_tilepicker;
 	UI::ColorPicker * m_colorpicker;
-	UI::TextButton * m_tileIdBox;
 	
 	std::string m_tilesetName;
 	Graphics::Tileset * m_tileset;

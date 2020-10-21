@@ -589,9 +589,9 @@ TextScrollArea
 		textbutton->fillColor  = fillColor ;
 		textbutton->sticky = sticky ;
 
-
 		textbutton->setEscape( isEscaped );
 		textbutton->setFont(font);
+
 		//perhaps avoidable
 		textbutton->cbClick = [this, buttonId, click] () 
 		{ 
@@ -732,15 +732,19 @@ TextScrollArea
 
 	TilePicker::TilePicker()
 		:
-		m_scale(2),
+		m_scale(1),
 		m_tileset(0),
 		m_focus(false)
 	{
 		resizeCursor(m_selectionSizes[0][0], m_selectionSizes[0][0]);
+
+		m_tileIdBox = 0;
+
 	}
 
 	TilePicker::~TilePicker()
 	{
+		delete m_tileIdBox;
 		if(m_tileset)
 			Assets::Unload<Graphics::Tileset>(m_tileset->name);
 	}
@@ -815,6 +819,12 @@ TextScrollArea
 					m_focus = false;
 			}
 		}
+
+		//update id
+		const int id = selectionIndex();
+		char idText[]  = "000";
+		snprintf(idText, 4, "%03d", id);
+		m_tileIdBox->setText(idText);
 	}
 	void TilePicker::reload( const Graphics::Tileset * tileset)
 	{
@@ -828,36 +838,63 @@ TextScrollArea
 		m_aspect = 2;//w / (m_tileset->w* m_scale);
 		const int adjw = ( int ) ( m_tileset->w * m_aspect );
 		const int adjh = ( int ) ( m_tileset->w / m_aspect );
-
+		const int border = 2;
 		m_cursor = {0,0,TILE_W,TILE_H};	
-		m_box = { 0, h - m_tileset->h * m_scale , m_tileset->w * m_scale, m_tileset->h * m_scale};
+		m_box = { border, h - m_tileset->h * m_scale - border , m_tileset->w * m_scale, m_tileset->h * m_scale};
 
+				const std::string &fontName = DEFAULT_FONT;
+		Graphics::Font * font = Assets::Load<Graphics::Font>(DEFAULT_FONT);
+		
+		// account for padding in 
+		const int tileIdX =  w - (font->charW+DEFAULT_TEXT_BORDER) * 3;
+		const int tileIdY =  m_box.y - font->charH- border;
+		
+		if ( m_tileIdBox )
+			delete m_tileIdBox;
+		m_tileIdBox = new UI::TextButton("000", tileIdX, tileIdY, 3, 1, DEFAULT_FONT );
+
+		m_tileIdBox->onUpdate();
 	}
 
 	void TilePicker::onDraw()
 	{
+
 		Engine::DrawRect( EDITOR_COLOR, m_box, true);		
 
 		if(!m_tileset) return;
 		const Rect & worldCursor = 
 		{
-			m_cursor.x * m_scale + m_box.x, 
-			m_cursor.y * m_scale + m_box.y, 
-			m_cursor.w * m_scale , 
-			m_cursor.h * m_scale 
+			//-1 +1 wrap around tile
+			m_cursor.x * m_scale + m_box.x - 1, 
+			m_cursor.y * m_scale + m_box.y - 1, 
+			m_cursor.w * m_scale + 2, 
+			m_cursor.h * m_scale + 2 
 		};
 
+		const Rect & worldBorder = 
+		{
+			//-1 +1 wrap around tile
+			m_box.x - 1, 
+			m_box.y - 1, 
+			m_box.w + 2, 
+			m_box.h + 2 
+		};
+
+		
 		const Rect& src = { 0, 0, m_tileset->w, m_tileset->h };
 		Engine::DrawTexture( m_tileset->texture, src, m_box);
 
 		Engine::DrawRect(CURSOR_COLOR, worldCursor, false);
+		Engine::DrawRect(BORDER_COLOR, worldBorder, false);
+
+		m_tileIdBox->onDraw();
 
 	}
 
-	void TilePicker::handleKey(Key key, ButtonState state)
+	bool TilePicker::handleKey(Key key, ButtonState state)
 	{
 		if( state == BUTTON_RELEASE) 
-			return;
+			return false;
 		
 		switch(key)
 		{
@@ -879,6 +916,11 @@ TextScrollArea
 			case KEY_2:
 				resizeCursor( m_selectionSizes[1][0], m_selectionSizes[1][1] );
 				break;
+			default:
+				return false;
+
 		}
+		return true;
+
 	}
 } // namespace UI

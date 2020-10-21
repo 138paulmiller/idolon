@@ -71,7 +71,6 @@ namespace Engine
         
         s_windowW = (int)( w * s_windowScale);
         s_windowH = (int)( h * s_windowScale);
-
         s_window = SDL_CreateWindow(title, WINDOW_X, WINDOW_Y, s_windowW, s_windowH, WINDOW_FLAGS);
         s_renderer = SDL_CreateRenderer(s_window, -1, RENDERER_FLAGS);
         s_target = CreateTexture( w, h, TEXTURE_TARGET);
@@ -201,7 +200,7 @@ namespace Engine
         SDL_SetRenderTarget(s_renderer, 0);
         SDL_SetRenderDrawColor(s_renderer, s_clearColor.r, s_clearColor.g, s_clearColor.b, s_clearColor.a);
         SDL_RenderClear(s_renderer);
-        SDL_Rect drect = { 0,0, s_windowW,s_windowH };
+        SDL_Rect drect = { 0, 0, s_windowW,s_windowH };
         SDL_RenderCopy( s_renderer, s_textures[s_target], NULL, &drect );
         SDL_RenderPresent(s_renderer);
     }
