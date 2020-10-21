@@ -1,7 +1,7 @@
 
 
 #include "ui.hpp"
-#include "context.hpp"
+#include "app.hpp"
 #include "../config.hpp"
 
 namespace UI
@@ -160,6 +160,10 @@ namespace UI
 	}
 
 
+	void TextButton::setEscape( bool isEscaped )
+	{
+		m_textbox->escaped = isEscaped;
+	}
 
 
 /*--------------------------------------------------------------------------------------
@@ -563,7 +567,7 @@ TextScrollArea
 			m_parent->removeButton( id );
 	}
 
-	int  Toolbar::add(const std::string & text, std::function<void()> click, bool sticky )
+	int  Toolbar::add(const std::string & text, std::function<void()> click, bool sticky, bool isEscaped )
 	{
 		if ( !leftAlign && m_count == 0 )
 		{
@@ -584,6 +588,9 @@ TextScrollArea
 		textbutton->clickColor = clickColor;
 		textbutton->fillColor  = fillColor ;
 		textbutton->sticky = sticky ;
+
+
+		textbutton->setEscape( isEscaped );
 		textbutton->setFont(font);
 		//perhaps avoidable
 		textbutton->cbClick = [this, buttonId, click] () 

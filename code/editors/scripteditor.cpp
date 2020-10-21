@@ -41,7 +41,7 @@ void ScriptEditor::onEnter()
 
 	m_scriptRunning = false;
 
-	addTool("RUN", [&](){
+	addTool("PLAY", [&](){
 		runCode();
 	}, false);
 	

@@ -5,10 +5,10 @@
 enum TileToolMode : char
 {
 	//the correspond to tool bar order!. can be used by APP to get widget
-	TILE_TOOL_PIXEL = 0,
+	TILE_TOOL_PENCIL = 0,
 	TILE_TOOL_FILL,
 	TILE_TOOL_LINE,
-	TILE_TOOL_ERASE,
+	TILE_TOOL_ERASER,
 	TILE_TOOL_COUNT,
 };
 

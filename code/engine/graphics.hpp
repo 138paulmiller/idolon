@@ -4,29 +4,6 @@
 #include "../assets/api.hpp"
 
 
-//Default Tileset size
-//Size fits to bottom of the screen
-#define TILESET_W 128
-#define TILESET_H 32
-//Default Tileset sizes
-#define TILE_W 8
-#define TILE_H 8
-#define TILE_COUNT (TILESET_W/TILE_W * TILESET_H/TILE_H) 
-
-#define MAP_W 128
-#define MAP_H 128
-//if tile index is -1, then will be clear
-#define TILE_CLEAR -1
-
-//Max number of tilesets per map
-#define TILESETS_PER_MAP 2
-//Default Tileset sizes
-#define SPRITE_W 16
-#define SPRITE_H 16
-#define SPRITE_W_SMALL 8
-#define SPRITE_H_SMALL 8
-#define SPRITE_COUNT (TILESET_W/SPRITE_W * TILESET_H/SPRITE_W) 
-#define SPRITE_SMALL_COUNT (TILESET_W/SPRITE_W_SMALL * TILESET_H/SPRITE_H_SMALL) 
 
 namespace Graphics
 {
@@ -126,7 +103,8 @@ namespace Graphics
         Font(const std::string& name, int w, int h, int charW = TILE_W, int charH = TILE_H, char start = ' ');
 
         //src is textbox in character units
-        void blit(int destTexture, const std::string & text, const Rect & dest, int scrolly);
+        // if isEscaped, will handle newlines and replace tabs
+        void blit(int destTexture, const std::string & text, const Rect & dest, int scrolly, bool isEscaped );
 
         //do not modify!s
         int charW,charH;
@@ -189,7 +167,7 @@ namespace Graphics
         
         bool filled; 
         bool visible;
-
+        bool escaped;
     private:
         int m_texture; 
         //font sheet to use

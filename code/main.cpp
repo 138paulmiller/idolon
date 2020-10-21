@@ -292,10 +292,7 @@ void NewAsset(const Args& args)
 	}
 	else if(type == ARG_NAME_FONT)
 	{
-		//8x8 chars. 18 x 6  
-		const int w = 18 * 8;
-		const int h =  6 * 8;
-		Graphics::Font* font= new Graphics::Font(name, w, h);
+		Graphics::Font* font= new Graphics::Font(name, TILESET_W, TILESET_H);
 		Assets::SaveAs(font, UserAssetPath<Graphics::Font>(name));
 		delete font;
 	}

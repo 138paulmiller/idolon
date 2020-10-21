@@ -1,6 +1,6 @@
 #pragma once
 
-#include "context.hpp"
+#include "app.hpp"
 
 /*
 	Primary Editor interface. 
@@ -11,7 +11,12 @@
 class Editor : public App
 {
 public:
+
 	Editor(uint8 support = 0);
+
+	//returns string representation of icon
+	static std::string getIcon( const std::string &name );
+
 	virtual void redo();
 	virtual void undo();
 	virtual void save();
@@ -27,7 +32,9 @@ public:
 	inline int controlX() { return m_controlX;  }
 	inline int controlY() { return m_controlY;  }
 
+
 private:
+
 
 	uint8 m_support;
 	int m_control;

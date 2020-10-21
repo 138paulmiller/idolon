@@ -9,10 +9,10 @@
 enum MapToolMode : char
 {
 	//the correspond to tool bar order!. can be used by APP to get widget
-	MAP_TOOL_PIXEL = 0,
+	MAP_TOOL_STAMP = 0,
 	MAP_TOOL_FILL,
 	MAP_TOOL_LINE,
-	MAP_TOOL_ERASE,
+	MAP_TOOL_ERASER,
 	MAP_TOOL_COUNT,
 };
 

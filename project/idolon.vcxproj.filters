@@ -88,6 +88,9 @@
     <None Include="..\system\assets\rpg.cfg">
       <Filter>System Files\assets</Filter>
     </None>
+    <None Include="..\system\assets\icons.fnt">
+      <Filter>System Files\assets</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\code\scripting\api.hpp">
@@ -97,9 +100,6 @@
       <Filter>Source Files\scripting</Filter>
     </ClInclude>
     <ClInclude Include="..\code\ui\api.hpp">
-      <Filter>Source Files\ui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\code\ui\context.hpp">
       <Filter>Source Files\ui</Filter>
     </ClInclude>
     <ClInclude Include="..\code\ui\editor.hpp">
@@ -180,13 +180,13 @@
     <ClInclude Include="..\code\idolon.hpp">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\code\ui\app.hpp">
+      <Filter>Source Files\ui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\code\scripting\eval.cpp">
       <Filter>Source Files\scripting</Filter>
-    </ClCompile>
-    <ClCompile Include="..\code\ui\context.cpp">
-      <Filter>Source Files\ui</Filter>
     </ClCompile>
     <ClCompile Include="..\code\ui\editor.cpp">
       <Filter>Source Files\ui</Filter>
@@ -253,6 +253,9 @@
     </ClCompile>
     <ClCompile Include="..\code\idolon.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\ui\app.cpp">
+      <Filter>Source Files\ui</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -56,8 +56,8 @@ void TilesetEditor::onEnter()
 	const int tilesetY =  m_tilepicker->rect().y - m_charH;
 	m_tileIdBox = new UI::TextButton("00", tileidX, tilesetY, idLen , 1, fontName );
 	
-	addTool("PIXEL", [&](){
-		m_tool = TILE_TOOL_PIXEL;                     
+	addTool("PENCIL", [&](){
+		m_tool = TILE_TOOL_PENCIL;                     
 	});
 	
 	addTool("FILL", [&](){
@@ -69,8 +69,8 @@ void TilesetEditor::onEnter()
 		m_shapeRect = { -1, -1, -1, -1 };
 	});
 
-	addTool("ERASE", [&](){
-		m_tool = TILE_TOOL_ERASE;
+	addTool("ERASER", [&](){
+		m_tool = TILE_TOOL_ERASER;
 		m_shapeRect = { -1, -1, 1, 1 };
 
 	});
@@ -82,7 +82,7 @@ void TilesetEditor::onEnter()
 	App::addWidget( m_tileIdBox );
 
 	//choose pixel tool on start
-	m_tool = TILE_TOOL_PIXEL;                     
+	m_tool = TILE_TOOL_PENCIL;                     
 
 	if ( m_tileset )
 	{
@@ -178,13 +178,13 @@ void TilesetEditor::onTick()
 				FloodFill( m_tileset->pixels, m_tileset->w, { tileSrc.x, tileSrc.y, tileSrc.w, tileSrc.h }, color, sheetx, sheety );
 				commit();
 				break;
-			case TILE_TOOL_ERASE:
+			case TILE_TOOL_ERASER:
 				m_shapeRect.x = tilex;
 				m_shapeRect.y = tiley;
 				m_tileset->pixels[sheety * m_tileset->w + sheetx] = CLEAR;
 				m_tileset->update(tileSrc);
 				break;
-			case TILE_TOOL_PIXEL:
+			case TILE_TOOL_PENCIL:
 				m_tileset->pixels[sheety * m_tileset->w + sheetx] = color;
 				m_tileset->update(tileSrc);
 				break;
@@ -204,7 +204,7 @@ void TilesetEditor::onTick()
 		{
 			switch ( m_tool )
 			{
-			case TILE_TOOL_ERASE:
+			case TILE_TOOL_ERASER:
 
 				m_shapeRect.x = tilex;
 				m_shapeRect.y = tiley;
@@ -222,7 +222,7 @@ void TilesetEditor::onTick()
 				}
 				m_tileset->update(m_tilepicker->selection());
 				break;
-			case TILE_TOOL_PIXEL:
+			case TILE_TOOL_PENCIL:
 				m_tileset->pixels[sheety * m_tileset->w + sheetx] = color;
 				m_tileset->update(m_tilepicker->selection());
 				break;
@@ -242,12 +242,12 @@ void TilesetEditor::onTick()
 				//commit shape 
 				switch(m_tool)
 				{
-				case TILE_TOOL_ERASE:
+				case TILE_TOOL_ERASER:
 					m_shapeRect.x = tilex;
 					m_shapeRect.y = tiley;
 					commit();
 					break;
-				case TILE_TOOL_PIXEL:
+				case TILE_TOOL_PENCIL:
 					commit();
 					break;
 				case TILE_TOOL_LINE:
@@ -332,7 +332,7 @@ void TilesetEditor::drawOverlay(int tilex, int tiley, const Rect & dest)
 			LineBresenham(m_overlay->pixels, m_overlay->w, x1, y1, x2, y2, color);
 		}
 		break;
-	case TILE_TOOL_ERASE:
+	case TILE_TOOL_ERASER:
 		for(int y = tiley; y < tiley + m_shapeRect.h; y++)
 		{
 			if(y < m_overlay->h)
@@ -363,7 +363,7 @@ void TilesetEditor::onKey(Key key, ButtonState state)
 		switch(key)
 		{
 			case KEY_z:
-				if(m_tool == TILE_TOOL_ERASE)
+				if(m_tool == TILE_TOOL_ERASER)
 				{
 					if(m_shapeRect.w > 1 )
 					{
@@ -373,7 +373,7 @@ void TilesetEditor::onKey(Key key, ButtonState state)
 				}
 				break;
 			case KEY_x:
-				if(m_tool == TILE_TOOL_ERASE)
+				if(m_tool == TILE_TOOL_ERASER)
 				{
 					if(m_shapeRect.w < m_tilepicker->selection().w)
 					{

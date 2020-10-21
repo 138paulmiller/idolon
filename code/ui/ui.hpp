@@ -102,11 +102,13 @@ namespace UI
 	public:
 		TextButton(const std::string & text, int x, int y, int tw, int th, const std::string & font);
 		~TextButton();
+		
 		virtual void onUpdate() override ;
 		virtual void onDraw() override;
 		//if font is changed reload
 		void setFont(const std::string & font) ;
 		void setText(const std::string & text) ;
+		void setEscape( bool isEscaped ) ;
 		
 		Color textColor;
 
@@ -186,7 +188,7 @@ namespace UI
 		void onUpdate() override;
 		void onDraw() override;
 		
-		int  add(const std::string & text, std::function<void()> click, bool sticky = true);
+		int  add(const std::string & text, std::function<void()> click, bool sticky = true, bool isEscaped = true);
 		void  remove(int id);
 		Button *  get(int id);
 		

@@ -3,10 +3,45 @@
 
 //----------------------------------------------------------------------------
 
+
+namespace
+{
+	//map from icon name to tileindex repr
+	std::unordered_map<std::string, std::string> s_iconNameMap = {
+		{ "PENCIL", { 0  } },
+		{ "FILL",   { 1  } },
+		{ "ERASER", { 2  } },
+		{ "LINE",   { 3  } },
+		{ "STAMP",  { 4  } },
+		{ "PLAY",   { 5  } },
+		{ "PAUSE",  { 6  } },
+		{ "RELOAD", { 7  } },
+		{ "UNDO",   { 8  } },
+		{ "REDO",   { 9  } },
+		{ "SAVE",   { 10 } },
+		{ "LOAD",   { 11 } },
+		{ "EXIT",   { 12 } },
+		{ "BUILD",  { 13 } },
+	};
+
+}
+
 Editor::Editor(uint8 support) 
 		:m_support(support)
 {
 	m_control = -1;
+}
+
+
+std::string Editor::getIcon( const std::string &name )
+{
+	auto iconIt = s_iconNameMap.find( name );
+	if ( iconIt != s_iconNameMap.end() )
+	{
+		return iconIt->second;
+	}
+	//assert!
+	return "";
 }
 
 void Editor::redo()  
@@ -44,7 +79,7 @@ void Editor::onEnter()
 	if ( m_control!= -1 )
 		App::removeWidget( m_control );
 
-	const std::string &fontName = "full";
+	const std::string &fontName = DEFAULT_FONT_ICONS;
 
 	int screenw, screenh;
 	UI::Toolbar *toolbar = new UI::Toolbar( this, 0, 0 );
@@ -60,7 +95,7 @@ void Editor::onEnter()
 	control->leftAlign = false;
 	
 	//BACK
-	control->add({'X'}, [&](){
+	control->add( getIcon("EXIT"), [&](){
 		App::signal(APP_CODE_EXIT);
 	}, false);
 	
@@ -71,23 +106,23 @@ void Editor::onEnter()
 	//SAVE
 	if(supports(APP_SAVE))
 	{	
-		control->add({20}, [&](){
+		control->add( getIcon("SAVE"), [&](){
 			this->save();
-		}, false);
+		}, false, false);
 	}
 	//REDO
 	if(supports(APP_REDO))
 	{
-		control->add({19}, [&](){
+		control->add( getIcon("REDO"), [&](){
 			this->redo();
-		}, false);
+		}, false, false);
 	}
 	//UNDO
 	if(supports(APP_UNDO))
 	{	
-		control->add({18}, [&](){
+		control->add( getIcon("UNDO"), [&](){
 			this->undo();
-		}, false);
+		}, false, false);
 	}
 }
 
@@ -104,10 +139,10 @@ void Editor::hideTools( bool hidden )
 	toolbar->hidden = hidden;
 }
 
-void Editor::addTool( const std::string &text, std::function<void()> click, bool sticky )
+void Editor::addTool( const std::string &icon, std::function<void()> click, bool sticky )
 {
 	UI::Toolbar * toolbar = dynamic_cast<UI::Toolbar*>(App::getWidget( m_toolbar ));
-	toolbar->add( text, click, sticky );	
+	toolbar->add( getIcon(icon), click, sticky, false );	
 	toolbar->get( 0 )->cbClick();
 	
 }

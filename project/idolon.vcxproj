@@ -168,6 +168,7 @@
     <None Include="..\system\assets\basic.fnt" />
     <None Include="..\system\assets\default.fnt" />
     <None Include="..\system\assets\full.fnt" />
+    <None Include="..\system\assets\icons.fnt" />
     <None Include="..\system\assets\lib\core.js" />
     <None Include="..\system\assets\lib\rpg.js" />
     <None Include="..\system\assets\rpg.cart" />
@@ -207,7 +208,7 @@
     <ClInclude Include="..\code\sys.hpp" />
     <ClInclude Include="..\code\ui\api.hpp" />
     <ClInclude Include="..\code\ui\commands.hpp" />
-    <ClInclude Include="..\code\ui\context.hpp" />
+    <ClInclude Include="..\code\ui\app.hpp" />
     <ClInclude Include="..\code\ui\editor.hpp" />
     <ClInclude Include="..\code\ui\ui.hpp" />
   </ItemGroup>
@@ -233,7 +234,7 @@
     <ClCompile Include="..\code\shell.cpp" />
     <ClCompile Include="..\code\sys.cpp" />
     <ClCompile Include="..\code\ui\commands.cpp" />
-    <ClCompile Include="..\code\ui\context.cpp" />
+    <ClCompile Include="..\code\ui\app.cpp" />
     <ClCompile Include="..\code\ui\editor.cpp" />
     <ClCompile Include="..\code\ui\ui.cpp" />
   </ItemGroup>

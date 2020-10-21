@@ -345,7 +345,7 @@ namespace Graphics
     { 
     }
 
-    void Font::blit(int destTexture, const std::string & text, const Rect & dest, int scrolly)
+    void Font::blit(int destTexture, const std::string & text, const Rect & dest, int scrolly, bool isEscaped )
     {
         int c, sx,sy;
         const int srcW = w / charW;  
@@ -367,30 +367,34 @@ namespace Graphics
         for(; i < text.size(); i++)
         {
             int s =  text[i];
-            //handle newlines
-            while(s == '\n' || s == KEY_RETURN)
+            if ( isEscaped )
             {
-                i++;
-                if ( i == text.size() ) {
-                    s = ' ';
-                }
-                if ( i > text.size() )
+                //handle newlines
+                while( s == '\n' || s == KEY_RETURN)
                 {
-                    break;
+                    i++;
+                    if ( i == text.size() ) {
+                        s = ' ';
+                    }
+                    if ( i > text.size() )
+                    {
+                        break;
+                    }
+                    else {
+                        s = text[i];
+                    }
+                    scrolly++;
+                    dx = 0;
+                    dy++;
                 }
-                else {
-                    s = text[i];
-                }
-                scrolly++;
-                dx = 0;
-                dy++;
             }
             int repeat = 1;
-            if ( s == KEY_TAB )
+            if ( isEscaped && s == KEY_TAB )
             {
                 s = ' ';
                 repeat = TAB_SIZE;
             }
+
             while ( repeat )
             {
                 repeat--;
@@ -431,7 +435,7 @@ namespace Graphics
         x(0), y(0), 
         w(0), h(0),
         tw(tw), th(th),
-        scrolly(0),filled(false),
+        scrolly(0),filled(false), escaped(true),
         textColor({255,255,255,255}),
         fillColor({0,0,0,0}),
         visible(true),
@@ -464,9 +468,8 @@ namespace Graphics
     void TextBox::refresh()
     {
         Engine::ClearTexture(m_texture, {0,0,0,0});
-        m_fontcache->blit(m_texture, text, { borderX, borderY , m_textureW, m_textureH }, scrolly);
+        m_fontcache->blit(m_texture, text, { borderX, borderY , m_textureW, m_textureH }, scrolly, escaped );
         Engine::MultiplyTexture(m_texture, textColor);
-
     }
     void TextBox::reload()
     {

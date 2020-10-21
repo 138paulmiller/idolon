@@ -45,12 +45,12 @@ void MapEditor::onEnter()
 
 	//TODO - default tile w and height
 	m_tooldata = {0,0, TILE_W, TILE_H};
-	m_tool = MAP_TOOL_PIXEL;
+	m_tool = MAP_TOOL_STAMP;
 
 	//managed locally. is not added to asset manager
 	m_overlay = new Graphics::Tileset("MapEditor_Overlay", screenw, screenh);
-	Editor::addTool("PIXEL", [&](){
-		m_tool = MAP_TOOL_PIXEL;                     
+	Editor::addTool("STAMP", [&](){
+		m_tool = MAP_TOOL_STAMP;                     
 	});
 	//TODO - fill tiles
 
@@ -58,8 +58,8 @@ void MapEditor::onEnter()
 	//	m_tool = MAP_TOOL_FILL;             
 	//});
 
-	Editor::addTool("ERASE", [&](){
-		m_tool = MAP_TOOL_ERASE;
+	Editor::addTool("ERASER", [&](){
+		m_tool = MAP_TOOL_ERASER;
 		m_tooldata = { -1, -1, -1, -1, -1 ,-1 };
 	});
 
@@ -205,7 +205,7 @@ void MapEditor::onKey( Key key, ButtonState state)
 			m_map->update();
 		break;
 		case KEY_x:
-			if(m_tool == MAP_TOOL_ERASE)
+			if(m_tool == MAP_TOOL_ERASER)
 			{
 				if(m_tooldata.w > 1 )
 				{
@@ -215,7 +215,7 @@ void MapEditor::onKey( Key key, ButtonState state)
 			}
 		break;
 		case KEY_z:
-			if(m_tool == MAP_TOOL_ERASE)
+			if(m_tool == MAP_TOOL_ERASER)
 			{
 				if(m_tooldata.w < m_map->rect.w)
 				{
@@ -245,7 +245,7 @@ bool MapEditor::handleTool()
 	//if pixel tool
 	switch(m_tool)
 	{
-		case MAP_TOOL_PIXEL:
+		case MAP_TOOL_STAMP:
 			if (( Engine::GetMouseButtonState( MOUSEBUTTON_LEFT ) == BUTTON_CLICK )
 				|| ( Engine::GetMouseButtonState( MOUSEBUTTON_LEFT ) == BUTTON_HOLD ))
 			{
@@ -280,7 +280,7 @@ bool MapEditor::handleTool()
 				}
 			}
 		break;
-		case MAP_TOOL_ERASE:
+		case MAP_TOOL_ERASER:
 			if (( Engine::GetMouseButtonState( MOUSEBUTTON_LEFT ) == BUTTON_CLICK )
 				|| ( Engine::GetMouseButtonState( MOUSEBUTTON_LEFT ) == BUTTON_HOLD ))
 			{
@@ -316,7 +316,7 @@ void MapEditor::drawOverlay()
 	const Rect& tile = m_map->getTileRect( m_tooldata.mx, m_tooldata.my );
 	switch(m_tool)
 	{
-		case MAP_TOOL_PIXEL:
+		case MAP_TOOL_STAMP:
 			if(tile.w != -1)
 			{	
 				const Rect & src = m_tilepicker->selection();
@@ -333,7 +333,7 @@ void MapEditor::drawOverlay()
 				m_overlay->update(tile);
 			}	
 		break;
-		case MAP_TOOL_ERASE:
+		case MAP_TOOL_ERASER:
 		{
 			if(tile.w != -1)
 			{	
