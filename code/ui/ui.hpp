@@ -249,7 +249,7 @@ namespace UI
 		void onUpdate() override;
 		void onDraw() override;
 		
-		void reload(const std::string & tileset);
+		void reload(const Graphics::Tileset * tileset);
 		//get tile/frame relative to given sheet
 		Rect selection();
 		int selectionIndex();

@@ -26,7 +26,15 @@ void TilesetEditor::onEnter()
 	m_tileset = 0;
 	m_overlay = 0;
 	m_revision = -1;
-	m_tileset = Assets::Load<Graphics::Tileset>(m_tilesetName);
+
+	if ( m_isFont )
+	{
+		m_tileset  = Assets::Load<Graphics::Font>(m_tilesetName);
+	}
+	else
+	{
+		m_tileset = Assets::Load<Graphics::Tileset>(m_tilesetName);
+	}
 	
 
 	const std::string &fontName = DEFAULT_FONT;
@@ -41,7 +49,7 @@ void TilesetEditor::onEnter()
 	const int y = 8 * 2;
 	m_colorpicker = new UI::ColorPicker(x,y);
 	m_tilepicker = new UI::TilePicker();
-	m_tilepicker->reload(m_tilesetName);
+	m_tilepicker->reload(m_tileset );
 
 	const int idLen  = 3;
 	const int tileidX =  w - m_charW * 3;
@@ -96,7 +104,15 @@ void TilesetEditor::onExit()
 	delete m_overlay;
 	m_overlay = 0;
 
-	Assets::Unload<Graphics::Tileset>(m_tilesetName );
+	if ( m_isFont )
+	{
+		Assets::Unload<Graphics::Font>(m_tilesetName );
+	}
+	else 
+	{
+		Assets::Unload<Graphics::Tileset>(m_tilesetName );
+	}
+
 	App::clear();
 	Editor::onExit();
 	LOG("Exited sheet editor");
@@ -107,9 +123,9 @@ void TilesetEditor::onExit()
 
 void TilesetEditor::onTick()
 {
-
 	//set pixel tool by default if not set
 	Engine::Clear(EDITOR_COLOR);
+	if ( !m_tileset ) return;
 	//update 
 	int mx, my;
 	Engine::GetMousePosition(mx, my);
@@ -375,10 +391,11 @@ void TilesetEditor::onKey(Key key, ButtonState state)
 
 
 //Create buttons to resize?
-void TilesetEditor::setTileset(const std::string& name)
+void TilesetEditor::setTileset(const std::string& name, bool isFont )
 {
-	LOG("Loading sheet %s ...\n", name.c_str());
+	LOG("Loading tileset %s ...\n", name.c_str());
 	m_tilesetName = name;
+	m_isFont = isFont;
 }
 
 void TilesetEditor::commit()
@@ -495,8 +512,17 @@ void TilesetEditor::redo()
 
 void TilesetEditor::save()
 {
-	if(!m_tileset) return;
+	if ( !m_tileset ) return;
 
 	m_tileset->update();
-	Assets::Save(m_tileset);
+
+	if ( m_isFont )
+	{
+		Graphics::Font *font = dynamic_cast<Graphics::Font*>( m_tileset );
+		Assets::Save( font );
+	}
+	else 
+	{
+		Assets::Save( m_tileset );
+	}
 }

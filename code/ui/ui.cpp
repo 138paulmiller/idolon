@@ -809,12 +809,9 @@ TextScrollArea
 			}
 		}
 	}
-	void TilePicker::reload(const std::string & tileset)
+	void TilePicker::reload( const Graphics::Tileset * tileset)
 	{
-		if(m_tileset)
-			Assets::Unload<Graphics::Tileset>(m_tileset->name);
-
-		m_tileset = Assets::Load<Graphics::Tileset>(tileset);
+		m_tileset = tileset;
 		
 		if ( !m_tileset ) return;
 

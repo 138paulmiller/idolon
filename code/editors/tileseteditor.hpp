@@ -26,7 +26,7 @@ public:
 	void save()override;
 
 	//allow for runtime update of tilesheet
-	void setTileset(const std::string & name);
+	void setTileset(const std::string & name, bool isFont = false );
 private:
 	void commit();
 	//draw the propoed changes with mouse at tilex,y
@@ -52,4 +52,7 @@ private:
 	std::vector<Color * > m_revisionData;
 	//
 	int m_charW, m_charH;
+
+	bool m_isFont;
+
 };

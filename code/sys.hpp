@@ -34,7 +34,8 @@ namespace Sys
 	Context* GetContext();
 
 	//Actions
-	void RunTilesetEditor(const std::string & tilesetName);
+	void RunFontEditor(const std::string & tilesetName );
+	void RunTilesetEditor(const std::string & tilesetName );
 	void RunMapEditor(const std::string & mapName);
 	void RunScriptEditor(const std::string & scriptName);
 	void RunGameEditor(const std::string & cartPath);

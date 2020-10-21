@@ -294,6 +294,14 @@ namespace Graphics
         return true;
     }
 
+    const Tileset * Map::getTileset( int index )
+    {
+        if ( index > -1 && index < TILESETS_PER_MAP )
+            return m_tilesetscache[index];
+        return nullptr;
+    }
+
+
 /*--------------------------------------------------------------------------------------
     Sprite 
 */

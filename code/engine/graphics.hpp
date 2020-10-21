@@ -87,6 +87,9 @@ namespace Graphics
         Rect getTileRect(int scrx, int scry);
         //tile xy in map space from screen space
         bool getTileXY(int scrx, int scry, int & tilex, int & tiley);
+        const Tileset * getTileset(int index );
+
+        
         void clear();
 		void clampView();
 

@@ -244,6 +244,13 @@ namespace Idolon
 		Engine::GetMousePosition( x, y);
 	}
 	
+	int GetKeyState( char keysym )
+	{
+		Key key = static_cast<Key>(keysym);
+		const int state = Engine::GetKeyState(key);
+		return state;
+	}
+	
 
 	void GfxSize( int &w, int &h )
 	{

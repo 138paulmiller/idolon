@@ -178,9 +178,15 @@ namespace Sys
 		return s_context;
 	}
 
+	void RunFontEditor( const std::string &tilesetName )
+	{
+		s_context->app<TilesetEditor>(APP_TILESET_EDITOR)->setTileset(tilesetName, true );
+		s_context->enter(APP_TILESET_EDITOR);
+	}
+	
 	void RunTilesetEditor( const std::string &tilesetName )
 	{
-		s_context->app<TilesetEditor>(APP_TILESET_EDITOR)->setTileset(tilesetName);
+		s_context->app<TilesetEditor>(APP_TILESET_EDITOR)->setTileset(tilesetName, false );
 		s_context->enter(APP_TILESET_EDITOR);
 	}
 	

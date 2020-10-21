@@ -19,7 +19,9 @@ namespace Idolon
 	void Unload( int assetId );
 
 	void MousePosition( int & x, int & y );
-
+	
+	int GetKeyState( char keysym );
+		
 	//execute  gamescript code
 	bool Import( const char *filepath );
 	//TODO - create a serialization api to write into a user file.

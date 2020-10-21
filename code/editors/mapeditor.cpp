@@ -31,8 +31,7 @@ void MapEditor::onEnter()
 	m_map = Assets::Load<Graphics::Map>(m_mapName);
 
 	m_tilepicker = new UI::TilePicker();
-	const std::string &tilesetName = m_map ? m_map->tilesets[0] : "";
-	m_tilepicker->reload( tilesetName );
+	m_tilepicker->reload(  m_map->getTileset(0) );
 
 
 	//use just to get w/h
@@ -80,6 +79,8 @@ void MapEditor::onEnter()
 		tw+=(charW+border*2); //left and right border
 	}	
 	//add two buttons
+	const std::string &tilesetName = m_map ? m_map->tilesets[0] : "";
+
 	m_tilesetInput = new UI::TextInput(tilesetName, tw, toolY, tw, 1, fontName);
 	m_tilesetInput->cbAccept = [this]()
 	{
@@ -379,7 +380,7 @@ void MapEditor::useTileset(int index )
 	if ( !m_map ) return;
 	const std::string tilesetName = m_map->tilesets[index];
 	m_tilesetInput->setText(tilesetName ); 
-	m_tilepicker->reload( tilesetName );
+	m_tilepicker->reload( m_map->getTileset(index) );
 }
 
 //toolbar and tilepicker. resize map

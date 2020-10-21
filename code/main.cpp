@@ -148,11 +148,8 @@ static const CommandTable & g_cli =
 int try_main(int argc, char** argv)
 { 
 	argc--; argv++;	//skip exe path arg
-
 	Err::Stacktrace();
-
 	Sys::Startup(g_cmds);
-
 	Execute( argc, argv, g_cli );
 
 
@@ -346,11 +343,10 @@ void EditAsset(const Args& args)
 			Assets::GetAssetTypeExt<Game::Header>(),
 			Sys::RunGameEditor
 		},
-		//TODO load font as tls
-		//{
-		//	Assets::GetAssetTypeExt<Graphics::Font>(),
-		//	Sys::RunFontEditor
-		//},
+		{
+			Assets::GetAssetTypeExt<Graphics::Font>(),
+			Sys::RunFontEditor
+		},
 	};
 	//edit <asset>   
 	ARG_COUNT(args, 1);
