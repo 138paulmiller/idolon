@@ -192,8 +192,11 @@ namespace UI
 					this->cbLeave();
 				break;
 				case KEY_BACKSPACE:
-					this->text.pop_back();
-					this->setText(this->text);
+					if ( !this->text.empty() )
+					{
+						this->text.pop_back();
+						this->setText(this->text);
+					}
 				break;
 				default:
 				if(key <= KEY_TILDA)
@@ -820,11 +823,15 @@ TextScrollArea
 			}
 		}
 
-		//update id
-		const int id = selectionIndex();
-		char idText[]  = "000";
-		snprintf(idText, 4, "%03d", id);
-		m_tileIdBox->setText(idText);
+		if ( m_tileIdBox )
+		{
+			//update id
+			const int id = selectionIndex();
+			char idText[]  = "000";
+			snprintf(idText, 4, "%03d", id);
+			m_tileIdBox->setText(idText);
+		}
+
 	}
 	void TilePicker::reload( const Graphics::Tileset * tileset)
 	{

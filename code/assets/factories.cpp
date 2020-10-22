@@ -91,7 +91,7 @@ Asset *  MapFactory::deserialize( std::istream & in)
         //tilesets
         for ( int i = 0; i < TILESETS_PER_MAP; i++ )
         {
-            map->tilesets[i] = tilesets[i];
+            map->setTileset(i, Assets::Load<Graphics::Tileset>(tilesets[i]) );
         }
         map->reset(tiledata, w, h, tilew, tileh);
 
@@ -123,7 +123,11 @@ void MapFactory::serialize(const Asset * asset, std::ostream & out) const
     out << map->name << std::endl;
     for(int i = 0 ; i < TILESETS_PER_MAP; i++ )
     {
-        out << map->tilesets[i] << std::endl;
+        const Graphics::Tileset *tileset = map->getTileset( i );
+        const std::string &name = ( tileset ? tileset->name : "");
+        out << name << std::endl;
+        Assets::Unload<Graphics::Tileset>(name);
+
     }
     //TODO - verify endian-ness!
     int blocksize =  map->w * map->h;

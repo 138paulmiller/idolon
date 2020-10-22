@@ -54,25 +54,22 @@ namespace Graphics
         void reset(char * tiles, int w, int h, int tilew=TILE_W, int tileh=TILE_H); 
         //update texute with tile data
         void update(const Rect & rect = { 0, 0, 0, 0 } ); 
-        //update tilesheets and update
-        void reload();
         void draw();
         float scale( );
         void zoomTo( float scale, int x, int y );
 		void scroll(int dx, int dy);
         //get screenspace tile rect at x y 
-        Rect getTileRect(int scrx, int scry);
+        Rect getTileRect(int scrx, int scry)const ;
         //tile xy in map space from screen space
-        bool getTileXY(int scrx, int scry, int & tilex, int & tiley);
-        const Tileset * getTileset(int index );
+        bool getTileXY(int scrx, int scry, int & tilex, int & tiley)const ;
+        
+        const Tileset * getTileset(int index ) const ;
+        void setTileset(int index, const Tileset * tileset ) ;
 
         
         void clear();
 		void clampView();
 
-        //can use 4 tilesets. 
-        //tileset index =  index / TILE_COUNT
-        std::string tilesets[TILESETS_PER_MAP];
 
         //The view is viewport into the map texture
         Rect view;
@@ -83,10 +80,12 @@ namespace Graphics
         //width and height is in tiles
         int w,h, tilew, tileh, worldw, worldh;
 
+        //tileset index =  index / TILE_COUNT
         char * tiles;
         
      private:
-        Tileset * m_tilesetscache[TILESETS_PER_MAP];
+        //can use 4 tilesets. 
+        const Tileset * m_tilesets[TILESETS_PER_MAP];
         //TODO - split map into multiple subtextures. Each streamed in on demand. "Super maps"
         int m_texture; 
         //viewport

@@ -29,10 +29,9 @@ void MapEditor::onEnter()
 
 	m_tilesetSelection = 0;
 	m_map = Assets::Load<Graphics::Map>(m_mapName);
-
 	m_tilepicker = new UI::TilePicker();
-	m_tilepicker->reload(  m_map->getTileset(0) );
 
+	m_tilepicker->reload(  m_map->getTileset(0) );
 
 	//use just to get w/h
 	const std::string &fontName = DEFAULT_FONT;
@@ -79,7 +78,8 @@ void MapEditor::onEnter()
 		tw+=(charW+border*2); //left and right border
 	}	
 	//add two buttons
-	const std::string &tilesetName = m_map ? m_map->tilesets[0] : "";
+    const Graphics::Tileset *tileset = m_map->getTileset( 0 );
+    const std::string &tilesetName = ( tileset ? tileset->name : "");
 
 	m_tilesetInput = new UI::TextInput(tilesetName, tw, toolY, tw, 1, fontName);
 	m_tilesetInput->cbAccept = [this]()
@@ -92,7 +92,7 @@ void MapEditor::onEnter()
 	App::addWidget( m_tilepicker);
 	App::addWidget( m_tilesetSelectToolbar );
 	App::addButton( m_tilesetInput );
-	//select pixel and first tileset by default
+
 	m_tilesetInput->cbAccept();
 	showWorkspace();
 	useTileset( 0 );
@@ -104,7 +104,8 @@ void MapEditor::onExit()
 	delete m_overlay;
 	m_overlay = 0;
 
-	Assets::Unload<Graphics::Map>(m_mapName);
+	Assets::Unload<Graphics::Map>(m_map->name);
+	m_map = nullptr;
 	//delete widgets
 	App::clear();
 	Editor::onExit();
@@ -368,20 +369,27 @@ void MapEditor::save()
 void MapEditor::setMap( const std::string& name )
 {
 	m_mapName = name;
-}	//
+}	
+
 
 void MapEditor::setTileset(int index,  const std::string& tileset )
 {
 	if ( !m_map ) return;
-	m_map->tilesets[index] = tileset;
+	//search relative to map
+	Assets::PushPath( FS::DirName(m_map->filepath) );
+	m_map->setTileset ( index, Assets::Load<Graphics::Tileset>(tileset) );
+	m_map->update( );
+
+	Assets::PopPath( );
+
 	useTileset( index );
 }
 
 void MapEditor::useTileset(int index )
 {
 	if ( !m_map ) return;
-	const std::string tilesetName = m_map->tilesets[index];
-	m_tilesetInput->setText(tilesetName ); 
+	const Graphics::Tileset * tileset = m_map->getTileset(index);
+	const std::string tilesetName = tileset ? tileset->name : "" ;
 	m_tilepicker->reload( m_map->getTileset(index) );
 }
 

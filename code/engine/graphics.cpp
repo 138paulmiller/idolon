@@ -3,7 +3,6 @@
 #include "core.hpp"
 #include "engine.hpp"
 #include "graphics.hpp"
-#include "../assets/api.hpp"
 
 namespace Graphics
 {
@@ -100,8 +99,7 @@ namespace Graphics
     {
         for ( int i = 0; i < TILESETS_PER_MAP; i++ )
         {
-            tilesets[i] = "";
-            m_tilesetscache[i] = 0;
+            m_tilesets[i] = nullptr;
         }
 
         char *const initial = new char[w * h];
@@ -113,8 +111,7 @@ namespace Graphics
     {
         for ( int i = 0; i < TILESETS_PER_MAP; i++ )
         {
-            if(m_tilesetscache[i] && tilesets[i] != "")
-                Assets::Unload<Tileset>(m_tilesetscache[i]->name);
+            m_tilesets[i] = nullptr;
         }
 
         Engine::DestroyTexture( m_texture );
@@ -193,21 +190,10 @@ namespace Graphics
         Engine::GetSize(screenw,screenh);
         view = { 0, 0, screenw, screenh };
         rect = { 0, 0, screenw, screenh };    
-        reload();
-    }
-    
-
-    void Map::reload()
-    {
-        for ( int i = 0; i < TILESETS_PER_MAP; i++ )
-        {
-            if(m_tilesetscache[i] && tilesets[i] != "")
-                Assets::Unload<Tileset>(m_tilesetscache[i]->name);
-            m_tilesetscache[i] = Assets::Load<Tileset>(tilesets[i]);
-        }
         update({0,0,w,h}); 
 
     }
+    
 
 	void Map::clampView()
 	{
@@ -236,7 +222,7 @@ namespace Graphics
                 tile = tile - tilesetIndex * TILE_COUNT;
                 if(tile >= TILE_COUNT) 
                     return;
-                Tileset* tileset = m_tilesetscache[tilesetIndex];
+                const Tileset* tileset = m_tilesets[tilesetIndex];
 
                 const Rect & dest = { x*tilew, y*tileh, tilew, tileh };
                 //clear portion if clear color or null tileset
@@ -263,7 +249,7 @@ namespace Graphics
         Engine::DrawTexture( m_texture, view, rect );
     }
 
-    Rect Map::getTileRect(int scrx, int scry)
+    Rect Map::getTileRect(int scrx, int scry)const 
     {
          //tile xy in screen space 
         int tilex;
@@ -280,7 +266,7 @@ namespace Graphics
         return {  alignscrx, alignscry, scrTW,  scrTH };
     }
 
-    bool Map::getTileXY( int scrx, int scry, int& tilex, int& tiley )
+    bool Map::getTileXY( int scrx, int scry, int& tilex, int& tiley )const 
     {
         if ( ( scrx < rect.x || scrx > rect.x + rect.w )
             || ( scry < rect.y || scry > rect.y + rect.h ) )
@@ -294,11 +280,17 @@ namespace Graphics
         return true;
     }
 
-    const Tileset * Map::getTileset( int index )
+    const Tileset * Map::getTileset( int index ) const 
     {
         if ( index > -1 && index < TILESETS_PER_MAP )
-            return m_tilesetscache[index];
+            return m_tilesets[index];
         return nullptr;
+    }
+
+    void Map::setTileset( int index, const Tileset * tileset ) 
+    {
+        if ( index > -1 && index < TILESETS_PER_MAP )
+            m_tilesets[index] = tileset;
     }
 
 
