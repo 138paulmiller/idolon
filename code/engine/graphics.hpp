@@ -56,6 +56,8 @@ namespace Graphics
         void update(const Rect & rect = { 0, 0, 0, 0 } ); 
         void draw();
         float scale( );
+        //view w,h
+        void resize( int w, int h );
         void zoomTo( float scale, int x, int y );
 		void scroll(int dx, int dy);
         //get screenspace tile rect at x y 
@@ -122,18 +124,20 @@ namespace Graphics
     public:
         Sprite(int tile, int w = SPRITE_W, int h = SPRITE_H);
         ~Sprite();
-        void reload();
+
         void draw();
 
         //tile index
         int tile ;
         int x,y;
         int w,h;
-        std::string tileset;
+
+        void setTileset(const Tileset * tileset);
+        const Tileset * getTileset();
         //TODO add animation info
 
     private:
-        Tileset * m_tilesetcache;
+        const Tileset * m_tileset;
     };
 
     /*--------------------------- Textbox ------------------------------------

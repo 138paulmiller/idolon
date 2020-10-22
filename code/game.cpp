@@ -4,56 +4,6 @@
 
 namespace 
 {
-	//TODO Sprite Manager should use octree
-	struct SpriteManager
-	{
-		SpriteManager()
-		{
-			tileset = "";
-		}
-		~SpriteManager()
-		{
-			for(Graphics::Sprite * sprite : sprites)
-			{
-				delete sprite;
-			}
-			sprites.clear();
-		}
-		int  spawn(int tileId, int x, int y)
-		{
-			const int spriteId = sprites.size();
-			Graphics::Sprite * sprite = new Graphics::Sprite(tileId, x,y);
-			sprite->tileset = tileset;
-			sprite->reload();
-			sprites.push_back(sprite);
-			return spriteId;
-		}
-		Graphics::Sprite * sprite(int id)
-		{
-			if(id > -1 && id < sprites.size())
-			{
-				return  sprites[id];
-			}
-			return 0;			
-		}
-
-		void draw()
-		{
-			for(Graphics::Sprite * sprite : sprites)
-			{
-				sprite->draw();
-			}
-		}
-
-		std::vector<Graphics::Sprite*> sprites;
-		//sprite sheet
-		std::string tileset;
-	} *s_sm;
-
-	Graphics::Map * s_maps[LAYER_COUNT];
-
-	//Scripts should be loaded from cartridge and written to disk. 
-	// should allow multiple imports. script compile should instead write to disk, then script run exectutes the code
 
 	bool s_mapsEnabled[LAYER_COUNT];
 	Game::Cartridge * m_cart;
@@ -115,29 +65,14 @@ namespace Game
 
 	void Startup(const std::string & cartpath)
 	{
-		//load cart asset 
 		//load cartridge header and data.
 		m_cart = 0;
-
-		s_sm = new SpriteManager();
-		
-		for(int i = 0 ; i < LAYER_COUNT; i++)
-		{
-			s_mapsEnabled[i] = 0;
-			s_maps[i] = 0;
-		}
-		//load cart
 	}
 
 
 	void Shutdown()
 	{
-		delete s_sm;
-		for(int i = 0 ; i < LAYER_COUNT; i++)
-		{
-			if(s_maps[i])
-				delete s_maps[i];
-		}
+		//unload cartrigde 
 
 	}
 	

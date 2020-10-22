@@ -30,10 +30,9 @@ namespace Idolon
 		{
 			const int spriteId = sprites.size();
 			Graphics::Sprite * sprite = new Graphics::Sprite(tileId, w,h);
+			sprite->setTileset( tileset );
 			sprite->x = x;
 			sprite->y = y;
-			sprite->tileset = tileset ? tileset->name : "";
-			sprite->reload();
 			sprites.push_back(sprite);
 			return spriteId;
 		}

@@ -126,6 +126,22 @@ namespace Graphics
         return m_scale;
     }
 
+    void Map::resize( int w, int h )
+    {
+        view.w = w;
+        view.h = h;
+
+        if(view.w < TILE_W) 
+            view.w = TILE_W;
+        else if(view.w > rect.w) 
+            view.w = rect.w;
+
+        if(view.h < TILE_H) 
+            view.h = TILE_H;
+        else if(view.h > rect.h) 
+            view.h = rect.h;
+    }
+
     void Map::zoomTo(float scale, int x, int y)
     {
         //delta
@@ -143,19 +159,7 @@ namespace Graphics
         m_scale = scale;
         
         scroll( x - view.x, y - view.y );
-
-        view.w = rect.w * m_scale;
-        view.h = rect.h * m_scale;
-
-        if(view.w < TILE_W) 
-            view.w = TILE_W;
-        else if(view.w > rect.w) 
-            view.w = rect.w;
-
-        if(view.h < TILE_H) 
-            view.h = TILE_H;
-        else if(view.h > rect.h) 
-            view.h = rect.h;
+        resize( rect.w * m_scale, rect.h * m_scale );
     
     }
 
@@ -299,32 +303,31 @@ namespace Graphics
 */
 
     Sprite::Sprite(int tileId, int w, int h)
-        :x(0), y(0), w(w), h(h), 
-        tileset(""), tile(tileId), 
-        m_tilesetcache(0)
+        :x(0), y(0), w(w), h(h), tile(tileId), m_tileset(0)
     {
 
     }
     Sprite::~Sprite()
     {
-        if(m_tilesetcache)
-            Assets::Unload<Tileset>(m_tilesetcache->name);
-    }
-
-     void Sprite::reload()
-    {
-        if(m_tilesetcache)
-            Assets::Unload<Tileset>(m_tilesetcache->name);
-        m_tilesetcache = Assets::Load<Tileset>(tileset);
     }
 
     void Sprite::draw()
     {
-        if ( !m_tilesetcache ) return;
-        const Rect& src = m_tilesetcache->tile(tile, w, h);
-        Engine::DrawTexture( m_tilesetcache->texture, src, { x,y,w,h } );
+        if ( !m_tileset ) return;
+        const Rect& src = m_tileset->tile(tile, w, h);
+        Engine::DrawTexture( m_tileset->texture, src, { x,y,w,h } );
     }
 
+    
+    void Sprite::setTileset( const Tileset *tileset )
+    {
+        m_tileset = tileset;
+    }
+
+    const Tileset *Sprite::getTileset()
+    {
+        return m_tileset;
+    }
 /*--------------------------------------------------------------------------------------
     Font 
 */

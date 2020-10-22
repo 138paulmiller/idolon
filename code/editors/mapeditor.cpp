@@ -31,7 +31,12 @@ void MapEditor::onEnter()
 	m_map = Assets::Load<Graphics::Map>(m_mapName);
 	m_tilepicker = new UI::TilePicker();
 
-	m_tilepicker->reload(  m_map->getTileset(0) );
+	if ( m_map )
+	{
+		m_map->rect.x = 0;
+		m_map->rect.y = TILE_H;
+		m_tilepicker->reload(  m_map->getTileset(0) );
+	}
 
 	//use just to get w/h
 	const std::string &fontName = DEFAULT_FONT;
@@ -78,7 +83,7 @@ void MapEditor::onEnter()
 		tw+=(charW+border*2); //left and right border
 	}	
 	//add two buttons
-    const Graphics::Tileset *tileset = m_map->getTileset( 0 );
+    const Graphics::Tileset *tileset = m_map ? m_map->getTileset( 0 ) : nullptr;
     const std::string &tilesetName = ( tileset ? tileset->name : "");
 
 	m_tilesetInput = new UI::TextInput(tilesetName, tw, toolY, tw, 1, fontName);
@@ -408,13 +413,21 @@ void MapEditor::useTileset(int index )
 //toolbar and tilepicker. resize map
 void MapEditor::hideWorkspace() 
 {
-	int w,h;
-	Engine::GetSize(w,h);
+	if ( m_map )
+	{
+		int w, h;
+		Engine::GetSize( w, h );
+		m_map->rect = { 0, 0, w, h };
+		
+		const int viewW = m_map->rect.w * m_map->scale();
+		const int viewH = m_map->rect.h * m_map->scale();
+		m_map->resize( viewW, viewH );
+		m_map->scroll( 0, -1 ); //account for space created by toolbar
+
+	}				  
+   	
 	m_workspaceHidden = true;
-	m_map->rect = { 0, TILE_H, w, h };
-	//reset view
-   	m_map->zoomTo(1.0, 0, 0 );
-   	m_tilepicker->hidden = true;
+	m_tilepicker->hidden = true;
 	m_tilesetInput->hidden = true;
 	m_tilesetSelectToolbar->hidden = true;
    	hideTools(true);
@@ -422,16 +435,22 @@ void MapEditor::hideWorkspace()
 
 void MapEditor::showWorkspace()
 {
-	int w,h;
-	Engine::GetSize(w,h);
-	m_workspaceHidden = false;
-	const int toolY = h - (m_tilepicker->rect().h + TILE_H);
 	if ( m_map )
 	{
-		m_map->rect = { 0, TILE_H, w, toolY - TILE_H };
-   		m_map->zoomTo(1.0, 0, 0 );
-	}
+		int w, h;
+		Engine::GetSize( w, h );
+		
+		m_map->rect = { 0, TILE_H, w, h - ( m_tilepicker->rect().h / TILE_H ) * TILE_H };
+		
+		const int viewW = m_map->rect.w * m_map->scale();
+		const int viewH = m_map->rect.h * m_map->scale();
+		m_map->resize( viewW, viewH );
+		m_map->scroll( 0, 1 );
 
+	}				   
+   
+
+	m_workspaceHidden = false;
    	m_tilepicker->hidden = false;
 	m_tilesetInput->hidden = false;
 	m_tilesetSelectToolbar->hidden = false;
