@@ -104,7 +104,19 @@ void MapEditor::onExit()
 	delete m_overlay;
 	m_overlay = 0;
 
-	Assets::Unload<Graphics::Map>(m_map->name);
+	if ( m_map )
+	{
+		for(int i = 0 ; i < TILESETS_PER_MAP; i++ )
+		{
+			const Graphics::Tileset *tileset = m_map->getTileset( i );
+			m_map->setTileset( i, 0 );
+			const std::string &name = ( tileset ? tileset->name : "");
+			Assets::Unload<Graphics::Tileset>(name);
+
+		}
+
+		Assets::Unload<Graphics::Map>(m_map->name);
+	}
 	m_map = nullptr;
 	//delete widgets
 	App::clear();

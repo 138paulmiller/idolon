@@ -126,7 +126,6 @@ void MapFactory::serialize(const Asset * asset, std::ostream & out) const
         const Graphics::Tileset *tileset = map->getTileset( i );
         const std::string &name = ( tileset ? tileset->name : "");
         out << name << std::endl;
-        Assets::Unload<Graphics::Tileset>(name);
 
     }
     //TODO - verify endian-ness!
