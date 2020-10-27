@@ -31,12 +31,12 @@ namespace UI
 		m_isDirty = true;
 	}
 	
-	bool Button::isDown()
+	bool Button::isDown() const
 	{
 		return m_isDown;
 	}
 	
-	bool Button::isDirty()
+	bool Button::isDirty()const
 	{
 		return m_isDirty;
 	}
@@ -86,7 +86,7 @@ namespace UI
 		m_isDirty = true;
 		onReset();
 	}
-	const Rect & Button::rect()
+	const Rect & Button::rect() const
 	{
 		return m_rect;
 	}
@@ -286,7 +286,7 @@ namespace UI
 		TextButton *upBtn = new TextButton( { 15 }, x, y, 1, 1, DEFAULT_FONT_ICONS );
 		setRange( 1, 10 );
 
-		int nx, ny;
+		int nx = x, ny=  y;
 		if ( m_isHoriz )
 		{
 			
@@ -299,6 +299,8 @@ namespace UI
 		
 		TextButton *downBtn = new TextButton( { 14 }, nx, ny, 1, 1, DEFAULT_FONT_ICONS );
 		Button * bar = new Button();
+		bar->fillColor = upBtn->hoverColor;
+
 		m_barBtn  = parent->addButton( bar );
 		m_downBtn  = parent->addButton( downBtn );
 		m_upBtn  = parent->addButton( upBtn );
@@ -332,22 +334,24 @@ namespace UI
 		m_parent->removeButton( m_upBtn );
 		m_parent->removeButton( m_downBtn);
 		m_parent->removeButton( m_barBtn );
-
-
 	}
+
 	void ScrollBar::onUpdate()
 	{		
 		scrollBy( m_scrollDir );
 	
-		Button *upBtn = m_parent->getButton( m_upBtn );
+		const Button *upBtn = m_parent->getButton( m_upBtn );
 		//-h*2 to account for up down buttons
-		int size = ((float)m_step/ m_total) * m_len;
-		const int border = 2;
-		const int w = ( m_isHoriz ? size :  upBtn->rect().w) - border;
-		const int h = (!m_isHoriz ? size :  upBtn->rect().h) - border;
 
-		const int x = upBtn->rect().x + border / 2 +(  m_isHoriz ? upBtn->rect().w +m_scroll * size : 0 );
-		const int y = upBtn->rect().y + border / 2 +( !m_isHoriz ? upBtn->rect().h +m_scroll * size : 0 );
+		const int bw = upBtn->rect().w;
+		const int bh = upBtn->rect().h;
+		const float size = ((float)m_step/ m_total) ;
+		const int border = 2;
+		const int w = ( m_isHoriz ? size * m_len :  bw - border ) ;
+		const int h = (!m_isHoriz ? size * m_len :  bh - border ) ;
+
+		const int x = upBtn->rect().x +(  m_isHoriz ? bw + m_scroll/m_total*m_len : border / 2  );
+		const int y = upBtn->rect().y +( !m_isHoriz ? bh + m_scroll/m_total*m_len : border / 2  );
 
 		m_parent->getButton(m_barBtn)->setRect(x,y,w,h);
 
@@ -355,13 +359,29 @@ namespace UI
 	void ScrollBar::onDraw()
 	{
 		//draw scroll line 
+		Button *upBtn = m_parent->getButton( m_upBtn );
+		const int bw = upBtn->rect().w;
+		const int bh = upBtn->rect().h;
+		const int bx = upBtn->rect().x;
+		const int by = upBtn->rect().y;
+		const Rect &rect = 
+		{ 
+			!m_isHoriz ? bx : bx+bw, 
+			m_isHoriz ? by : by+bh,
+			 m_isHoriz ? m_len : bw,
+			!m_isHoriz ? m_len : bh,
+		};
+		Engine::DrawRect(upBtn->fillColor, rect, true);
 	}
 	
 	void ScrollBar::scrollBy( float d )
 	{
-		m_scroll += d * m_step;
-		m_scroll = Clamp( m_scroll, 0, m_total-1 );
-		if ( cbScroll )
+		const int prevScroll = m_scroll;
+		m_scroll += d;
+		//do not overstep
+		m_scroll = Clamp( m_scroll, 0, m_total-m_step );
+		//if scroll success
+		if ( prevScroll != m_scroll && cbScroll )
 				cbScroll( d );
 		
 	}
@@ -375,7 +395,7 @@ namespace UI
 /*-------------------------------------------------------------------
 TextScrollArea
 */
-	TextScrollArea::TextScrollArea(int x, int y, int w, int h, const std::string & fontname)
+	TextScrollArea::TextScrollArea(App * parent, int x, int y, int w, int h, const std::string & fontname)
 
 	{
 		Graphics::Font * font = Assets::Load<Graphics::Font>(fontname);
@@ -408,6 +428,13 @@ TextScrollArea
 		m_cursor->filled = true;
 		m_cursor->fillColor = WHITE;
 		m_cursor->reload();
+
+		//scroll bar is roughly 12 pixels
+		m_scrollBar = new ScrollBar( parent, w-m_scrollBarWidth, y, h );
+		m_scrollBar->cbScroll = [this] (int step ){ 
+			this->scrollPageBy(0, step );
+		};
+
 	}
 
 	TextScrollArea::~TextScrollArea()
@@ -418,11 +445,13 @@ TextScrollArea
 			delete m_cursor;
 			m_cursor = 0;
 		}
+		delete m_scrollBar;
 	}
 	
 	void TextScrollArea::onUpdate() 
 	{
-
+		m_scrollBar->setRange( m_textH, m_lines-2 );						
+		m_scrollBar->onUpdate();
 	}
 	
 	void TextScrollArea::onDraw()
@@ -434,13 +463,13 @@ TextScrollArea
 		Engine::GetMousePosition(mx, my);
 		if (Engine::GetMouseButtonState(MOUSEBUTTON_LEFT) == BUTTON_CLICK)
 		{
-			//relative to textbox
-			const int tx = mx - m_textBox->x;
-			const int ty = my - m_textBox->y;
-			if (tx >= 0 && ty >= 0)
+			int w, h;
+			Engine::GetSize( w, h );
+			if (tx >= 0 && ty >= 0 && tx < w - m_scrollBarWidth && ty < h)
 			{
-				m_cursorX = tx / m_charW;
-				m_cursorY = ty / m_charH + m_textBox->scrolly;
+				//relative to textbox
+				m_cursorX = (mx - m_textBox->x ) / m_charW;
+				m_cursorY = (my - m_textBox->y ) / m_charH + m_textBox->scrolly;
 				updateTextOffset();
 			}
 		}
@@ -451,9 +480,10 @@ TextScrollArea
 			m_cursor->visible = !m_cursor->visible;
 			m_timer = 0;
 		}
-
 		m_textBox->draw();
 		m_cursor->draw();
+		m_scrollBar->onDraw();
+
 	}
 
 	bool TextScrollArea::handleKey(Key key, ButtonState state)
@@ -480,9 +510,34 @@ TextScrollArea
 					m_textBox->text += '\n';
 				else
 					m_textBox->text.insert(m_cursorPos, 1, '\n');
+				m_lines++;
 				dirty = true;
 				m_cursorX = 0;
 				scrollTextBy(0, 1);
+				break;
+			case KEY_BACKSPACE:
+				if (m_cursorPos > 0)
+				{
+					scrollTextBy(-1, 0);
+					if ( m_cursorPos == m_textBox->text.size() )
+					{
+						if ( m_textBox->text.back() == '\n' )
+						{
+							m_lines--;
+						}
+						m_textBox->text.pop_back();
+					}
+					else
+					{
+						if ( m_textBox->text[m_cursorPos] == '\n' )
+						{
+							m_lines--;
+						}
+						m_textBox->text.erase(m_cursorPos, 1);
+					}
+					dirty = true;
+				}
+
 				break;
 			default:
 				if (KeyPrintable(key))
@@ -512,18 +567,6 @@ TextScrollArea
 
 				}
 				break;
-			case KEY_BACKSPACE:
-				if (m_cursorPos > 0)
-				{
-					scrollTextBy(-1, 0);
-					if (m_cursorPos == m_textBox->text.size())
-						m_textBox->text.pop_back();
-					else
-						m_textBox->text.erase(m_cursorPos, 1);
-					dirty = true;
-				}
-
-				break;
 			}
 		}
 		if (dirty)
@@ -536,6 +579,7 @@ TextScrollArea
 
 	void TextScrollArea::setText(const std::string & text)
 	{
+		m_lines = 0;
 		if (text.size() == 0)
 		{
 			m_textBox->text = "";
@@ -544,7 +588,16 @@ TextScrollArea
 		{
 			//copy lines to codeview.
 			m_textBox->text = text;
+			for ( int i = 0; i < text.size(); i++ )
+			{
+				if ( text[i] == '\n' )
+				{
+					m_lines++;
+				}
+			}
 		}
+		m_scrollBar->setRange( m_textH, m_lines );
+
 		m_textBox->refresh();
 	}
 
@@ -568,9 +621,12 @@ TextScrollArea
 
 	void TextScrollArea::scrollPageBy( int dx, int dy )
 	{
-		m_textBox->scrolly += dy;
-		if ( m_textBox->scrolly < 0 ) m_textBox->scrolly = 0;
-		m_textBox->view.x = Clamp(m_textBox->view.x + dx, 0, m_textW - 2) ;
+		//-2 to see 
+		m_textBox->scrolly = Clamp(m_textBox->scrolly + dy, 0, m_lines) ;
+		m_textBox->view.x = Clamp(m_textBox->view.x + dx, 0, m_textW - 4) ;
+		m_textBox->refresh();
+		updateTextOffset();
+
 	}
 
 	void TextScrollArea::scrollTextBy(int dx, int dy)
@@ -622,14 +678,6 @@ TextScrollArea
 
 		updateTextOffset();
 
-		//update cursor and code view
-		//-2 allow to see cursor
-		m_textBox->view.x = Max(0, m_cursorX - (m_textW - 2)) * m_charW;
-
-		const int cy = Clamp(m_cursorY - m_textBox->scrolly, 0, m_textH);
-
-		m_cursor->x = m_textBox->x + (m_cursorX * m_charW - m_textBox->view.x);
-		m_cursor->y = m_textBox->y + (cy * m_charH);
 	}
 
 	void TextScrollArea::updateTextOffset()
@@ -642,7 +690,6 @@ TextScrollArea
 
 		for (m_cursorPos = 0; m_cursorPos < m_textBox->text.size(); m_cursorPos++)
 		{
-
 			if (m_cursorY == cy)
 			{
 				//get as close to cursor X as possible
@@ -663,6 +710,13 @@ TextScrollArea
 				m_cursorX = 0;
 			}
 		}
+	
+		//update cursor and code view
+		//-4 allow to see cursor
+		m_textBox->view.x = Max(0, m_cursorX - (m_textW - 4)) * m_charW;
+
+		m_cursor->x = m_textBox->x + ( m_cursorX * m_charW )- m_textBox->view.x;
+		m_cursor->y = m_textBox->y + ( m_cursorY - m_textBox->scrolly ) * m_charH;
 	}
 /*--------------------------------------------------------------------------------------
 	 Toolbar

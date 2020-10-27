@@ -112,9 +112,12 @@ AppCode Context::run( )
 	void App::update()
 	{
 
-		for(UI::Widget * widget : m_widgets)
+		for ( UI::Widget *widget : m_widgets )
 		{
-			if(widget) widget->onUpdate();
+			if ( widget )
+			{
+				widget->onUpdate();
+			}
 		}
 
 		int mx, my;
@@ -128,7 +131,6 @@ AppCode Context::run( )
 				//handle collision only for visible buttons
 				if ( !button->hidden )
 				{
-				
 					if(button->rect().intersects({mx, my, 1,1}))
 					{
 						if( Engine::GetMouseButtonState(MouseButton::MOUSEBUTTON_LEFT) == BUTTON_CLICK)
@@ -156,6 +158,8 @@ AppCode Context::run( )
 			}
 		}
 	}
+
+
 	void App::draw()
 	{	
 		for(UI::Widget * widget : m_widgets)
@@ -165,6 +169,7 @@ AppCode Context::run( )
 				widget->onDraw();
 			}
 		}
+
 		for(UI::Button * button : m_buttons)
 		{
 			if(button && !button->hidden)

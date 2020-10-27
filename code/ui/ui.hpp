@@ -66,10 +66,10 @@ namespace UI
 		void click();
 		//was in focus on first click, next clicked missed button
 		void leave();
-		bool isDown();
-		bool isDirty();
+		bool isDown() const;
+		bool isDirty() const;
 		virtual void reset();
-		const Rect & rect();
+		const Rect & rect() const;
 		void setRect( int x, int y, int w, int h );
 
 		std::function<void()> cbLeave;
@@ -167,7 +167,7 @@ namespace UI
 	class TextScrollArea : public Widget
 	{
 	public:
-		TextScrollArea(int x, int y, int w, int h, const std::string & fontname);
+		TextScrollArea(App * parent,int x, int y, int w, int h, const std::string & fontname);
 		~TextScrollArea();
 		void onUpdate() override;
 		void onDraw() override;
@@ -186,7 +186,8 @@ namespace UI
 
 		Graphics::TextBox * m_textBox;
 		Graphics::TextBox *m_cursor;
-	
+		UI::ScrollBar *m_scrollBar  ;
+
 		int m_cursorX, m_cursorY;
 		uint m_cursorPos;
 		
@@ -196,9 +197,12 @@ namespace UI
 		//size of char in pixels
 		int m_charW;
 		int m_charH;
+		int m_lines;
 		//flicker timer 
 		float m_timer;
 		bool m_hidden;
+		const int m_scrollBarWidth = 12;
+
 	};
 
 	/*-------------------------------------------------------------------

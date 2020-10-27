@@ -27,11 +27,10 @@ private:
 	void reload();
 	void hide(bool isHidden);
 	UI::TextScrollArea * m_codeArea;
-	UI::ScrollBar *m_scrollBar  ;
 	Script * m_script;
 	bool m_scriptRunning;
 	std::string m_scriptName;
 	//size of code box in chars
 	bool m_initialized;
-	
+
 };
