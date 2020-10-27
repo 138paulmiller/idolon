@@ -134,9 +134,11 @@ AppCode Context::run( )
 						if( Engine::GetMouseButtonState(MouseButton::MOUSEBUTTON_LEFT) == BUTTON_CLICK)
 						{
 							button->click();
-						}	
-						else
+						}							
+						else if( Engine::GetMouseButtonState(MouseButton::MOUSEBUTTON_LEFT) != BUTTON_HOLD)
 						{
+							button->leave();
+
 							if(button->cbHover)
 								button->cbHover();
 							button->onHover();

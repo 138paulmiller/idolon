@@ -6,6 +6,7 @@
 
 namespace
 {
+	//TODO move this table to ini file!!
 	//map from icon name to tileindex repr
 	std::unordered_map<std::string, std::string> s_iconNameMap = {
 		{ "PENCIL", { 0  } },
@@ -22,6 +23,8 @@ namespace
 		{ "BUILD",  { 11 } },
 		{ "PLAY",   { 12 } },
 		{ "PAUSE",  { 13 } },
+		{ "DOWN",   { 14 } },
+		{ "UP",     { 15 } },
 	};
 
 }

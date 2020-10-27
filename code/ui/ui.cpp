@@ -13,6 +13,9 @@ namespace UI
 
 	Button::Button()
 	:m_rect{0,0,0,0}
+	,hoverColor(DEFAULT_COLOR_HOVER)
+	,clickColor(DEFAULT_COLOR_CLICK)
+	,fillColor(DEFAULT_COLOR_FILL)
 	{
 		m_isDown = false;
 		m_isHover = false;
@@ -62,6 +65,12 @@ namespace UI
 
 		m_isDirty = false;
 	}
+
+	void Button::onDraw() 
+	{
+		Engine::DrawRect( m_color, m_rect, true );
+	}
+
 	void Button::onHover()
 	{
 		if(!m_isHover)
@@ -80,6 +89,11 @@ namespace UI
 	const Rect & Button::rect()
 	{
 		return m_rect;
+	}
+	
+	void Button::setRect(int x, int y, int w, int h)
+	{
+		m_rect = { x,y,w,h };
 	}
 	
 	void Button::leave()
@@ -116,8 +130,6 @@ namespace UI
 		m_textbox->x = x;
 		m_textbox->y = y;
 		m_textbox->borderX = DEFAULT_TEXT_BORDER;
-		m_textbox->textColor = textColor;
-		m_textbox->fillColor = fillColor;
 		m_textbox->filled = true;
 		m_textbox->reload();
 
@@ -137,6 +149,7 @@ namespace UI
 		{
 			Button::m_rect = { m_textbox->x, m_textbox->y, m_textbox->w, m_textbox->h };
 			m_textbox->fillColor = Button::m_color;
+			m_textbox->textColor = textColor;
 			m_textbox->refresh();
 		}
 	}
@@ -260,6 +273,103 @@ namespace UI
 				Engine::DrawRect( WHITE, {cx,cy,cw,ch}, true );
 			}
 		}
+	}
+/*-------------------------------------------------------------------
+	ScrollBar
+*/
+	ScrollBar::ScrollBar(  App* parent, int x, int y, int len, bool isHorizontal )
+	{
+		m_parent = parent;
+		m_scroll = 0;
+
+		m_isHoriz = isHorizontal;
+		TextButton *upBtn = new TextButton( { 15 }, x, y, 1, 1, DEFAULT_FONT_ICONS );
+		setRange( 1, 10 );
+
+		int nx, ny;
+		if ( m_isHoriz )
+		{
+			
+			nx = x + len - upBtn->rect().w;
+		}
+		else 
+		{
+			ny = y + len - upBtn->rect().h; 
+		}
+		
+		TextButton *downBtn = new TextButton( { 14 }, nx, ny, 1, 1, DEFAULT_FONT_ICONS );
+		Button * bar = new Button();
+		m_barBtn  = parent->addButton( bar );
+		m_downBtn  = parent->addButton( downBtn );
+		m_upBtn  = parent->addButton( upBtn );
+		if ( m_isHoriz )
+		{
+			m_len = downBtn->rect().x - (upBtn->rect().x + upBtn->rect().w) ;
+		}
+		else
+		{
+			m_len = downBtn->rect().y - (upBtn->rect().y + upBtn->rect().h) ;
+		}
+
+		upBtn->cbClick = [this] () {
+			m_scrollDir = -1;
+		};
+		upBtn->cbLeave = [this] () {
+			m_scrollDir = 0;
+		};
+		downBtn->cbClick = [this] () {
+			m_scrollDir = 1;
+		};
+		downBtn->cbLeave = [this] () {
+			m_scrollDir = 0;
+		};
+		m_scrollDir = 0;
+
+	}
+	
+	ScrollBar::~ScrollBar()
+	{
+		m_parent->removeButton( m_upBtn );
+		m_parent->removeButton( m_downBtn);
+		m_parent->removeButton( m_barBtn );
+
+
+	}
+	void ScrollBar::onUpdate()
+	{		
+		scrollBy( m_scrollDir );
+	
+		Button *upBtn = m_parent->getButton( m_upBtn );
+		//-h*2 to account for up down buttons
+		int size = ((float)m_step/ m_total) * m_len;
+		const int border = 2;
+		const int w = ( m_isHoriz ? size :  upBtn->rect().w) - border;
+		const int h = (!m_isHoriz ? size :  upBtn->rect().h) - border;
+
+		const int x = upBtn->rect().x + border / 2 +(  m_isHoriz ? upBtn->rect().w +m_scroll * size : 0 );
+		const int y = upBtn->rect().y + border / 2 +( !m_isHoriz ? upBtn->rect().h +m_scroll * size : 0 );
+
+		m_parent->getButton(m_barBtn)->setRect(x,y,w,h);
+
+	}
+	void ScrollBar::onDraw()
+	{
+		//draw scroll line 
+	}
+	
+	void ScrollBar::scrollBy( float d )
+	{
+		m_scroll += d * m_step;
+		m_scroll = Clamp( m_scroll, 0, m_total-1 );
+		if ( cbScroll )
+				cbScroll( d );
+		
+	}
+
+	void ScrollBar::setRange( int step, int total )
+	{
+		m_step = step;
+		m_total = total;
 	}
 
 /*-------------------------------------------------------------------
@@ -455,6 +565,14 @@ TextScrollArea
 		m_textBox->scrolly = 0;
 		scrollTextBy(0, 0);
 	}
+
+	void TextScrollArea::scrollPageBy( int dx, int dy )
+	{
+		m_textBox->scrolly += dy;
+		if ( m_textBox->scrolly < 0 ) m_textBox->scrolly = 0;
+		m_textBox->view.x = Clamp(m_textBox->view.x + dx, 0, m_textW - 2) ;
+	}
+
 	void TextScrollArea::scrollTextBy(int dx, int dy)
 	{
 		m_cursorX += dx;

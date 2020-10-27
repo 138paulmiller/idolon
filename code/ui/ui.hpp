@@ -56,7 +56,9 @@ namespace UI
 	public:
 		Button();
 		virtual ~Button() = default;
-		virtual void onUpdate();
+		virtual void onUpdate() override;
+		virtual void onDraw() override;
+
 		virtual void onReset();
 		virtual void onClick();
 		virtual void onHover();
@@ -68,11 +70,12 @@ namespace UI
 		bool isDirty();
 		virtual void reset();
 		const Rect & rect();
-		
+		void setRect( int x, int y, int w, int h );
+
 		std::function<void()> cbLeave;
 		std::function<void()> cbClick;
 		std::function<void()> cbHover;
-		
+		std::function<void()> cbHoverOff;
 		//User settings
 		Color hoverColor;
 		Color clickColor;
@@ -135,6 +138,32 @@ namespace UI
 
 	/*-------------------------------------------------------------------
 	*/
+
+	class ScrollBar : public Widget
+	{
+	public:
+		ScrollBar(App* parent, int x, int y, int len, bool isHorizontal = false );
+		~ScrollBar ();
+		void onDraw() override;
+		void onUpdate() override;
+		void setRange(int step, int total );
+		  
+		std::function<void( int )> cbScroll;
+
+	private:
+		void scrollBy(float d);
+		bool m_isHoriz;
+		int m_step, m_total, m_len;
+		//percentage of movement across bars
+		int m_scrollDir;
+		float m_scroll;
+		float m_scrollSpeed = 0.15;
+		int m_upBtn, m_downBtn, m_barBtn;
+		App *m_parent;
+	};
+
+	/*-------------------------------------------------------------------
+	*/
 	class TextScrollArea : public Widget
 	{
 	public:
@@ -146,6 +175,7 @@ namespace UI
 
 		void setText(const std::string & text);
 		const std::string & getText();
+		void scrollPageBy(int dx, int dy);
 
 		void hide(bool isHidden);
 		void resetCursor();
@@ -153,7 +183,6 @@ namespace UI
 
 		void scrollTextBy(int dx, int dy);
 		void updateTextOffset();
-
 
 		Graphics::TextBox * m_textBox;
 		Graphics::TextBox *m_cursor;
@@ -170,8 +199,6 @@ namespace UI
 		//flicker timer 
 		float m_timer;
 		bool m_hidden;
-
-
 	};
 
 	/*-------------------------------------------------------------------
