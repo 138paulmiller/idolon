@@ -335,6 +335,13 @@ namespace UI
 		m_parent->removeButton( m_downBtn);
 		m_parent->removeButton( m_barBtn );
 	}
+	void ScrollBar::hide( bool isHidden )
+	{
+		m_parent->getButton( m_barBtn )->hidden = isHidden;
+		m_parent->getButton( m_downBtn )->hidden = isHidden;
+		m_parent->getButton( m_upBtn )->hidden = isHidden;
+		hidden = isHidden;
+	}
 
 	void ScrollBar::onUpdate()
 	{		
@@ -450,7 +457,7 @@ TextScrollArea
 	
 	void TextScrollArea::onUpdate() 
 	{
-		m_scrollBar->setRange( m_textH, m_lines-2 );						
+		m_scrollBar->setRange( m_textH, m_lines );						
 		m_scrollBar->onUpdate();
 	}
 	
@@ -465,7 +472,7 @@ TextScrollArea
 		{
 			int w, h;
 			Engine::GetSize( w, h );
-			if (tx >= 0 && ty >= 0 && tx < w - m_scrollBarWidth && ty < h)
+			if (mx >= 0 && my >= 0 && mx < w - m_scrollBarWidth && my < h)
 			{
 				//relative to textbox
 				m_cursorX = (mx - m_textBox->x ) / m_charW;
@@ -510,6 +517,8 @@ TextScrollArea
 					m_textBox->text += '\n';
 				else
 					m_textBox->text.insert(m_cursorPos, 1, '\n');
+			
+				m_scrollBar->scrollBy( 1 );
 				m_lines++;
 				dirty = true;
 				m_cursorX = 0;
@@ -523,6 +532,7 @@ TextScrollArea
 					{
 						if ( m_textBox->text.back() == '\n' )
 						{
+							m_scrollBar->scrollBy( -1 );
 							m_lines--;
 						}
 						m_textBox->text.pop_back();
@@ -596,7 +606,6 @@ TextScrollArea
 				}
 			}
 		}
-		m_scrollBar->setRange( m_textH, m_lines );
 
 		m_textBox->refresh();
 	}
@@ -608,6 +617,7 @@ TextScrollArea
 
 	void TextScrollArea::hide(bool isHidden)
 	{
+		m_scrollBar->hide( isHidden );
 		m_hidden = isHidden;
 	}
 

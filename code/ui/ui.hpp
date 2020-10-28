@@ -146,12 +146,14 @@ namespace UI
 		~ScrollBar ();
 		void onDraw() override;
 		void onUpdate() override;
-		void setRange(int step, int total );
+		
+		void hide( bool isHidden );
+		void setRange( int step, int total );
+		void scrollBy(float d);
 		  
 		std::function<void( int )> cbScroll;
 
 	private:
-		void scrollBy(float d);
 		bool m_isHoriz;
 		int m_step, m_total, m_len;
 		//percentage of movement across bars
