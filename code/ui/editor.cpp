@@ -52,18 +52,18 @@ std::string Editor::getIcon( const std::string &name )
 	return "";
 }
 
-void Editor::redo()  
+void Editor::onRedo()  
 {
 	LOG( "Editor: Redo unimplemented" );
 }
 
-void Editor::undo()  
+void Editor::onUndo()  
 {
 
 	LOG( "Editor: Undo unimplemented" );
 }
 
-void Editor::save()  
+void Editor::onSave()  
 {
 	LOG( "Editor: Save unimplemented" );
 }
@@ -76,10 +76,7 @@ bool Editor::supports(AppSupport support)
 
 void Editor::onExit()
 {
-	if(m_control != -1) 
-		App::removeWidget(m_control);
-	if ( m_toolbar != -1 )
-		App::removeWidget( m_toolbar );
+	App::clear();
 }
 
 void Editor::onEnter()
@@ -88,12 +85,17 @@ void Editor::onEnter()
 		App::removeWidget( m_control );
 
 	const std::string &fontName = DEFAULT_FONT_ICONS;
+	Graphics::Font * font = Assets::Load<Graphics::Font>(fontName);
+	const int charW = font->charW;
+	const int charH = font->charH;
+	Assets::Unload<Graphics::Font>(fontName);
+	
 
 	int screenw, screenh;
 	UI::Toolbar *toolbar = new UI::Toolbar( this, 0, 0 );
 	toolbar->font = fontName;
 	m_toolbar = App::addWidget( toolbar );
-
+	
 	int screenW, screenH;
 	Engine::GetSize( screenW, screenH );
 	UI::Toolbar *control = new UI::Toolbar( this, screenW, 0 );
@@ -115,21 +117,21 @@ void Editor::onEnter()
 	if(supports(APP_SAVE))
 	{	
 		control->add( getIcon("SAVE"), [&](){
-			this->save();
+			this->onSave();
 		}, false, false);
 	}
 	//REDO
 	if(supports(APP_REDO))
 	{
 		control->add( getIcon("REDO"), [&](){
-			this->redo();
+			this->onRedo();
 		}, false, false);
 	}
 	//UNDO
 	if(supports(APP_UNDO))
 	{	
 		control->add( getIcon("UNDO"), [&](){
-			this->undo();
+			this->onUndo();
 		}, false, false);
 	}
 }
@@ -151,6 +153,9 @@ void Editor::addTool( const std::string &icon, std::function<void()> click, bool
 {
 	UI::Toolbar * toolbar = dynamic_cast<UI::Toolbar*>(App::getWidget( m_toolbar ));
 	toolbar->add( getIcon(icon), click, sticky, false );	
-	toolbar->get( 0 )->cbClick();
+	if ( sticky )
+	{
+		toolbar->get( 0 )->cbClick();
+	}
 	
 }

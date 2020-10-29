@@ -21,9 +21,10 @@ public:
 	void onTick()override;
 	void onKey(Key key , ButtonState state) override;
 
-	void redo()override;
-	void undo()override;
-	void save()override;
+	void onRedo()override;
+	void onUndo()override;
+	void onSave()override;
+
 
 	//allow for runtime update of tilesheet
 	void setTileset(const std::string & name, bool isFont = false );

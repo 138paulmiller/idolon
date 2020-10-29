@@ -17,15 +17,14 @@ public:
 	//returns string representation of icon
 	static std::string getIcon( const std::string &name );
 
-	virtual void redo();
-	virtual void undo();
-	virtual void save();
+	virtual void onRedo();
+	virtual void onUndo();
+	virtual void onSave();
 	
-	virtual void onEnter();
-	virtual void onExit();
+	virtual void onEnter() override;
+	virtual void onExit() override;
 
 	bool supports(AppSupport support);
-
 	void hideControl( bool hidden );
 	void hideTools(bool hidden);
 	void addTool(const std::string & text, std::function<void()> click, bool sticky=true );
@@ -35,12 +34,11 @@ public:
 
 private:
 
-
 	uint8 m_support;
 	int m_control;
+	int m_toolbar;
 	int m_controlX;
 	int m_controlY;
-	int m_toolbar;
 	bool m_resetToolbar;
 
 };

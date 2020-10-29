@@ -41,7 +41,10 @@ public:
 	void removeButton(int idx);
 	void removeWidget(int idx);
 
+
 private:
+	bool m_isFocused;//is current focus
+
 	AppCode m_status;
 	std::vector<UI::Widget*> m_widgets;
 	std::vector<UI::Button*> m_buttons;
@@ -56,7 +59,7 @@ public:
 	void clear();
 	void create( uint8 appId, App * app );
 	//kill previous process
-	void enter(uint8 appId, bool kill = true);
+	void enter(uint8 appId, bool kill );
 	void exit();
 	void handleKey( Key key, ButtonState state);
 	AppCode run( );
@@ -78,7 +81,7 @@ public:
 private:
 
 	uint8 m_appId;
-	uint8 m_prevAppId;
+	std::vector<uint8> m_appStack;
 	App * m_app;	
 
 	uint8 m_appCount;

@@ -21,39 +21,30 @@ void GameEditor::onEnter()
 	Engine::GetSize(w, h);
 
 	redrawHeaderData();
-
-
-	Editor::addTool("TERMINAL", [this](){
-		const std::string &path = FS::DirName( m_header->filepath );
-		//Sys::RunShell( path, false );
-	}, false);
 	
 	Editor::addTool("CODE", [this](){
 		const std::string &name = m_header->scripts.empty() ? "" : m_header->scripts[0];
-		Sys::RunScriptEditor( name, false);
+		Sys::RunScriptEditor( name);
 	}, false);
 	
 	Editor::addTool("TILESET", [this](){
 		const std::string &name = m_header->tilesets.empty() ? "" : m_header->tilesets[0];
-		Sys::RunTilesetEditor( name, false);
+		Sys::RunTilesetEditor( name);
 	}, false);
 	
 	Editor::addTool("MAP", [this](){
 		const std::string &name = m_header->maps.empty() ? "" : m_header->maps[0];
-		Sys::RunMapEditor( name, false);
+		Sys::RunMapEditor( name );
 	}, false);
 	
 	Editor::addTool("BUILD", [this](){
 		this->package();
 	}, false);
-	
-
 }
 
 void GameEditor::onExit()
 {
 	m_headerButtons.clear();
-	App::clear();
 	Editor::onExit();
 	LOG("Exited game editor");
 }
@@ -78,16 +69,16 @@ void GameEditor::onKey(Key key, ButtonState state)
 {
 }
 
-void GameEditor::undo()
+void GameEditor::onUndo()
 { 	
 }
 
-void GameEditor::redo()
+void GameEditor::onRedo()
 {
 
 }
 
-void GameEditor::save()
+void GameEditor::onSave()
 {
 }
 
@@ -161,12 +152,12 @@ int GameEditor::AddNamesList(const std::string & labelText, std::vector<std::str
 	{
 		for ( int i = 0; i < names.size(); i++ )
 		{
-			UI::TextInput * tilesetInput = new UI::TextInput( names[i], colx, y, inputw, 1, DEFAULT_FONT);
+			UI::TextInput * textInput = new UI::TextInput( names[i], colx, y, inputw, 1, DEFAULT_FONT);
 			y += offy;
-			tilesetInput->cbAccept = [this, i, tilesetInput, &names] () {
-				names[i] = tilesetInput->text;
+			textInput->cbAccept = [this, i, textInput, &names] () {
+				names[i] = textInput->text;
 			};
-			m_headerButtons.push_back(App::addButton( tilesetInput ));
+			m_headerButtons.push_back(App::addButton( textInput ));
 
 			//add a goto button, this will load editor on the tileset, if the tileset does not exist, it will be created
 		}
@@ -231,9 +222,9 @@ void GameEditor::redrawHeaderData()
 	}
 	y += offy;
 
-	y = AddNamesList( "Tilesets", m_header->tilesets, borderx, y, colx, offy, inputw );
 	y = AddNamesList( "Maps", m_header->maps, borderx, y, colx, offy, inputw );
 	y = AddNamesList( "Scripts", m_header->scripts, borderx, y, colx, offy, inputw );
+	y = AddNamesList( "Fonts", m_header->fonts, borderx, y, colx, offy, inputw );
 
 }
 

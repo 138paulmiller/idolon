@@ -8,7 +8,6 @@ Context::Context( uint8 appCount )
 	m_appCount = appCount;
 	m_apps = new App * [appCount];
 	memset( m_apps, 0, appCount * sizeof( App *) );
-	m_prevAppId =  0;
 	m_appId  = 0;
 	m_app = 0;
 }
@@ -37,23 +36,34 @@ void Context::create( uint8 appId, App * app )
 
 void Context::enter(uint8 appId, bool kill )
 {
+	//already withiin
 	ASSERT(appId < m_appCount, "Invalid App ID");
-	LOG("Context Switch: from %d to %d\n", m_prevAppId, appId);
+
+	const int prevAppId = m_appStack.empty() ? -1 : m_appStack.back();
+	if ( prevAppId != -1 )
+	{
+		LOG("Context Switch: from %d to %d\n", prevAppId, appId);
+	}
+
 	if ( m_app )
 	{
 		if ( kill )
 		{
-			m_app->signal( APP_CODE_EXIT );
+			m_app->signal( APP_CODE_EXIT ); 
 			m_app->onExit();
+			m_appStack.pop_back();
 		}
 	}
-
-	m_prevAppId = m_appId;
-	m_app = m_apps[m_appId = appId];
-	if ( m_app )
+	//if not dead, can reenter
+	if ( !kill )
 	{
-		//set current back to continue so can reenter
-		m_app->signal( APP_CODE_CONTINUE );
+		m_appStack.push_back( m_appId );
+	}
+	m_app = m_apps[m_appId = appId];
+
+	if ( m_app  && m_app->status() != APP_CODE_CONTINUE )
+	{
+		m_app->signal( APP_CODE_CONTINUE ); //allow reenter
 		m_app->onEnter();
 	}
 	else
@@ -64,7 +74,12 @@ void Context::enter(uint8 appId, bool kill )
 void Context::exit()
 {
 	LOG("Exiting Context...\n");
-	enter(m_prevAppId, true);
+
+	const int prevAppId = m_appStack.empty() ? -1 : m_appStack.back();
+	if ( prevAppId != -1 )
+	{
+		enter(prevAppId, true );
+	}
 }
 void Context::handleKey( Key key, ButtonState state)
 {
@@ -86,161 +101,162 @@ AppCode Context::run( )
 }
 	//////////////////////////////////////////////////////////////////////////////////
 	
-	App::App()
-	{
-	}
+App::App()
+{
+	m_status = APP_CODE_EXIT;
+}
 
-	App::~App()
-	{
-		clear();
-	}
+App::~App()
+{
+	clear();
+}
 
-	void App::clear()
-	{
+void App::clear()
+{
 
-		for(UI::Widget * widget : m_widgets)
-		{
-			if(widget)
-				delete widget;
-		}
-		for(UI::Button * button : m_buttons)
-		{
-			if(button)
-				delete button;
-		}
-		m_widgets.clear();
-		m_buttons.clear();
-	}
-
-	void App::signal(AppCode code)
+	for(UI::Widget * widget : m_widgets)
 	{
-		m_status = code;
+		if(widget)
+			delete widget;
 	}
+	for(UI::Button * button : m_buttons)
+	{
+		if(button)
+			delete button;
+	}
+	m_widgets.clear();
+	m_buttons.clear();
+}
+
+void App::signal(AppCode code)
+{
+	m_status = code;
+}
 	
-	AppCode App::status()
-	{
-		return m_status ;
-	}
+AppCode App::status()
+{
+	return m_status ;
+}
 	
-	void App::update()
+void App::update()
+{
+
+	for ( UI::Widget *widget : m_widgets )
 	{
-
-		for ( UI::Widget *widget : m_widgets )
+		if ( widget )
 		{
-			if ( widget )
-			{
-				widget->onUpdate();
-			}
+			widget->onUpdate();
 		}
-
-		int mx, my;
-		Engine::GetMousePosition(mx, my);
-		for(UI::Button * button : m_buttons)
+	}
+	int mx, my;
+	Engine::GetMousePosition(mx, my);
+	for(UI::Button * button : m_buttons)
+	{
+		if(button)
 		{
-			if(button)
-			{
-				button->onReset();
+			button->onReset();
 				
-				//handle collision only for visible buttons
-				if ( !button->hidden )
+			//handle collision only for visible buttons
+			if ( !button->hidden )
+			{
+				if(button->rect().intersects({mx, my, 1,1}))
 				{
-					if(button->rect().intersects({mx, my, 1,1}))
+					if( Engine::GetMouseButtonState(MouseButton::MOUSEBUTTON_LEFT) == BUTTON_CLICK)
 					{
-						if( Engine::GetMouseButtonState(MouseButton::MOUSEBUTTON_LEFT) == BUTTON_CLICK)
-						{
-							button->click();
-						}							
-						else if( Engine::GetMouseButtonState(MouseButton::MOUSEBUTTON_LEFT) != BUTTON_HOLD)
-						{
-							button->leave();
+						button->click();
+					}							
+					else if( Engine::GetMouseButtonState(MouseButton::MOUSEBUTTON_LEFT) != BUTTON_HOLD)
+					{
+						button->leave();
 
-							if(button->cbHover)
-								button->cbHover();
-							button->onHover();
-						}
-					}
-					else
-					{
-						if ( Engine::GetMouseButtonState( MouseButton::MOUSEBUTTON_LEFT ) == BUTTON_CLICK )
-						{
-							button->leave();
-						}
+						if(button->cbHover)
+							button->cbHover();
+						button->onHover();
 					}
 				}
-				button->onUpdate();
+				else
+				{
+					if ( Engine::GetMouseButtonState( MouseButton::MOUSEBUTTON_LEFT ) == BUTTON_CLICK )
+					{
+						button->leave();
+					}
+				}
 			}
+			button->onUpdate();
 		}
 	}
+}
 
 
-	void App::draw()
-	{	
-		for(UI::Widget * widget : m_widgets)
+void App::draw()
+{	
+	for(UI::Widget * widget : m_widgets)
+	{
+		if(widget && !widget->hidden)
 		{
-			if(widget && !widget->hidden)
-			{
-				widget->onDraw();
-			}
+			widget->onDraw();
 		}
+	}
 
-		for(UI::Button * button : m_buttons)
+	for(UI::Button * button : m_buttons)
+	{
+		if(button && !button->hidden)
 		{
-			if(button && !button->hidden)
-			{
-				button->onDraw();
-			}	
-		}
+			button->onDraw();
+		}	
 	}
+}
 
-	int App::addWidget(UI::Widget * widget)
-	{
-		int idx = m_widgets.size();
-		m_widgets.push_back(widget);
-		return idx;
-	}
+int App::addWidget(UI::Widget * widget)
+{
+	int idx = m_widgets.size();
+	m_widgets.push_back(widget);
+	return idx;
+}
 
-	int App::addButton(UI::Button * button)
-	{
+int App::addButton(UI::Button * button)
+{
 
-		int idx = m_buttons.size();
-		m_buttons.push_back(button);
-		return idx;
-	}
-	UI::Button * App::getButton(int idx)
-	{
-		if(idx < m_buttons.size())
-			return m_buttons[idx];
-		return 0;
-	}
+	int idx = m_buttons.size();
+	m_buttons.push_back(button);
+	return idx;
+}
+UI::Button * App::getButton(int idx)
+{
+	if(idx < m_buttons.size())
+		return m_buttons[idx];
+	return 0;
+}
 
-	UI::Widget * App::getWidget(int idx)
-	{
-		if(idx < m_widgets.size())
-			return m_widgets[idx];
-		return 0;
-	}
-	int App::getButtonCount()
-	{
-		return m_buttons.size();
-	}
+UI::Widget * App::getWidget(int idx)
+{
+	if(idx < m_widgets.size())
+		return m_widgets[idx];
+	return 0;
+}
+int App::getButtonCount()
+{
+	return m_buttons.size();
+}
 	
-	int App::getWidgetCount()
-	{
-		return m_widgets.size();
-	}
+int App::getWidgetCount()
+{
+	return m_widgets.size();
+}
 
-	void App::removeButton(int idx)
-	{
+void App::removeButton(int idx)
+{
 
-		if(idx >= m_buttons.size()) return;
-		delete m_buttons[idx];
-		m_buttons[idx] = 0;
-	}
+	if(idx >= m_buttons.size()) return;
+	delete m_buttons[idx];
+	m_buttons[idx] = 0;
+}
 
-	void App::removeWidget(int idx)
-	{
-		if(idx >= m_widgets.size()) return;
-		delete m_widgets[idx];
-		m_widgets[idx] = 0;
+void App::removeWidget(int idx)
+{
+	if(idx >= m_widgets.size()) return;
+	delete m_widgets[idx];
+	m_widgets[idx] = 0;
 
-	}
+}
+	

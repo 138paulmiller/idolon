@@ -38,7 +38,7 @@ void TilesetEditor::onEnter()
 	
 
 	const std::string &fontName = DEFAULT_FONT;
-	Graphics::Font * font = Assets::Load<Graphics::Font>(DEFAULT_FONT);
+	Graphics::Font * font = Assets::Load<Graphics::Font>(fontName);
 	m_charW = font->charW;
 	m_charH = font->charH;
 
@@ -88,6 +88,7 @@ void TilesetEditor::onEnter()
 
 void TilesetEditor::onExit()
 {
+	Editor::onExit();
 	//remove all ui Widgets/buttons. do not manually delete
 	for(Color * colors : m_revisionData)
 	{
@@ -108,8 +109,6 @@ void TilesetEditor::onExit()
 		Assets::Unload<Graphics::Tileset>(m_tilesetName );
 	}
 
-	App::clear();
-	Editor::onExit();
 	LOG("Exited sheet editor");
 
 }
@@ -436,7 +435,7 @@ void TilesetEditor::commit()
 
 }
 
-void TilesetEditor::undo()
+void TilesetEditor::onUndo()
 { 	
 	const Rect & selection = m_tilepicker->selection();
 	/*TODO
@@ -468,7 +467,7 @@ void TilesetEditor::undo()
 	}
 }
 
-void TilesetEditor::redo()
+void TilesetEditor::onRedo()
 {
 	const Rect & selection = m_tilepicker->selection();
 /*TODO 
@@ -500,7 +499,7 @@ void TilesetEditor::redo()
 
 }
 
-void TilesetEditor::save()
+void TilesetEditor::onSave()
 {
 	if ( !m_tileset ) return;
 

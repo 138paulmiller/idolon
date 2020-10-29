@@ -21,7 +21,6 @@ ScriptEditor::ScriptEditor()
 
 void ScriptEditor::onEnter()
 {
-
 	Editor::onEnter();
 
 	LOG("Entering script editor ... ");
@@ -56,13 +55,13 @@ void ScriptEditor::onEnter()
 
 void ScriptEditor::onExit()
 {
+	Editor::onExit();
+
 	Idolon::Quit();
 	Assets::Unload<Script>(m_scriptName);
 	m_script =  0;
 	m_codeArea = 0;
 	
-	App::clear();
-	Editor::onExit();
 	Eval::Shutdown();
 	
 	LOG("Exited script editor");
@@ -161,16 +160,16 @@ void ScriptEditor::runCode()
 	
 }
 
-void ScriptEditor::undo()
+void ScriptEditor::onUndo()
 { 	
 }
 
-void ScriptEditor::redo()
+void ScriptEditor::onRedo()
 {
 	//todo revision stack!
 }
 
-void ScriptEditor::save()
+void ScriptEditor::onSave()
 {
 	Assets::Save<Script>(m_script);
 }

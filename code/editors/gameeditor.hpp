@@ -12,9 +12,9 @@ public:
 	void onExit() override;
 	void onTick()override;
 	void onKey(Key key , ButtonState state) override;
-	void redo()override;
-	void undo()override;
-	void save()override;
+	void onRedo()override;
+	void onUndo()override;
+	void onSave()override;
 
 	void setGame(const std::string & gameHeaderPath);
 

@@ -102,9 +102,6 @@
     <ClInclude Include="..\code\ui\api.hpp">
       <Filter>Source Files\ui</Filter>
     </ClInclude>
-    <ClInclude Include="..\code\ui\editor.hpp">
-      <Filter>Source Files\ui</Filter>
-    </ClInclude>
     <ClInclude Include="..\code\ui\ui.hpp">
       <Filter>Source Files\ui</Filter>
     </ClInclude>
@@ -183,13 +180,13 @@
     <ClInclude Include="..\code\ui\app.hpp">
       <Filter>Source Files\ui</Filter>
     </ClInclude>
+    <ClInclude Include="..\code\ui\editor.hpp">
+      <Filter>Source Files\ui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\code\scripting\eval.cpp">
       <Filter>Source Files\scripting</Filter>
-    </ClCompile>
-    <ClCompile Include="..\code\ui\editor.cpp">
-      <Filter>Source Files\ui</Filter>
     </ClCompile>
     <ClCompile Include="..\code\ui\ui.cpp">
       <Filter>Source Files\ui</Filter>
@@ -255,6 +252,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\code\ui\app.cpp">
+      <Filter>Source Files\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\ui\editor.cpp">
       <Filter>Source Files\ui</Filter>
     </ClCompile>
   </ItemGroup>

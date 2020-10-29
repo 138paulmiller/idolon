@@ -47,6 +47,7 @@ namespace  Game
 		//game name
 		
 		//array of tileset names
+		std::vector<std::string> fonts;
 		std::vector<std::string> tilesets;
 		std::vector<std::string> maps;
 		std::vector<std::string> scripts;

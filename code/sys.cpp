@@ -16,10 +16,7 @@ namespace
 	std::string s_sysAssetPath;
 
 	GameState s_gamestate;
-
 	Factory * s_factories[FACTORY_COUNT];
-
-
 
 } // namespace
 
@@ -54,7 +51,7 @@ namespace Sys
 		s_context->create( APP_TILESET_EDITOR, new TilesetEditor()   );
 		s_context->create( APP_MAP_EDITOR,     new MapEditor()       );
 		s_context->create( APP_SCRIPT_EDITOR,  new ScriptEditor()    );
-		s_context->create( APP_GAME_EDITOR,  new GameEditor()    );
+		s_context->create( APP_GAME_EDITOR,    new GameEditor()    );
 		s_shell->addCommands( cmds );
 
 		//redirect key event to appropriate app. 
@@ -65,7 +62,6 @@ namespace Sys
 			{
 				if ( state == BUTTON_CLICK && key == KEY_ESCAPE )
 				{	
-					s_context->app()->signal( APP_CODE_CONTINUE ); //allow reenter
 					s_context->exit();
 				}
 				else
@@ -76,7 +72,7 @@ namespace Sys
 		);
 
 		//boot into shell
-		Sys::GetContext()->enter( APP_SHELL );
+		Sys::GetContext()->enter( APP_SHELL, true );
 
 
 		LOG( "System On!\n" );
@@ -112,7 +108,6 @@ namespace Sys
 			s_context->exit();
 			break;
 		}
-
 	}
 
 
@@ -176,42 +171,41 @@ namespace Sys
 	}
 
 	
-	void RunShell( const std::string &path, bool exit )
+	void RunShell( const std::string &path )
 	{
 		FS::Cd( path );
-		s_context->enter(APP_SHELL, exit);
+		s_context->enter(APP_SHELL, true);
 
 	}
 
-	void RunFontEditor( const std::string &tilesetName, bool exit )
+	void RunFontEditor( const std::string &tilesetName )
 	{
 		s_context->app<TilesetEditor>(APP_TILESET_EDITOR)->setTileset(tilesetName, true );
-		s_context->enter(APP_TILESET_EDITOR, exit);
+		s_context->enter(APP_TILESET_EDITOR, false);
 	}
 	
-	void RunTilesetEditor( const std::string &tilesetName, bool exit )
+	void RunTilesetEditor( const std::string &tilesetName )
 	{
 		s_context->app<TilesetEditor>(APP_TILESET_EDITOR)->setTileset(tilesetName, false );
-		s_context->enter(APP_TILESET_EDITOR, exit);
+		s_context->enter(APP_TILESET_EDITOR, false);
 	}
 	
-	void RunMapEditor( const std::string &mapName, bool exit )
+	void RunMapEditor( const std::string &mapName )
 	{
 		s_context->app<MapEditor>(APP_MAP_EDITOR)->setMap(mapName);
-		s_context->enter(APP_MAP_EDITOR, exit);
+		s_context->enter(APP_MAP_EDITOR, false);
 	}
 	
-	void RunScriptEditor(const std::string & scriptName, bool exit )
+	void RunScriptEditor(const std::string & scriptName )
 	{
 		s_context->app<ScriptEditor>(APP_SCRIPT_EDITOR)->setScript(scriptName);
-		s_context->enter(APP_SCRIPT_EDITOR, exit);
+		s_context->enter(APP_SCRIPT_EDITOR, false);
 	}
-
 		
-	void RunGameEditor(const std::string & cartPath, bool exit )
+	void RunGameEditor(const std::string & cartPath )
 	{
 		s_context->app<GameEditor>(APP_GAME_EDITOR)->setGame(cartPath);
-		s_context->enter(APP_GAME_EDITOR, exit);
+		s_context->enter(APP_GAME_EDITOR, false);
 	}
 
 	void RunGame(const std::string & gameName)

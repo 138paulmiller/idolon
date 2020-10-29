@@ -167,6 +167,8 @@ void Shell::onKey(Key key, ButtonState state)
 
 void Shell::onTick()
 {
+	Engine::Clear(m_buffer->fillColor);
+
 	m_timer += Engine::GetTimeDeltaMs()/1000.0f;
 	if (m_timer > 1.0/CURSOR_FLICKER_RATE  ) 
 	{

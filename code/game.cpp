@@ -136,6 +136,7 @@ namespace Game
 		std::ostringstream oss;
 		Game::Chunk outChunk;
 		//write out asset chunk to string stream
+		PackAssetList<Graphics::Font, TilesetFactory>( header.fonts, outChunk.offsets, oss );
 		PackAssetList<Graphics::Tileset, TilesetFactory>( header.tilesets, outChunk.offsets, oss );
 		PackAssetList<Graphics::Map,     MapFactory    >( header.maps,     outChunk.offsets, oss );
 		PackAssetList<Script,            ScriptFactory >( header.scripts,  outChunk.offsets, oss );
@@ -152,6 +153,7 @@ namespace Game
 		// offset name
 		// chunk
 		out << header.name << "\n";
+		PackHeader( header.fonts , outChunk.offsets, out );
 		PackHeader( header.tilesets, outChunk.offsets, out );
 		PackHeader( header.maps,     outChunk.offsets, out );
 		PackHeader( header.scripts,  outChunk.offsets, out );
@@ -202,6 +204,7 @@ namespace Game
 			Game::Header header(name);
 			Game::Chunk chunk;
 			
+			UnpackHeader( header.fonts, chunk.offsets, in );
 			UnpackHeader( header.tilesets, chunk.offsets, in );
 			UnpackHeader( header.maps,     chunk.offsets, in );
 			UnpackHeader( header.scripts,  chunk.offsets, in );

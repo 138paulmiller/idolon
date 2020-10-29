@@ -106,6 +106,8 @@ void MapEditor::onEnter()
 
 void MapEditor::onExit()
 {	
+	Editor::onExit();
+
 	delete m_overlay;
 	m_overlay = 0;
 
@@ -123,9 +125,6 @@ void MapEditor::onExit()
 		Assets::Unload<Graphics::Map>(m_map->name);
 	}
 	m_map = nullptr;
-	//delete widgets
-	App::clear();
-	Editor::onExit();
 
 
 	LOG("Exited map editor\n");
@@ -367,16 +366,16 @@ void MapEditor::drawOverlay()
 }
 
 
-void MapEditor::undo()
+void MapEditor::onUndo()
 { 	
 
 }
 
-void MapEditor::redo()
+void MapEditor::onRedo()
 {
 }
 
-void MapEditor::save()
+void MapEditor::onSave()
 {
 	if(!m_map) return;
 
