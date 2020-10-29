@@ -322,7 +322,7 @@ void NewAsset(const Args& args)
 
 void EditAsset(const Args& args)
 {			
-	std::unordered_map<std::string, std::function<void(const std::string&)>> assetToEditorMap = 
+	std::unordered_map<std::string, std::function<void(const std::string&, bool)>> assetToEditorMap = 
 	{
 		{
 			Assets::GetAssetTypeExt<Graphics::Tileset>(),
@@ -357,7 +357,7 @@ void EditAsset(const Args& args)
 	auto it = assetToEditorMap.find(type);
 	if(it != assetToEditorMap.end())
 	{
-		it->second(name);
+		it->second(name, true);
 	}
 	else
 	{

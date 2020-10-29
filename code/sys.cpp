@@ -109,9 +109,6 @@ namespace Sys
 			Sys::Shutdown();
 			break;
 		case APP_CODE_EXIT:
-			//cannot exit shell.
-			//set current back to continue so can reenter
-			s_context->app()->signal( APP_CODE_CONTINUE );
 			s_context->exit();
 			break;
 		}
@@ -178,35 +175,43 @@ namespace Sys
 		return s_context;
 	}
 
-	void RunFontEditor( const std::string &tilesetName )
+	
+	void RunShell( const std::string &path, bool exit )
+	{
+		FS::Cd( path );
+		s_context->enter(APP_SHELL, exit);
+
+	}
+
+	void RunFontEditor( const std::string &tilesetName, bool exit )
 	{
 		s_context->app<TilesetEditor>(APP_TILESET_EDITOR)->setTileset(tilesetName, true );
-		s_context->enter(APP_TILESET_EDITOR);
+		s_context->enter(APP_TILESET_EDITOR, exit);
 	}
 	
-	void RunTilesetEditor( const std::string &tilesetName )
+	void RunTilesetEditor( const std::string &tilesetName, bool exit )
 	{
 		s_context->app<TilesetEditor>(APP_TILESET_EDITOR)->setTileset(tilesetName, false );
-		s_context->enter(APP_TILESET_EDITOR);
+		s_context->enter(APP_TILESET_EDITOR, exit);
 	}
 	
-	void RunMapEditor( const std::string &mapName )
+	void RunMapEditor( const std::string &mapName, bool exit )
 	{
 		s_context->app<MapEditor>(APP_MAP_EDITOR)->setMap(mapName);
-		s_context->enter(APP_MAP_EDITOR);
+		s_context->enter(APP_MAP_EDITOR, exit);
 	}
 	
-	void RunScriptEditor(const std::string & scriptName)
+	void RunScriptEditor(const std::string & scriptName, bool exit )
 	{
 		s_context->app<ScriptEditor>(APP_SCRIPT_EDITOR)->setScript(scriptName);
-		s_context->enter(APP_SCRIPT_EDITOR);
+		s_context->enter(APP_SCRIPT_EDITOR, exit);
 	}
 
 		
-	void RunGameEditor(const std::string & cartPath)
+	void RunGameEditor(const std::string & cartPath, bool exit )
 	{
 		s_context->app<GameEditor>(APP_GAME_EDITOR)->setGame(cartPath);
-		s_context->enter(APP_GAME_EDITOR);
+		s_context->enter(APP_GAME_EDITOR, exit);
 	}
 
 	void RunGame(const std::string & gameName)

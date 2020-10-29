@@ -25,6 +25,11 @@ namespace
 		{ "PAUSE",  { 13 } },
 		{ "DOWN",   { 14 } },
 		{ "UP",     { 15 } },
+		{ "TERMINAL",   { 16 } },
+		{ "CODE",   { 17 } },
+		{ "TILESET",   { 18 } },
+		{ "MAP",   { 19 } },
+		{ "PACKAGE",   { 19 } },
 	};
 
 }

@@ -23,14 +23,28 @@ void GameEditor::onEnter()
 	redrawHeaderData();
 
 
-	Editor::addTool("PACKAGE", [&](){
-		if ( m_header )
-		{
-			Assets::Save<Game::Header>( m_header );
-			const std::string path = FS::DirName( m_header->filepath );
-			const std::string &cartPath = path + "/" + m_header->name + DEFAULT_CARTRIDGE_EXT;
-			Game::Package( *m_header, cartPath );
-		}
+	Editor::addTool("TERMINAL", [this](){
+		const std::string &path = FS::DirName( m_header->filepath );
+		//Sys::RunShell( path, false );
+	}, false);
+	
+	Editor::addTool("CODE", [this](){
+		const std::string &name = m_header->scripts.empty() ? "" : m_header->scripts[0];
+		Sys::RunScriptEditor( name, false);
+	}, false);
+	
+	Editor::addTool("TILESET", [this](){
+		const std::string &name = m_header->tilesets.empty() ? "" : m_header->tilesets[0];
+		Sys::RunTilesetEditor( name, false);
+	}, false);
+	
+	Editor::addTool("MAP", [this](){
+		const std::string &name = m_header->maps.empty() ? "" : m_header->maps[0];
+		Sys::RunMapEditor( name, false);
+	}, false);
+	
+	Editor::addTool("BUILD", [this](){
+		this->package();
 	}, false);
 	
 
@@ -91,7 +105,16 @@ void GameEditor::setName( const std::string &name )
 	}
 
 }
-
+void GameEditor::package()
+{
+	if ( m_header )
+		{
+			Assets::Save<Game::Header>( m_header );
+			const std::string path = FS::DirName( m_header->filepath );
+			const std::string &cartPath = path + "/" + m_header->name + DEFAULT_CARTRIDGE_EXT;
+			Game::Package( *m_header, cartPath );
+		}
+}
 
 void GameEditor::requestRedrawHeader()
 {
@@ -212,5 +235,6 @@ void GameEditor::redrawHeaderData()
 	y = AddNamesList( "Maps", m_header->maps, borderx, y, colx, offy, inputw );
 	y = AddNamesList( "Scripts", m_header->scripts, borderx, y, colx, offy, inputw );
 
-
 }
+
+

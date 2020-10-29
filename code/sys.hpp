@@ -34,11 +34,12 @@ namespace Sys
 	Context* GetContext();
 
 	//Actions
-	void RunFontEditor(const std::string & tilesetName );
-	void RunTilesetEditor(const std::string & tilesetName );
-	void RunMapEditor(const std::string & mapName);
-	void RunScriptEditor(const std::string & scriptName);
-	void RunGameEditor(const std::string & cartPath);
-	void RunGame(const std::string & gameName);
+	void RunShell(const std::string & path, bool exit = true );
+	void RunFontEditor(const std::string & tilesetName, bool exit = true  );
+	void RunTilesetEditor(const std::string & tilesetName, bool exit = true  );
+	void RunMapEditor(const std::string & mapName, bool exit = true );
+	void RunScriptEditor(const std::string & scriptName, bool exit = true );
+	void RunGameEditor(const std::string & cartPath, bool exit = true );
+	void RunGame(const std::string & gameName );
 
 }

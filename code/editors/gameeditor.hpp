@@ -20,12 +20,13 @@ public:
 
 private:
 
+	void package();
+
 	//if a new row is added, then must offset all text inputs
 	void redrawHeaderData();
 	void requestRedrawHeader();
 
 	void setName( const std::string &name );
-
 	int AddNamesList( const std::string &labelText, std::vector<std::string> &names, int x, int y, int colx, int offy, int inputw  );
 
 

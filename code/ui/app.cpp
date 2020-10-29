@@ -39,19 +39,32 @@ void Context::enter(uint8 appId, bool kill )
 {
 	ASSERT(appId < m_appCount, "Invalid App ID");
 	LOG("Context Switch: from %d to %d\n", m_prevAppId, appId);
-	if(kill && m_app)
-		m_app->onExit();
+	if ( m_app )
+	{
+		if ( kill )
+		{
+			m_app->signal( APP_CODE_EXIT );
+			m_app->onExit();
+		}
+	}
 
 	m_prevAppId = m_appId;
 	m_app = m_apps[m_appId = appId];
-	if(m_app)
+	if ( m_app )
+	{
+		//set current back to continue so can reenter
+		m_app->signal( APP_CODE_CONTINUE );
 		m_app->onEnter();
+	}
+	else
+	{
+		LOG("Entering empty app ...\n");
+	}
 }
 void Context::exit()
 {
 	LOG("Exiting Context...\n");
-
-	enter(m_prevAppId);
+	enter(m_prevAppId, true);
 }
 void Context::handleKey( Key key, ButtonState state)
 {

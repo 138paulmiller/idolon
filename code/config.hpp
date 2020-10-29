@@ -19,7 +19,7 @@
 #define GAME_API_UPDATE "OnFrame"
 #define GAME_API_ONKEY "OnKey"
 
-#define SHELL_PREFIX ">"
+#define SHELL_PREFIX "$"
 #define DEFAULT_FONT "default"
 #define DEFAULT_FONT_ICONS "icons" //see s_iconNameMap for usage
 #define DEFAULT_TEXT_BORDER 2

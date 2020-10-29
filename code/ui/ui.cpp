@@ -930,8 +930,6 @@ TextScrollArea
 	TilePicker::~TilePicker()
 	{
 		delete m_tileIdBox;
-		if(m_tileset)
-			Assets::Unload<Graphics::Tileset>(m_tileset->name);
 	}
 
 	const Rect & TilePicker::rect()
