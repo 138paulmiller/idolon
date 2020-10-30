@@ -45,7 +45,7 @@ void TilesetEditor::onEnter()
 	int w, h;
 	Engine::GetSize(w, h);
 
-	const int x = 8;
+	const int x = w-32;
 	const int y = 16;
 	m_colorpicker = new UI::ColorPicker(x,y);
 	m_tilepicker = new UI::TilePicker();

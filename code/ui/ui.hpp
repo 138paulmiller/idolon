@@ -228,13 +228,18 @@ namespace UI
 		std::string font;
 		//add buttons from left to right. 
 		bool leftAlign;
+
+		//add buttons from top to bottom. 
+		bool verticalAlign;
+
 	private:
 		int m_x, m_y;
 		const int border = 1;
 		//non-owning
 		App* m_parent;
 		int m_count;
-		int m_xoff;
+		//x or y offset
+		int m_off;
 		std::vector<int> m_buttonIds;
 		//if hiden changes
 		bool m_prevHidden;

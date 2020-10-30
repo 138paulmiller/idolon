@@ -130,6 +130,8 @@ namespace UI
 		m_textbox->x = x;
 		m_textbox->y = y;
 		m_textbox->borderX = DEFAULT_TEXT_BORDER;
+		m_textbox->borderY = DEFAULT_TEXT_BORDER;
+
 		m_textbox->filled = true;
 		m_textbox->reload();
 
@@ -290,11 +292,11 @@ namespace UI
 		if ( m_isHoriz )
 		{
 			
-			nx = x + len - upBtn->rect().w;
+			nx = x + len - upBtn->rect().w ;
 		}
 		else 
 		{
-			ny = y + len - upBtn->rect().h; 
+			ny = y + len - upBtn->rect().h ; 
 		}
 		
 		TextButton *downBtn = new TextButton( { 14 }, nx, ny, 1, 1, DEFAULT_FONT_ICONS );
@@ -436,8 +438,9 @@ TextScrollArea
 		m_cursor->fillColor = WHITE;
 		m_cursor->reload();
 
+		const int border = DEFAULT_TEXT_BORDER * 2;
 		//scroll bar is roughly 12 pixels
-		m_scrollBar = new ScrollBar( parent, w-m_scrollBarWidth, y, h );
+		m_scrollBar = new ScrollBar( parent, w-m_scrollBarWidth, y + border, h - border*2 );
 		m_scrollBar->cbScroll = [this] (int step ){ 
 			this->scrollPageBy(0, step );
 		};
@@ -734,9 +737,10 @@ TextScrollArea
 	Toolbar::Toolbar( App* parent, int x, int y )
 		:m_parent(parent), 
 		m_x(x),m_y(y),
-		m_count(0), m_xoff(0),
+		m_count(0), m_off(0),
 		font("default"),
-		leftAlign(true)
+		leftAlign(true),
+		verticalAlign(false)
 
 	{
 		textColor = { 255,255,255,255 };
@@ -757,14 +761,15 @@ TextScrollArea
 		{
 			//if first, must offset x by size of first button
 			TextButton * tmp = new TextButton( text, 0,0, text.size(), 1, font );
-			m_xoff = tmp->rect().w;
+			m_off = tmp->rect().w;
 			delete tmp;
 		}
 		m_count++;
-		const int x = leftAlign ? m_x + m_xoff : m_x - m_xoff;
+		const int x = verticalAlign ? m_x : ( leftAlign ? m_x + m_off : m_x - m_off ) ;
+		const int y = verticalAlign ? m_y + m_off : m_y;
 
-		TextButton * textbutton = new TextButton( text, x, m_y, text.size(), 1, font );
-		m_xoff += (textbutton->rect().w);
+		TextButton * textbutton = new TextButton( text, x, y, text.size(), 1, font );
+		m_off += verticalAlign ? (textbutton->rect().h) : (textbutton->rect().w);
 			
 		int buttonId = m_parent->addButton( textbutton );
 		textbutton->textColor  = textColor ;
@@ -1033,7 +1038,7 @@ TextScrollArea
 		
 		// account for padding in 
 		const int tileIdX =  w - (font->charW+DEFAULT_TEXT_BORDER) * 3;
-		const int tileIdY =  m_box.y - font->charH- border;
+		const int tileIdY =  m_box.y - font->charH-DEFAULT_TEXT_BORDER*2- 1;
 		
 		if ( m_tileIdBox )
 			delete m_tileIdBox;

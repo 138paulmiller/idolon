@@ -33,8 +33,6 @@ void MapEditor::onEnter()
 
 	if ( m_map )
 	{
-		m_map->rect.x = 0;
-		m_map->rect.y = TILE_H;
 		m_tilepicker->reload(  m_map->getTileset(0) );
 	}
 
@@ -45,7 +43,7 @@ void MapEditor::onEnter()
 	const int charH = font->charH;
 	Assets::Unload<Graphics::Font>(fontName);
 
-	const int toolY = screenh - (m_tilepicker->rect().h + TILE_H);
+	const int toolY = screenh - m_tilepicker->rect().h - TILE_H * 2;
 
 	//TODO - default tile w and height
 	m_tooldata = {0,0, TILE_W, TILE_H};
@@ -67,7 +65,7 @@ void MapEditor::onEnter()
 		m_tooldata = { -1, -1, -1, -1, -1 ,-1 };
 	});
 
-	int tw = screenw - 16* charW;
+	int tw = 0;
 	m_tilesetSelectToolbar = new UI::Toolbar(this, tw, toolY);
 
 	const int border = 2;
@@ -80,13 +78,13 @@ void MapEditor::onEnter()
 			}, 
 			false
 		);
-		tw+=(charW+border*2); //left and right border
+		tw+=(TILE_W+2*DEFAULT_TEXT_BORDER); //left and right border
 	}	
-	//add two buttons
-    const Graphics::Tileset *tileset = m_map ? m_map->getTileset( 0 ) : nullptr;
+
+	const Graphics::Tileset *tileset = m_map ? m_map->getTileset( 0 ) : nullptr;
     const std::string &tilesetName = ( tileset ? tileset->name : "");
 
-	m_tilesetInput = new UI::TextInput(tilesetName, tw, toolY, tw, 1, fontName);
+	m_tilesetInput = new UI::TextInput(tilesetName, tw, toolY, tw/2, 1, fontName);
 	m_tilesetInput->cbAccept = [this]()
 	{
 		this->setTileset(m_tilesetSelection, m_tilesetInput->text);
@@ -439,7 +437,7 @@ void MapEditor::showWorkspace()
 		int w, h;
 		Engine::GetSize( w, h );
 		
-		m_map->rect = { 0, TILE_H, w, h - ( m_tilepicker->rect().h / TILE_H ) * TILE_H };
+		m_map->rect = { 0, TILE_H+DEFAULT_TEXT_BORDER*2, w, h - ( m_tilepicker->rect().h / TILE_H ) * TILE_H };
 		
 		const int viewW = m_map->rect.w * m_map->scale();
 		const int viewH = m_map->rect.h * m_map->scale();

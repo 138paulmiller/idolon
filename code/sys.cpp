@@ -55,7 +55,7 @@ namespace
 
 			//BACK
 			m_controls->add( TranslateIcon("EXIT"), [&](){
-				Sys::RunShell( FS::Cwd() );
+				Sys::RunShell( "" );
 			}, false, false );
 
 			m_controls->add( TranslateIcon("SAVE"), [&](){
@@ -275,8 +275,6 @@ namespace Sys
 	void RunShell( const std::string &path )
 	{
 		s_menu->hide( true );
-
-		FS::Cd( path );
 		s_context->enter(APP_SHELL, true);
 
 	}

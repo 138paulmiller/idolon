@@ -35,10 +35,13 @@ void Editor::onEnter()
 	const int charW = font->charW;
 	const int charH = font->charH;
 	Assets::Unload<Graphics::Font>(fontName);
+	
+	int w, h;
+	Engine::GetSize( w, h );
 
 	//Make toolbar verticle left hand side of screen 
 	int screenw, screenh;
-	UI::Toolbar *toolbar = new UI::Toolbar( this, 0,  charH );
+	UI::Toolbar *toolbar = new UI::Toolbar( this, w/2, 0 );
 	toolbar->font = fontName;
 	m_toolbar = App::addWidget( toolbar );
 
