@@ -182,6 +182,7 @@ void ScriptEditor::setScript(const std::string & name)
 
 void ScriptEditor::hide(bool isHidden)
 {
+	Sys::HideMenu( isHidden );
 	hideTools( isHidden);
 	m_codeArea->hide(isHidden);
 }

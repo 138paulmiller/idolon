@@ -32,7 +32,7 @@ namespace Sys
 	const std::string& AssetPath();
 	Shell* GetShell();
 	Context* GetContext();
-
+	void HideMenu( bool isHidden );
 	//Actions
 	void RunShell(const std::string & path );
 	void RunFontEditor(const std::string & tilesetName  );

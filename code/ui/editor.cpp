@@ -44,8 +44,6 @@ void Editor::onEnter()
 	UI::Toolbar *toolbar = new UI::Toolbar( this, w/2, 0 );
 	toolbar->font = fontName;
 	m_toolbar = App::addWidget( toolbar );
-
-
 }
 
 void Editor::hideTools( bool hidden )

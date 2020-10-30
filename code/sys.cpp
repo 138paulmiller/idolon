@@ -153,12 +153,8 @@ namespace Sys
 					switch ( key )
 					{
 					case KEY_ESCAPE:
-						s_context->exit();
+						RunShell( "" );
 						return;
-					case KEY_h:
-						s_menu->hide(!s_menu->isHidden());
-						return;
-
 					}
 				}
 				s_context->handleKey( key, state );
@@ -167,7 +163,7 @@ namespace Sys
 		);
 
 		//boot into shell
-		RunShell( FS::Cwd() );
+		RunShell( "" );
 
 		LOG( "System On!\n" );
 	}
@@ -270,10 +266,15 @@ namespace Sys
 	{
 		return s_context;
 	}
-
+	
+	void HideMenu( bool isHidden )
+	{
+		s_menu->hide( isHidden );
+	}
 	
 	void RunShell( const std::string &path )
 	{
+		FS::Cd( path );
 		s_menu->hide( true );
 		s_context->enter(APP_SHELL, true);
 

@@ -423,6 +423,7 @@ void MapEditor::hideWorkspace()
 
 	}				  
    	
+	Sys::HideMenu( true );
 	m_workspaceHidden = true;
 	m_tilepicker->hidden = true;
 	m_tilesetInput->hidden = true;
@@ -446,6 +447,7 @@ void MapEditor::showWorkspace()
 
 	}				   
    
+	Sys::HideMenu( false );
 
 	m_workspaceHidden = false;
    	m_tilepicker->hidden = false;
