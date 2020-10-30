@@ -7,6 +7,7 @@
 //TODO handle all exceptions here. Close down, or restart system if necessary. Worst case shutdown, then startup system.
 namespace
 {
+	Game::Header  * s_header;
 	Shell  * s_shell;
 	Context* s_context;
 	
@@ -17,6 +18,90 @@ namespace
 
 	GameState s_gamestate;
 	Factory * s_factories[FACTORY_COUNT];
+
+	class MainMenu : public App
+	{
+		UI::Toolbar *m_appTab, *m_controls;
+
+	public:
+		void onEnter() override
+		{	
+			m_appTab  = new UI::Toolbar( this,0, 0 );
+			App::addWidget(m_appTab);
+			m_appTab->font = DEFAULT_FONT_ICONS;
+
+			m_appTab->add( TranslateIcon( "CODE" ), [this] () { 
+				const std::string &name = (!s_header || s_header->scripts.empty()) ? "" : s_header->scripts[0];
+				Sys::RunScriptEditor( name);	
+			}, true, false );
+
+			m_appTab->add( TranslateIcon( "TILESET" ), [this] () { 
+				const std::string &name = (!s_header || s_header->tilesets.empty()) ? "" : s_header->tilesets[0];
+				Sys::RunTilesetEditor( name);	
+			}, true, false );
+
+			m_appTab->add( TranslateIcon( "MAP" ), [this] () { 
+				const std::string &name = (!s_header || s_header->maps.empty()) ? "" : s_header->maps[0];
+				Sys::RunMapEditor( name);	
+			}, true, false );
+
+			int screenW, screenH;
+			Engine::GetSize( screenW, screenH );
+			m_controls = new UI::Toolbar( this,screenW, 0 );
+			App::addWidget(m_controls);
+
+			m_controls->font = DEFAULT_FONT_ICONS; //has glyphs
+			m_controls->leftAlign = false;
+
+			//BACK
+			m_controls->add( TranslateIcon("EXIT"), [&](){
+				App::signal(APP_CODE_EXIT);
+			}, false, false );
+
+			m_controls->add( TranslateIcon("SAVE"), [&](){
+				s_context->app()->onSave();
+			}, false, false);
+			
+			m_controls->add( TranslateIcon("REDO"), [&](){
+				s_context->app()->onRedo();
+			}, false, false);
+			
+			m_controls->add( TranslateIcon("UNDO"), [&](){
+				s_context->app()->onUndo();
+			}, false, false);
+			
+		}
+
+		void onExit() override
+		{
+			App::clear();
+		}
+
+		void onKey( Key key, ButtonState state ) override
+		{}
+
+
+		void onTick() override
+		{}
+
+		void hide( bool isHidden )
+		{
+			m_controls->hidden = isHidden;
+			m_appTab->hidden = isHidden;
+		}
+
+		bool isHidden()
+		{
+			return m_controls->hidden && m_appTab->hidden ;
+		}
+
+	};
+
+	//editor
+	MainMenu *s_menu;
+
+
+
 
 } // namespace
 
@@ -46,6 +131,9 @@ namespace Sys
 		Engine::Startup( title, SCREEN_W, SCREEN_H, WINDOW_SCALE );
 		Assets::Startup( Sys::AssetPath() );
 
+		s_menu = new MainMenu();
+		s_menu->onEnter();
+
 		//setup context apps
 		s_context->create( APP_SHELL,          s_shell = new Shell() );
 		s_context->create( APP_TILESET_EDITOR, new TilesetEditor()   );
@@ -60,26 +148,35 @@ namespace Sys
 		Engine::PushKeyHandler(
 			[&] ( Key key, ButtonState state)
 			{
-				if ( state == BUTTON_CLICK && key == KEY_ESCAPE )
+				if ( state == BUTTON_CLICK  )
 				{	
-					s_context->exit();
+					switch ( key )
+					{
+					case KEY_ESCAPE:
+						s_context->exit();
+						return;
+					case KEY_h:
+						s_menu->hide(!s_menu->isHidden());
+						return;
+
+					}
 				}
-				else
-				{
-					s_context->handleKey( key, state );
-				}
+				s_context->handleKey( key, state );
+				
 			}
 		);
 
 		//boot into shell
-		Sys::GetContext()->enter( APP_SHELL, true );
-
+		RunShell( FS::Cwd() );
 
 		LOG( "System On!\n" );
 	}
 
 	void Shutdown()
 	{
+		s_menu->onExit();
+		delete s_menu;
+
 		s_context->clear();
 		delete s_context;
 
@@ -96,6 +193,8 @@ namespace Sys
 
 	static void EditorStep()
 	{
+		s_menu->update();
+
 		//run editor context
 		switch ( Sys::GetContext()->run() )
 		{
@@ -108,6 +207,8 @@ namespace Sys
 			s_context->exit();
 			break;
 		}
+
+		s_menu->draw();
 	}
 
 
@@ -173,6 +274,8 @@ namespace Sys
 	
 	void RunShell( const std::string &path )
 	{
+		s_menu->hide( true );
+
 		FS::Cd( path );
 		s_context->enter(APP_SHELL, true);
 
@@ -180,36 +283,43 @@ namespace Sys
 
 	void RunFontEditor( const std::string &tilesetName )
 	{
+		s_menu->hide( false );
+		//if == "" create 
 		s_context->app<TilesetEditor>(APP_TILESET_EDITOR)->setTileset(tilesetName, true );
 		s_context->enter(APP_TILESET_EDITOR, false);
 	}
 	
 	void RunTilesetEditor( const std::string &tilesetName )
 	{
+		s_menu->hide( false );
 		s_context->app<TilesetEditor>(APP_TILESET_EDITOR)->setTileset(tilesetName, false );
 		s_context->enter(APP_TILESET_EDITOR, false);
 	}
 	
 	void RunMapEditor( const std::string &mapName )
 	{
+		s_menu->hide( false );
 		s_context->app<MapEditor>(APP_MAP_EDITOR)->setMap(mapName);
 		s_context->enter(APP_MAP_EDITOR, false);
 	}
 	
 	void RunScriptEditor(const std::string & scriptName )
 	{
+		s_menu->hide( false );
 		s_context->app<ScriptEditor>(APP_SCRIPT_EDITOR)->setScript(scriptName);
 		s_context->enter(APP_SCRIPT_EDITOR, false);
 	}
 		
 	void RunGameEditor(const std::string & cartPath )
 	{
+		s_menu->hide( false );
 		s_context->app<GameEditor>(APP_GAME_EDITOR)->setGame(cartPath);
 		s_context->enter(APP_GAME_EDITOR, false);
 	}
 
 	void RunGame(const std::string & gameName)
 	{
+		s_menu->hide( true );
 		TypedArg ret;
 		Game::Startup(gameName);
 	}

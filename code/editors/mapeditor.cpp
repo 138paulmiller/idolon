@@ -56,8 +56,8 @@ void MapEditor::onEnter()
 	Editor::addTool("STAMP", [&](){
 		m_tool = MAP_TOOL_STAMP;                     
 	});
-	//TODO - fill tiles
 
+	//TODO - fill tiles
 	//m_toolbar->add("FILL", [&](){
 	//	m_tool = MAP_TOOL_FILL;             
 	//});

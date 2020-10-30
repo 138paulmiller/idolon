@@ -747,9 +747,8 @@ TextScrollArea
 	
 	Toolbar::~Toolbar()
 	{
-
-		//for ( int id : m_buttonIds )
-		//	m_parent->removeButton( id );
+//		for ( int id : m_buttonIds )
+//			m_parent->removeButton( id );
 	}
 
 	int  Toolbar::add(const std::string & text, std::function<void()> click, bool sticky, bool isEscaped )

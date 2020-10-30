@@ -10,12 +10,14 @@ Context::Context( uint8 appCount )
 	memset( m_apps, 0, appCount * sizeof( App *) );
 	m_appId  = 0;
 	m_app = 0;
+
 }
 Context::~Context()
 {
 	clear();
 	delete[] m_apps;
 }
+
 void Context::clear( )
 {
 	if ( m_app )
@@ -99,7 +101,9 @@ AppCode Context::run( )
 
 	return m_app->status();
 }
-	//////////////////////////////////////////////////////////////////////////////////
+	
+
+//////////////////////////////////////////////////////////////////////////////////
 	
 App::App()
 {
@@ -140,7 +144,6 @@ AppCode App::status()
 	
 void App::update()
 {
-
 	for ( UI::Widget *widget : m_widgets )
 	{
 		if ( widget )
@@ -216,7 +219,6 @@ int App::addWidget(UI::Widget * widget)
 
 int App::addButton(UI::Button * button)
 {
-
 	int idx = m_buttons.size();
 	m_buttons.push_back(button);
 	return idx;
@@ -260,3 +262,18 @@ void App::removeWidget(int idx)
 
 }
 	
+void App::onRedo()  
+{
+	LOG( "App: Redo unimplemented" );
+}
+
+void App::onUndo()  
+{
+
+	LOG( "App: Undo unimplemented" );
+}
+
+void App::onSave()  
+{
+	LOG( "App: Save unimplemented" );
+}

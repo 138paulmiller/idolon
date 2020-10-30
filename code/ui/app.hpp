@@ -19,6 +19,9 @@ public:
 	virtual void onExit() = 0;
 	virtual void onTick() = 0;
 	virtual void onKey(Key key, ButtonState state) = 0;
+	virtual void onRedo() ;
+	virtual void onUndo() ;
+	virtual void onSave() ;
 						
 
 	void signal(AppCode code);
@@ -64,7 +67,7 @@ public:
 	void handleKey( Key key, ButtonState state);
 	AppCode run( );
 	
-
+	void addControl( const std::string &icon, std::function<void()> click, bool sticky );
 
 	template <typename Type= App>
 	Type * app()
@@ -79,6 +82,8 @@ public:
 	}
 
 private:
+	//control bar
+	UI::Toolbar * m_control;
 
 	uint8 m_appId;
 	std::vector<uint8> m_appStack;

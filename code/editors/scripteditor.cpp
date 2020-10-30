@@ -31,9 +31,9 @@ void ScriptEditor::onEnter()
 
 	//can scroll horiz 
 	//space for toolbar
-	h = (h - controlY());
+	h = (h - 8);
 	int col = 12;
-	m_codeArea = new UI::TextScrollArea(this, col, controlY(), w, h, DEFAULT_FONT);
+	m_codeArea = new UI::TextScrollArea(this, col, 8, w, h, DEFAULT_FONT);
 	addWidget(m_codeArea);
 
 

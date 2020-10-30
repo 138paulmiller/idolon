@@ -38,7 +38,6 @@ bool Color::operator==(const Color & c) const
 
 const Color Palette[32] =
 {
-	
 	{0xff, 0x00, 0x00, 0x00},
 	{0xff, 0xff, 0xff, 0xff},
 	{0xff, 0x12, 0x25, 0x24},
@@ -75,3 +74,38 @@ const Color Palette[32] =
 const int PaletteCount = 32;
 
 
+const std::string &TranslateIcon( const std::string &name )
+{
+	//TODO move this table to ini file!!
+	//map from icon name to tileindex repr
+	static std::unordered_map<std::string, std::string> s_iconNameMap = {
+		{ "PENCIL", { 0  } },
+		{ "FILL",   { 1  } },
+		{ "LINE",   { 2  } },
+		{ "ERASER", { 3  } },
+		{ "UNDO",   { 4  } },
+		{ "REDO",   { 5  } },
+		{ "RELOAD", { 6  } },
+		{ "SAVE",   { 7  } },
+		{ "LOAD",   { 8  } },
+		{ "EXIT",   { 9  } },
+		{ "STAMP",  { 10 } },
+		{ "BUILD",  { 11 } },
+		{ "PLAY",   { 12 } },
+		{ "PAUSE",  { 13 } },
+		{ "DOWN",   { 14 } },
+		{ "UP",     { 15 } },
+		{ "TERMINAL",   { 16 } },
+		{ "CODE",   { 17 } },
+		{ "TILESET",   { 18 } },
+		{ "MAP",   { 19 } },
+		{ "PACKAGE",   { 19 } },
+	};
+	auto iconIt = s_iconNameMap.find( name );
+	if ( iconIt != s_iconNameMap.end() )
+	{
+		return iconIt->second;
+	}
+	//assert!
+	return "";
+}

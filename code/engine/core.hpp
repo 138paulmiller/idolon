@@ -40,6 +40,7 @@ typedef unsigned int uint;
 
 std::string Trim( const std::string &s );
 
+
 struct Color
 {
     uint8 a;
@@ -51,10 +52,10 @@ struct Color
     bool operator!=(const Color & c) const;
 };
 
+const std::string &TranslateIcon( const std::string &name );
 
 extern const Color Palette[];
 extern const int PaletteCount;
-
 
 
 struct Rect
