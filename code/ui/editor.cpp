@@ -13,7 +13,6 @@ namespace
 Editor::Editor(uint8 support) 
 		:m_support(support)
 {
-	m_control = -1;
 }
 
 bool Editor::supports(AppSupport support)
@@ -37,6 +36,7 @@ void Editor::onEnter()
 	const int charH = font->charH;
 	Assets::Unload<Graphics::Font>(fontName);
 
+	//Make toolbar verticle left hand side of screen 
 	int screenw, screenh;
 	UI::Toolbar *toolbar = new UI::Toolbar( this, 0,  charH );
 	toolbar->font = fontName;
@@ -44,13 +44,6 @@ void Editor::onEnter()
 
 
 }
-
-void Editor::hideControl( bool hidden )
-{
-	UI::Toolbar * control = dynamic_cast<UI::Toolbar*>(App::getWidget( m_control));
-	control->hidden = hidden;
-}
-
 
 void Editor::hideTools( bool hidden )
 {

@@ -18,7 +18,6 @@ public:
 	virtual void onExit() override;
 
 	bool supports(AppSupport support);
-	void hideControl( bool hidden );
 	void hideTools(bool hidden);
 	void addTool(const std::string & text, std::function<void()> click, bool sticky=true );
 

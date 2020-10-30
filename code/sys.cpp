@@ -55,7 +55,7 @@ namespace
 
 			//BACK
 			m_controls->add( TranslateIcon("EXIT"), [&](){
-				App::signal(APP_CODE_EXIT);
+				Sys::RunShell( FS::Cwd() );
 			}, false, false );
 
 			m_controls->add( TranslateIcon("SAVE"), [&](){

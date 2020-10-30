@@ -22,21 +22,6 @@ void GameEditor::onEnter()
 
 	redrawHeaderData();
 	
-	Editor::addTool("CODE", [this](){
-		const std::string &name = m_header->scripts.empty() ? "" : m_header->scripts[0];
-		Sys::RunScriptEditor( name);
-	}, true);
-	
-	Editor::addTool("TILESET", [this](){
-		const std::string &name = m_header->tilesets.empty() ? "" : m_header->tilesets[0];
-		Sys::RunTilesetEditor( name);
-	}, true);
-	
-	Editor::addTool("MAP", [this](){
-		const std::string &name = m_header->maps.empty() ? "" : m_header->maps[0];
-		Sys::RunMapEditor( name );
-	}, true);
-	
 	Editor::addTool("BUILD", [this](){
 		this->package();
 	}, false);
