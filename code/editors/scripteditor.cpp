@@ -74,7 +74,6 @@ void ScriptEditor::onExit()
 
 void ScriptEditor::onTick()
 {
-
 	hide(m_scriptRunning  );
 
 	if ( m_scriptRunning ) 

@@ -50,7 +50,14 @@ void TilesetEditor::onEnter()
 	m_colorpicker = new UI::ColorPicker(x,y);
 	m_tilepicker = new UI::TilePicker();
 	m_tilepicker->reload(m_tileset );
+	const int comboY = m_tilepicker->rect().y - TILE_H * 2;
+	m_tileSelections = new UI::ComboBox( this, 0, comboY, 16, 1 );
+	m_tileSelections->cbSelect = [this] ( const std::string & text) { 
+		reload( text );
+	};
+	m_tileSelections->add( m_tilesetName );
 
+	App::addWidget( m_tileSelections );
 
 	addTool("PENCIL", [&](){
 		m_tool = TILE_TOOL_PENCIL;                     
@@ -71,6 +78,7 @@ void TilesetEditor::onEnter()
 
 	});
 
+
 	//first add toolbat	
 	//add the ui widgets
 	App::addWidget( m_tilepicker );
@@ -84,10 +92,13 @@ void TilesetEditor::onEnter()
 		m_tileset->update();
 		commit();
 	}
+	
+	Assets::PushPath(FS::Cwd());
 }
 
 void TilesetEditor::onExit()
 {
+	Assets::PopPath();
 	Editor::onExit();
 	//remove all ui Widgets/buttons. do not manually delete
 	for(Color * colors : m_revisionData)
@@ -514,4 +525,32 @@ void TilesetEditor::onSave()
 	{
 		Assets::Save( m_tileset );
 	}
+}
+
+void TilesetEditor::reload(const std::string & name)
+{
+	if ( !m_tilesetName.empty() )
+	{
+		if ( m_isFont )
+		{
+			Assets::Unload<Graphics::Font>(m_tilesetName );
+		}
+		else 
+		{
+			Assets::Unload<Graphics::Tileset>(m_tilesetName );
+		}
+	}
+	
+	setTileset( name, m_isFont );
+
+	if ( m_isFont )
+	{
+		m_tileset  = Assets::Load<Graphics::Font>(name);
+	}
+	else
+	{
+		m_tileset = Assets::Load<Graphics::Tileset>(name);
+	}
+	m_tilepicker->reload(m_tileset );
+
 }

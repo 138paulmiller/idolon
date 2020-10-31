@@ -188,6 +188,7 @@ namespace UI
 		:TextButton(text, x, y, tw, th, font)
 		
 	{
+		m_cursorVisible = false;
 		this->text = text;
 		auto handleKey = [this](Key key, ButtonState state)
 		{
@@ -232,7 +233,6 @@ namespace UI
 			m_timer = 0.0;
 			m_cursorVisible = true;
 			m_textprev = this->text;
-
 		};
 		this->cbLeave = [this]()
 		{
@@ -275,6 +275,13 @@ namespace UI
 				Engine::DrawRect( WHITE, {cx,cy,cw,ch}, true );
 			}
 		}
+	}
+
+	
+	void TextInput::setText( const std::string &text )
+	{
+		this->text = text;
+		TextButton::setText( text );
 	}
 /*-------------------------------------------------------------------
 	ScrollBar
@@ -826,7 +833,174 @@ TextScrollArea
 	{
 	}
 
+
+ComboBox::ComboBox( App *parent, int x, int y, int tw, int th )
+{
+	m_selection = -1;
+	m_isOpen = false;
+	m_parent = parent;
+	m_x = x;
+	m_y = y;
+	m_tw = tw;
+	m_th = th;
+	m_requiresClear = false;
+
+
+	TextInput * textInput = new TextInput( "", x, y, tw , th , DEFAULT_FONT );
+	m_textInputId = m_parent->addButton( textInput);
+	textInput->cbAccept = [this] () { 
+		updateInput();
+	};
+
+	const int endx = textInput->rect().x + textInput->rect().w;
+
+	TextButton *openBtn = new TextButton(TranslateIcon("UP"), endx, y, 1, 1, DEFAULT_FONT_ICONS);
+	openBtn->sticky = true;
+	openBtn->cbClick = [this] () { 
+		if( m_isOpen  )
+			close();
+		else
+			open();
+	};
+
+
+	m_openButtonId = m_parent->addButton( openBtn );
+
+
+
+	TextButton *addBtn = new TextButton(TranslateIcon("ADD"), openBtn->rect().x + openBtn->rect().w, y, 1, 1, DEFAULT_FONT_ICONS);
+	addBtn ->cbClick = [this] () { 
+		add("tiles" + std::to_string(m_selections.size()));
+	};
+	m_parent->addButton( addBtn );
+
+
+	TextButton *removeBtn  = new TextButton(TranslateIcon("REMOVE"), addBtn->rect().x + addBtn->rect().w, y, 1, 1, DEFAULT_FONT_ICONS);
+	removeBtn  ->cbClick = [this] () { 
+		if(m_selection != -1 )
+		remove(m_selections[m_selection]);
+	};
+
+	m_parent->addButton( removeBtn );
+
+}
+
+ComboBox::~ComboBox()
+{
+
+}
+
+void ComboBox::onUpdate() 
+{
+	if ( m_requiresClear )
+	{
+		m_requiresClear = false;
+		for ( int id : m_selectionIds )
+		{
+			m_parent->removeButton( id );
+		}
+		m_selectionIds.clear();
+	}
+}
+
+void ComboBox::onDraw()
+{
+
+}
+
+
+void ComboBox::select( int index )
+{
+	m_selection = index;
+	TextInput * input = dynamic_cast<TextInput*>(m_parent->getButton( m_textInputId ));
+	input->setText(m_selections[index]);
+}
+
+void ComboBox::add( const std::string &text )
+{
+
+	m_selections.push_back( text );
+	if ( m_selection == -1 )
+	{
+		select( 0 );
+	}
+	//create the asset!
+}
+
+void  ComboBox::remove( const std::string & text )
+{
+	//cannto remove
+	if ( m_selections.size() == 1 ) return;
+	m_selection = -1;
+	std::vector<std::string> selections;
+	for ( std::string &t  : m_selections )
+	{
+		if ( t != text )
+		{
+			selections.push_back( t );
+		}
+	}
+
+	m_selections.clear();
+	for (std::string & t : selections )
+	{
+		add( t );
+	}
 	
+	//delete asset 
+
+}
+	
+void ComboBox::open()
+{
+	//only open if more than one 	
+	if ( m_selections.size() == 1 ) return;
+
+	m_isOpen = true;
+	Button *const input = (m_parent->getButton( m_textInputId ));
+	input->hidden = true;
+
+	int offset = input->rect().h;
+	for ( int i = 0; i < m_selections.size(); i++ )
+	{
+		//skip selection
+		TextButton * btn = new TextButton( m_selections[i], m_x, m_y-offset*i , m_tw, m_th, DEFAULT_FONT );
+		btn->cbClick = [this, i, input] () {
+			select(i);
+			updateInput();
+			
+			close();
+		};
+		m_selectionIds.push_back(m_parent->addButton( btn ));
+	}
+	
+}
+
+void ComboBox::close()
+{
+	Button *const input = (m_parent->getButton( m_textInputId ));
+	input->hidden = false;
+	Button *const openBtn = (m_parent->getButton( m_openButtonId ));
+	openBtn->reset();
+	m_requiresClear = true;
+	m_isOpen = false;
+}
+
+
+void ComboBox::updateInput()
+{
+	TextInput * input = dynamic_cast<TextInput*>(m_parent->getButton( m_textInputId ));
+	if ( m_selection != -1 )
+	{
+		m_selections[m_selection] = input->text;
+		cbSelect( input->text );
+	}
+	else
+	{
+		m_selections[m_selection] = "";
+	}
+}
+
 /*--------------------------------------------------------------------------------------
 	 ColorPicker
 */
@@ -919,14 +1093,13 @@ TextScrollArea
 		{ SPRITE_W, SPRITE_W }
 	};
 
-	TilePicker::TilePicker()
+	TilePicker::TilePicker( )
 		:
 		m_scale(1),
 		m_tileset(0),
 		m_focus(false)
 	{
 		resizeCursor(m_selectionSizes[0][0], m_selectionSizes[0][0]);
-
 		m_tileIdBox = 0;
 
 	}

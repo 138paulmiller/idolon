@@ -170,8 +170,10 @@ void App::update()
 					}							
 					else if( Engine::GetMouseButtonState(MouseButton::MOUSEBUTTON_LEFT) != BUTTON_HOLD)
 					{
-						button->leave();
-
+						if ( !button->sticky )
+						{
+							button->leave();
+						}
 						if(button->cbHover)
 							button->cbHover();
 						button->onHover();
@@ -212,15 +214,41 @@ void App::draw()
 
 int App::addWidget(UI::Widget * widget)
 {
-	int idx = m_widgets.size();
-	m_widgets.push_back(widget);
+
+	int idx = 0;
+	for ( ; idx < m_widgets.size(); idx++ )
+	{
+		if ( m_widgets[idx] == 0 )
+			break;
+ 	}
+	if ( idx == m_widgets.size() )
+	{
+		m_widgets.push_back(widget);
+	}
+	else
+	{
+		m_widgets[idx]=widget;
+	}
+
 	return idx;
 }
 
 int App::addButton(UI::Button * button)
 {
-	int idx = m_buttons.size();
-	m_buttons.push_back(button);
+	int idx = 0;
+	for ( ; idx < m_buttons.size(); idx++ )
+	{
+		if ( m_buttons[idx] == 0 )
+			break;
+ 	}
+	if ( idx == m_buttons.size() )
+	{
+		m_buttons.push_back(button);
+	}
+	else
+	{
+		m_buttons[idx]=button;
+	}
 	return idx;
 }
 UI::Button * App::getButton(int idx)

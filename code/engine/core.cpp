@@ -99,7 +99,9 @@ const std::string &TranslateIcon( const std::string &name )
 		{ "CODE",   { 17 } },
 		{ "TILESET",   { 18 } },
 		{ "MAP",   { 19 } },
-		{ "PACKAGE",   { 19 } },
+		{ "ADD",   { 20 } },
+		{ "REMOVE",   { 21 } },
+		{ "PACKAGE",   { 22 } },
 	};
 	auto iconIt = s_iconNameMap.find( name );
 	if ( iconIt != s_iconNameMap.end() )

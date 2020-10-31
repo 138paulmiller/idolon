@@ -25,7 +25,6 @@ public:
 	void onUndo()override;
 	void onSave()override;
 
-
 	//allow for runtime update of tilesheet
 	void setTileset(const std::string & name, bool isFont = false );
 private:
@@ -33,10 +32,11 @@ private:
 	//draw the propoed changes with mouse at tilex,y
 	void drawOverlay(int tilex, int tiley, const Rect & dest);
 	
+	void reload( const std::string &name );
 
 	UI::TilePicker * m_tilepicker;
 	UI::ColorPicker * m_colorpicker;
-	
+	UI::ComboBox * m_tileSelections;
 	std::string m_tilesetName;
 	Graphics::Tileset * m_tileset;
 	const int m_tileScale = 8;

@@ -128,6 +128,7 @@ namespace UI
 		std::function<void()> cbAccept ;
 		//draw cursor
 		void onDraw() override;
+		void setText(const std::string & text);
 
 	private:
 		std::string m_textprev ;
@@ -246,6 +247,37 @@ namespace UI
 
 	};
 
+	class ComboBox : public Widget
+	{
+	public:
+		ComboBox( App *parent, int x, int y, int tw, int th);
+		~ComboBox();
+		void onUpdate() override;
+		void onDraw() override;
+		
+		void select( int index );
+		void add(const std::string & text );
+		void  remove( const std::string & text  );
+		void open();
+		void close();
+		std::function<void(const std::string &)> cbSelect;
+
+	private:
+		
+		void updateInput();
+		
+		int m_x, m_y, m_tw, m_th;
+		App *m_parent;
+		bool m_isOpen, m_requiresClear;
+;
+		int m_selection;
+		//selected option. 
+		int m_textInputId;
+		int m_openButtonId;
+		//selections
+		std::vector<int> m_selectionIds;
+		std::vector<std::string> m_selections;
+	};
 
 	/*-------------------------------------------------------------------
 		Color Selector
