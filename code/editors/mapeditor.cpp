@@ -28,9 +28,9 @@ void MapEditor::onEnter()
 	Engine::GetSize(screenw, screenh);
 
 	m_tilesetSelection = 0;
-	m_map = Assets::Load<Graphics::Map>(m_mapName);
 	m_tilepicker = new UI::TilePicker();
 
+	m_map = Assets::Load<Graphics::Map>(m_mapName);
 	if ( m_map )
 	{
 		m_tilepicker->reload(  m_map->getTileset(0) );

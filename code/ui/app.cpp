@@ -157,37 +157,7 @@ void App::update()
 	{
 		if(button)
 		{
-			button->onReset();
-				
-			//handle collision only for visible buttons
-			if ( !button->hidden )
-			{
-				if(button->rect().intersects({mx, my, 1,1}))
-				{
-					if( Engine::GetMouseButtonState(MouseButton::MOUSEBUTTON_LEFT) == BUTTON_CLICK)
-					{
-						button->click();
-					}							
-					else if( Engine::GetMouseButtonState(MouseButton::MOUSEBUTTON_LEFT) != BUTTON_HOLD)
-					{
-						if ( !button->sticky )
-						{
-							button->leave();
-						}
-						if(button->cbHover)
-							button->cbHover();
-						button->onHover();
-					}
-				}
-				else
-				{
-					if ( Engine::GetMouseButtonState( MouseButton::MOUSEBUTTON_LEFT ) == BUTTON_CLICK )
-					{
-						button->leave();
-					}
-				}
-			}
-			button->onUpdate();
+			button->handle( mx, my );
 		}
 	}
 }

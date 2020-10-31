@@ -50,14 +50,14 @@ void TilesetEditor::onEnter()
 	m_colorpicker = new UI::ColorPicker(x,y);
 	m_tilepicker = new UI::TilePicker();
 	m_tilepicker->reload(m_tileset );
+
 	const int comboY = m_tilepicker->rect().y - TILE_H * 2;
-	m_tileSelections = new UI::ComboBox( this, 0, comboY, 16, 1 );
-	m_tileSelections->cbSelect = [this] ( const std::string & text) { 
+	UI::ComboBox * tileSelections = new UI::ComboBox( this, 0, comboY, 16, 1 );
+	tileSelections->cbSelect = [this] ( const std::string & text) { 
 		reload( text );
 	};
-	m_tileSelections->add( m_tilesetName );
-
-	App::addWidget( m_tileSelections );
+	tileSelections->add( m_tilesetName );
+	App::addWidget( tileSelections );
 
 	addTool("PENCIL", [&](){
 		m_tool = TILE_TOOL_PENCIL;                     
@@ -455,7 +455,6 @@ void TilesetEditor::onUndo()
 		return; //does not exist
 	int & revisionId = m_revisions[sheetIndex];
 	*/
-	
 	if ( m_revision > 0 )
 	{
 		m_revision--;

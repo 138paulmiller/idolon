@@ -27,11 +27,9 @@ private:
 	void requestRedrawHeader();
 
 	void setName( const std::string &name );
-	int AddNamesList( const std::string &labelText, std::vector<std::string> &names, int x, int y, int colx, int offy, int inputw  );
+	void AddComboBox( const std::string &labelText, std::vector<std::string> &names, int x, int y  );
 
 
-	//managed to allow redraw
-	std::vector<int> m_headerButtons;
 	std::vector<Graphics::TextBox*> m_labels;
 	
 	Game::Header * m_header;

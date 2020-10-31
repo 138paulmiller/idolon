@@ -106,6 +106,41 @@ namespace UI
 		}
 
 	}
+	void Button::handle( int mx, int my )
+	{
+		onReset();
+				
+		//handle collision only for visible buttons
+		if ( !hidden )
+		{
+			if(rect().intersects({mx, my, 1,1}))
+			{
+				if( Engine::GetMouseButtonState(MouseButton::MOUSEBUTTON_LEFT) == BUTTON_CLICK)
+				{
+					click();
+				}							
+				else if( Engine::GetMouseButtonState(MouseButton::MOUSEBUTTON_LEFT) != BUTTON_HOLD)
+				{
+					if ( !sticky )
+					{
+						leave();
+					}
+					if(cbHover)
+						cbHover();
+					onHover();
+				}
+			}
+			else
+			{
+				if ( Engine::GetMouseButtonState( MouseButton::MOUSEBUTTON_LEFT ) == BUTTON_CLICK )
+				{
+					leave();
+				}
+			}
+		}
+		onUpdate();
+	}
+
 	void Button::click()
 	{
 		onClick();
@@ -834,7 +869,69 @@ TextScrollArea
 	}
 
 
-ComboBox::ComboBox( App *parent, int x, int y, int tw, int th )
+
+Dialog::Dialog( const std::string &msg )
+{
+	
+	int w, h;
+	Engine::GetSize( w, h );
+
+	//add space between text and options
+	m_box = new Graphics::TextBox(20, msg.size()/20+2, msg, DEFAULT_FONT);
+	m_box->reload();
+	m_box->x = w / 2 - m_box->w/2;
+	m_box->y = h / 2 - m_box->y/2;
+	m_box->fillColor = BLACK;
+	m_box->filled = true;
+
+
+	int x = m_box->x;
+	int y = m_box->y + m_box->h;
+
+
+	m_yes = new TextButton( "YES", x, y, 3, 1, DEFAULT_FONT );
+	m_yes->cbClick = [this] () {
+		m_option = YES;
+	};
+	
+	x += m_yes->rect().w + 12;
+	m_no= new TextButton( " NO", x, y, 3, 1, DEFAULT_FONT );
+	m_no->cbClick = [this] () {
+		m_option = NO;
+	};
+
+	m_rect = { m_box->x, m_box->y, m_box->w,  m_box->h + m_yes->rect().h };
+}
+Dialog::~Dialog()
+{
+	delete m_box;
+	delete m_yes;
+	delete m_no;
+}
+
+Dialog::Option Dialog::run()
+{
+	m_option = NONE;
+	int mx, my;
+	while ( m_option == NONE )
+	{
+		Engine::Run();
+		Engine::GetMousePosition( mx, my );
+
+		m_yes->handle( mx, my );
+		m_no->handle( mx, my );
+
+		//draw bar under yes no
+		Engine::DrawRect( BLACK, m_rect, true );
+		m_yes->onDraw();
+		m_no->onDraw();
+		m_box->draw();
+	}
+	return m_option;
+}
+
+
+ComboBox::ComboBox( App *parent, int x, int y, int tw, int th, bool modifiable)
 {
 	m_selection = -1;
 	m_isOpen = false;
@@ -862,26 +959,24 @@ ComboBox::ComboBox( App *parent, int x, int y, int tw, int th )
 		else
 			open();
 	};
-
-
 	m_openButtonId = m_parent->addButton( openBtn );
 
+	if ( modifiable )
+	{
+		TextButton *addBtn = new TextButton(TranslateIcon("ADD"), openBtn->rect().x + openBtn->rect().w, y, 1, 1, DEFAULT_FONT_ICONS);
+		addBtn ->cbClick = [this] () { 
+			add("tiles" + std::to_string(m_selections.size()));
+		};
+		m_parent->addButton( addBtn );
 
+		TextButton *removeBtn  = new TextButton(TranslateIcon("REMOVE"), addBtn->rect().x + addBtn->rect().w, y, 1, 1, DEFAULT_FONT_ICONS);
+		removeBtn  ->cbClick = [this] () { 
+			if(m_selection != -1 )
+			remove(m_selections[m_selection]);
+		};
 
-	TextButton *addBtn = new TextButton(TranslateIcon("ADD"), openBtn->rect().x + openBtn->rect().w, y, 1, 1, DEFAULT_FONT_ICONS);
-	addBtn ->cbClick = [this] () { 
-		add("tiles" + std::to_string(m_selections.size()));
-	};
-	m_parent->addButton( addBtn );
-
-
-	TextButton *removeBtn  = new TextButton(TranslateIcon("REMOVE"), addBtn->rect().x + addBtn->rect().w, y, 1, 1, DEFAULT_FONT_ICONS);
-	removeBtn  ->cbClick = [this] () { 
-		if(m_selection != -1 )
-		remove(m_selections[m_selection]);
-	};
-
-	m_parent->addButton( removeBtn );
+		m_parent->addButton( removeBtn );
+	}
 
 }
 
@@ -914,21 +1009,23 @@ void ComboBox::select( int index )
 	m_selection = index;
 	TextInput * input = dynamic_cast<TextInput*>(m_parent->getButton( m_textInputId ));
 	input->setText(m_selections[index]);
+	updateInput();
+
 }
 
 void ComboBox::add( const std::string &text )
 {
-
+	const int selection = m_selections.size();
 	m_selections.push_back( text );
-	if ( m_selection == -1 )
-	{
-		select( 0 );
-	}
-	//create the asset!
+	select( selection );	
 }
 
 void  ComboBox::remove( const std::string & text )
 {
+	Dialog *dialog = new Dialog( "Are you sure?" );
+	Dialog::Option option = dialog->run();
+	delete dialog;
+	if ( option == Dialog::Option::NO ) return;
 	//cannto remove
 	if ( m_selections.size() == 1 ) return;
 	m_selection = -1;
@@ -946,16 +1043,18 @@ void  ComboBox::remove( const std::string & text )
 	{
 		add( t );
 	}
-	
-	//delete asset 
-
+	select( 0 );
 }
 	
 void ComboBox::open()
 {
 	//only open if more than one 	
-	if ( m_selections.size() == 1 ) return;
-
+	if ( m_selections.size() == 1 ) 
+	{
+		Button *const openBtn = (m_parent->getButton( m_openButtonId ));
+		openBtn->reset();
+		return;
+	}
 	m_isOpen = true;
 	Button *const input = (m_parent->getButton( m_textInputId ));
 	input->hidden = true;
@@ -967,7 +1066,6 @@ void ComboBox::open()
 		TextButton * btn = new TextButton( m_selections[i], m_x, m_y-offset*i , m_tw, m_th, DEFAULT_FONT );
 		btn->cbClick = [this, i, input] () {
 			select(i);
-			updateInput();
 			
 			close();
 		};

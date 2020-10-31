@@ -63,6 +63,8 @@ namespace UI
 		virtual void onClick();
 		virtual void onHover();
 
+
+		void handle(int mx, int my );
 		void click();
 		//was in focus on first click, next clicked missed button
 		void leave();
@@ -247,21 +249,47 @@ namespace UI
 
 	};
 
+	/*-------------------------------------------------------------------
+		ComboBox
+	*/
+	class Dialog : public Widget
+	{
+	public:
+		enum Option { NONE, YES, NO };
+		Dialog(const std::string &msg);
+		~Dialog();
+
+		void onDraw() {};
+		void onUpdate() {};
+		Option run();
+
+	private:
+		Option m_option;
+		Rect m_rect;
+		Graphics::TextBox *m_box;
+		TextButton *m_yes, *m_no;
+	};
+
+	/*-------------------------------------------------------------------
+		ComboBox
+	*/
 	class ComboBox : public Widget
 	{
 	public:
-		ComboBox( App *parent, int x, int y, int tw, int th);
+		ComboBox( App *parent, int x, int y, int tw, int th, bool modifiable = true);
 		~ComboBox();
 		void onUpdate() override;
 		void onDraw() override;
 		
 		void select( int index );
 		void add(const std::string & text );
-		void  remove( const std::string & text  );
+		void remove( const std::string & text  );
 		void open();
 		void close();
-		std::function<void(const std::string &)> cbSelect;
 
+		const std::vector<std::string> &entries() { return m_selections; }
+		std::function<void(const std::string &)> cbSelect;
+		
 	private:
 		
 		void updateInput();

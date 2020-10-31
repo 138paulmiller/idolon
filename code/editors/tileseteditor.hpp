@@ -36,7 +36,6 @@ private:
 
 	UI::TilePicker * m_tilepicker;
 	UI::ColorPicker * m_colorpicker;
-	UI::ComboBox * m_tileSelections;
 	std::string m_tilesetName;
 	Graphics::Tileset * m_tileset;
 	const int m_tileScale = 8;
