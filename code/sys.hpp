@@ -23,6 +23,20 @@ enum : uint8
 	APP_COUNT
 };
 
+class MainMenu : public App
+{
+	UI::Toolbar *m_appTab, *m_controls;
+public:
+	void onEnter() override;
+	void onExit() override;
+	void onKey( Key key, ButtonState state ) override;
+	void onTick() override;
+	void hide( bool isHidden );
+	bool isHidden();
+	UI::Toolbar *appTab();
+	UI::Toolbar *controls();
+};
+
 namespace Sys
 {
 	void Startup( const CommandTable & cmds);
@@ -32,7 +46,7 @@ namespace Sys
 	const std::string& AssetPath();
 	Shell* GetShell();
 	Context* GetContext();
-	void HideMenu( bool isHidden );
+	MainMenu *GetMainMenu();
 	//Actions
 	void RunShell(const std::string & path );
 	void RunFontEditor(const std::string & tilesetName  );

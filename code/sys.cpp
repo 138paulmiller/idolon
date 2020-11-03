@@ -19,93 +19,89 @@ namespace
 	GameState s_gamestate;
 	Factory * s_factories[FACTORY_COUNT];
 
-	class MainMenu : public App
-	{
-		UI::Toolbar *m_appTab, *m_controls;
-
-	public:
-		void onEnter() override
-		{	
-			m_appTab  = new UI::Toolbar( this,0, 0 );
-			App::addWidget(m_appTab);
-			m_appTab->font = DEFAULT_FONT_ICONS;
-
-			m_appTab->add( TranslateIcon( "CODE" ), [this] () { 
-				const std::string &name = (!s_header || s_header->scripts.empty()) ? "" : s_header->scripts[0];
-				Sys::RunScriptEditor( name);	
-			}, true, false );
-
-			m_appTab->add( TranslateIcon( "TILESET" ), [this] () { 
-				const std::string &name = (!s_header || s_header->tilesets.empty()) ? "" : s_header->tilesets[0];
-				Sys::RunTilesetEditor( name);	
-			}, true, false );
-
-			m_appTab->add( TranslateIcon( "MAP" ), [this] () { 
-				const std::string &name = (!s_header || s_header->maps.empty()) ? "" : s_header->maps[0];
-				Sys::RunMapEditor( name);	
-			}, true, false );
-
-			int screenW, screenH;
-			Engine::GetSize( screenW, screenH );
-			m_controls = new UI::Toolbar( this,screenW, 0 );
-			App::addWidget(m_controls);
-
-			m_controls->font = DEFAULT_FONT_ICONS; //has glyphs
-			m_controls->leftAlign = false;
-
-			//BACK
-			m_controls->add( TranslateIcon("EXIT"), [&](){
-				Sys::RunShell( "" );
-			}, false, false );
-
-			m_controls->add( TranslateIcon("SAVE"), [&](){
-				s_context->app()->onSave();
-			}, false, false);
-			
-			m_controls->add( TranslateIcon("REDO"), [&](){
-				s_context->app()->onRedo();
-			}, false, false);
-			
-			m_controls->add( TranslateIcon("UNDO"), [&](){
-				s_context->app()->onUndo();
-			}, false, false);
-			
-		}
-
-		void onExit() override
-		{
-			App::clear();
-		}
-
-		void onKey( Key key, ButtonState state ) override
-		{}
-
-
-		void onTick() override
-		{}
-
-		void hide( bool isHidden )
-		{
-			m_controls->hidden = isHidden;
-			m_appTab->hidden = isHidden;
-		}
-
-		bool isHidden()
-		{
-			return m_controls->hidden && m_appTab->hidden ;
-		}
-
-	};
-
 	//editor
 	MainMenu *s_menu;
-
-
-
-
 } // namespace
 
+void MainMenu::onEnter() 
+{	
+	m_appTab  = new UI::Toolbar( this,0, 0 );
+	App::addWidget(m_appTab);
+	m_appTab->font = DEFAULT_FONT_ICONS;
 
+	m_appTab->add( TranslateIcon( "CODE" ), [this] () { 
+		const std::string &name = (!s_header || s_header->scripts.empty()) ? "" : s_header->scripts[0];
+		Sys::RunScriptEditor( name);	
+	}, true, false );
+
+	m_appTab->add( TranslateIcon( "TILESET" ), [this] () { 
+		const std::string &name = (!s_header || s_header->tilesets.empty()) ? "" : s_header->tilesets[0];
+		Sys::RunTilesetEditor( name);	
+	}, true, false );
+
+	m_appTab->add( TranslateIcon( "MAP" ), [this] () { 
+		const std::string &name = (!s_header || s_header->maps.empty()) ? "" : s_header->maps[0];
+		Sys::RunMapEditor( name);	
+	}, true, false );
+
+	int screenW, screenH;
+	Engine::GetSize( screenW, screenH );
+	m_controls = new UI::Toolbar( this,screenW, 0 );
+	App::addWidget(m_controls);
+
+	m_controls->font = DEFAULT_FONT_ICONS; //has glyphs
+	m_controls->leftAlign = false;
+
+	//BACK
+	m_controls->add( TranslateIcon("EXIT"), [&](){
+		Sys::RunShell( "" );
+	}, false, false );
+
+	m_controls->add( TranslateIcon("SAVE"), [&](){
+		s_context->app()->onSave();
+	}, false, false);
+			
+	m_controls->add( TranslateIcon("REDO"), [&](){
+		s_context->app()->onRedo();
+	}, false, false);
+			
+	m_controls->add( TranslateIcon("UNDO"), [&](){
+		s_context->app()->onUndo();
+	}, false, false);
+			
+}
+
+void MainMenu::onExit() 
+{
+	App::clear();
+}
+
+void MainMenu::onKey( Key key, ButtonState state ) 
+{}
+
+
+void MainMenu::onTick() 
+{}
+
+void MainMenu::hide( bool isHidden )
+{
+	m_controls->hidden = isHidden;
+	m_appTab->hidden = isHidden;
+}
+
+bool MainMenu::isHidden()
+{
+	return m_controls->hidden && m_appTab->hidden ;
+}
+UI::Toolbar *MainMenu::appTab()
+{
+	return m_appTab;
+}
+
+UI::Toolbar *MainMenu::controls()
+{
+	return m_controls;
+}
 namespace Sys
 {
 
@@ -266,11 +262,13 @@ namespace Sys
 	{
 		return s_context;
 	}
+
 	
-	void HideMenu( bool isHidden )
+	MainMenu *GetMainMenu()
 	{
-		s_menu->hide( isHidden );
+		return s_menu;
 	}
+	
 	
 	void RunShell( const std::string &path )
 	{
