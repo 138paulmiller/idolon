@@ -1,8 +1,0 @@
-define: DUK_USE_FUZZILLI
-introduced: 3.0.0
-default: false
-tags:
-  - fuzzing
-description: >
-  Needed when running Fuzzilli fuzzing, enables access to duk_assert_wrapper()
-  expected by the integration.

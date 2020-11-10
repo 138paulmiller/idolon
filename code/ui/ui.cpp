@@ -1049,7 +1049,7 @@ void  ComboBox::remove( const std::string & text )
 void ComboBox::open()
 {
 	//only open if more than one 	
-	if ( m_selections.size() == 1 ) 
+	if ( m_selections.size() <= 1 ) 
 	{
 		Button *const openBtn = (m_parent->getButton( m_openButtonId ));
 		openBtn->reset();
@@ -1059,9 +1059,20 @@ void ComboBox::open()
 	Button *const input = (m_parent->getButton( m_textInputId ));
 	input->hidden = true;
 
-	int offset = input->rect().h;
+	//add selection as first 
+
+
+	TextButton * btn = new TextButton( m_selections[m_selection], m_x, m_y , m_tw, m_th, DEFAULT_FONT );
+	btn->cbClick = [this, input] () {
+		select(m_selection);
+		close();
+	};
+	m_selectionIds.push_back(m_parent->addButton( btn ));
+
+	const int offset = input->rect().h;
 	for ( int i = 0; i < m_selections.size(); i++ )
 	{
+		if ( i == m_selection ) return;
 		//skip selection
 		TextButton * btn = new TextButton( m_selections[i], m_x, m_y-offset*i , m_tw, m_th, DEFAULT_FONT );
 		btn->cbClick = [this, i, input] () {
@@ -1091,11 +1102,10 @@ void ComboBox::updateInput()
 	if ( m_selection != -1 )
 	{
 		m_selections[m_selection] = input->text;
-		cbSelect( input->text );
-	}
-	else
-	{
-		m_selections[m_selection] = "";
+		if ( cbSelect )
+		{
+			cbSelect( input->text );
+		}
 	}
 }
 

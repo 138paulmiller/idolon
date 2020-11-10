@@ -158,19 +158,21 @@ int try_main(int argc, char** argv)
 
 int main(int argc, char** argv)
 { 
-	try
-	{
-		return try_main(argc, argv);
-	}
-	// catch anything thrown within try block that derives from std::exception
-	catch (const std::exception &ex)
-	{
-	    printf("System : Caught exception\n%s\n", ex.what());
-	}
-	catch (...)
-	{
-	    printf("System : Caught Unknown exception\n");
-	}
+	return try_main(argc, argv);
+
+	//try
+	//{
+	//	return try_main(argc, argv);
+	//}
+	//// catch anything thrown within try block that derives from std::exception
+	//catch (const std::exception &ex)
+	//{
+	//    printf("System : Caught exception\n%s\n", ex.what());
+	//}
+	//catch (...)
+	//{
+	//    printf("System : Caught Unknown exception\n");
+	//}
 
 	return -1;
 }
@@ -338,7 +340,7 @@ void EditAsset(const Args& args)
 		},
 		{
 			Assets::GetAssetTypeExt<Game::Header>(),
-			Sys::RunGameEditor
+			Sys::RunEditor
 		},
 		{
 			Assets::GetAssetTypeExt<Graphics::Font>(),

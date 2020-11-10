@@ -187,7 +187,7 @@
     <ClInclude Include="..\code\assets\factories.hpp" />
     <ClInclude Include="..\code\config.hpp" />
     <ClInclude Include="..\code\editors\api.hpp" />
-    <ClInclude Include="..\code\editors\gameeditor.hpp" />
+    <ClInclude Include="..\code\editors\configeditor.hpp" />
     <ClInclude Include="..\code\editors\mapeditor.hpp" />
     <ClInclude Include="..\code\editors\scripteditor.hpp" />
     <ClInclude Include="..\code\editors\tileseteditor.hpp" />
@@ -215,7 +215,7 @@
   <ItemGroup>
     <ClCompile Include="..\code\assets\assets.cpp" />
     <ClCompile Include="..\code\assets\factories.cpp" />
-    <ClCompile Include="..\code\editors\gameeditor.cpp" />
+    <ClCompile Include="..\code\editors\configeditor.cpp" />
     <ClCompile Include="..\code\editors\mapeditor.cpp" />
     <ClCompile Include="..\code\editors\scripteditor.cpp" />
     <ClCompile Include="..\code\editors\tileseteditor.cpp" />
@@ -239,8 +239,8 @@
     <ClCompile Include="..\code\ui\ui.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="duktape\duktape\duktape.vcxproj">
-      <Project>{269c5154-d03a-44cb-9d8c-645539bd409c}</Project>
+    <ProjectReference Include="duktape\duktape.vcxproj">
+      <Project>{f4f5ee11-4d6c-42db-861a-f1ed3be66603}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

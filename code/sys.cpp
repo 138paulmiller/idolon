@@ -44,6 +44,11 @@ void MainMenu::onEnter()
 		Sys::RunMapEditor( name);	
 	}, true, false );
 
+	m_appTab->add( TranslateIcon( "CONFIG" ), [this] () { 
+		const std::string &name = !s_header ? "" : s_header->name;
+		Sys::RunEditor( name);	
+	}, true, false );
+
 	int screenW, screenH;
 	Engine::GetSize( screenW, screenH );
 	m_controls = new UI::Toolbar( this,screenW, 0 );
@@ -102,6 +107,8 @@ UI::Toolbar *MainMenu::controls()
 {
 	return m_controls;
 }
+
+
 namespace Sys
 {
 
@@ -135,7 +142,7 @@ namespace Sys
 		s_context->create( APP_TILESET_EDITOR, new TilesetEditor()   );
 		s_context->create( APP_MAP_EDITOR,     new MapEditor()       );
 		s_context->create( APP_SCRIPT_EDITOR,  new ScriptEditor()    );
-		s_context->create( APP_GAME_EDITOR,    new GameEditor()    );
+		s_context->create( APP_GAME_EDITOR,    new ConfigEditor()      );
 		s_shell->addCommands( cmds );
 
 		//redirect key event to appropriate app. 
@@ -269,6 +276,10 @@ namespace Sys
 		return s_menu;
 	}
 	
+	Game::Header *GetGameHeader()
+	{
+		return s_header;
+	}
 	
 	void RunShell( const std::string &path )
 	{
@@ -307,10 +318,20 @@ namespace Sys
 		s_context->enter(APP_SCRIPT_EDITOR, false);
 	}
 		
-	void RunGameEditor(const std::string & cartPath )
+	void RunEditor(const std::string & cartPath )
 	{
+		//unload previous game  
+		if ( s_header )
+		{
+			Assets::PopPath();
+			Assets::Unload<Game::Header>( s_header->name );
+		}
+		const std::string &path = FS::DirName( FS::FullPath(cartPath) );
+		const std::string &name = FS::BaseName( cartPath );
+		Assets::PushPath( path) ;
+		s_header = Assets::Load<Game::Header>(name);
+		
 		s_menu->hide( false );
-		s_context->app<GameEditor>(APP_GAME_EDITOR)->setGame(cartPath);
 		s_context->enter(APP_GAME_EDITOR, false);
 	}
 

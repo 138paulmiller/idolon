@@ -1,5 +1,5 @@
 #pragma once
 #include "scripteditor.hpp"
-#include "gameeditor.hpp"
+#include "configeditor.hpp"
 #include "mapeditor.hpp"
 #include "tileseteditor.hpp"

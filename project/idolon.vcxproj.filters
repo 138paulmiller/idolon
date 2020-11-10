@@ -111,9 +111,6 @@
     <ClInclude Include="..\code\editors\api.hpp">
       <Filter>Source Files\editors</Filter>
     </ClInclude>
-    <ClInclude Include="..\code\editors\gameeditor.hpp">
-      <Filter>Source Files\editors</Filter>
-    </ClInclude>
     <ClInclude Include="..\code\editors\mapeditor.hpp">
       <Filter>Source Files\editors</Filter>
     </ClInclude>
@@ -183,6 +180,9 @@
     <ClInclude Include="..\code\ui\editor.hpp">
       <Filter>Source Files\ui</Filter>
     </ClInclude>
+    <ClInclude Include="..\code\editors\configeditor.hpp">
+      <Filter>Source Files\editors</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\code\scripting\eval.cpp">
@@ -242,9 +242,6 @@
     <ClCompile Include="..\code\assets\assets.cpp">
       <Filter>Source Files\assets</Filter>
     </ClCompile>
-    <ClCompile Include="..\code\editors\gameeditor.cpp">
-      <Filter>Source Files\editors</Filter>
-    </ClCompile>
     <ClCompile Include="..\code\scripting\jseval.cpp">
       <Filter>Source Files\scripting</Filter>
     </ClCompile>
@@ -256,6 +253,9 @@
     </ClCompile>
     <ClCompile Include="..\code\ui\editor.cpp">
       <Filter>Source Files\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\editors\configeditor.cpp">
+      <Filter>Source Files\editors</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -26,6 +26,7 @@ enum : uint8
 class MainMenu : public App
 {
 	UI::Toolbar *m_appTab, *m_controls;
+	//Graphics::TextBox *m_title;
 public:
 	void onEnter() override;
 	void onExit() override;
@@ -47,13 +48,18 @@ namespace Sys
 	Shell* GetShell();
 	Context* GetContext();
 	MainMenu *GetMainMenu();
+	Game::Header* GetGameHeader();
+	
+	
+	
 	//Actions
 	void RunShell(const std::string & path );
 	void RunFontEditor(const std::string & tilesetName  );
 	void RunTilesetEditor(const std::string & tilesetName  );
 	void RunMapEditor(const std::string & mapName );
 	void RunScriptEditor(const std::string & scriptName );
-	void RunGameEditor(const std::string & cartPath );
+	void RunConfigEditor(const std::string & gameName );
+	void RunEditor(const std::string & gameName );
 	void RunGame(const std::string & gameName );
 
 }

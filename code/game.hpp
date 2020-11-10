@@ -44,9 +44,8 @@ namespace  Game
 	struct Header : public Asset
 	{
 		Header( const std::string &name );
-		//game name
 		
-		//array of tileset names
+		//array of asset names
 		std::vector<std::string> fonts;
 		std::vector<std::string> tilesets;
 		std::vector<std::string> maps;
